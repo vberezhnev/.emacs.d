@@ -1,0 +1,14 @@
+;; Emacs-W3 HTTP cookies file
+;; Automatically generated file!!! DO NOT EDIT!!!
+
+(setq url-cookie-storage
+ 'nil)
+(setq url-cookie-secure-storage
+ '((".youtube.com"
+  [url-cookie "VISITOR_INFO1_LIVE" "ZzXA4XJB--Y" "Fri, 20-Jan-2023 03:40:11 GMT" "/" ".youtube.com" t]))
+)
+
+;; Local Variables:
+;; version-control: never
+;; no-byte-compile: t
+;; End:
