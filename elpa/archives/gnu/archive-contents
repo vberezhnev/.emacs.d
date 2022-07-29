@@ -285,16 +285,18 @@
 	  (:keywords "brief" "emulations" "crisp")
 	  (:url . "http://elpa.gnu.org/packages/brief.html"))])
  (buffer-env .
-	     [(0 3)
+	     [(0 4)
 	      ((emacs
-		(27 1)))
+		(27 1))
+	       (compat
+		(28 1)))
 	      "Buffer-local process environments" tar
 	      ((:url . "https://github.com/astoff/buffer-env")
 	       (:keywords "processes" "tools")
 	       (:maintainer "Augusto Stoffel" . "arstoffel@gmail.com")
 	       (:authors
 		("Augusto Stoffel" . "arstoffel@gmail.com"))
-	       (:commit . "ba1c9d24d3f1ba58445cbf1f762ba6859b66f6bf"))])
+	       (:commit . "7c176d043445ea94fe924a715158c25b91ec4776"))])
  (buffer-expose .
 		[(0 4 3)
 		 ((emacs
@@ -693,7 +695,7 @@
 	    (:maintainer "Phil Sainty" . "psainty@orcon.net.nz")
 	    (:url . "https://savannah.nongnu.org/projects/delight"))])
  (denote .
-	 [(0 3 1)
+	 [(0 4 0)
 	  ((emacs
 	    (27 2)))
 	  "Simple notes with an efficient file-naming scheme" tar
@@ -701,7 +703,7 @@
 	   (:maintainer "Denote Development" . "~protesilaos/denote@lists.sr.ht")
 	   (:authors
 	    ("Protesilaos Stavrou" . "info@protesilaos.com"))
-	   (:commit . "08fa8b223926b6aee1549b87602d6bf3ac284d8b"))])
+	   (:commit . "0ca421e3d403e0e81882b1a3584f482b97d27a15"))])
  (detached .
 	   [(0 7)
 	    ((emacs
@@ -1569,13 +1571,14 @@
 		  ("Feng Shu" . "tumashu@163.com")
 		  ("Naoya Yamashita" . "conao3@gmail.com")))])
  (javaimp .
-	  [(0 8)
+	  [(0 9)
 	   nil "Add and reorder Java import statements in Maven/Gradle projects" tar
 	   ((:keywords "java" "maven" "gradle" "programming")
 	    (:maintainer "Filipp Gunbin" . "fgunbin@fastmail.fm")
 	    (:authors
 	     ("Filipp Gunbin" . "fgunbin@fastmail.fm"))
-	    (:url . "https://elpa.gnu.org/packages/javaimp.html"))])
+	    (:url . "https://elpa.gnu.org/packages/javaimp.html")
+	    (:commit . "65599a7954821c38e38949b5ec42891b41e75e13"))])
  (jgraph-mode .
 	      [(1 1)
 	       ((cl-lib
@@ -2154,6 +2157,17 @@
 	       (:authors
 		("Daniel Mendler" . "mail@daniel-mendler.de"))
 	       (:commit . "5de3da1ff55b4567e9df3b234c09427aed2cbcd7"))])
+ (org-notify .
+	     [(0 1 0)
+	      ((emacs
+		(25 1)))
+	      "Notifications for Org-mode" tar
+	      ((:url . "https://github.com/p-m/org-notify")
+	       (:keywords "notification" "todo-list" "alarm" "reminder" "pop-up" "calendar")
+	       (:maintainer "Peter Münster" . "pmrb@free.fr")
+	       (:authors
+		("Peter Münster" . "pmrb@free.fr"))
+	       (:commit . "3a9c55aabdd1204f032fc02fd64ef643e0f19ae6"))])
  (org-real .
 	   [(1 0 5)
 	    ((emacs
@@ -2314,7 +2328,7 @@
 	     ("Phillip Lord" . "phillip.lord@russet.org.uk"))
 	    (:url . "http://elpa.gnu.org/packages/persist.html"))])
  (phps-mode .
-	    [(0 4 22)
+	    [(0 4 24)
 	     ((emacs
 	       (26)))
 	     "Major mode for PHP with code intelligence" tar
@@ -2323,7 +2337,7 @@
 	      (:maintainer "Christian Johansson" . "christian@cvj.se")
 	      (:authors
 	       ("Christian Johansson" . "christian@cvj.se"))
-	      (:commit . "69d4de374b1696bebf1fda5c9f8e1652b1b0fe2b"))])
+	      (:commit . "49c379f9f6db473310a2625b0c6dfc77d9198b6f"))])
  (pinentry .
 	   [(0 1)
 	    nil "GnuPG Pinentry server implementation" single

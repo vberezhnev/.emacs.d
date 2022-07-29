@@ -1,49 +1,74 @@
 (package-initialize)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-(setq package-selected-packages '(lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode solarized-theme json-mode))
+(setq package-selected-packages '(lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
 (when (cl-find-if-not #'package-installed-p package-selected-packages)
   (package-refresh-contents)
   (mapc #'package-install package-selected-packages))
 
-(require 'use-package)
-(setq use-package-always-ensure t)
+;; Set up package.el to work with MELPA
+;; (require 'package)
+;; (add-to-list 'package-archives
+;;              '("melpa" . "https://melpa.org/packages/"))
+;; (package-initialize)
+;; (package-refresh-contents)
 
 (add-to-list 'load-path "~/.emacs.d/evil")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
 
 (require 'evil)
-(require 'eaf)
-(require 'eaf-browser)
-(require 'eaf-pdf-viewer)
 
-(which-key-mode)
-(add-hook 'prog-mode-hook #'lsp)
-(setq gc-cons-threshold (* 100 1024 1024)
-      read-process-output-max (* 1024 1024)
-      company-idle-delay 0.0
-      company-minimum-prefix-length 1
-      create-lockfiles nil) ;; lock files will kill `npm start`
-
-(with-eval-after-load 'lsp-mode
-  (require 'dap-chrome)
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-  (yas-global-mode))
-(with-eval-after-load 'js
-  (define-key js-mode-map (kbd "M-.") nil))
-
-;; Go - lsp-mode
-;; Set up before-save hooks to format buffer and add/delete imports.
-(defun lsp-go-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-
-;; Start LSP Mode and YASnippet mode
-(add-hook 'go-mode-hook #'lsp-deferred)
-(add-hook 'go-mode-hook #'yas-minor-mode)
+(unless (package-installed-p 'evil)
+  (package-install 'evil))
 
 (evil-mode 1)
-(load-theme 'solarized-dark ))
+; Deleting top bar
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+;; (scroll-bar-mode -1)
+
+;; Load theme
+(load-theme 'gruvbox t)
+
+;; Ctrl+C, Ctrl+V copy, paste mode
+;(global-set-key (kbd "C-c") 'kill-ring-save)
+;(global-set-key (kbd "C-v") 'yank)
+
+
+;; Customize tabs
+(defvar my/tab-height 22)
+(defvar my/tab-left (powerline-wave-right 'tab-line nil my/tab-height))
+(defvar my/tab-right (powerline-wave-left nil 'tab-line my/tab-height))
+
+(defun my/tab-line-tab-name-buffer (buffer &optional _buffers)
+  (powerline-render (list my/tab-left
+                          (format "%s" (buffer-name buffer))
+                          my/tab-right)))
+(setq tab-line-tab-name-function #'my/tab-line-tab-name-buffer)
+
+;; tab color settings
+(set-face-attribute 'tab-line nil ;; background behind tabs
+      :background "gray40"
+      :foreground "gray60" :distant-foreground "gray50"
+      :height 1.0 :box nil)
+(set-face-attribute 'tab-line-tab nil ;; active tab in another window
+      :inherit 'tab-line
+      :foreground "gray70" :background "gray90" :box nil)
+(set-face-attribute 'tab-line-tab-current nil ;; active tab in current window
+      :background "#b34cb3" :foreground "white" :box nil)
+(set-face-attribute 'tab-line-tab-inactive nil ;; inactive tab
+      :background "gray60" :foreground "black" :box nil)
+(set-face-attribute 'tab-line-highlight nil ;; mouseover
+      :background "white" :foreground 'unspecified)
+
+;; Setting dashboard
+(setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")
+(setq dashboard-banner-logo-title "Welcome back, Vladimir!")
+(setq dashboard-center-content t)
+(setq dashboard-items '((recents  . 5)
+                        (bookmarks . 5)
+                        (projects . 5)
+                        (agenda . 5)
+                        (registers . 5)))
+(dashboard-setup-startup-hook)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -51,7 +76,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
-(custom-set-faces
+
+ (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.

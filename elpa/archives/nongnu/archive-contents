@@ -1366,7 +1366,7 @@
 	      ("Eric James Michael Ritz"))
 	     (:keywords "languages" "php"))])
  (popon .
-	[(0 7)
+	[(0 9)
 	 ((emacs
 	   (25 1)))
 	 "\"Pop\" floating text \"on\" a window" tar
@@ -1375,7 +1375,7 @@
 	  (:maintainer "Akib Azmain Turja" . "akib@disroot.org")
 	  (:authors
 	   ("Akib Azmain Turja" . "akib@disroot.org"))
-	  (:commit . "11ee8321e777ebef67f4956961bb6c7bfad225df"))])
+	  (:commit . "b5b370077111ae65f50f8a3dca76e7c270ff0743"))])
  (popup .
 	[(0 5 9)
 	 ((emacs
@@ -1608,7 +1608,7 @@
 		     ("John Olsson" . "john@cryon.se"))
 		    (:commit . "2d5acd143a153e16372d59000e57d76291ab81dd"))])
  (subed .
-	[(1 0 6)
+	[(1 0 7)
 	 ((emacs
 	   (25 1)))
 	 "A major mode for editing subtitles" tar
@@ -1617,7 +1617,7 @@
 	  (:maintainer "Sacha Chua" . "sacha@sachachua.com")
 	  (:authors
 	   ("Random User"))
-	  (:commit . "badbfb7d2088efb1f8032ca6eb6f67b83f1af76a"))])
+	  (:commit . "eefe94f308d7006a498b17fc9acf01790b793bcd"))])
  (swift-mode .
 	     [(8 6 0)
 	      ((emacs
