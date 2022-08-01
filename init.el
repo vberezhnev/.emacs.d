@@ -1,6 +1,7 @@
 (package-initialize)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-(setq package-selected-packages '(lsp-mode all-the-icons yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
+(setq package-selected-packages '(all-the-icons auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
+
 (when (cl-find-if-not #'package-installed-p package-selected-packages)
   (package-refresh-contents)
   (mapc #'package-install package-selected-packages))
@@ -14,14 +15,28 @@
 
 (add-to-list 'load-path "~/.emacs.d/evil")
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/awesome-tab"))
+(add-to-list 'load-path "~/.emacs.d/neotree")
 
 (require 'evil)
 (require 'awesome-tab)
+(require 'elcord)
+(require 'lsp-mode)
 
 (unless (package-installed-p 'evil)
   (package-install 'evil))
 
 (evil-mode 1)
+(elcord-mode)
+(require 'neotree)
+
+;; Company mode
+;(setq company-idle-delay 0)
+;(setq company-minimum-prefix-length 1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;; Setting packages ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Deleting top bar
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -35,6 +50,9 @@
 ;(global-set-key (kbd "C-c") 'kill-ring-save)
 ;(global-set-key (kbd "C-v") 'yank)
 
+;; Setting NeoTree
+(global-set-key [f8] 'neotree-toggle)
+
 ;; Setting tabs
 (when (not (display-graphic-p))
   (setq frame-background-mode 'dark))
@@ -43,7 +61,7 @@
 (setq awesome-tab-show-tab-index t)
 
 ;; Setting dashboard
-(setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")
+;; (setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")
 (setq dashboard-banner-logo-title "Welcome back, Vladimir!")
 (setq dashboard-center-content t)
 (setq dashboard-items '((recents  . 5)
@@ -52,6 +70,17 @@
                         (agenda . 5)
                         (registers . 5)))
 (dashboard-setup-startup-hook)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;; LSP ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; LSP for Golang
+(add-hook 'go-mode-hook #'lsp-deferred)
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
