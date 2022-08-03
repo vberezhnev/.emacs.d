@@ -1,1 +1,1 @@
-nil
+("~/" "~/Templates/NextJS/berezhnev-blog/" "~/.emacs.d/")
