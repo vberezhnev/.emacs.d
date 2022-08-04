@@ -37,6 +37,8 @@
 (require 'neotree)
 (require 'powerline)
 
+(setq make-backup-files nil)
+
 ;; Company mode
 ;(setq company-idle-delay 0)
 ;(setq company-minimum-prefix-length 1)
@@ -161,7 +163,7 @@
  '(custom-safe-themes
 	 '("a5956ec25b719bf325e847864e16578c61d8af3e8a3d95f60f9040d02497e408" "5dbdb4a71a0e834318ae868143bb4329be492dd04bdf8b398fb103ba1b8c681a" default))
  '(package-selected-packages
-	 '(doom-themes all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard)))
+	 '(## doom-themes all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

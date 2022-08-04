@@ -1,1 +1,1 @@
-("~/" "~/Templates/NextJS/berezhnev-blog/" "~/.emacs.d/")
+("~/.emacs.d/" "~/Templates/Vue/test-vue/" "~/" "~/Templates/NextJS/berezhnev-blog/")

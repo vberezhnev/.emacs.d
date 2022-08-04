@@ -1,0 +1,25 @@
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 2061
+Cache-Control: max-age=86400, s-maxage=86400
+Content-Security-Policy: default-src 'none'; img-src data:
+Content-Type: image/svg+xml;charset=utf-8
+Last-Modified: Tue, 02 Aug 2022 02:24:29 GMT
+Server: github-camo (0529d7ac)
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+X-GitHub-Request-Id: EC6E:4564:236A80:2790E6:62E9E5DC
+Accept-Ranges: bytes
+Date: Wed, 03 Aug 2022 12:49:50 GMT
+Via: 1.1 varnish
+Age: 35089
+X-Served-By: cache-fra19165-FRA
+X-Cache: HIT
+X-Cache-Hits: 1
+X-Timer: S1659530990.043961,VS0,VE1
+X-Fastly-Request-ID: ed3577612c2975c75fab3511399ec2db62d8fd03
+Timing-Allow-Origin: https://github.com
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="87.25" height="28" role="img" aria-label="FIGMA"><title>FIGMA</title><g shape-rendering="crispEdges"><rect width="87.25" height="28" fill="#f24e1e"/></g><g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="100"><image x="9" y="7" width="14" height="14" xlink:href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSJ3aGl0ZSIgcm9sZT0iaW1nIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPkZpZ21hPC90aXRsZT48cGF0aCBkPSJNMTUuODUyIDguOTgxaC00LjU4OFYwaDQuNTg4YzIuNDc2IDAgNC40OSAyLjAxNCA0LjQ5IDQuNDlzLTIuMDE0IDQuNDkxLTQuNDkgNC40OTF6TTEyLjczNSA3LjUxaDMuMTE3YzEuNjY1IDAgMy4wMTktMS4zNTUgMy4wMTktMy4wMTlzLTEuMzU1LTMuMDE5LTMuMDE5LTMuMDE5aC0zLjExN1Y3LjUxem0wIDEuNDcxSDguMTQ4Yy0yLjQ3NiAwLTQuNDktMi4wMTQtNC40OS00LjQ5UzUuNjcyIDAgOC4xNDggMGg0LjU4OHY4Ljk4MXptLTQuNTg3LTcuNTFjLTEuNjY1IDAtMy4wMTkgMS4zNTUtMy4wMTkgMy4wMTlzMS4zNTQgMy4wMiAzLjAxOSAzLjAyaDMuMTE3VjEuNDcxSDguMTQ4em00LjU4NyAxNS4wMTlIOC4xNDhjLTIuNDc2IDAtNC40OS0yLjAxNC00LjQ5LTQuNDlzMi4wMTQtNC40OSA0LjQ5LTQuNDloNC41ODh2OC45OHpNOC4xNDggOC45ODFjLTEuNjY1IDAtMy4wMTkgMS4zNTUtMy4wMTkgMy4wMTlzMS4zNTUgMy4wMTkgMy4wMTkgMy4wMTloMy4xMTdWOC45ODFIOC4xNDh6TTguMTcyIDI0Yy0yLjQ4OSAwLTQuNTE1LTIuMDE0LTQuNTE1LTQuNDlzMi4wMTQtNC40OSA0LjQ5LTQuNDloNC41ODh2NC40NDFjMCAyLjUwMy0yLjA0NyA0LjUzOS00LjU2MyA0LjUzOXptLS4wMjQtNy41MWEzLjAyMyAzLjAyMyAwIDAgMC0zLjAxOSAzLjAxOWMwIDEuNjY1IDEuMzY1IDMuMDE5IDMuMDQ0IDMuMDE5IDEuNzA1IDAgMy4wOTMtMS4zNzYgMy4wOTMtMy4wNjh2LTIuOTdIOC4xNDh6bTcuNzA0IDBoLS4wOThjLTIuNDc2IDAtNC40OS0yLjAxNC00LjQ5LTQuNDlzMi4wMTQtNC40OSA0LjQ5LTQuNDloLjA5OGMyLjQ3NiAwIDQuNDkgMi4wMTQgNC40OSA0LjQ5cy0yLjAxNCA0LjQ5LTQuNDkgNC40OXptLS4wOTctNy41MDljLTEuNjY1IDAtMy4wMTkgMS4zNTUtMy4wMTkgMy4wMTlzMS4zNTUgMy4wMTkgMy4wMTkgMy4wMTloLjA5OGMxLjY2NSAwIDMuMDE5LTEuMzU1IDMuMDE5LTMuMDE5cy0xLjM1NS0zLjAxOS0zLjAxOS0zLjAxOWgtLjA5OHoiLz48L3N2Zz4="/><text transform="scale(.1)" x="536.25" y="175" textLength="432.5" fill="#fff" font-weight="bold">FIGMA</text></g></svg>

@@ -4,8 +4,12 @@
 (setq url-cookie-storage
  'nil)
 (setq url-cookie-secure-storage
- '((".youtube.com"
-  [url-cookie "VISITOR_INFO1_LIVE" "ZzXA4XJB--Y" "Fri, 20-Jan-2023 03:40:11 GMT" "/" ".youtube.com" t]))
+ '(("github.com"
+	[url-cookie "_octo" "GH1.1.476448519.1659530982" "Thu, 03 Aug 2023 12:49:42 GMT" "/" "github.com" t]
+	[url-cookie "logged_in" "no" "Thu, 03 Aug 2023 12:49:42 GMT" "/" "github.com" t])
+ (".youtube.com"
+	[url-cookie "VISITOR_INFO1_LIVE" "ZzXA4XJB--Y" "Fri, 20-Jan-2023 03:40:11 GMT" "/" ".youtube.com" t]
+	[url-cookie "GPS" "1" "Wed, 03-Aug-2022 13:18:55 GMT" "/" ".youtube.com" t]))
 )
 
 ;; Local Variables:

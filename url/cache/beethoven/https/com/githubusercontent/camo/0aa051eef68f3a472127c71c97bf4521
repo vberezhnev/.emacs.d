@@ -1,0 +1,25 @@
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 1917
+Cache-Control: max-age=86400, s-maxage=86400
+Content-Security-Policy: default-src 'none'; img-src data:
+Content-Type: image/svg+xml;charset=utf-8
+Last-Modified: Tue, 02 Aug 2022 09:25:51 GMT
+Server: github-camo (0529d7ac)
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+X-GitHub-Request-Id: E23E:9BFB:24DDEA:2964A5:62EA0304
+Accept-Ranges: bytes
+Date: Wed, 03 Aug 2022 12:49:49 GMT
+Via: 1.1 varnish
+Age: 27625
+X-Served-By: cache-fra19125-FRA
+X-Cache: HIT
+X-Cache-Hits: 2
+X-Timer: S1659530990.889141,VS0,VE0
+X-Fastly-Request-ID: 72d599dcbde377b70e6e41461fc22f6f6c19bd71
+Timing-Allow-Origin: https://github.com
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="126.5" height="28" role="img" aria-label="JAVASCRIPT"><title>JAVASCRIPT</title><g shape-rendering="crispEdges"><rect width="126.5" height="28" fill="#323330"/></g><g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="100"><image x="9" y="7" width="14" height="14" xlink:href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZjdkZjFlIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+SmF2YVNjcmlwdDwvdGl0bGU+PHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6bTIyLjAzNCAxOC4yNzZjLS4xNzUtMS4wOTUtLjg4OC0yLjAxNS0zLjAwMy0yLjg3My0uNzM2LS4zNDUtMS41NTQtLjU4NS0xLjc5Ny0xLjE0LS4wOTEtLjMzLS4xMDUtLjUxLS4wNDYtLjcwNS4xNS0uNjQ2LjkxNS0uODQgMS41MTUtLjY2LjM5LjEyLjc1LjQyLjk3Ni45IDEuMDM0LS42NzYgMS4wMzQtLjY3NiAxLjc1NS0xLjEyNS0uMjctLjQyLS40MDQtLjYwMS0uNTg2LS43OC0uNjMtLjcwNS0xLjQ2OS0xLjA2NS0yLjgzNC0xLjAzNGwtLjcwNS4wODljLS42NzYuMTY1LTEuMzIuNTI1LTEuNzEgMS4wMDUtMS4xNCAxLjI5MS0uODExIDMuNTQxLjU2OSA0LjQ3MSAxLjM2NSAxLjAyIDMuMzYxIDEuMjQ0IDMuNjE2IDIuMjA1LjI0IDEuMTctLjg3IDEuNTQ1LTEuOTY2IDEuNDEtLjgxMS0uMTgtMS4yNi0uNTg2LTEuNzU1LTEuMzM2bC0xLjgzIDEuMDUxYy4yMS40OC40NS42ODkuODEgMS4xMDkgMS43NCAxLjc1NiA2LjA5IDEuNjY2IDYuODcxLTEuMDA0LjAyOS0uMDkuMjQtLjcwNS4wNzQtMS42NWwuMDQ2LjA2N3ptLTguOTgzLTcuMjQ1aC0yLjI0OGMwIDEuOTM4LS4wMDkgMy44NjQtLjAwOSA1LjgwNSAwIDEuMjMyLjA2MyAyLjM2My0uMTM4IDIuNzExLS4zMy42ODktMS4xOC42MDEtMS41NjYuNDgtLjM5Ni0uMTk2LS41OTctLjQ2Ni0uODMtLjg1NS0uMDYzLS4xMDUtLjExLS4xOTYtLjEyNy0uMTk2bC0xLjgyNSAxLjEyNWMuMzA1LjYzLjc1IDEuMTcyIDEuMzI0IDEuNTE3Ljg1NS41MSAyLjAwNC42NzUgMy4yMDcuNDA1Ljc4My0uMjI2IDEuNDU4LS42OTEgMS44MTEtMS40MTEuNTEtLjkzLjQwMi0yLjA3LjM5Ny0zLjM0Ni4wMTItMi4wNTQgMC00LjEwOSAwLTYuMTc5bC4wMDQtLjA1NnoiLz48L3N2Zz4="/><text transform="scale(.1)" x="732.5" y="175" textLength="825" fill="#fff" font-weight="bold">JAVASCRIPT</text></g></svg>

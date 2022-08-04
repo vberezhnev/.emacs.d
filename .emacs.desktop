@@ -2,32 +2,68 @@
 ;; --------------------------------------------------------------------------
 ;; Desktop File for Emacs
 ;; --------------------------------------------------------------------------
-;; Created Wed Aug  3 18:10:11 2022
+;; Created Thu Aug  4 01:38:07 2022
 ;; Desktop file format version 208
 ;; Emacs version 28.1
 
 ;; Global section:
-(setq desktop-saved-frameset [frameset 1 (25322 11619 910391 412000) (desktop . "208") "beethoven@salieri" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font . "-ADBO-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1") (font-parameter . "Source Code Pro 10") (border-width . 0) (internal-border-width . 0) (child-frame-border-width) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars . right) (horizontal-scroll-bars) (foreground-color . "#fdf4c1") (background-color . "#282828") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground . "white") (scroll-bar-background . "#d9d7d6") (menu-bar-lines . 0) (tab-bar-lines . 0) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 16) (scroll-bar-height . 16) (alpha) (no-focus-on-map) (no-accept-focus) (fullscreen) (visibility . t) (skip-taskbar) (z-group) (cursor-color . "#fdf4c1") (display-type . color) (background-mode . dark) (environment) (powerline-cache) (modeline . t) (unsplittable) (frameset--id . "EE9A-05BA-C8CE-4D47") (frameset--mini t . t) (display . ":0") (last-focus-update) (tabs (current-tab (name . " *Treemacs-Scoped-Buffer-#<frame *dashboard* - GNU Emacs at salieri 0x55707c880280>*") (explicit-name))) (icon-name) (explicit-name) (height . 63) (width . 236) (left + -3840) (top . 0)) ((min-height . 4) (min-width . 20) (min-height-ignore . 4) (min-width-ignore . 12) (min-height-safe . 1) (min-width-safe . 4) (min-pixel-height . 68) (min-pixel-width . 160) (min-pixel-height-ignore . 68) (min-pixel-width-ignore . 96) (min-pixel-height-safe . 17) (min-pixel-width-safe . 32)) hc (pixel-width . 1920) (pixel-height . 1054) (total-width . 240) (total-height . 62) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 960) (pixel-height . 1054) (total-width . 120) (total-height . 62) (normal-height . 1.0) (normal-width . 0.5) (buffer "*dashboard*" (selected) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 2 t nil 0 t nil) (vscroll . 0) (dedicated) (point . 1) (start . 1)) (prev-buffers ("Card.jsx" 1 57) ("*dashboard*" 1 1) ("init.el" 979 1505) (".emacs.d" 1 969) ("CHANGELOG.md" 1 1))) (leaf (last . t) (pixel-width . 960) (pixel-height . 1054) (total-width . 120) (total-height . 62) (normal-height . 1.0) (normal-width . 0.5) (buffer "*Warnings*" (selected) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 2 t nil 0 t nil) (vscroll . 0) (dedicated) (point . 123) (start . 1)))))])
+(setq desktop-saved-frameset [frameset 1 (25322 38495 374084 103000) (desktop . "208") "beethoven@salieri" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font . "-ADBO-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1") (font-parameter . "Source Code Pro 10") (border-width . 0) (internal-border-width . 0) (child-frame-border-width) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars . right) (horizontal-scroll-bars) (foreground-color . "#fdf4c1") (background-color . "#282828") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground . "white") (scroll-bar-background . "#d9d7d6") (menu-bar-lines . 1) (tab-bar-lines . 0) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 16) (scroll-bar-height . 16) (alpha) (no-focus-on-map) (no-accept-focus) (fullscreen) (visibility . t) (skip-taskbar) (z-group) (cursor-color . "#fdf4c1") (display-type . color) (background-mode . dark) (environment) (powerline-cache) (modeline . t) (unsplittable) (frameset--id . "EE9A-05BA-C8CE-4D47") (frameset--mini t . t) (display . ":0") (last-focus-update . t) (tabs (current-tab (name . " *Treemacs-Scoped-Buffer-#<frame *dashboard* - GNU Emacs at salieri 0x55707c880280>*") (explicit-name))) (icon-name) (explicit-name) (height . 61) (width . 236) (left . 0) (top . 0)) ((min-height . 5) (min-width . 49) (min-height-ignore . 5) (min-width-ignore . 12) (min-height-safe . 1) (min-width-safe . 4) (min-pixel-height . 85) (min-pixel-width . 392) (min-pixel-height-ignore . 85) (min-pixel-width-ignore . 96) (min-pixel-height-safe . 17) (min-pixel-width-safe . 32)) hc (pixel-width . 1920) (pixel-height . 1020) (total-width . 240) (total-height . 60) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 312) (pixel-height . 1020) (total-width . 39) (total-height . 60) (normal-height . 1.0) (normal-width . 0.1625) (parameters (window-side . left) (window-slot . 0)) (buffer " *Treemacs-Scoped-Buffer-#<frame index.html - GNU Emacs at salieri 0x55690a90e830>*" (selected) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 2 t nil 0 t nil) (vscroll . 0) (dedicated . t) (point . 2080) (start . 1695))) (leaf (last . t) (pixel-width . 1608) (pixel-height . 1020) (total-width . 201) (total-height . 60) (normal-height . 1.0) (normal-width . 0.8375) (buffer "*eww*" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 2 t nil 0 t nil) (vscroll . 0) (dedicated) (point . 1) (start . 1)) (prev-buffers ("Card.jsx" 1 903) ("index.html" 1 238) ("init.el" 979 1505) (".emacs.d" 1 969)))))])
 (setq desktop-missing-file-warning nil)
 (setq tags-file-name nil)
 (setq tags-table-list nil)
 (setq search-ring nil)
 (setq regexp-search-ring nil)
 (setq register-alist nil)
-(setq file-name-history '("~/.emacs.d" "/home/beethoven/Templates/Vue/heito.xyz" "~/.archlinux.draft.txt" "~/git.txt" "~/Templates/NextJS/berezhnev-blog/posts/burnout-at-work.md" "~/Templates/NextJS/berezhnev-blog/pages/index.js" "~/Templates/NextJS/berezhnev-blog/pages/_app.js" "~/Templates/NextJS/berezhnev-blog-typescript/pages/index.tsx" "~/Templates/Pascal/firstP.pas" "~/Templates/Golang/makingAModule/mymodule/main.go" "~/.java/webview/.lock" "~/Templates/Java/JediNew/src/main/java/me/ru/JediCraft.java" "~/Templates/Java/JediNew/settings.gradle" "~/Templates/Java/JediNew/.gitignore" "~/Templates/NextJS/supabase-testing/pages/index.js" "~/Templates/NextJS/kinoway/client/pages/index.tsx" "~/Templates/NextJS/berezhnev-portfolio/src/index.js"))
+(setq file-name-history '("/home/beethoven/Загрузки/Egor's world (basic).zip" "/home/beethoven/Templates/Vue/test-vue/index.html" "~/.emacs.d" "/home/beethoven/Templates/Vue/heito.xyz" "~/.archlinux.draft.txt" "~/git.txt" "~/Templates/NextJS/berezhnev-blog/posts/burnout-at-work.md" "~/Templates/NextJS/berezhnev-blog/pages/index.js" "~/Templates/NextJS/berezhnev-blog/pages/_app.js" "~/Templates/NextJS/berezhnev-blog-typescript/pages/index.tsx" "~/Templates/Pascal/firstP.pas" "~/Templates/Golang/makingAModule/mymodule/main.go" "~/.java/webview/.lock" "~/Templates/Java/JediNew/src/main/java/me/ru/JediCraft.java" "~/Templates/Java/JediNew/settings.gradle" "~/Templates/Java/JediNew/.gitignore" "~/Templates/NextJS/supabase-testing/pages/index.js" "~/Templates/NextJS/kinoway/client/pages/index.tsx" "~/Templates/NextJS/berezhnev-portfolio/src/index.js"))
 
 ;; Buffer section -- buffers listed in same order as in buffer list:
+(desktop-create-buffer 208
+  nil
+  "*eww*"
+  'eww-mode
+  '(override-global-mode global-auto-revert-mode projectile-mode)
+  1
+  '(1 nil)
+  t
+  '(:history ((:url "https://github.com/Tell396/.emacs.d" :title "GitHub - Tell396/.emacs.d: My Emacs config") (:point 2762 :url "https://github.com/Tell396?tab=repositories" :title "Tell396 (Tell396) / Repositories · GitHub") (:point 1112 :url "https://github.com/tell396/" :title "Tell396 (Berezhnev Vladimir) · GitHub") (:point 76 :url "https://berezhnev.vercel.app/#contact" :title "Berezhnev -- FullStack developer") (:point 71 :url "https://berezhnev.vercel.app/" :title "Berezhnev -- FullStack developer") (:point 43 :url "https://www.youtube.com/?search_query=cats" :title "YouTube") (:point 7 :url "https://www.youtube.com/" :title "YouTube")))
+  '((buffer-display-time 25322 28458 973086 799000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode) (truncate-lines . t) (eww-history-position . 0))
+  '((mark-ring (1))))
+
 (desktop-create-buffer 208
   "/home/beethoven/Templates/NextJS/berezhnev-blog/components/Card.jsx"
   "Card.jsx"
   'js-mode
   '(override-global-mode global-auto-revert-mode projectile-mode)
-  57
-  '(28 nil)
+  903
+  '(903 nil)
   nil
   nil
-  '((buffer-display-time 25322 11494 894736 333000) (buffer-file-coding-system . undecided-unix) (overwrite-mode))
-  '((mark-ring (28 56 1))))
+  '((buffer-display-time 25322 28434 666685 268000) (buffer-file-coding-system . undecided-unix) (overwrite-mode))
+  '((mark-ring (903 903 903 904 950 951 28 56 1))))
+
+(desktop-create-buffer 208
+  "/home/beethoven/.emacs.d/games/tetris-scores"
+  "tetris-scores"
+  'fundamental-mode
+  '(override-global-mode global-auto-revert-mode projectile-mode view-mode)
+  105
+  '(105 nil)
+  t
+  nil
+  '((buffer-display-time 25322 28295 657251 674000) (buffer-file-coding-system . undecided-unix) (overwrite-mode))
+  '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/home/beethoven/Templates/Vue/test-vue/index.html"
+  "index.html"
+  'mhtml-mode
+  '(override-global-mode global-auto-revert-mode projectile-mode)
+  238
+  '(238 nil)
+  nil
+  nil
+  '((buffer-display-time 25322 27959 803243 290000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((mark-ring (238 239 32 338 338))))
 
 (desktop-create-buffer 208
   "/home/beethoven/.emacs.d/init.el"
@@ -54,38 +90,14 @@
   '((mark-ring nil)))
 
 (desktop-create-buffer 208
-  "/home/beethoven/.emacs.d/.cache/lsp/npm/typescript-language-server/lib/node_modules/typescript-language-server/CHANGELOG.md"
-  "CHANGELOG.md"
-  'markdown-mode
-  '(eldoc-mode override-global-mode global-auto-revert-mode projectile-mode)
-  1
-  '(nil nil)
-  nil
-  nil
-  '((tab-width . 4) (buffer-display-time 25322 10134 424998 244000) (buffer-file-coding-system . undecided-unix) (overwrite-mode))
-  '((mark-ring nil)))
-
-(desktop-create-buffer 208
-  "/home/beethoven/Templates/NextJS/berezhnev-blog/posts/burnout-at-work.md"
-  "burnout-at-work.md"
-  'markdown-mode
-  '(eldoc-mode override-global-mode global-auto-revert-mode projectile-mode)
-  2322
-  '(2322 nil)
-  nil
-  nil
-  '((tab-width . 4) (buffer-display-time 25322 9673 149565 946000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
-  '((mark-ring (1))))
-
-(desktop-create-buffer 208
-  "/home/beethoven/.archlinux.draft.txt"
-  ".archlinux.draft.txt"
-  'text-mode
+  "/home/beethoven/.newsrc-dribble"
+  ".newsrc-dribble"
+  'fundamental-mode
   '(override-global-mode global-auto-revert-mode projectile-mode)
-  1
+  119
   '(nil nil)
   nil
   nil
-  '((buffer-display-time 25322 11556 149827 983000) (buffer-file-coding-system . utf-8-unix) (overwrite-mode))
+  '((buffer-display-time) (buffer-file-coding-system . utf-8-unix))
   '((mark-ring nil)))
 

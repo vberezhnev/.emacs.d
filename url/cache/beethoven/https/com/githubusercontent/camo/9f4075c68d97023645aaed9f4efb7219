@@ -1,0 +1,26 @@
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 2785
+Cache-Control: public, max-age=0
+Content-Security-Policy: default-src 'none'; img-src data:
+Content-Type: image/svg+xml; charset=utf-8
+Server: github-camo (0529d7ac)
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-XSS-Protection: 1; mode=block
+X-GitHub-Request-Id: 97E2:1213E:6E59FD:75277F:62EA6EF0
+Accept-Ranges: bytes
+Date: Wed, 03 Aug 2022 12:49:52 GMT
+Via: 1.1 varnish
+Age: 0
+X-Served-By: cache-fra19163-FRA
+X-Cache: MISS
+X-Cache-Hits: 0
+X-Timer: S1659530992.050013,VS0,VE512
+X-Fastly-Request-ID: a9d7a48f0a1127d8f22749cade6c9a7eb1af7552
+Timing-Allow-Origin: https://github.com
+
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="200" viewBox="0 0 340 200"><style>* {
+          font-family: 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif
+        }</style><rect x="1.5" y="1.5" rx="5" ry="5" height="98%" width="98%" stroke="#eceff4" stroke-width="1" fill="#2e3440" stroke-opacity="1"></rect><text x="30" y="40" style="font-size: 22px; fill: #eceff4;">Top Languages by Commit</text><g transform="translate(0,40)"><g transform="translate(40,0)"><rect y="18" width="14" height="14" fill="#f1e05a" stroke="#2e3440" style="stroke-width: 1px;"></rect><rect y="43.2" width="14" height="14" fill="#3178c6" stroke="#2e3440" style="stroke-width: 1px;"></rect><rect y="68.4" width="14" height="14" fill="#e34c26" stroke="#2e3440" style="stroke-width: 1px;"></rect><rect y="93.60000000000002" width="14" height="14" fill="#c6538c" stroke="#2e3440" style="stroke-width: 1px;"></rect><rect y="118.80000000000001" width="14" height="14" fill="#563d7c" stroke="#2e3440" style="stroke-width: 1px;"></rect><text x="16.8" y="30" style="fill: #e5e9f0; font-size: 14px;">JavaScript</text><text x="16.8" y="55.2" style="fill: #e5e9f0; font-size: 14px;">TypeScript</text><text x="16.8" y="80.4" style="fill: #e5e9f0; font-size: 14px;">HTML</text><text x="16.8" y="105.60000000000002" style="fill: #e5e9f0; font-size: 14px;">SCSS</text><text x="16.8" y="130.8" style="fill: #e5e9f0; font-size: 14px;">CSS</text></g><g transform="translate( 230, 80 )"><g class="arc"><path d="M3.67394039744206e-15,-60A60,60,0,0,1,16.9039534104858,57.56957841686984L9.86063948945005,33.582254076507404A35,35,0,0,0,2.1431318985078682e-15,-35Z" style="fill: #f1e05a; stroke-width: 2px;" stroke="#2e3440"></path></g><g class="arc"><path d="M16.9039534104858,57.56957841686984A60,60,0,0,1,-59.38928651285595,8.538890296397163L-34.64375046583264,4.981019339565012A35,35,0,0,0,9.86063948945005,33.582254076507404Z" style="fill: #3178c6; stroke-width: 2px;" stroke="#2e3440"></path></g><g class="arc"><path d="M-59.38928651285595,8.538890296397163A60,60,0,0,1,-43.70458773949619,-41.10850289807061L-25.494342848039445,-23.979960023874522A35,35,0,0,0,-34.64375046583264,4.981019339565012Z" style="fill: #e34c26; stroke-width: 2px;" stroke="#2e3440"></path></g><g class="arc"><path d="M-43.70458773949619,-41.10850289807061A60,60,0,0,1,-22.29974733961968,-55.702075980964345L-13.00818594811148,-32.49287765556254A35,35,0,0,0,-25.494342848039445,-23.979960023874522Z" style="fill: #c6538c; stroke-width: 2px;" stroke="#2e3440"></path></g><g class="arc"><path d="M-22.29974733961968,-55.702075980964345A60,60,0,0,1,-1.1021821192326178e-14,-60L-6.429395695523604e-15,-35A35,35,0,0,0,-13.00818594811148,-32.49287765556254Z" style="fill: #563d7c; stroke-width: 2px;" stroke="#2e3440"></path></g></g></g></svg>
