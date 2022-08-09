@@ -517,6 +517,19 @@
 	    (:authors
 	     ("Daniel Mendler and Consult contributors"))
 	    (:commit . "0f55ad146b327d82a4a6dfa674349bfbbf3820e4"))])
+ (consult-recoll .
+		 [(0 6 2)
+		  ((emacs
+		    (26 1))
+		   (consult
+		    (0 18)))
+		  "Recoll queries using consult" tar
+		  ((:url . "https://codeberg.org/jao/consult-recoll")
+		   (:keywords "docs" "convenience")
+		   (:maintainer "Jose A Ortega Ruiz" . "jao@gnu.org")
+		   (:authors
+		    ("Jose A Ortega Ruiz" . "jao@gnu.org"))
+		   (:commit . "8299efb610178a73ea809de74f87d724ee6183d6"))])
  (context-coloring .
 		   [(8 1 0)
 		    ((emacs
@@ -1572,14 +1585,14 @@
 		  ("Feng Shu" . "tumashu@163.com")
 		  ("Naoya Yamashita" . "conao3@gmail.com")))])
  (javaimp .
-	  [(0 9)
+	  [(0 9 1)
 	   nil "Add and reorder Java import statements in Maven/Gradle projects" tar
 	   ((:keywords "java" "maven" "gradle" "programming")
 	    (:maintainer "Filipp Gunbin" . "fgunbin@fastmail.fm")
 	    (:authors
 	     ("Filipp Gunbin" . "fgunbin@fastmail.fm"))
 	    (:url . "https://elpa.gnu.org/packages/javaimp.html")
-	    (:commit . "65599a7954821c38e38949b5ec42891b41e75e13"))])
+	    (:commit . "2ac7afce3c6f0b390c4b62c065a898883940d65a"))])
  (jgraph-mode .
 	      [(1 1)
 	       ((cl-lib
@@ -1856,6 +1869,15 @@
 	  (:authors
 	   ("Tino Calancha" . "tino.calancha@gmail.com"))
 	  (:keywords "games"))])
+ (minibuffer-header .
+		    [(0 5)
+		     ((emacs
+		       (27 1)))
+		     "Minibuffer header line" tar
+		     ((:url . "https://github.com/rougier/minibuffer-header")
+		      (:keywords "convenience")
+		      (:maintainer "Nicolas P. Rougier" . "Nicolas.Rougier@inria.fr")
+		      (:commit . "fe5d90d3f13c0010eed3b5dd437b458f8bf3da5f"))])
  (minibuffer-line .
 		  [(0 1)
 		   nil "Display status info in the minibuffer window" single
@@ -1893,16 +1915,16 @@
 			  ("Protesilaos Stavrou" . "info@protesilaos.com"))
 			 (:keywords "faces" "theme" "accessibility"))])
  (modus-themes .
-	       [(2 4 1)
+	       [(2 5 0)
 		((emacs
 		  (27 1)))
 		"Elegant, highly legible and customizable themes" tar
 		((:url . "https://git.sr.ht/~protesilaos/modus-themes")
 		 (:keywords "faces" "theme" "accessibility")
-		 (:maintainer "Protesilaos Stavrou" . "info@protesilaos.com")
+		 (:maintainer "Modus-Themes Development" . "~protesilaos/modus-themes@lists.sr.ht")
 		 (:authors
 		  ("Protesilaos Stavrou" . "info@protesilaos.com"))
-		 (:commit . "e3ec91232fcdd4d7fe2c48fcdb78b4ac7c6356d5"))])
+		 (:commit . "8a9839348fb8762c8843362595f2ca9de60d515c"))])
  (modus-vivendi-theme .
 		      [(0 13 2)
 		       ((emacs
@@ -2056,13 +2078,14 @@
 	  ("Taro Kawagishi" . "tarok@transpulse.org"))
 	 (:maintainer "Thomas Fitzsimmons" . "fitzsim@fitzsim.org"))])
  (num3-mode .
-	    [(1 3)
-	     nil "highlight groups of digits in long numbers" single
-	     ((:url . "http://elpa.gnu.org/packages/num3-mode.html")
-	      (:keywords "faces" "minor-mode")
+	    [(1 4)
+	     nil "highlight groups of digits in long numbers" tar
+	     ((:keywords "faces" "minor-mode")
+	      (:maintainer "Michal Nazarewicz" . "mina86@mina86.com")
 	      (:authors
 	       ("Felix Lee <felix8a@gmail.com>, Michal Nazarewicz" . "mina86@mina86.com"))
-	      (:maintainer "Michal Nazarewicz" . "mina86@mina86.com"))])
+	      (:url . "https://elpa.gnu.org/packages/num3-mode.html")
+	      (:commit . "cfd02039760b28ba5af8b12d8613afe26f32d560"))])
  (oauth2 .
 	 [(0 16)
 	  ((cl-lib
@@ -2321,6 +2344,17 @@
 	(:authors
 	 ("Helmut Eller" . "eller.helmut@gmail.com"))
 	(:url . "http://elpa.gnu.org/packages/peg.html"))])
+ (perl-doc .
+	   [(0 2)
+	    ((emacs
+	      (27)))
+	    "Read Perl documentation" tar
+	    ((:url . "https://github.com/HaraldJoerg/emacs-perl-doc")
+	     (:keywords "languages")
+	     (:maintainer "Harald Jörg" . "haj@posteo.de")
+	     (:authors
+	      ("Harald Jörg" . "haj@posteo.de"))
+	     (:commit . "bc968d37dcc29db4cae65e6d1c3ddc80e31ffbb3"))])
  (persist .
 	  [(0 4)
 	   nil "Persist Variables between Emacs Sessions" tar
@@ -2329,7 +2363,7 @@
 	     ("Phillip Lord" . "phillip.lord@russet.org.uk"))
 	    (:url . "http://elpa.gnu.org/packages/persist.html"))])
  (phps-mode .
-	    [(0 4 24)
+	    [(0 4 25)
 	     ((emacs
 	       (26)))
 	     "Major mode for PHP with code intelligence" tar
@@ -2338,7 +2372,7 @@
 	      (:maintainer "Christian Johansson" . "christian@cvj.se")
 	      (:authors
 	       ("Christian Johansson" . "christian@cvj.se"))
-	      (:commit . "49c379f9f6db473310a2625b0c6dfc77d9198b6f"))])
+	      (:commit . "585f638d3c16b1a0cae35ef341fbd61c63020e79"))])
  (pinentry .
 	   [(0 1)
 	    nil "GnuPG Pinentry server implementation" single
@@ -3040,7 +3074,7 @@
 	 (:maintainer "Toby Cubitt" . "toby-predictive@dr-qubit.org")
 	 (:url . "http://www.dr-qubit.org/emacs.php"))])
  (taxy .
-       [(0 9)
+       [(0 10)
 	((emacs
 	  (26 3)))
 	"Programmable taxonomical grouping for arbitrary objects" tar
@@ -3049,20 +3083,22 @@
 	 (:maintainer "Adam Porter" . "adam@alphapapa.net")
 	 (:authors
 	  ("Adam Porter" . "adam@alphapapa.net"))
-	 (:commit . "b209692b632bbe8d7f97ea8a39b0c28c1be3b7ec"))])
+	 (:commit . "3c561ceaf967a827cb4f02db870a52c8e77d8db0"))])
  (taxy-magit-section .
-		     [(0 9 1)
+		     [(0 10)
 		      ((emacs
 			(26 3))
 		       (magit-section
-			(3 2 1)))
+			(3 2 1))
+		       (taxy
+			(0 10)))
 		      "View Taxy structs in a Magit Section buffer" tar
 		      ((:url . "https://github.com/alphapapa/taxy.el")
 		       (:keywords "lisp")
 		       (:maintainer "Adam Porter" . "adam@alphapapa.net")
 		       (:authors
 			("Adam Porter" . "adam@alphapapa.net"))
-		       (:commit . "62624c32d7f58bfa4acc89becc7cc8427d546aab"))])
+		       (:commit . "11feab7cdf82cfe9e5d1ca7f70e1b9bbf792ef5a"))])
  (temp-buffer-browse .
 		     [(1 5)
 		      ((emacs
@@ -3287,7 +3323,7 @@
 	      (:authors
 	       ("Philip Kaludercic" . "philipk@posteo.net")))])
  (vc-got .
-	 [(1 1 2)
+	 [(1 2)
 	  ((emacs
 	    (25 1)))
 	  "VC backend for Game of Trees VCS" tar
@@ -3297,7 +3333,7 @@
 	   (:authors
 	    ("Omar Polo" . "op@omarpolo.com")
 	    ("Timo Myyrä" . "timo.myyra@bittivirhe.fi"))
-	   (:commit . "20cee209dece2d1a49daf68e043aa6e78b8a13e9"))])
+	   (:commit . "bc158324418fd8bef96a7f62856679de2569030f"))])
  (vc-hgcmd .
 	   [(1 14 1)
 	    ((emacs
