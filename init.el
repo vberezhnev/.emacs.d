@@ -1,5 +1,5 @@
 ;; (package-initialize)
-;; (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 ;; (setq package-selected-packages '(all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
 
 ;; (when (cl-find-if-not #'package-installed-p package-selected-packages)
@@ -19,7 +19,7 @@
 (add-to-list 'load-path "~/.emacs.d/evil")
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/awesome-tab"))
-;(add-to-list 'load-path "~/.emacs.d/neotree")
+(add-to-list 'load-path "~/.emacs.d/neotree")
 (add-to-list 'load-path "~/.emacs.d/powerline")
 
 (require 'evil)
@@ -27,18 +27,15 @@
 (require 'awesome-tab)
 (require 'elcord)
 (require 'powerline)
+(require 'neotree)
 
 (require 'lsp-mode)
-
-(when (display-graphic-p)
-  (require 'all-the-icons))
 
 (use-package all-the-icons
   :if (display-graphic-p))
 
 (evil-mode 1)
 (elcord-mode)
-(require 'neotree)
 (require 'powerline)
 
 (setq make-backup-files nil)          ; Delete #filename# files
@@ -62,8 +59,8 @@
             (kill-buffer buffer)))))
 
 ;; Company mode
-;(setq company-idle-delay 0)
-;(setq company-minimum-prefix-length 1)
+(setq company-idle-delay 0)
+(setq company-minimum-prefix-length 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; Keymap ;;;;;;;;;;
@@ -115,10 +112,10 @@
 (setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
 
 ;; Restore previous session
-(desktop-save-mode 1)
+;(desktop-save-mode 1)
 
 ;; Load theme
-;(load-theme 'gruvbox t)
+(load-theme 'gruvbox-dark-medium t)
 (awesome-tab-mode t)
 
 (powerline-default-theme)
@@ -193,7 +190,9 @@
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (XXX-mode . lsp)
+         (go-mode . lsp)
+         (javascript-mode . lsp)
+         (typescript-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
@@ -250,13 +249,15 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-	 '("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "95b0bc7b8687101335ebbf770828b641f2befdcf6d3c192243a251ce72ab1692" "a5956ec25b719bf325e847864e16578c61d8af3e8a3d95f60f9040d02497e408" "5dbdb4a71a0e834318ae868143bb4329be492dd04bdf8b398fb103ba1b8c681a" default))
+	 '("c4cecd97a6b30d129971302fd8298c2ff56189db0a94570e7238bc95f9389cfb" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "95b0bc7b8687101335ebbf770828b641f2befdcf6d3c192243a251ce72ab1692" "a5956ec25b719bf325e847864e16578c61d8af3e8a3d95f60f9040d02497e408" "5dbdb4a71a0e834318ae868143bb4329be492dd04bdf8b398fb103ba1b8c681a" default))
+ '(inhibit-startup-screen t)
  '(package-selected-packages
-	 '(## spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
+	 '(vue-mode zenburn-theme ## spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(font-lock-comment-face ((t nil)))
+ '(widget-field ((t (:extend t :background "midnightblue" :foreground "azure" :width normal)))))
