@@ -1,1 +1,1 @@
-("~/.emacs.d/" "~/Templates/Commercial Projects/doll-stage/" "~/Templates/Vue/heito.xyz/" "~/Templates/Golang/gother/" "~/" "~/Templates/Vue/test-vue/" "~/Templates/NextJS/berezhnev-blog/" "~/Templates/NextJS/kinoway/")
+("~/Templates/Commercial Projects/evering/" "~/Templates/Commercial Projects/doll-stage/" "~/.emacs.d/" "~/.dwm/" "~/Templates/NextJS/berezhnev-blog/" "~/Templates/NextJS/berezhnev-blog-typescript/" "~/Templates/Vue/heito.xyz/" "~/Templates/Golang/gother/" "~/" "~/Templates/Vue/test-vue/" "~/Templates/NextJS/kinoway/")

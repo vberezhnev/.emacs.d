@@ -1,34 +1,23 @@
-;; (package-initialize)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-;; (setq package-selected-packages '(all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
-
-;; (when (cl-find-if-not #'package-installed-p package-selected-packages)
-;;   (package-refresh-contents)
-;;   (mapc #'package-install package-selected-packages))
-
 ;; Set up package.el to work with MELPA
-;; (require 'package)
-;; (add-to-list 'package-archives
-;;              '("melpa" . "https://melpa.org/packages/"))
-;; (package-initialize)
-;; (package-refresh-contents)
-
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
+(package-initialize)
+(package-refresh-contents)
 
 
 (add-to-list 'load-path "~/.emacs.d/site-lisp/use-package")
 (add-to-list 'load-path "~/.emacs.d/evil")
-
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/awesome-tab"))
 (add-to-list 'load-path "~/.emacs.d/neotree")
-(add-to-list 'load-path "~/.emacs.d/powerline")
 
 (require 'evil)
 (require 'use-package)
 (require 'awesome-tab)
 (require 'elcord)
-(require 'powerline)
 (require 'neotree)
 
+(require 'package)
 (require 'lsp-mode)
 
 (use-package all-the-icons
@@ -36,13 +25,15 @@
 
 (evil-mode 1)
 (elcord-mode)
-(require 'powerline)
 
 (setq make-backup-files nil)          ; Delete #filename# files
 ;(desktop-save-mode 1)                ; A global mode that automatically saves your Emacs session
 (display-line-numbers-mode)           ; Display numbers
 (setq display-line-numbers 'relative) ; Set relative numbers
 (xterm-mouse-mode 1)                  ; Mouse support for terminal
+
+;; Make *scratch* buffer blank.
+(setq initial-scratch-message nil)
 
 ;; Forces the messages to 0, and kills the *Messages* buffer - thus disabling it on startup.
 (setq-default message-log-max nil)
@@ -56,11 +47,11 @@
       '(lambda ()
          (let ((buffer "*Completions*"))
            (and (get-buffer buffer)
-            (kill-buffer buffer)))))
+								(kill-buffer buffer)))))
 
-;; Company mode
-(setq company-idle-delay 0)
-(setq company-minimum-prefix-length 1)
+;; JSX syntax highlighting
+(add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
+(setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; Keymap ;;;;;;;;;;
@@ -70,7 +61,7 @@
 
 (use-package neotree
   :ensure t
-  :config (global-set-key [f8] 'neotree)
+  :config (global-set-key [f8] 'neotree-toggle)
           ; Every time when the neotree window is opened, let it find current file and jump to node.
           (setq neo-smart-open t)
           ; Do not autorefresh directory to show current file
@@ -90,6 +81,46 @@
 ;;;;;;;;;; Setting packages ;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-dracula t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+
+(use-package doom-modeline
+	:commands doom-modeline
+	:config
+  ;(setq doom-modeline-height 25)
+  (setq doom-modeline-bar-width 3)
+  ;(setq doom-modeline-minor-modes (featurep 'minions))
+  ;(setq doom-modeline-minor-modes (featurep 'minions))
+  (setq doom-modeline-buffer-file-name-style 'buffer-name)
+    (doom-modeline-set-timemachine-modeline)
+  :hook (after-init . doom-modeline-mode)
+)
+
+(use-package all-the-icons
+      :config
+      ;; Make sure the icon fonts are good to go
+      (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+      (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+      (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+      (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+      (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+      (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
+
 (use-package projectile
   :demand t
   :init (projectile-global-mode 1)
@@ -101,7 +132,7 @@
            ("s-f" . counsel-projectile-find-file)
            ("s-b" . counsel-projectile-switch-to-buffer)))
   (setq projectile-use-git-grep t)
-  (setq projectile-completion-system 'ivy))    
+  (setq projectile-completion-system 'ivy))
 
 ; Deleting top bar
 (menu-bar-mode -1)
@@ -115,10 +146,8 @@
 ;(desktop-save-mode 1)
 
 ;; Load theme
-(load-theme 'gruvbox-dark-medium t)
 (awesome-tab-mode t)
 
-(powerline-default-theme)
 
 ;; Ctrl+C, Ctrl+V copy, paste mode
 ;(global-set-key (kbd "C-c") 'kill-ring-save)
@@ -161,6 +190,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (lsp-treemacs-sync-mode 1)
+
+(add-hook 'web-mode-hook  'emmet-mode)
+
+;; Company mode
+(setq company-idle-delay 0)
+(setq company-minimum-prefix-length 1)
 
 ; Install company
 (use-package company
@@ -215,9 +250,9 @@
     (which-key-mode))
 
 ;; for completions
-(use-package company-lsp
-  :after lsp-mode
-  :config (push 'company-lsp company-backends))
+;(use-package company-lsp
+;  :after lsp-mode
+;  :config (push 'company-lsp company-backends))
 
 (use-package vue-mode
   :mode "\\.vue\\'"
@@ -230,34 +265,30 @@
 (add-hook 'prog-mode-hook 'show-paren-mode)
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 
-;;(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
-;; '(inhibit-startup-screen t)
 
-;; (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
-;; )
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-	 '("c4cecd97a6b30d129971302fd8298c2ff56189db0a94570e7238bc95f9389cfb" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "95b0bc7b8687101335ebbf770828b641f2befdcf6d3c192243a251ce72ab1692" "a5956ec25b719bf325e847864e16578c61d8af3e8a3d95f60f9040d02497e408" "5dbdb4a71a0e834318ae868143bb4329be492dd04bdf8b398fb103ba1b8c681a" default))
+	 '("02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "eca44f32ae038d7a50ce9c00693b8986f4ab625d5f2b4485e20f22c47f2634ae" "251ed7ecd97af314cd77b07359a09da12dcd97be35e3ab761d4a92d8d8cf9a71" "e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" "636b135e4b7c86ac41375da39ade929e2bd6439de8901f53f88fde7dd5ac3561" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "cd4d1a0656fee24dc062b997f54d6f9b7da8f6dc8053ac858f15820f9a04a679" "d543a5f82ce200d50bdce81b2ecc4db51422439ba7c0e6845483dd89566e4cf9" "c4cecd97a6b30d129971302fd8298c2ff56189db0a94570e7238bc95f9389cfb" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "95b0bc7b8687101335ebbf770828b641f2befdcf6d3c192243a251ce72ab1692" "a5956ec25b719bf325e847864e16578c61d8af3e8a3d95f60f9040d02497e408" "5dbdb4a71a0e834318ae868143bb4329be492dd04bdf8b398fb103ba1b8c681a" default))
  '(inhibit-startup-screen t)
  '(package-selected-packages
-	 '(vue-mode zenburn-theme ## spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
+	 '(doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode zenburn-theme ## spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
  '(warning-suppress-types '((use-package))))
+
+;;(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ ;; '(font-lock-comment-face ((t nil)))
+ ;; '(widget-field ((t (:extend t :background "midnightblue" :foreground "azure" :width normal)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(font-lock-comment-face ((t nil)))
- '(widget-field ((t (:extend t :background "midnightblue" :foreground "azure" :width normal)))))
+ )
