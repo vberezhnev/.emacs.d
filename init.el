@@ -1,23 +1,24 @@
-;; Set up package.el to work with MELPA
+;; Set up package.el to work with MELPA and ELPA
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+
 (package-initialize)
 (package-refresh-contents)
 
-
 (add-to-list 'load-path "~/.emacs.d/site-lisp/use-package")
 (add-to-list 'load-path "~/.emacs.d/evil")
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/awesome-tab"))
 (add-to-list 'load-path "~/.emacs.d/neotree")
+(add-to-list 'load-path "~/.emacs.d/company-go.el")
+
+(load "~/.emacs.d/setting-packages")
 
 (require 'evil)
+(require 'company-go)
 (require 'use-package)
-(require 'awesome-tab)
 (require 'elcord)
 (require 'neotree)
 
-(require 'package)
 (require 'lsp-mode)
 
 (use-package all-the-icons
@@ -67,124 +68,6 @@
           ; Do not autorefresh directory to show current file
           (setq neo-autorefresh nil))
 
-
-(use-package treemacs
-	:config
-	(progn
-    (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0))
-		      treemacs-show-hidden-files               nil
-		)
-	
-	)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;; Setting packages ;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package doom-themes
-  :ensure t
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-dracula t)
-
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
-
-(use-package doom-modeline
-	:commands doom-modeline
-	:config
-  ;(setq doom-modeline-height 25)
-  (setq doom-modeline-bar-width 3)
-  ;(setq doom-modeline-minor-modes (featurep 'minions))
-  ;(setq doom-modeline-minor-modes (featurep 'minions))
-  (setq doom-modeline-buffer-file-name-style 'buffer-name)
-    (doom-modeline-set-timemachine-modeline)
-  :hook (after-init . doom-modeline-mode)
-)
-
-(use-package all-the-icons
-      :config
-      ;; Make sure the icon fonts are good to go
-      (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
-
-(use-package projectile
-  :demand t
-  :init (projectile-global-mode 1)
-  :bind-keymap* ("C-x p" . projectile-command-map)
-  :config
-  (require 'projectile)
-  (use-package counsel-projectile 
-    :bind (("s-p" . counsel-projectile)
-           ("s-f" . counsel-projectile-find-file)
-           ("s-b" . counsel-projectile-switch-to-buffer)))
-  (setq projectile-use-git-grep t)
-  (setq projectile-completion-system 'ivy))
-
-; Deleting top bar
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-;; (scroll-bar-mode -1)
-
-(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
-(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
-
-;; Restore previous session
-;(desktop-save-mode 1)
-
-;; Load theme
-(awesome-tab-mode t)
-
-
-;; Ctrl+C, Ctrl+V copy, paste mode
-;(global-set-key (kbd "C-c") 'kill-ring-save)
-;(global-set-key (kbd "C-v") 'yank)
-
-
-;; Setting tabs
-(when (not (display-graphic-p))
-  (setq frame-background-mode 'dark))
-(setq awesome-tab-label-fixed-length 16)
-(setq awesome-tab-height 90)
-(setq awesome-tab-show-tab-index t)
-
-;; Setting dashboard
-;; (setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")
-(setq dashboard-banner-logo-title "Welcome back, Vladimir!")
-(setq dashboard-center-content t)
-(setq dashboard-items '((recents  . 5)
-                        (bookmarks . 5)
-                        (projects . 5)
-                        (agenda . 5)
-                        (registers . 5)))
-(dashboard-setup-startup-hook)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;; My Funcs ;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; (defun my-insert-tab-char ()
-;   "insert a tab char. (ASCII 9, \t)"
-;   (interactive)
-;   (insert "\t")
-; 	)
-; 
-; (global-set-key (kbd "TAB") 'my-insert-tab-char)
-; (global-set-key (kbd "<tab>") 'my-insert-tab-char)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; LSP ;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -213,11 +96,11 @@
   :after company)
 
 ; Just as an example, aso Ruby:
-(use-package robe ;; company-robe is a Ruby mode
-  :ensure t
-  :after company
-  :config (add-to-list 'company-backends 'company-robe)
-          (add-hook 'ruby-mode-hook 'robe-mode))
+;(use-package robe ;; company-robe is a Ruby mode
+;  :ensure t
+;  :after company
+;  :config (add-to-list 'company-backends 'company-robe)
+;          (add-hook 'ruby-mode-hook 'robe-mode))
 
 
 (use-package lsp-mode
@@ -265,8 +148,6 @@
 (add-hook 'prog-mode-hook 'show-paren-mode)
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 
-
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -278,14 +159,6 @@
  '(package-selected-packages
 	 '(doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode zenburn-theme ## spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
  '(warning-suppress-types '((use-package))))
-
-;;(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- ;; '(font-lock-comment-face ((t nil)))
- ;; '(widget-field ((t (:extend t :background "midnightblue" :foreground "azure" :width normal)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

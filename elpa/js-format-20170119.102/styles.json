@@ -1,0 +1,23 @@
+{
+  "standard": {
+    "folder": "standard"
+  },
+  "airbnb": {
+    "folder": "airbnb"
+  },
+  "jsb": {
+    "folder": "jsbeautify"
+  },
+  "jsb-css": {
+    "folder": "jsbeautify",
+    "entry": "css.js"
+  },
+  "jsb-html": {
+    "folder": "jsbeautify",
+    "entry": "html.js"
+  },
+  "esfmt": {
+    "folder": "esformatter"
+  },
+  "stylefmt": {}
+}

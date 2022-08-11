@@ -1,0 +1,2 @@
+;;; Generated package description from persp-mode.el  -*- no-byte-compile: t -*-
+(define-package "persp-mode" "20220507.32" "windows/buffers sets shared among frames + save/load." '((emacs "24.3")) :commit "d0f8eb099e852b6073d4ec06d32587c60a7dce3f" :authors '(("Constantin Kulikov (Bad_ptr)" . "zxnotdead@gmail.com")) :maintainer '("Constantin Kulikov (Bad_ptr)" . "zxnotdead@gmail.com") :keywords '("perspectives" "session" "workspace" "persistence" "windows" "buffers" "convenience") :url "https://github.com/Bad-ptr/persp-mode.el")
