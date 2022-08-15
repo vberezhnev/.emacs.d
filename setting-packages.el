@@ -370,26 +370,24 @@
 (require 'fic-mode)
 (add-hook 'prog-mode-hook 'fic-mode)
 
-(menu-bar-mode -1)
+;(menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-
-
 
 ;; Ctrl+C, Ctrl+V copy, paste mode
 ;(global-set-key (kbd "C-c") 'kill-ring-save)
 ;(global-set-key (kbd "C-v") 'yank)
 
-;; Setting dashboard
+; Setting dashboard
 (use-package dashboard
   :init      ;; tweak dashboard config before loading it
   (setq dashboard-set-heading-icons t)
-  (setq dashboard-center-content t)
+  ;(setq dashboard-center-content t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
   (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
   ;;(setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")  ;; use custom image as banner
-  (setq dashboard-center-content nil) ;; set to 't' for centered content
+  (setq dashboard-startup-banner "~/.emacs.d/black-hole-2.png")  ;; use custom image as banner
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
                           (bookmarks . 3)
@@ -400,4 +398,3 @@
   (dashboard-modify-heading-icons '((recents . "file-text")
 				    (bookmarks . "book"))))
 
-(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))

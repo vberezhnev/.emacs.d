@@ -1,6 +1,6 @@
 (set-face-attribute 'default nil
   :font "Source Code Pro"
-  :height 110
+  :height 100
   :weight 'medium)
 ;(set-face-attribute 'variable-pitch nil
 ;  :font "Ubuntu Nerd Font"
@@ -8,7 +8,7 @@
 ;  :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
   :font "Source Code Pro"
-  :height 110
+  :height 100
   :weight 'medium)
 ;; Makes commented text and keywords italics.
 ;; This is working in emacsclient but not emacs.
@@ -19,7 +19,7 @@
   :slant 'italic)
 
 ;; Uncomment the following line if line spacing needs adjusting.
-(setq-default line-spacing 0.12)
+;(setq-default line-spacing 0.12)
 
 ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
 (add-to-list 'default-frame-alist '(font . "Source Code Pro-11"))
