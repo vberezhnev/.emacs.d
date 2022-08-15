@@ -1,0 +1,10 @@
+(undo-tree-save-format-version . 1)
+"4769c84e8e111ad1ac87fe27bfb44259c45203ef"
+[nil nil nil nil (25332 53451 598529 518000) 0 nil]
+([nil nil ((nil rear-nonsticky nil 9 . 10) (nil fontified nil 1 . 10) (1 . 10) (t 25332 53433 535504 736000)) nil (25332 53451 598525 805000) 0 nil])
+([nil nil ((8 . 9)) nil (25332 53451 598520 308000) 0 nil])
+([nil nil ((#("company " 0 7 (fontified t) 7 8 (fontified t)) . -1) (undo-tree-id4 . -8) 9) nil (25332 53451 598512 150000) 0 nil])
+([nil nil ((#("-" 0 1 (fontified t)) . -1) (undo-tree-id0 . -1) (undo-tree-id1 . -1) (undo-tree-id2 . -1) (#(":" 0 1 (fontified t rear-nonsticky t)) . -2) (undo-tree-id3 . -1) 3) nil (25332 53451 598501 353000) 0 nil])
+([nil nil ((nil rear-nonsticky nil 9393 . 9394) (nil fontified nil 1 . 9394) (1 . 9394)) nil (25332 53451 598471 143000) 0 nil])
+([nil current ((9394 . 9395)) nil (25332 53451 598462 466000) 0 nil])
+nil

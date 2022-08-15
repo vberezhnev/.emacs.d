@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: inductive-namespace
+# key: ins
+# --
+/--
+
+-/
+inductive $1 $2 : $3
+| $4 : $1 $5
+
+namespace $1
+
+end $1

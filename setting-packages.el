@@ -2,6 +2,38 @@
 ;;;;;;;;;; Setting packages ;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(setq vue-mode-packages
+  '(vue-mode))
+
+(setq vue-mode-excluded-packages '())
+
+(defun vue-mode/init-vue-mode ()
+  "Initialize my package"
+  (use-package vue-mode))
+
+;; zoom in/out like we do everywhere else.
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+
+(use-package evil
+  :init      ;; tweak evil's configuration before loading it
+  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+  (setq evil-want-keybinding nil)
+  (setq evil-vsplit-window-right t)
+  (setq evil-split-window-below t)
+  (evil-mode))
+(use-package evil-collection
+  :after evil
+  :config
+  (setq evil-collection-mode-list '(dashboard dired ibuffer))
+  (evil-collection-init))
+(use-package evil-tutor)
+
+(use-package general
+  :config
+  (general-evil-setup t))
 
 (use-package all-the-icons
   :if (display-graphic-p))
@@ -11,7 +43,24 @@
   :config
   (setq typescript-indent-level 2))
 
-(add-hook 'js2-mode-hook 'prettier-js-mode)
+(use-package js2-mode :ensure t :defer 20
+  :mode
+  (("\\.js\\'" . js2-mode))
+  :custom
+  (js2-include-node-externs t)
+  (js2-global-externs '("customElements"))
+  (js2-highlight-level 3)
+  (js2r-prefer-let-over-var t)
+  (js2r-prefered-quote-type 2)
+  (js-indent-align-list-continuation t)
+  (global-auto-highlight-symbol-mode t)
+  :config
+  (setq js-indent-level 2)
+  ;; patch in basic private field support
+  (advice-add #'js2-identifier-start-p
+            :after-until
+            (lambda (c) (eq c ?#))))
+
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
 (defun enable-minor-mode (my-pair)
@@ -24,15 +73,30 @@
                             (enable-minor-mode
                              '("\\.jsx?\\'" . prettier-js-mode))))
 
-;;;; JSON mode
-(add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
+(use-package json-mode :ensure t :defer 20
+  :custom
+  (json-reformat:indent-width 2)
+  :mode (("\\.bowerrc$"     . json-mode)
+         ("\\.jshintrc$"    . json-mode)
+         ("\\.json_schema$" . json-mode)
+         ("\\.json\\'" . json-mode))
+  :bind (:package json-mode-map
+         :map json-mode-map
+         ("C-c <tab>" . json-mode-beautify)))
 
-;;;; Emmet
-;(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-;(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-;(add-hook 'web-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-;(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
-;(setq emmet-move-cursor-between-quotes t) ;; default nil
+(use-package web-mode  :ensure t
+  :mode (("\\.js\\'" . web-mode)
+         ("\\.jsx\\'" . web-mode)
+         ("\\.ts\\'" . web-mode)
+         ("\\.tsx\\'" . web-mode)
+         ("\\.html\\'" . web-mode)
+         ;("\\.vue\\'" . web-mode)
+	 ("\\.json\\'" . web-mode))
+  :commands web-mode
+  :config
+  (setq web-mode-content-types-alist
+	'(("jsx" . "\\.js[x]?\\'")))
+  )
 
 (use-package treemacs
   :ensure t
@@ -40,7 +104,7 @@
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-  :config
+  :config 
   (progn
     (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
           treemacs-deferred-git-apply-delay        0.5
@@ -122,31 +186,11 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
+;(global-set-key [f8] 'neotree-toggle)
+
 (use-package treemacs-evil
   :after (treemacs evil)
   :ensure t)
-
-(use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
-
-(use-package treemacs-icons-dired
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
-
-(use-package treemacs-magit
-  :after (treemacs magit)
-  :ensure t)
-
-(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
-  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
-  :ensure t
-  :config (treemacs-set-scope-type 'Perspectives))
-
-(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
-  :after (treemacs)
-  :ensure t
-  :config (treemacs-set-scope-type 'Tabs))
 
 (use-package format-all
   :preface
@@ -161,14 +205,12 @@
   (add-hook 'prog-mode-hook #'format-all-ensure-formatter))
 
 
-(use-package undo-tree ; Setting undo for evil
-  :ensure t
-  :after evil
-  :diminish
-  :config
-  (evil-set-undo-system 'undo-tree)
-  (global-undo-tree-mode 1))
-
+; (use-package undo-fu
+; 	:config
+;   (global-unset-key (kbd "C-z"))
+;   (global-set-key (kbd "C-z")   'undo-fu-only-undo)
+;   (global-set-key (kbd "C-S-z") 'undo-fu-only-redo))
+	
 (use-package centaur-tabs
    :config
    (setq centaur-tabs-style "bar"
@@ -177,7 +219,8 @@
 	  centaur-tabs-set-modified-marker t
 	  centaur-tabs-show-navigation-buttons t
 	  centaur-tabs-set-bar 'under
-	  x-underline-at-descent-line t)
+	  x-underline-at-descent-line t
+		centaur-tabs-enable-key-bindings t)
    (centaur-tabs-headline-match)
    ;; (setq centaur-tabs-gray-out-icons 'buffer)
    ;; (centaur-tabs-enable-buffer-reordering)
@@ -247,7 +290,7 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-dracula t)
+  (load-theme 'gruvbox-dark-medium t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -268,8 +311,37 @@
   ;(setq doom-modeline-minor-modes (featurep 'minions))
   (setq doom-modeline-buffer-file-name-style 'buffer-name)
     (doom-modeline-set-timemachine-modeline)
-  :hook (after-init . doom-modeline-mode)
-)
+  :hook (after-init . doom-modeline-mode))
+
+(use-package company :ensure t :defer 20
+  ;; This is not perfect yet. It completes too quickly outside programming modes, but while programming it is just right.
+  :custom
+  (company-idle-delay 0.1)
+  (global-company-mode t)
+  (debug-on-error nil) ;; otherwise this throws lots of errors on completion errors
+  :config
+  (define-key company-active-map (kbd "TAB") 'company-complete-selection)
+  (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
+  (define-key company-active-map [return] 'company-complete-selection)
+  (define-key company-active-map (kbd "RET") 'company-complete-selection)
+  ;; auto-complete compatibility
+  (defun my-company-visible-and-explicit-action-p ()
+    (and (company-tooltip-visible-p)
+         (company-explicit-action-p)))
+  (defun company-ac-setup ()
+    "Sets up `company-mode' to behave similarly to `auto-complete-mode'."
+    (setq company-require-match nil)
+    (setq company-auto-complete #'my-company-visible-and-explicit-action-p)
+    (setq company-frontends '(company-echo-metadata-frontend
+                              company-pseudo-tooltip-unless-just-one-frontend-with-delay
+                              company-preview-frontend))
+    (define-key company-active-map [tab]
+      'company-select-next-if-tooltip-visible-or-complete-selection)
+    (define-key company-active-map (kbd "TAB")
+      'company-select-next-if-tooltip-visible-or-complete-selection))
+
+  (company-ac-setup)
+  (add-hook 'js2-mode-hook (lambda () (company-mode))))
 
 (use-package all-the-icons
       :config
@@ -294,25 +366,38 @@
   (setq projectile-use-git-grep t)
   (setq projectile-completion-system 'ivy))
 
-;(menu-bar-mode -1)
+;; Highlight TODO, FIXME, ... in any programming mode
+(require 'fic-mode)
+(add-hook 'prog-mode-hook 'fic-mode)
+
+(menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
-(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
+
 
 ;; Ctrl+C, Ctrl+V copy, paste mode
 ;(global-set-key (kbd "C-c") 'kill-ring-save)
 ;(global-set-key (kbd "C-v") 'yank)
 
 ;; Setting dashboard
-;; (setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")
-(setq dashboard-banner-logo-title "Welcome back, Vladimir!")
-(setq dashboard-center-content t)
-(setq dashboard-items '((recents  . 5)
-                        (bookmarks . 5)
-                        (projects . 5)
-                        (agenda . 5)
-                        (registers . 5)))
-(dashboard-setup-startup-hook)
+(use-package dashboard
+  :init      ;; tweak dashboard config before loading it
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-center-content t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
+  (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+  ;;(setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")  ;; use custom image as banner
+  (setq dashboard-center-content nil) ;; set to 't' for centered content
+  (setq dashboard-items '((recents . 5)
+                          (agenda . 5 )
+                          (bookmarks . 3)
+                          (projects . 3)
+                          (registers . 3)))
+  :config
+  (dashboard-setup-startup-hook)
+  (dashboard-modify-heading-icons '((recents . "file-text")
+				    (bookmarks . "book"))))
 
+(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))

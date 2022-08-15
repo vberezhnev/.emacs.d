@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: lemma
+# key: lem
+# --
+lemma $1 $2 : $3 :=
+$4

@@ -1,3 +1,15 @@
-* Default
+* No Tab
 ** beethoven
  - path :: ~
+* Default
+** beethoven
+ - path :: ~/Templates
+* No Perspective
+** beethoven
+ - path :: ~
+* kinoway
+** kinoway
+ - path :: ~/Templates/NextJS/kinoway
+* emacs.d
+** .emacs.d
+ - path :: ~/.emacs.d

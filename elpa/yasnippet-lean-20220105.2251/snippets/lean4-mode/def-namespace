@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: def-namespace
+# key: dns
+# --
+/--
+
+-/
+def $1 $2 : $3 :=
+$4
+
+namespace $1
+
+end $1

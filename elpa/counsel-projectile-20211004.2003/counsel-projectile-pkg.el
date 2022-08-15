@@ -1,0 +1,2 @@
+;;; Generated package description from counsel-projectile.el  -*- no-byte-compile: t -*-
+(define-package "counsel-projectile" "20211004.2003" "Ivy integration for Projectile" '((counsel "0.13.4") (projectile "2.5.0")) :commit "40d1e1d4bb70acb00fddd6f4df9778bf2c52734b" :authors '(("Eric Danan")) :maintainer '("Eric Danan") :keywords '("project" "convenience") :url "https://github.com/ericdanan/counsel-projectile")
