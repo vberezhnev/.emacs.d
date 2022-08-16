@@ -1,5 +1,5 @@
-;; Set up package.el to work with MELPA and ELPA
 (require 'package)
+;;; Set up package.el to work with MELPA and ELPA
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 ;(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 (package-refresh-contents)
@@ -32,7 +32,6 @@
 ;(desktop-save-mode 1)                ; A global mode that automatically saves your Emacs session
 
 (display-line-numbers-mode)           ; Display numbers
-(setq display-line-numbers 'relative) ; Set relative numbers
 (xterm-mouse-mode 1)                  ; Mouse support for terminal
 
 (setq frame-resize-pixelwise t)
@@ -57,8 +56,8 @@
 								(kill-buffer buffer)))))
 
 ;; JSX syntax highlighting
-(add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
-(setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+;; (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
+;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
 ;; Minimize garbage collection during startup
 (setq gc-cons-threshold most-positive-fixnum)
@@ -72,13 +71,6 @@
      "Open all recent files."
      (interactive)
      (dolist (file  recentf-list) (find-file file)))
-
-(defun run-vim ()
-  (interactive)
-  (eshell)
-  (switch-to-buffer "*terminal*")
-  (insert "nvim")
-(eshell-send-input))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; Keymap ;;;;;;;;;;

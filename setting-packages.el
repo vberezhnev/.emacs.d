@@ -38,11 +38,6 @@
 (use-package all-the-icons
   :if (display-graphic-p))
 
-(use-package typescript-mode
-  :mode ("\\.tsx?\\'" . typescript-mode)
-  :config
-  (setq typescript-indent-level 2))
-
 (use-package js2-mode :ensure t :defer 20
   :mode
   (("\\.js\\'" . js2-mode))
@@ -84,19 +79,19 @@
          :map json-mode-map
          ("C-c <tab>" . json-mode-beautify)))
 
-(use-package web-mode  :ensure t
-  :mode (("\\.js\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode)
-         ("\\.ts\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.html\\'" . web-mode)
-         ;("\\.vue\\'" . web-mode)
-	 ("\\.json\\'" . web-mode))
-  :commands web-mode
-  :config
-  (setq web-mode-content-types-alist
-	'(("jsx" . "\\.js[x]?\\'")))
-  )
+;; (use-package web-mode  :ensure t
+;;   :mode (("\\.js\\'" . web-mode)
+;;          ("\\.jsx\\'" . web-mode)
+;;          ("\\.ts\\'" . web-mode)
+;;          ("\\.tsx\\'" . web-mode)
+;;          ("\\.html\\'" . web-mode)
+;;          ;("\\.vue\\'" . web-mode)
+;; 	 ("\\.json\\'" . web-mode))
+;;   :commands web-mode
+;;   :config
+;;   (setq web-mode-content-types-alist
+;; 	'(("jsx" . "\\.js[x]?\\'")))
+;;   )
 
 (use-package treemacs
   :ensure t
@@ -387,7 +382,7 @@
   (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
   (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
   ;;(setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")  ;; use custom image as banner
-  (setq dashboard-startup-banner "~/.emacs.d/black-hole-2.png")  ;; use custom image as banner
+  (setq dashboard-startup-banner "~/.emacs.d/black-hole.png")  ;; use custom image as banner
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
                           (bookmarks . 3)
