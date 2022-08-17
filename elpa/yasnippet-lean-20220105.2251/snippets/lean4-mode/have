@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: have
-# key: have
-# --
-have ${1:this} : $2 := ${3:by}
-  $4

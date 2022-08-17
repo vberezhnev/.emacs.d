@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: comment-block
-# key: /-
-# --
-/-
-$1
--/

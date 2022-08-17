@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: theorem
-# key: th
-# --
-theorem $1 $2 : $3 :=
-$4

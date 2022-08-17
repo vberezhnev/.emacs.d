@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: show
-# key: show
-# --
-show $1 ${2:by}
-  {$3}

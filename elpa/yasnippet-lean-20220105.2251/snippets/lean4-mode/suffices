@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: suffices
-# key: suff
-# --
-suffices ${1:this} : $2 ${3:by}
-  {$4}
