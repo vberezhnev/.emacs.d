@@ -285,7 +285,6 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'gruvbox-dark-medium t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -376,8 +375,9 @@
 ; Setting dashboard
 (use-package dashboard
   :init      ;; tweak dashboard config before loading it
+  (setq dashboard-center-content t)
+  ;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
   (setq dashboard-set-heading-icons t)
-  ;(setq dashboard-center-content t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
   (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
@@ -391,5 +391,5 @@
   :config
   (dashboard-setup-startup-hook)
   (dashboard-modify-heading-icons '((recents . "file-text")
-				    (bookmarks . "book"))))
+  				    (bookmarks . "book"))))
 

@@ -1,0 +1,1 @@
+("~/.emacs.d/" "~/Templates/NextJS/kinoway/" "~/Templates/Golang/gother/")

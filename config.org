@@ -1,0 +1,83 @@
+#+TITLE: Berezhnev's emacs config
+#+AUTHOR: Berezhnev Vladimir
+#+DESCRIPTION: Berezhnev's personal Emacs config.
+#+STARTUP: showeverything
+#+EXPORT_FILE_NAME: ~/Org/html/config.html
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+#+OPTIONS: num:nil ^:{}
+
+* Loading other files in directory
+  #+begin_src emacs-lisp
+		(load "~/.emacs.d/setting-packages")
+		(load "~/.emacs.d/setting-lsp")
+		(load "~/.emacs.d/setting-font-face")
+	#+end_src
+
+** Disabling's:
+*** Backup files:
+	#+begin_src emacs-lisp
+		(setq make-backup-files nil)          ; Delete #filename# files
+	#+end_src
+
+*** *Messages* buffer on startup:
+	Forces the messages to 0, and kills the *Messages* buffer - thus disabling it on startup.
+	
+	#+begin_src emacs-lisp
+		(setq-default message-log-max nil)
+		(kill-buffer "*Messages*")
+	#+end_src
+
+*** *Completions* buffer on startup:
+  #+begin_src emacs-lisp
+	  (add-hook 'minibuffer-exit-hook
+	    '(lambda ()
+               (let ((buffer "*Completions*"))
+                 (and (get-buffer buffer)
+	  	    (kill-buffer buffer)))))
+  #+end_src
+
+*** *scratch* buffer on startup:
+  #+begin_src emacs-lisp	
+    (setq initial-major-mode (quote fundamental-mode))
+	#+end_src
+	
+
+** Display line numbers:
+  #+begin_src emacs-lisp
+		(setq display-line-numbers-type t)
+	#+end_src
+
+
+** Loading theme:
+  #+begin_src
+		(load-theme 'doom-one)
+	#+end_src
+
+
+** Enable support mouse for emacs in terminal:
+  #+begin_src emacs-lisp
+		(xterm-mouse-mode 1)
+	#+end_src
+
+
+** Setting tabs:
+  #+begin_src emacs-lisp
+		(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
+	  (setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
+	#+end_src
+
+
+** Little optimization:
+  Minimize garbage collection during startup.
+	
+  #+begin_src emacs-lisp
+    (setq gc-cons-threshold most-positive-fixnum)
+	#+end_src
+
+
+** Lower threshold back to 8 MiB (default is 800kB)
+  #+begin_src emacs-lisp
+		(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (expt 2 23))))
+	#+end_src
