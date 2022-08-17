@@ -7,12 +7,12 @@
 #+OPTIONS: num:nil ^:{}
 
 * Loading other files in directory
-  #+begin_src emacs-lisp
-		(load "~/.emacs.d/setting-packages")
-		(load "~/.emacs.d/setting-lsp")
-		(load "~/.emacs.d/setting-font-face")
-	#+end_src
-
+#+begin_src emacs-lisp
+(load "~/.emacs.d/setting-packages")
+(load "~/.emacs.d/setting-lsp")
+(load "~/.emacs.d/setting-font-face")
+#+end_src
+	
 ** Disabling's:
 *** Backup files:
 	#+begin_src emacs-lisp
@@ -50,7 +50,7 @@
 
 ** Loading theme:
   #+begin_src
-		(load-theme 'doom-one)
+		(load-theme 'doom-horizon)
 	#+end_src
 
 

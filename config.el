@@ -8,10 +8,10 @@
 (kill-buffer "*Messages*")
 
 (add-hook 'minibuffer-exit-hook
-  '(lambda ()
-     (let ((buffer "*Completions*"))
-       (and (get-buffer buffer)
-	  (kill-buffer buffer)))))
+	'(lambda ()
+           (let ((buffer "*Completions*"))
+             (and (get-buffer buffer)
+	  	(kill-buffer buffer)))))
 
 (setq initial-major-mode (quote fundamental-mode))
 
@@ -25,5 +25,5 @@
 (setq gc-cons-threshold most-positive-fixnum)
 
 (add-hook 'emacs-startup-hook
-(lambda ()
-  (setq gc-cons-threshold (expt 2 23))))
+      (lambda ()
+        (setq gc-cons-threshold (expt 2 23))))
