@@ -34,7 +34,7 @@
 (setq make-backup-files nil)          ; Delete #filename# files
 ;(desktop-save-mode 1)                ; A global mode that automatically saves your Emacs session
 
-(display-line-numbers-mode)           ; Display numbers
+(setq display-line-numbers-type t)    ; Display numbers
 (xterm-mouse-mode 1)                  ; Mouse support for terminal
 
 (setq frame-resize-pixelwise t)
