@@ -17,8 +17,12 @@
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 
-(use-package org-superstar
-	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+(use-package elcord
+	:init
+	(elcord-mode))
+
+; (use-package org-superstar
+;	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
 (use-package evil
   :init      ;; tweak evil's configuration before loading it
@@ -351,17 +355,12 @@
       (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
 
 (use-package projectile
-  :demand t
-  :init (projectile-global-mode 1)
-  :bind-keymap* ("C-x p" . projectile-command-map)
-  :config
-  (require 'projectile)
-  (use-package counsel-projectile 
-    :bind (("s-p" . counsel-projectile)
-           ("s-f" . counsel-projectile-find-file)
-           ("s-b" . counsel-projectile-switch-to-buffer)))
-  (setq projectile-use-git-grep t)
-  (setq projectile-completion-system 'ivy))
+  :ensure t
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+              ("s-p" . projectile-command-map)
+              ("C-c p" . projectile-command-map)))
 
 ;; Highlight TODO, FIXME, ... in any programming mode
 (require 'fic-mode)

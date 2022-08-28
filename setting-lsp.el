@@ -8,6 +8,8 @@
 
 (helm-mode)
 
+(use-package react-snippets)
+
 ;;///////////;;
 ;;/ COMPANY /;;
 ;;///////////;;

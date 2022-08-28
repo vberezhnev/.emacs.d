@@ -1,3 +1,7 @@
-* Hello World
-dashboard
-* Hlloo wolw
+* My Emacs configuration 
+** List of setting files:
+
+init.el
+setting-packages.el
+setting-lsp.el
+setting-font-face.el

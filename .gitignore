@@ -1,2 +1,12 @@
+games/
+bookmarks/
+auto-save-list/
+eshell/
+projectile-bookmarks.eld
+site-lisp/
+.cache/
+elpa/
+.lsp-session*
+.local/
 init.el~
 #init.el#

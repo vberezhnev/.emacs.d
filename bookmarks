@@ -1,0 +1,15 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("IMovie.ts"
+ (filename . "~/Templates/NextJS/kinoway/client/src/types/IMovie.ts")
+ (front-context-string . "src: string;\n  s")
+ (rear-context-string . "es: IMovie[];\n  ")
+ (position . 2239))
+("NewFilms.tsx"
+ (filename . "~/Templates/NextJS/kinoway/client/src/components/NewFilms/NewFilms.tsx")
+ (front-context-string . " className=\"\">\n ")
+ (rear-context-string . "n (\n									<ul")
+ (position . 1088))
+)
