@@ -1,1 +1,1 @@
-("~/Templates/NextJS/kinoway/" "~/.emacs.d/" "~/Загрузки/tesseract/" "~/Templates/Commercial Projects/doll-stage/" "~/" "~/Templates/MixTechProjects/Magni/" "~/Trash/nix-configuration/" "~/Trash/nitch/")
+("~/Templates/NextJS/kinoway/" "~/" "~/.emacs.d/" "~/Загрузки/tesseract/" "~/Templates/Commercial Projects/doll-stage/" "~/Templates/MixTechProjects/Magni/" "~/Trash/nix-configuration/" "~/Trash/nitch/")
