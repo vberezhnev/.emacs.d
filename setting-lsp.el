@@ -10,6 +10,11 @@
 
 (use-package react-snippets)
 
+
+; JSX syntax highlighting
+;add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
+;(setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+
 ;;///////////;;
 ;;/ COMPANY /;;
 ;;///////////;;
@@ -132,7 +137,7 @@
   :config
   (apheleia-global-mode +1))
 
-(add-hook 'prog-mode-hook 'linum-mode)
+;(add-hook 'prog-mode-hook 'linum-mode)
 (add-hook 'prog-mode-hook 'visual-line-mode)
 (add-hook 'prog-mode-hook 'show-paren-mode)
 (add-hook 'prog-mode-hook 'hs-minor-mode)

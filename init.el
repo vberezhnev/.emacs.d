@@ -1,8 +1,8 @@
 (require 'package)
 ;;; Set up package.el to work with MELPA and ELPA
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-(package-refresh-contents)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                        ;; ("org" . "https://orgmode.org/elpa/")
+                        ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -14,9 +14,7 @@
 (load "~/.emacs.d/setting-lsp")
 (load "~/.emacs.d/setting-font-face")
 
-(add-to-list 'load-path "~/.emacs.d/company-go.el")
-
-(require 'company-go)
+;(load "~/.emacs.d/company-go")
 
 (setq frame-resize-pixelwise t)
 (dotimes (n 3)
@@ -24,7 +22,7 @@
 
 ;(desktop-save-mode 1)                ; A global mode that automatically saves your Emacs session
 
-(load-theme 'doom-horizon t)
+(load-theme 'gruvbox-dark-medium t)
 
 (setq make-backup-files nil)          ; Delete #filename# files
 (setq telega-use-docker t)
@@ -40,7 +38,6 @@
 
 (setq initial-major-mode (quote fundamental-mode))
 
-(setq display-line-numbers-type t)
 
 (xterm-mouse-mode 1)
 
@@ -53,9 +50,29 @@
       (lambda ()
         (setq gc-cons-threshold (expt 2 23))))
 
-; JSX syntax highlighting
- (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
- (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+
+; Disable line numbers for some modes
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+;(column-number-mode)
+(global-display-line-numbers-mode t)
+;(setq display-line-numbers-type t)
+(setq display-line-numbers-type 'relative)
+
+; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+(scroll-bar-mode -1)        ; Disable visible scrollbar
+(tool-bar-mode -1)          ; Disable the toolbar
+(tooltip-mode -1)           ; Disable tooltips
+(set-fringe-mode 10)        ; Give some breathing room
+
+(menu-bar-mode -1)            ; Disable the menu bar
 
 ; Minimize garbage collection during startup
 ;(setq gc-cons-threshold most-positive-fixnum)
@@ -82,10 +99,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-	 '("e8882a809fb14f2307410a659846a06bfa58a2279ffb1f5aca0c3aecbcb6aaee" default))
+	 '("dc8285f7f4d86c0aebf1ea4b448842a6868553eded6f71d1de52f3dcbc960039" "e8882a809fb14f2307410a659846a06bfa58a2279ffb1f5aca0c3aecbcb6aaee" default))
  '(inhibit-startup-screen t)
  '(package-selected-packages
-	 '(telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys simple-modeline yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode zenburn-theme spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard))
+	 '(org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys simple-modeline yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode zenburn-theme spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
