@@ -107,17 +107,17 @@
   (evil-mode))
 (use-package evil-collection
   :after evil
+	:ensure t
   :config
   (setq evil-collection-mode-list '(dashboard dired ibuffer))
   (evil-collection-init))
-(use-package evil-tutor)
+(use-package evil-tutor
+	:ensure t)
 
 (use-package general
   :config
+	:ensure t
   (general-evil-setup t))
-
-(use-package all-the-icons
-  :if (display-graphic-p))
 
 (use-package js2-mode :ensure t :defer 20
   :mode
@@ -267,7 +267,8 @@
   :ensure t)
 
 (use-package format-all
-  :preface
+	:ensure t
+	:preface
   (defun ian/format-code ()
     "Auto-format whole buffer."
     (interactive)
@@ -432,13 +433,14 @@
   (add-hook 'js2-mode-hook (lambda () (company-mode))))
 
 (use-package all-the-icons
-  :config
+  :if (display-graphic-p))
+	:config
   ;; Make sure the icon fonts are good to go
   (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
   (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
   (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
   (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") t 'append)
+  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
   (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
 
 (use-package projectile
