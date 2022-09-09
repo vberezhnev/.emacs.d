@@ -3,83 +3,83 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package pdf-tools
-   :defer t
-   :config
-       (pdf-tools-install)
-       (setq-default pdf-view-display-size 'fit-page)
-   :bind (:map pdf-view-mode-map
-         ("\\" . hydra-pdftools/body)
-         ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
-         ("g"  . pdf-view-first-page)
-         ("G"  . pdf-view-last-page)
-         ("l"  . image-forward-hscroll)
-         ("h"  . image-backward-hscroll)
-         ("j"  . pdf-view-next-page)
-         ("k"  . pdf-view-previous-page)
-         ("e"  . pdf-view-goto-page)
-         ("u"  . pdf-view-revert-buffer)
-         ("al" . pdf-annot-list-annotations)
-         ("ad" . pdf-annot-delete)
-         ("aa" . pdf-annot-attachment-dired)
-         ("am" . pdf-annot-add-markup-annotation)
-         ("at" . pdf-annot-add-text-annotation)
-         ("y"  . pdf-view-kill-ring-save)
-         ("i"  . pdf-misc-display-metadata)
-         ("s"  . pdf-occur)
-         ("b"  . pdf-view-set-slice-from-bounding-box)
-         ("r"  . pdf-view-reset-slice)))
+  :defer t
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-page)
+  :bind (:map pdf-view-mode-map
+							("\\" . hydra-pdftools/body)
+							("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+							("g"  . pdf-view-first-page)
+							("G"  . pdf-view-last-page)
+							("l"  . image-forward-hscroll)
+							("h"  . image-backward-hscroll)
+							("j"  . pdf-view-next-page)
+							("k"  . pdf-view-previous-page)
+							("e"  . pdf-view-goto-page)
+							("u"  . pdf-view-revert-buffer)
+							("al" . pdf-annot-list-annotations)
+							("ad" . pdf-annot-delete)
+							("aa" . pdf-annot-attachment-dired)
+							("am" . pdf-annot-add-markup-annotation)
+							("at" . pdf-annot-add-text-annotation)
+							("y"  . pdf-view-kill-ring-save)
+							("i"  . pdf-misc-display-metadata)
+							("s"  . pdf-occur)
+							("b"  . pdf-view-set-slice-from-bounding-box)
+							("r"  . pdf-view-reset-slice)))
 
-;;(defhydra hydra-pdftools (:color blue :hint nil)
-;;       "
-;;                                                                     ╭───────────┐
-;;      Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-;;  ╭──────────────────────────────────────────────────────────────────┴───────────╯
-;;        ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-;;        ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-;;        ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-;;        ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-;;   _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-;;        ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-;;        ^^_n_^^      ^ ^  _r_eset slice box
-;;        ^^^↓^^^
-;;        ^^_G_^^
-;;  --------------------------------------------------------------------------------
-;;       "
-;;       ("\\" hydra-master/body "back")
-;;       ("<ESC>" nil "quit")
-;;       ("al" pdf-annot-list-annotations)
-;;       ("ad" pdf-annot-delete)
-;;       ("aa" pdf-annot-attachment-dired)
-;;       ("am" pdf-annot-add-markup-annotation)
-;;       ("at" pdf-annot-add-text-annotation)
-;;       ("y"  pdf-view-kill-ring-save)
-;;       ("+" pdf-view-enlarge :color red)
-;;       ("-" pdf-view-shrink :color red)
-;;       ("0" pdf-view-scale-reset)
-;;       ("H" pdf-view-fit-height-to-window)
-;;       ("W" pdf-view-fit-width-to-window)
-;;       ("P" pdf-view-fit-page-to-window)
-;;       ("n" pdf-view-next-page-command :color red)
-;;       ("p" pdf-view-previous-page-command :color red)
-;;       ("d" pdf-view-dark-minor-mode)
-;;       ("b" pdf-view-set-slice-from-bounding-box)
-;;       ("r" pdf-view-reset-slice)
-;;       ("g" pdf-view-first-page)
-;;       ("G" pdf-view-last-page)
-;;       ("e" pdf-view-goto-page)
-;;       ("o" pdf-outline)
-;;       ("s" pdf-occur)
-;;       ("i" pdf-misc-display-metadata)
-;;       ("u" pdf-view-revert-buffer)
-;;       ("F" pdf-links-action-perfom)
-;;       ("f" pdf-links-isearch-link)
-;;       ("B" pdf-history-backward :color red)
-;;       ("N" pdf-history-forward :color red)
-;;       ("l" image-forward-hscroll :color red)
-;;       ("h" image-backward-hscroll :color red))
+(defhydra hydra-pdftools (:color blue :hint nil)
+  "
+                                                                     ╭───────────┐
+      Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+  ╭──────────────────────────────────────────────────────────────────┴───────────╯
+        ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+        ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+        ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+        ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+   _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+        ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+        ^^_n_^^      ^ ^  _r_eset slice box
+        ^^^↓^^^
+        ^^_G_^^
+  --------------------------------------------------------------------------------
+       "
+  ("\\" hydra-master/body "back")
+  ("<ESC>" nil "quit")
+  ("al" pdf-annot-list-annotations)
+  ("ad" pdf-annot-delete)
+  ("aa" pdf-annot-attachment-dired)
+  ("am" pdf-annot-add-markup-annotation)
+  ("at" pdf-annot-add-text-annotation)
+  ("y"  pdf-view-kill-ring-save)
+  ("+" pdf-view-enlarge :color red)
+  ("-" pdf-view-shrink :color red)
+  ("0" pdf-view-scale-reset)
+  ("H" pdf-view-fit-height-to-window)
+  ("W" pdf-view-fit-width-to-window)
+  ("P" pdf-view-fit-page-to-window)
+  ("n" pdf-view-next-page-command :color red)
+  ("p" pdf-view-previous-page-command :color red)
+  ("d" pdf-view-dark-minor-mode)
+  ("b" pdf-view-set-slice-from-bounding-box)
+  ("r" pdf-view-reset-slice)
+  ("g" pdf-view-first-page)
+  ("G" pdf-view-last-page)
+  ("e" pdf-view-goto-page)
+  ("o" pdf-outline)
+  ("s" pdf-occur)
+  ("i" pdf-misc-display-metadata)
+  ("u" pdf-view-revert-buffer)
+  ("F" pdf-links-action-perfom)
+  ("f" pdf-links-isearch-link)
+  ("B" pdf-history-backward :color red)
+  ("N" pdf-history-forward :color red)
+  ("l" image-forward-hscroll :color red)
+  ("h" image-backward-hscroll :color red))
 
 (setq vue-mode-packages
-  '(vue-mode))
+			'(vue-mode))
 
 (setq vue-mode-excluded-packages '())
 
@@ -94,11 +94,9 @@
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 
 (use-package elcord
-	:init
-	(elcord-mode))
-
-; (use-package org-superstar
-;	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+	:hook (after-init . doom-modeline-mode))
+																				; (use-package org-superstar
+																				;	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
 (use-package evil
   :init      ;; tweak evil's configuration before loading it
@@ -136,8 +134,8 @@
   (setq js-indent-level 2)
   ;; patch in basic private field support
   (advice-add #'js2-identifier-start-p
-            :after-until
-            (lambda (c) (eq c ?#))))
+							:after-until
+							(lambda (c) (eq c ?#))))
 
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
@@ -145,11 +143,11 @@
   "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
   (if (buffer-file-name)
       (if (string-match (car my-pair) buffer-file-name)
-      (funcall (cdr my-pair)))))
+					(funcall (cdr my-pair)))))
 
 (add-hook 'web-mode-hook #'(lambda ()
-                            (enable-minor-mode
-                             '("\\.jsx?\\'" . prettier-js-mode))))
+                             (enable-minor-mode
+															'("\\.jsx?\\'" . prettier-js-mode))))
 
 (use-package json-mode :ensure t :defer 20
   :custom
@@ -159,8 +157,8 @@
          ("\\.json_schema$" . json-mode)
          ("\\.json\\'" . json-mode))
   :bind (:package json-mode-map
-         :map json-mode-map
-         ("C-c <tab>" . json-mode-beautify)))
+									:map json-mode-map
+									("C-c <tab>" . json-mode-beautify)))
 
 ;; (use-package web-mode  :ensure t
 ;;   :mode (("\\.js\\'" . web-mode)
@@ -182,7 +180,7 @@
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-  :config 
+  :config
   (progn
     (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
           treemacs-deferred-git-apply-delay        0.5
@@ -264,8 +262,6 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
-;(global-set-key [f8] 'neotree-toggle)
-
 (use-package treemacs-evil
   :after (treemacs evil)
   :ensure t)
@@ -283,84 +279,84 @@
   (add-hook 'prog-mode-hook #'format-all-ensure-formatter))
 
 
-; (use-package undo-fu
-; 	:config
-;   (global-unset-key (kbd "C-z"))
-;   (global-set-key (kbd "C-z")   'undo-fu-only-undo)
-;   (global-set-key (kbd "C-S-z") 'undo-fu-only-redo))
-	
+																				; (use-package undo-fu
+																				; 	:config
+																				;   (global-unset-key (kbd "C-z"))
+																				;   (global-set-key (kbd "C-z")   'undo-fu-only-undo)
+																				;   (global-set-key (kbd "C-S-z") 'undo-fu-only-redo))
+
 (use-package centaur-tabs
-   :config
-   (setq centaur-tabs-style "bar"
-	  centaur-tabs-height 32
-	  centaur-tabs-set-icons t
-	  centaur-tabs-set-modified-marker t
-	  centaur-tabs-show-navigation-buttons t
-	  centaur-tabs-set-bar 'under
-	  x-underline-at-descent-line t
-		centaur-tabs-enable-key-bindings t)
-   (centaur-tabs-headline-match)
-   ;; (setq centaur-tabs-gray-out-icons 'buffer)
-   ;; (centaur-tabs-enable-buffer-reordering)
-   ;; (setq centaur-tabs-adjust-buffer-order t)
-   (centaur-tabs-mode t)
-   (setq uniquify-separator "/")
-   (setq uniquify-buffer-name-style 'forward)
-   (defun centaur-tabs-buffer-groups ()
-     "`centaur-tabs-buffer-groups' control buffers' group rules.
+  :config
+  (setq centaur-tabs-style "bar"
+				centaur-tabs-height 32
+				centaur-tabs-set-icons t
+				centaur-tabs-set-modified-marker t
+				centaur-tabs-show-navigation-buttons t
+				centaur-tabs-set-bar 'under
+				x-underline-at-descent-line t
+				centaur-tabs-enable-key-bindings t)
+  (centaur-tabs-headline-match)
+  ;; (setq centaur-tabs-gray-out-icons 'buffer)
+  ;; (centaur-tabs-enable-buffer-reordering)
+  ;; (setq centaur-tabs-adjust-buffer-order t)
+  (centaur-tabs-mode t)
+  (setq uniquify-separator "/")
+  (setq uniquify-buffer-name-style 'forward)
+  (defun centaur-tabs-buffer-groups ()
+    "`centaur-tabs-buffer-groups' control buffers' group rules.
 
  Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
  All buffer name start with * will group to \"Emacs\".
  Other buffer group by `centaur-tabs-get-group-name' with project name."
-     (list
-      (cond
-	;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-	;; "Remote")
-	((or (string-equal "*" (substring (buffer-name) 0 1))
-	     (memq major-mode '(magit-process-mode
-				magit-status-mode
-				magit-diff-mode
-				magit-log-mode
-				magit-file-mode
-				magit-blob-mode
-				magit-blame-mode
-				)))
-	 "Emacs")
-	((derived-mode-p 'prog-mode)
-	 "Editing")
-	((derived-mode-p 'dired-mode)
-	 "Dired")
-	((memq major-mode '(helpful-mode
-			    help-mode))
-	 "Help")
-	((memq major-mode '(org-mode
-			    org-agenda-clockreport-mode
-			    org-src-mode
-			    org-agenda-mode
-			    org-beamer-mode
-			    org-indent-mode
-			    org-bullets-mode
-			    org-cdlatex-mode
-			    org-agenda-log-mode
-			    diary-mode))
-	 "OrgMode")
-	(t
-	 (centaur-tabs-get-group-name (current-buffer))))))
-   :hook
-   (dashboard-mode . centaur-tabs-local-mode)
-   (term-mode . centaur-tabs-local-mode)
-   (calendar-mode . centaur-tabs-local-mode)
-   (org-agenda-mode . centaur-tabs-local-mode)
-   (helpful-mode . centaur-tabs-local-mode)
-   :bind
-   ("C-<prior>" . centaur-tabs-backward)
-   ("C-<next>" . centaur-tabs-forward)
-   ("C-c t s" . centaur-tabs-counsel-switch-group)
-   ("C-c t p" . centaur-tabs-group-by-projectile-project)
-   ("C-c t g" . centaur-tabs-group-buffer-groups)
-   (:map evil-normal-state-map
-	  ("g t" . centaur-tabs-forward)
-	  ("g T" . centaur-tabs-backward)))
+    (list
+     (cond
+			;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+			;; "Remote")
+			((or (string-equal "*" (substring (buffer-name) 0 1))
+					 (memq major-mode '(magit-process-mode
+															magit-status-mode
+															magit-diff-mode
+															magit-log-mode
+															magit-file-mode
+															magit-blob-mode
+															magit-blame-mode
+															)))
+			 "Emacs")
+			((derived-mode-p 'prog-mode)
+			 "Editing")
+			((derived-mode-p 'dired-mode)
+			 "Dired")
+			((memq major-mode '(helpful-mode
+													help-mode))
+			 "Help")
+			((memq major-mode '(org-mode
+													org-agenda-clockreport-mode
+													org-src-mode
+													org-agenda-mode
+													org-beamer-mode
+													org-indent-mode
+													org-bullets-mode
+													org-cdlatex-mode
+													org-agenda-log-mode
+													diary-mode))
+			 "OrgMode")
+			(t
+			 (centaur-tabs-get-group-name (current-buffer))))))
+  :hook
+  (dashboard-mode . centaur-tabs-local-mode)
+  (term-mode . centaur-tabs-local-mode)
+  (calendar-mode . centaur-tabs-local-mode)
+  (org-agenda-mode . centaur-tabs-local-mode)
+  (helpful-mode . centaur-tabs-local-mode)
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward)
+  ("C-c t s" . centaur-tabs-counsel-switch-group)
+  ("C-c t p" . centaur-tabs-group-by-projectile-project)
+  ("C-c t g" . centaur-tabs-group-buffer-groups)
+  (:map evil-normal-state-map
+				("g t" . centaur-tabs-forward)
+				("g T" . centaur-tabs-backward)))
 
 (use-package doom-themes
   :ensure t
@@ -368,7 +364,6 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (all-the-icons must be installed!)
@@ -381,17 +376,21 @@
 
 (use-package doom-modeline
 	:commands doom-modeline
-	:config
+	;:config
   ;(setq doom-modeline-height 15)
-  (setq doom-modeline-bar-width 3)
-	(display-battery-mode 1)
-  (setq doom-modeline-time t)
-	;(column-number-mode)
-  ;(setq doom-modeline-minor-modes (featurep 'minions))
-  ;(setq doom-modeline-minor-modes (featurep 'minions))
-  (setq doom-modeline-buffer-file-name-style 'buffer-name)
-    (doom-modeline-set-timemachine-modeline)
-  :hook (after-init . doom-modeline-mode))
+  ;(setq doom-modeline-bar-width 3)
+	;(display-battery-mode 1)
+	;;(setq doom-modeline-minor-modes (featurep 'minions))
+  ;(setq doom-modeline-buffer-file-name-style 'buffer-name)
+  ;(doom-modeline-set-timemachine-modeline)
+	;(doom-modeline-time t)
+
+	:custom
+ (doom-modeline-set-timemachine-modeline)
+ (doom-modeline-time t)
+ ;(doom-modeline-height 15)
+ (doom-modeline-bar-width 3)
+ :hook (after-init . doom-modeline-mode))
 
 ;;(use-package term
 ;;  :commands term
@@ -433,14 +432,14 @@
   (add-hook 'js2-mode-hook (lambda () (company-mode))))
 
 (use-package all-the-icons
-      :config
-      ;; Make sure the icon fonts are good to go
-      (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
-      (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
+  :config
+  ;; Make sure the icon fonts are good to go
+  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") t 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
 
 (use-package projectile
   :ensure t
@@ -454,21 +453,18 @@
 (require 'fic-mode)
 (add-hook 'prog-mode-hook 'fic-mode)
 
-;; Ctrl+C, Ctrl+V copy, paste mode
-;(global-set-key (kbd "C-c") 'kill-ring-save)
-;(global-set-key (kbd "C-v") 'yank)
 
-; Setting dashboard
+																				; Setting dashboard
 (use-package dashboard
   :init      ;; tweak dashboard config before loading it
   (setq dashboard-center-content t)
-  ;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+																				;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
   (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
   ;;(setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")  ;; use custom image as banner
-  (setq dashboard-startup-banner "~/.emacs.d/black-hole.png")  ;; use custom image as banner
+  (setq dashboard-startup-banner "~/.emacs.d/images/black-hole.png")  ;; use custom image as banner
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
                           (bookmarks . 3)
@@ -477,5 +473,4 @@
   :config
   (dashboard-setup-startup-hook)
   (dashboard-modify-heading-icons '((recents . "file-text")
-  				    (bookmarks . "book"))))
-
+  																	(bookmarks . "book"))))

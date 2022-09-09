@@ -5,6 +5,8 @@
  - path :: ~/Templates/MixTechProjects/Magni
 ** tesseract
  - path :: ~/Загрузки/tesseract
+** wallis.dev
+ - path :: ~/Templates/NextJS/wallis.dev
 * No Tab
 ** beethoven
  - path :: ~
