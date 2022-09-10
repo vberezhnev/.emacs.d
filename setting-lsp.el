@@ -85,6 +85,15 @@
   :config
   (add-hook 'vue-mode-hook #'lsp))
 
+(setq vue-mode-packages
+			'(vue-mode))
+
+(setq vue-mode-excluded-packages '())
+
+(defun vue-mode/init-vue-mode ()
+  "Initialize my package"
+  (use-package vue-mode))
+
 ; Symbol highlighting
 (setq lsp-enable-symbol-highlighting nil)
 

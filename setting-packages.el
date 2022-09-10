@@ -29,69 +29,54 @@
 							("b"  . pdf-view-set-slice-from-bounding-box)
 							("r"  . pdf-view-reset-slice)))
 
-(defhydra hydra-pdftools (:color blue :hint nil)
-  "
-                                                                     ╭───────────┐
-      Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-  ╭──────────────────────────────────────────────────────────────────┴───────────╯
-        ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-        ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-        ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-        ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-   _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-        ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-        ^^_n_^^      ^ ^  _r_eset slice box
-        ^^^↓^^^
-        ^^_G_^^
-  --------------------------------------------------------------------------------
-       "
-  ("\\" hydra-master/body "back")
-  ("<ESC>" nil "quit")
-  ("al" pdf-annot-list-annotations)
-  ("ad" pdf-annot-delete)
-  ("aa" pdf-annot-attachment-dired)
-  ("am" pdf-annot-add-markup-annotation)
-  ("at" pdf-annot-add-text-annotation)
-  ("y"  pdf-view-kill-ring-save)
-  ("+" pdf-view-enlarge :color red)
-  ("-" pdf-view-shrink :color red)
-  ("0" pdf-view-scale-reset)
-  ("H" pdf-view-fit-height-to-window)
-  ("W" pdf-view-fit-width-to-window)
-  ("P" pdf-view-fit-page-to-window)
-  ("n" pdf-view-next-page-command :color red)
-  ("p" pdf-view-previous-page-command :color red)
-  ("d" pdf-view-dark-minor-mode)
-  ("b" pdf-view-set-slice-from-bounding-box)
-  ("r" pdf-view-reset-slice)
-  ("g" pdf-view-first-page)
-  ("G" pdf-view-last-page)
-  ("e" pdf-view-goto-page)
-  ("o" pdf-outline)
-  ("s" pdf-occur)
-  ("i" pdf-misc-display-metadata)
-  ("u" pdf-view-revert-buffer)
-  ("F" pdf-links-action-perfom)
-  ("f" pdf-links-isearch-link)
-  ("B" pdf-history-backward :color red)
-  ("N" pdf-history-forward :color red)
-  ("l" image-forward-hscroll :color red)
-  ("h" image-backward-hscroll :color red))
-
-(setq vue-mode-packages
-			'(vue-mode))
-
-(setq vue-mode-excluded-packages '())
-
-(defun vue-mode/init-vue-mode ()
-  "Initialize my package"
-  (use-package vue-mode))
-
-;; zoom in/out like we do everywhere else.
-(global-set-key (kbd "C-=") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+;; (defhydra hydra-pdftools (:color blue :hint nil)
+;;   "
+;;                                                                      ╭───────────┐
+;;       Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+;;   ╭──────────────────────────────────────────────────────────────────┴───────────╯
+;;         ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+;;         ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+;;         ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+;;         ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+;;    _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+;;         ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+;;         ^^_n_^^      ^ ^  _r_eset slice box
+;;         ^^^↓^^^
+;;         ^^_G_^^
+;;   --------------------------------------------------------------------------------
+;;        "
+;;   ("\\" hydra-master/body "back")
+;;   ("<ESC>" nil "quit")
+;;   ("al" pdf-annot-list-annotations)
+;;   ("ad" pdf-annot-delete)
+;;   ("aa" pdf-annot-attachment-dired)
+;;   ("am" pdf-annot-add-markup-annotation)
+;;   ("at" pdf-annot-add-text-annotation)
+;;   ("y"  pdf-view-kill-ring-save)
+;;   ("+" pdf-view-enlarge :color red)
+;;   ("-" pdf-view-shrink :color red)
+;;   ("0" pdf-view-scale-reset)
+;;   ("H" pdf-view-fit-height-to-window)
+;;   ("W" pdf-view-fit-width-to-window)
+;;   ("P" pdf-view-fit-page-to-window)
+;;   ("n" pdf-view-next-page-command :color red)
+;;   ("p" pdf-view-previous-page-command :color red)
+;;   ("d" pdf-view-dark-minor-mode)
+;;   ("b" pdf-view-set-slice-from-bounding-box)
+;;   ("r" pdf-view-reset-slice)
+;;   ("g" pdf-view-first-page)
+;;   ("G" pdf-view-last-page)
+;;   ("e" pdf-view-goto-page)
+;;   ("o" pdf-outline)
+;;   ("s" pdf-occur)
+;;   ("i" pdf-misc-display-metadata)
+;;   ("u" pdf-view-revert-buffer)
+;;   ("F" pdf-links-action-perfom)
+;;   ("f" pdf-links-isearch-link)
+;;   ("B" pdf-history-backward :color red)
+;;   ("N" pdf-history-forward :color red)
+;;   ("l" image-forward-hscroll :color red)
+;;   ("h" image-backward-hscroll :color red))
 
 (use-package elcord
 	:hook (after-init . doom-modeline-mode))
@@ -100,6 +85,7 @@
 
 (use-package evil
   :init      ;; tweak evil's configuration before loading it
+	:ensure t
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
   (setq evil-vsplit-window-right t)
@@ -368,7 +354,7 @@
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
+  ;;(doom-themes-neotree-config)
   ;; or for treemacs users
   (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
   (doom-themes-treemacs-config)
@@ -377,21 +363,21 @@
 
 (use-package doom-modeline
 	:commands doom-modeline
-	;:config
-  ;(setq doom-modeline-height 15)
-  ;(setq doom-modeline-bar-width 3)
-	;(display-battery-mode 1)
+																				;:config
+																				;(setq doom-modeline-height 15)
+																				;(setq doom-modeline-bar-width 3)
 	;;(setq doom-modeline-minor-modes (featurep 'minions))
-  ;(setq doom-modeline-buffer-file-name-style 'buffer-name)
-  ;(doom-modeline-set-timemachine-modeline)
-	;(doom-modeline-time t)
+																				;(setq doom-modeline-buffer-file-name-style 'buffer-name)
+																				;(doom-modeline-set-timemachine-modeline)
+																				;(doom-modeline-time t)
 
 	:custom
- (doom-modeline-set-timemachine-modeline)
- (doom-modeline-time t)
- ;(doom-modeline-height 15)
- (doom-modeline-bar-width 3)
- :hook (after-init . doom-modeline-mode))
+	(doom-modeline-set-timemachine-modeline)
+	(doom-modeline-time t)
+	(display-battery-mode 1)
+																				;(doom-modeline-height 15)
+	(doom-modeline-bar-width 3)
+	:hook (after-init . doom-modeline-mode))
 
 ;;(use-package term
 ;;  :commands term
@@ -430,18 +416,18 @@
       'company-select-next-if-tooltip-visible-or-complete-selection))
 
   (company-ac-setup)
-  (add-hook 'js2-mode-hook (lambda () (company-mode))))
+	(add-hook 'js2-mode-hook (lambda () (company-mode))))
 
-(use-package all-the-icons
-  :if (display-graphic-p))
-	:config
-  ;; Make sure the icon fonts are good to go
-  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
+;; (use-package all-the-icons
+;;   :if (display-graphic-p))
+;; 	:config
+;;   ;; Make sure the icon fonts are good to go
+;;   (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
 
 (use-package projectile
   :ensure t

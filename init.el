@@ -26,11 +26,11 @@
 (load "~/.emacs.d/setting-font-face")
 ;(load "~/.emacs.d/company-go")
 
+(load-theme 'gruvbox-dark-medium t)
+
 (setq frame-resize-pixelwise t)
 (dotimes (n 3)
   (toggle-frame-maximized))
-
-(load-theme 'gruvbox-dark-medium t)
 
 (setq make-backup-files nil)          ; Delete #filename# files
 
@@ -56,8 +56,8 @@
 					(lambda ()
 						(setq gc-cons-threshold (expt 2 23))))
 
-																				; Disable line numbers for some modes
-(dolist (mode '(org-mode-hook
+																				
+(dolist (mode '(org-mode-hook ; Disable line numbers for some modes
                 term-mode-hook
                 shell-mode-hook
                 treemacs-mode-hook
@@ -71,14 +71,11 @@
 (tool-bar-mode -1)          ; Disable the toolbar
 (tooltip-mode -1)           ; Disable tooltips
 (set-fringe-mode 10)        ; Give some breathing room
+(menu-bar-mode -1)          ; Disable the menu bar
 
-(menu-bar-mode -1)            ; Disable the menu bar
+(setq gc-cons-threshold most-positive-fixnum) ; Minimize garbage collection during startup
 
-																				; Minimize garbage collection during startup
-(setq gc-cons-threshold most-positive-fixnum)
-
-																				; Lower threshold back to 8 MiB (default is 800kB)
-(add-hook 'emacs-startup-hook
+(add-hook 'emacs-startup-hook ; Lower threshold back to 8 MiB (default is 800kB)
           (lambda ()
             (setq gc-cons-threshold (expt 2 23))))
 
@@ -86,6 +83,11 @@
 ;;;;;;;;;; Keymap ;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; zoom in/out like we do everywhere else.
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 																				; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -93,8 +95,8 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
 ;; Ctrl+C, Ctrl+V copy, paste mode
-																				;(global-set-key (kbd "C-c") 'kill-ring-save)
-																				;(global-set-key (kbd "C-v") 'yank)
+;(global-set-key (kbd "C-c") 'kill-ring-save)
+;(global-set-key (kbd "C-v") 'yank)
 
 ;;;; Custom modeline ;;;;
 

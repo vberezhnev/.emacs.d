@@ -7,6 +7,8 @@
  - path :: ~/Загрузки/tesseract
 ** wallis.dev
  - path :: ~/Templates/NextJS/wallis.dev
+** .emacs.d
+ - path :: ~/.emacs.d
 * No Tab
 ** beethoven
  - path :: ~
