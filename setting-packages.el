@@ -438,9 +438,9 @@
               ("C-c p" . projectile-command-map)))
 
 ;; Highlight TODO, FIXME, ... in any programming mode
-(require 'fic-mode)
-(add-hook 'prog-mode-hook 'fic-mode)
-
+(use-package 'fic-mode
+	:ensure t
+	:hook 'prog-mode-hook 'fic-mode)
 
 																				; Setting dashboard
 (use-package dashboard
