@@ -84,9 +84,9 @@
 																				;	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
 (use-package evil
+	;; :ensure t
   :init      ;; tweak evil's configuration before loading it
-	:ensure t
-  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+  ;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
@@ -438,9 +438,9 @@
               ("C-c p" . projectile-command-map)))
 
 ;; Highlight TODO, FIXME, ... in any programming mode
-(use-package 'fic-mode
-	:ensure t
-	:hook 'prog-mode-hook 'fic-mode)
+;; (use-package 'fic-mode
+;; 	:ensure t
+;; 	:hook 'prog-mode-hook 'fic-mode)
 
 																				; Setting dashboard
 (use-package dashboard
