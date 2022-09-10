@@ -100,10 +100,10 @@
 (use-package evil-tutor
 	:ensure t)
 
-(use-package general
-  :config
-	:ensure t
-  (general-evil-setup t))
+;; (use-package general
+;;   :config
+;; 	:ensure t
+;;   (general-evil-setup t))
 
 (use-package js2-mode :ensure t :defer 20
   :mode
