@@ -15,7 +15,7 @@
 (load "~/.emacs.d/setting-packages")
 (load "~/.emacs.d/setting-lsp")
 (load "~/.emacs.d/setting-font-face")
-(load "~/.emacs.d/company-go")
+(load "~/.emacs.d/local-packages/company-go")
 
 (require 'company-go)
 
