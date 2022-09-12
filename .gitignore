@@ -16,5 +16,5 @@ projectile-bookmarks.eld
 
 .dap-breakpoints
 .lsp-session*
-init.el~
-#init.el#
+
+#*

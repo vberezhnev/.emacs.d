@@ -1,7 +1,21 @@
 * My Emacs configuration 
 ** List of setting files:
 
-init.el
-setting-packages.el
-setting-lsp.el
-setting-font-face.el
+#+NAME: file structure example
+#+BEGIN_SRC 
+.
+├── images
+│   ├── black-hole-2.png
+│   ├── black-hole.png
+│   ├── emacs-e-medium.png
+│   ├── emacs-e.png
+│   ├── emacs-e-small.png   
+│   └── RMS.png             <- Best photo ever.
+├── local-packages
+│   └── company-go.el
+├── README.org
+├── init.el                 <- Main init file
+├── setting-font-face.el    <- All settings of custom font face
+├── setting-lsp.el          <- Setting LSP Mode for many languages
+└── setting-packages.el     <- Setting all packages with use-package
+#+END_SRC
