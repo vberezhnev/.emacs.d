@@ -1,14 +1,14 @@
 * kinoway
 ** kinoway
  - path :: ~/Templates/NextJS/kinoway
-** Magni
- - path :: ~/Templates/MixTechProjects/Magni
 ** tesseract
  - path :: ~/Загрузки/tesseract
 ** wallis.dev
  - path :: ~/Templates/NextJS/wallis.dev
 ** .emacs.d
  - path :: ~/.emacs.d
+** rest-api-golang
+ - path :: ~/Templates/Golang/rest-api-golang
 * No Tab
 ** beethoven
  - path :: ~

@@ -80,8 +80,212 @@
 
 (use-package elcord
 	:hook (after-init . doom-modeline-mode))
-																				; (use-package org-superstar
-																				;	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+; (use-package org-superstar
+;	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+
+;; (use-package org
+;;   ;:straight (:type built-in)
+;;   :custom
+;;   (org-confirm-babel-evaluate nil)
+;;   (org-ellipsis "↴") ;; ↴, ▼, ▶, ⤵
+;;   (org-src-window-setup 'current-window)
+;;   (org-startup-indented t)
+;;   (org-startup-folded 'content)  ; show only headlines (and sub headlines, recursively) at startup
+;;   (org-startup-with-inline-images t)
+;;   (org-image-actual-width '(400))
+;;   (org-hierarchical-todo-statistics nil)
+;;   (org-checkbox-hierarchical-statistics nil)
+;;   (org-src-preserve-indentation t)
+;;   (org-adapt-indentation nil)
+;;   (org-tags-column 0)
+;;   (org-imenu-depth 20)
+;;   (org-hide-emphasis-markers t)
+;;   (org-catch-invisible-edits 'show-and-error)
+;;   (org-cycle-separator-lines 0)  ; Never leave empty lines between headings in collapsed view
+;;   ;;;; Getting Things Done ;;;;
+;;   (org-directory "~/org")  ; This is default already but lets declare explicitly
+;;   (org-agenda-files `(,(expand-file-name "agenda.org" org-directory)))
+;;   (org-agenda-start-on-weekday nil)
+;;   (org-deadline-warning-days 5)
+;;   (org-display-custom-times t)
+;;   (org-time-stamp-custom-formats '("<%d/%m/%Y %A>" . "<%d/%m/%Y %A %H:%M>"))
+;;   (org-bookmark-names-plist '())  ; Do not create bookmarks
+;;   (org-capture-templates '(("i" "Capture to inbox" entry
+;;                             (file "inbox.org")
+;;                             "* %?\nCREATED: %U"
+;;                             :empty-lines 1)))
+;;   (org-refile-targets '(("todos.org" :level . 1)
+;;                         ("someday.org" :level . 1)
+;;                         ("archive.org" :level . 1)
+;;                         ("agenda.org" :level . 1)))
+;;   (org-priority-default ?A)  ; Highest
+;;   ;; (org-log-done 'time)
+;;   (org-fontify-done-headline t)
+;;   (org-log-into-drawer t)  ; Log TODO state changes into :LOGBOOK: drawer insted of directly adding lines to the subtree
+;;   (org-todo-keywords '((sequence "TODO(t)" "WIP(w)" "HOLD(h)" "|" "DONE(d)")))
+;;   (org-todo-keyword-faces
+;;    '(("TODO" :foreground "orangered2" :weight bold)
+;;      ("WIP" :foreground "#86DC2F" :weight bold)
+;;      ("HOLD" :foreground "#DC752F" :weight bold)))
+;;   ;;;; Getting Things Done ;;;;
+;;   ;; :custom-face
+;;   ;; (org-block ((t (:family ,fk/default-font-family :extend t))))
+;;   ;; (org-ellipsis ((t (:foreground nil :inherit org-tag :weight light :height 0.9))))
+;;   ;; (org-checkbox ((t (:foreground "white"))))
+;;   ;; (org-level-1 ((t (:height 1.3 :weight bold))))
+;;   ;; (org-level-2 ((t (:height 1.2 :weight bold))))
+;;   ;; (org-level-3 ((t (:height 1.15 :weight bold))))
+;;   ;; (org-level-4 ((t (:height 1.1 :weight bold))))
+;;   ;; (org-level-5 ((t (:height 1.0 :weight bold))))
+;;   ;; (org-level-6 ((t (:height 1.0 :weight bold))))
+;;   ;; (org-level-7 ((t (:height 1.0 :weight bold))))
+;;   ;; (org-level-8 ((t (:height 1.0 :weight bold))))
+;;   ;; (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
+;;   ;; (org-table ((t (:family ,fk/default-font-family :foreground "white"))))
+;;   ;; (org-document-title ((t (:family "AV Qest" :height 3.0))))
+;;   ;; (org-block-begin-line ((t (:foreground ,fk/light-color3 :background ,fk/background-color :extend t))))
+;;   ;; (org-document-info-keyword ((t (:foreground ,fk/background-color))))  ; Make #+TITLE: invisible
+;;   ;; (org-meta-line ((t (:foreground ,fk/light-color3))))  ; Less distractive
+;;   ;; (org-agenda-date ((t (:foreground "#ECBE7B"))))
+;;   ;; (org-agenda-date-today ((t (:foreground "LightGoldenrod"))))
+;;   ;; (org-agenda-current-time ((t (:foreground "LightGoldenrod"))))
+;;   ;; (org-agenda-calendar-event ((t (:weight bold))))
+;;   ;; :bind
+;;   ;; ( :map org
+;;   ;;   ("a" . fk/org-agenda-posframe)
+;;   ;;   ("f" . (lambda () (interactive) (helm-find-files-1 "~/org/")))
+;;   ;;   ("c" . (lambda () (interactive) (org-capture :keys "i")))
+;;   ;;   ("t" . fk/org-babel-tangle-block)
+;;   ;;   ("d" . (lambda () (interactive) (org-todo "DONE")))
+;;   ;;   :map org-mode-map
+;;   ;;   ("C-c C-e" . org-edit-special)
+;;   ;;   ("M-n" . org-next-visible-heading)
+;;   ;;   ("M-p" . org-previous-visible-heading)
+;;   ;;   ("C-x C-1" . outline-hide-other)
+;;   ;;   ("C-c C-r" . org-refile-hydra/body)
+;;   ;;   ("C-c C-a" . fk/org-refile-done)  ; "a" for archive
+;;   ;;   ("C-c C-t" . fk/org-refile-trash)
+;;   ;;   ("C-c t" . org-todo)
+;;   ;;   ("C-c C-p" . org-priority-down)
+;;   ;;   ("C-M-j" . org-open-at-point)
+;;   ;;   ("C-c r" . org-shiftright)
+;;   ;;   ("C-c l" . org-shiftleft)
+;;   ;;   ("C-c u" . org-shiftup)
+;;   ;;   ("C-c d" . org-shiftdown)
+;;   ;;   ("C-c R" . org-metaright)
+;;   ;;   ("C-c L" . org-metaleft)
+;;   ;;   ("C-c U" . org-metaup)
+;;   ;;   ("C-c D" . org-metadown)
+;;   ;;   :map org-src-mode-map
+;;   ;;   ("C-c C-c" . org-edit-src-exit)
+;;   ;;   ;; Better, intuitive movement when selecting a date for schedule or deadline
+;;   ;;   :map org-read-date-minibuffer-local-map
+;;   ;;   ("C-n". (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1))))
+;;   ;;   ("C-p". (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
+;;   ;;   ("C-f". (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
+;;   ;;   ("C-b". (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
+;;   ;;   ("C-v". (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-month 1))))
+;;   ;;   ("M-v". (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-month 1)))))
+;;   :hook
+;;   (org-babel-after-execute . org-redisplay-inline-images)
+;;   (org-mode . (lambda () (fk/add-local-hook 'before-save-hook 'org-redisplay-inline-images)))
+;;   (org-after-refile-insert . (lambda () (fk/org-sort-by-priority) (save-buffer)))
+;;   (org-capture-mode . delete-other-windows)  ; make capture buffer fullscreen
+;;   (org-agenda-mode . (lambda () (require 'org-habit)))
+;;   :config
+;;   (add-to-list 'org-emphasis-alist '("#" (:box '(:line-width -1))))  ; FIXME: does not work.
+;;   (setf (cdr (assoc "*" org-emphasis-alist)) '((:weight extra-bold :foreground "#DDDDDD")))
+
+;;   (defun fk/org-babel-load-languages ()
+;;     "Load languages I use."
+;;     (interactive)
+;;     (org-babel-do-load-languages 'org-babel-load-languages '((python . t)
+;;                                                              (emacs-lisp . t)
+;;                                                              (shell . t)
+;;                                                              (ein . t))))
+
+;;   (defun fk/org-babel-tangle-block()
+;;     (interactive)
+;;     (let ((current-prefix-arg '(4)))
+;;       (call-interactively 'org-babel-tangle)))
+
+;;   (with-eval-after-load 'org-agenda
+;;     (bind-key "m" 'org-agenda-month-view org-agenda-mode-map))
+
+;;   ;; Beautify org mode
+;;   (font-lock-add-keywords 'org-mode
+;;                           '(("^ *\\([-]\\) "
+;;                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+;;   (font-lock-add-keywords 'org-mode
+;;                           '(("^ *\\([+]\\) "
+;;                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
+;;   (defface org-checkbox-done-text
+;;     '((t (:inherit 'font-lock-comment-face :slant normal)))
+;;     "Face for the text part of a checked org-mode checkbox.")
+
+;;   (font-lock-add-keywords
+;;    'org-mode
+;;    `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?:X\\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)"
+;;       1 'org-checkbox-done-text prepend))
+;;    'append)
+
+;;   (defun fk/org-insert-created-time ()
+;;     (interactive)
+;;     (insert "CREATED: " (format-time-string (org-time-stamp-format t t) (current-time))))
+
+;;   (defun fk/org-refile-fixed-location (file headline)
+;;     "Refile headline without selecting from refile-targets."
+;;     (let ((pos (save-window-excursion
+;;                  (find-file file)
+;;                  (org-find-exact-headline-in-buffer headline))))
+;;       (org-refile nil nil (list headline file nil pos))))
+
+;;   (defun fk/org-refile-fixed-location-with-closed-timestamp (file headline)
+;;     "Refile headline without selecting from refile-targets. Add
+;;     \"CLOSED\" timestamp info."
+;;     (add-hook 'org-after-refile-insert-hook (lambda () (org-add-planning-info 'closed (org-current-effective-time))) -100)
+;;     (fk/org-refile-fixed-location file headline)
+;;     (remove-hook 'org-after-refile-insert-hook (lambda () (org-add-planning-info 'closed (org-current-effective-time)))))
+
+;;   (defun fk/org-refile-done ()
+;;     (interactive)
+;;     (fk/org-refile-fixed-location-with-closed-timestamp "archive.org" "Done"))
+
+;;   (defun fk/org-refile-trash ()
+;;     (interactive)
+;;     (fk/org-refile-fixed-location-with-closed-timestamp "archive.org" "Trash"))
+
+;;   (defhydra org-refile-hydra
+;;     (:color red :hint nil)
+;;     "
+;; ^Move^                 ^Todo^         ^Someday^          ^Archive^
+;; -----------------------------------------------------------
+;; _n_: Next              _w_: Work      _E_: Emacs         _d_: Done
+;; _p_: Previous          _e_: Emacs     _R_: Presentation  _x_: Trash
+;; _P_: Priority          _t_: Tech      _T_: Tech          ^^
+;; _1_: Low Priority      _h_: Home      _M_: Movie         ^^
+;; _2_: Medium Priority   _o_: Other     _S_: TV Show       ^^
+;; _3_: High Priority     ^^             _A_: Anime         ^^
+;; ^^                     ^^             _V_: Video         ^^
+;; ^^                     ^^             _B_: Book          ^^
+;; ^^                     ^^             _F_: Food          ^^
+;; ^^                     ^^             _O_: Other         ^^
+
+;; "
+;;     ;; Move
+;;     ("n" next-line)
+;;     ("p" previous-line)
+;;     ("P" org-priority-down)
+;;     ("1" (lambda () (interactive) (org-priority ?C)))
+;;     ("2" (lambda () (interactive) (org-priority ?B)))
+;;     ("3" (lambda () (interactive) (org-priority ?A)))
+;;     ;; Archive
+;;     ("d" fk/org-refile-done)
+;;     ("x" fk/org-refile-trash)
+;;     ;; General
+;;     ("m" org-refile "Refile manually")
+;;     ("s" save-buffer "Save buffer")
+;;     ("q" nil "Quit" :color blue)))
 
 (use-package evil
 	;; :ensure t
@@ -330,7 +534,7 @@
 			(t
 			 (centaur-tabs-get-group-name (current-buffer))))))
   :hook
-  (dashboard-mode . centaur-tabs-local-mode)
+  ;;(dashboard-mode . centaur-tabs-local-mode)
   (term-mode . centaur-tabs-local-mode)
   (calendar-mode . centaur-tabs-local-mode)
   (org-agenda-mode . centaur-tabs-local-mode)
@@ -361,6 +565,7 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
+
 (use-package doom-modeline
 	:commands doom-modeline
 																				;:config
@@ -378,6 +583,11 @@
 																				;(doom-modeline-height 15)
 	(doom-modeline-bar-width 3)
 	:hook (after-init . doom-modeline-mode))
+
+;; Define your custom doom-modeline
+;(doom-modeline-def-modeline 'my-simple-line
+;  '(bar matches buffer-info remote-host buffer-position selection-info parrot nyan)
+;  '(misc-info minor-modes input-method buffer-encoding major-mode process vcs checker))
 
 ;;(use-package term
 ;;  :commands term
@@ -429,6 +639,74 @@
 ;;   (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
 ;;   (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
 
+;; TODO: Add a function to set window width to fill column width
+;; according to current major mode
+(use-package zoom
+	:ensure t
+  :commands zoom-mode
+  :preface
+  (defvar fk/zoom-default-size '(120 . 40))
+  :custom
+  (zoom-size fk/zoom-default-size)
+  :bind*
+  (("C-M-=" . fk/enlarge-window)
+   ("C-M--" . fk/shrink-window)
+   ("C-M-0" . balance-windows))
+  :config
+  ;; TODO: handle when zoom-mode active
+  (defun fk/adjust-window-width (percentage)
+    (if (and olivetti-mode (= (count-windows) 1))
+        (if (> percentage 1.0) (olivetti-expand) (olivetti-shrink))
+      (let* ((new-width (round (* (window-width) percentage)))
+             (zoom-size (cons new-width (cdr zoom-size))))
+        (if (> percentage 1.0)  ; TODO: fk/smooth-zoom do not shrink
+            (fk/smooth-zoom)
+          (zoom)))))
+
+  (defun fk/enlarge-window ()
+    (interactive)
+    (fk/adjust-window-width 1.1))
+
+  (defun fk/shrink-window ()
+    (interactive)
+    (fk/adjust-window-width 0.9))
+
+  (defvar fk/smooth-zoom-steps 10)
+  (defvar fk/smooth-zoom-period 0.01)
+
+  (defun fk/floor (number)
+    "Floor by absolute value."
+    (if (< number 0)
+        (ceiling number)
+      (floor number)))
+
+  (defun fk/smooth-zoom ()
+    "Smooth (animated) version of `zoom'."
+    (interactive)
+    (cancel-function-timers 'fk/smooth-zoom--resize)
+    (setq fk/smooth-zoom-sizes '())
+    (setq fk/smooth-zoom-window (get-buffer-window))
+    (let* ((current-size (cons (window-width) (window-height)))
+           (desired-size zoom-size)
+           (distances (cons (- (car desired-size) (car current-size))
+                            (- (cdr desired-size) (cdr current-size))))
+           (step-distance (cons (fk/floor (/ (car distances) (float fk/smooth-zoom-steps)))
+                                (fk/floor (/ (cdr distances) (float fk/smooth-zoom-steps))))))
+      (dotimes (i fk/smooth-zoom-steps)
+        (let* ((zoom-size (if (< i (1- fk/smooth-zoom-steps))
+                              (cons (+ (car step-distance) (car current-size))
+                                    (+ (cdr step-distance) (cdr current-size)))
+                            desired-size))
+               (time (concat (number-to-string (round (* i fk/smooth-zoom-period 1000))) " millisec")))
+          (setq current-size zoom-size)
+          (add-to-list 'fk/smooth-zoom-sizes current-size t)
+          (run-at-time time nil 'fk/smooth-zoom--resize)))))
+
+  (defun fk/smooth-zoom--resize ()
+    (with-selected-window fk/smooth-zoom-window
+      (let ((zoom-size (pop fk/smooth-zoom-sizes)))
+        (zoom--resize)))))
+
 (use-package projectile
   :ensure t
   :init
@@ -452,7 +730,7 @@
   (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
   (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
   ;;(setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")  ;; use custom image as banner
-  (setq dashboard-startup-banner "~/.emacs.d/images/black-hole.png")  ;; use custom image as banner
+  (setq dashboard-startup-banner "~/.emacs.d/images/RMS.png")  ;; use custom image as banner
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
                           (bookmarks . 3)

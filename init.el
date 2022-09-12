@@ -4,29 +4,25 @@
 
 (package-initialize)
 (require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("elpa" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; ; fetch the list of packages available 
-;; (unless package-archive-contents
-;;   (package-refresh-contents))
-
-;; ; install the missing packages
-;; (dolist (package package-list)
-;;   (unless (package-installed-p package)
-;;     (package-install package)))
-
 (load "~/.emacs.d/setting-packages")
 (load "~/.emacs.d/setting-lsp")
 (load "~/.emacs.d/setting-font-face")
-;(load "~/.emacs.d/company-go")
+(load "~/.emacs.d/company-go")
+
+(require 'company-go)
 
 (load-theme 'gruvbox-dark-medium t)
+;; (use-package catppuccin-theme
+;;  :config
+;;  (setq catppuccin-height-title1 1.5))
 
 (setq frame-resize-pixelwise t)
 (dotimes (n 3)
@@ -173,15 +169,19 @@
 
 
 (custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-	 '(default))
+	 '("2627707bc15dd427ef165fc8ff9868e3e184f6a151f139c092561bbc39734364" default))
  '(inhibit-startup-screen t)
  '(package-selected-packages
-	 '(rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground))
+	 '(zoom nyan-mode parrot catppuccin-theme rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(custom-button ((t (:background "RoyalBlue1" :foreground "white" :box (:line-width (2 . 2) :style released-button))))))
