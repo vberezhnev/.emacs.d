@@ -1,1 +1,0 @@
-("~/.emacs.d/" "~/Templates/Golang/rest-api-golang/" "~/" "~/Templates/NextJS/wallis.dev/" "~/Templates/NextJS/kinoway/" "~/Templates/NestJS/technical-task-pytech/" "~/Templates/MixTechProjects/Magni/" "~/Templates/Commercial Projects/doll-stage/" "~/Trash/nix-configuration/" "~/Trash/nitch/" "~/\320\227\320\260\320\263\321\200\321\203\320\267\320\272\320\270/tesseract/")
