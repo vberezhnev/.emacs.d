@@ -19,11 +19,15 @@
 
 (load-theme 'doom-one t)
 
+;; Disable backup
+(setq backup-inhibited t)
+;; Disable auto save
+(setq auto-save-default nil)
+
+
 (setq frame-resize-pixelwise t)
 (dotimes (n 3)
   (toggle-frame-maximized))
-
-(setq make-backup-files nil)          ; Delete #filename# files
 
 (setq-default message-log-max nil)
 (kill-buffer "*Messages*")
