@@ -5,6 +5,7 @@ auto-save-list/
 eshell/
 site-lisp/
 elpa/
+quelpa/
 
 .local/
 .cache/

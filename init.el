@@ -1,7 +1,3 @@
-;; (setq package-list '(rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground)) ;
-
-;; xah-fly-keys 
-
 (package-initialize)
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -15,14 +11,8 @@
 (load "~/.emacs.d/setting-packages")
 (load "~/.emacs.d/setting-lsp")
 (load "~/.emacs.d/setting-font-face")
-(load "~/.emacs.d/local-packages/company-go")
 
-(require 'company-go)
-
-(load-theme 'gruvbox-dark-medium t)
-;; (use-package catppuccin-theme
-;;  :config
-;;  (setq catppuccin-height-title1 1.5))
+(load-theme 'doom-gruvbox t)
 
 (setq frame-resize-pixelwise t)
 (dotimes (n 3)
@@ -41,18 +31,18 @@
 
 (setq initial-major-mode (quote fundamental-mode))
 
-(xterm-mouse-mode 1)
+(xterm-mouse-mode t)
+
+;; Prompt for y or n instead of yes or no.
+(use-package subr
+  :straight nil
+  :no-require t
+  :init
+  (fset 'yes-or-no-p 'y-or-n-p))
 
 (setq-default tab-width 2) ; set default tab char's display width to 2 spaces
 (setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
 
-(setq gc-cons-threshold most-positive-fixnum)
-
-(add-hook 'emacs-startup-hook
-					(lambda ()
-						(setq gc-cons-threshold (expt 2 23))))
-
-																				
 (dolist (mode '(org-mode-hook ; Disable line numbers for some modes
                 term-mode-hook
                 shell-mode-hook
@@ -60,20 +50,35 @@
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
+
 (global-display-line-numbers-mode t)
-(setq display-line-numbers-type 'relative)
+(use-package display-line-numbers
+  ;;:straight nil
+  ;; :hook (prog-mode . display-line-numbers-mode)
+  :custom
+	;;(setq display-line-numbers-type 'relative)
+	(display-line-numbers-width 4)
+  (display-line-numbers-grow-only t)
+  (display-line-numbers-width-start t)
+  :config
+  ;; (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
+	;;     "The `display-line-numbers' mode affects `scroll-margin' variable.
+
+	;; This advice recalculates the amount of lines needed to scroll to
+	;; ensure `scroll-margin' preserved."
+	;;     (apply f args)
+	;;     (let ((diff (- scroll-margin
+	;;                    (- (line-number-at-pos (point))
+	;;                       (line-number-at-pos (window-start))))))
+	;;       (when (> diff 0)
+	;;         (scroll-down diff))))
+  )
 
 (scroll-bar-mode -1)        ; Disable visible scrollbar
 (tool-bar-mode -1)          ; Disable the toolbar
 (tooltip-mode -1)           ; Disable tooltips
 (set-fringe-mode 10)        ; Give some breathing room
-(menu-bar-mode -1)          ; Disable the menu bar
-
-(setq gc-cons-threshold most-positive-fixnum) ; Minimize garbage collection during startup
-
-(add-hook 'emacs-startup-hook ; Lower threshold back to 8 MiB (default is 800kB)
-          (lambda ()
-            (setq gc-cons-threshold (expt 2 23))))
+;;(menu-bar-mode -1)        ; Disable the menu bar
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; Keymap ;;;;;;;;;;
@@ -91,8 +96,8 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
 ;; Ctrl+C, Ctrl+V copy, paste mode
-;(global-set-key (kbd "C-c") 'kill-ring-save)
-;(global-set-key (kbd "C-v") 'yank)
+;;(global-set-key (kbd "C-c") 'kill-ring-save)
+;;(global-set-key (kbd "C-v") 'yank)
 
 ;;;; Custom modeline ;;;;
 
@@ -174,10 +179,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-	 '("2627707bc15dd427ef165fc8ff9868e3e184f6a151f139c092561bbc39734364" default))
+   '("b6c43bb2aea78890cf6bd4a970e6e0277d2daf0075272817ea8bb53f9c6a7f0a" "0ed3d96a506b89c1029a1ed904b11b5adcebeb2e0c16098c99c0ad95cb124729" "ae426fc51c58ade49774264c17e666ea7f681d8cae62570630539be3d06fd964" "bf948e3f55a8cd1f420373410911d0a50be5a04a8886cabe8d8e471ad8fdba8e" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "58c996beb973f7e988ee4fd21c367b7a5bbdb0622ddfbbd112672a7b4e3d3b81" "636b135e4b7c86ac41375da39ade929e2bd6439de8901f53f88fde7dd5ac3561" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "2627707bc15dd427ef165fc8ff9868e3e184f6a151f139c092561bbc39734364" default))
  '(inhibit-startup-screen t)
  '(package-selected-packages
-	 '(zoom nyan-mode parrot catppuccin-theme rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground))
+   '(ample-theme melancholy-theme moe-theme lua-mode zoom nyan-mode parrot catppuccin-theme rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

@@ -80,8 +80,9 @@
 
 (use-package elcord
 	:hook (after-init . doom-modeline-mode))
-; (use-package org-superstar
-;	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+
+;; (use-package org-superstar
+;;	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
 ;; (use-package org
 ;;   ;:straight (:type built-in)
@@ -287,10 +288,16 @@
 ;;     ("s" save-buffer "Save buffer")
 ;;     ("q" nil "Quit" :color blue)))
 
+(use-package multi-term
+	:bind
+  ("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
+  ("C-x w" . multi-term) ;; Open default multi-term without automate spliting
+	)
+
 (use-package evil
 	;; :ensure t
   :init      ;; tweak evil's configuration before loading it
-  ;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+																				;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
@@ -470,22 +477,22 @@
   (add-hook 'prog-mode-hook #'format-all-ensure-formatter))
 
 
-																				; (use-package undo-fu
-																				; 	:config
-																				;   (global-unset-key (kbd "C-z"))
-																				;   (global-set-key (kbd "C-z")   'undo-fu-only-undo)
-																				;   (global-set-key (kbd "C-S-z") 'undo-fu-only-redo))
+;; (use-package undo-fu
+;; 	:config
+;;   (global-unset-key (kbd "C-z"))
+;;   (global-set-key (kbd "C-z")   'undo-fu-only-undo)
+;;   (global-set-key (kbd "C-S-z") 'undo-fu-only-redo))
 
 (use-package centaur-tabs
-  :config
+	 :ensure t
+	 :config
   (setq centaur-tabs-style "bar"
-				centaur-tabs-height 32
-				centaur-tabs-set-icons t
-				centaur-tabs-set-modified-marker t
-				centaur-tabs-show-navigation-buttons t
-				centaur-tabs-set-bar 'under
-				x-underline-at-descent-line t
-				centaur-tabs-enable-key-bindings t)
+	  centaur-tabs-height 32
+	  centaur-tabs-set-icons t
+	  centaur-tabs-set-modified-marker t
+	  ;; centaur-tabs-show-navigation-buttons t
+	  centaur-tabs-set-bar 'over
+	  x-underline-at-descent-line t)
   (centaur-tabs-headline-match)
   ;; (setq centaur-tabs-gray-out-icons 'buffer)
   ;; (centaur-tabs-enable-buffer-reordering)
@@ -496,43 +503,43 @@
   (defun centaur-tabs-buffer-groups ()
     "`centaur-tabs-buffer-groups' control buffers' group rules.
 
- Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
- All buffer name start with * will group to \"Emacs\".
- Other buffer group by `centaur-tabs-get-group-name' with project name."
+Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+All buffer name start with * will group to \"Emacs\".
+Other buffer group by `centaur-tabs-get-group-name' with project name."
     (list
      (cond
-			;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-			;; "Remote")
-			((or (string-equal "*" (substring (buffer-name) 0 1))
-					 (memq major-mode '(magit-process-mode
-															magit-status-mode
-															magit-diff-mode
-															magit-log-mode
-															magit-file-mode
-															magit-blob-mode
-															magit-blame-mode
-															)))
-			 "Emacs")
-			((derived-mode-p 'prog-mode)
-			 "Editing")
-			((derived-mode-p 'dired-mode)
-			 "Dired")
-			((memq major-mode '(helpful-mode
-													help-mode))
-			 "Help")
-			((memq major-mode '(org-mode
-													org-agenda-clockreport-mode
-													org-src-mode
-													org-agenda-mode
-													org-beamer-mode
-													org-indent-mode
-													org-bullets-mode
-													org-cdlatex-mode
-													org-agenda-log-mode
-													diary-mode))
-			 "OrgMode")
-			(t
-			 (centaur-tabs-get-group-name (current-buffer))))))
+	;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+	;; "Remote")
+	((or (string-equal "*" (substring (buffer-name) 0 1))
+	     (memq major-mode '(magit-process-mode
+				magit-status-mode
+				magit-diff-mode
+				magit-log-mode
+				magit-file-mode
+				magit-blob-mode
+				magit-blame-mode
+				)))
+	 "Emacs")
+	((derived-mode-p 'prog-mode)
+	 "Editing")
+	((derived-mode-p 'dired-mode)
+	 "Dired")
+	((memq major-mode '(helpful-mode
+			    help-mode))
+	 "Help")
+	((memq major-mode '(org-mode
+			    org-agenda-clockreport-mode
+			    org-src-mode
+			    org-agenda-mode
+			    org-beamer-mode
+			    org-indent-mode
+			    org-bullets-mode
+			    org-cdlatex-mode
+			    org-agenda-log-mode
+			    diary-mode))
+	 "OrgMode")
+	(t
+	 (centaur-tabs-get-group-name (current-buffer))))))
   :hook
   ;;(dashboard-mode . centaur-tabs-local-mode)
   (term-mode . centaur-tabs-local-mode)
@@ -546,35 +553,152 @@
   ("C-c t p" . centaur-tabs-group-by-projectile-project)
   ("C-c t g" . centaur-tabs-group-buffer-groups)
   (:map evil-normal-state-map
-				("g t" . centaur-tabs-forward)
-				("g T" . centaur-tabs-backward)))
+	  ("g t" . centaur-tabs-forward)
+	  ("g T" . centaur-tabs-backward)))
 
-(use-package doom-themes
-  :ensure t
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  ;;(doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+;; ;; (use-package tab-line
+;; ;;   :straight nil
+;; ;;   :when window-system
+;; ;;   :hook ((after-init . global-tab-line-mode)
+;; ;;          (aorst--theme-change . aorst/tabline-setup-faces))
+;; ;;   :config
+;; ;;   (defun tab-line-close-tab (&optional e)
+;; ;;     "Close the selected tab.
 
+;; ;; If tab is presented in another window, close the tab by using
+;; ;; `bury-buffer` function.  If tab is unique to all existing
+;; ;; windows, kill the buffer with `kill-buffer` function.  Lastly, if
+;; ;; no tabs left in the window, it is deleted with `delete-window`
+;; ;; function."
+;; ;;     (interactive "e")
+;; ;;     (let* ((posnp (event-start e))
+;; ;;            (window (posn-window posnp))
+;; ;;            (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+;; ;;       (with-selected-window window
+;; ;;         (let ((tab-list (tab-line-tabs-window-buffers))
+;; ;;               (buffer-list (flatten-list
+;; ;;                             (seq-reduce (lambda (list window)
+;; ;;                                           (select-window window t)
+;; ;;                                           (cons (tab-line-tabs-window-buffers) list))
+;; ;;                                         (window-list) nil))))
+;; ;;           (select-window window)
+;; ;;           (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+;; ;;               (progn
+;; ;;                 (if (eq buffer (current-buffer))
+;; ;;                     (bury-buffer)
+;; ;;                   (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+;; ;;                   (set-window-next-buffers window (delq buffer (window-next-buffers))))
+;; ;;                 (unless (cdr tab-list)
+;; ;;                   (ignore-errors (delete-window window))))
+;; ;;             (and (kill-buffer buffer)
+;; ;;                  (unless (cdr tab-list)
+;; ;;                    (ignore-errors (delete-window window)))))))))
+
+
+;; ;;   (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
+;; ;;     "Create name for tab with padding and truncation.
+
+;; ;; If buffer name is shorter than `tab-line-tab-max-width' it gets
+;; ;; centered with spaces, otherwise it is truncated, to preserve
+;; ;; equal width for all tabs.  This function also tries to fit as
+;; ;; many tabs in window as possible, so if there are no room for tabs
+;; ;; with maximum width, it calculates new width for each tab and
+;; ;; truncates text if needed.  Minimal width can be set with
+;; ;; `tab-line-tab-min-width' variable."
+;; ;;     (with-current-buffer buffer
+;; ;;       (let ((buffer (string-trim (buffer-name)))
+;; ;;             (right-pad (if tab-line-close-button-show "" " ")))
+;; ;;         (propertize (concat " " buffer right-pad)
+;; ;;                     'help-echo (when-let ((name (buffer-file-name)))
+;; ;;                                  (abbreviate-file-name name))))))
+
+
+;; ;;   (setq tab-line-close-button-show t
+;; ;;         tab-line-new-button-show nil
+;; ;;         tab-line-separator ""
+;; ;;         tab-line-tab-name-function #'aorst/tab-line-name-buffer
+;; ;;         tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+;; ;;                                           'keymap tab-line-right-map
+;; ;;                                           'mouse-face 'tab-line-highlight
+;; ;;                                           'help-echo "Click to scroll right")
+;; ;;         tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+;; ;;                                          'keymap tab-line-left-map
+;; ;;                                          'mouse-face 'tab-line-highlight
+;; ;;                                          'help-echo "Click to scroll left")
+;; ;;         tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+;; ;;                                           'keymap tab-line-tab-close-map
+;; ;;                                           'mouse-face 'tab-line-close-highlight
+;; ;;                                           'help-echo "Click to close tab")
+;; ;;         tab-line-exclude-modes '(ediff-mode
+;; ;;                                  process-menu-mode
+;; ;;                                  term-mode
+;; ;;                                  vterm-mode
+;; ;;                                  treemacs-mode
+;; ;;                                  imenu-list-major-mode))
+
+
+;;   (defun aorst/tabline-setup-faces ()
+;;     (let ((bg (face-attribute 'default :background))
+;;           (fg (face-attribute 'default :foreground))
+;;           (dark-fg (face-attribute 'shadow :foreground))
+;;           (overline (face-attribute 'font-lock-keyword-face :foreground))
+;;           (base (if (and (facep 'solaire-default-face)
+;;                          (not (eq (face-attribute 'solaire-default-face :background)
+;;                                   'unspecified)))
+;;                     (face-attribute 'solaire-default-face :background)
+;;                   (face-attribute 'mode-line :background)))
+;;           (box-width (/ aorst--line-pixel-height 5)))
+;;       (when (facep 'tab-line-tab-special)
+;;         (set-face-attribute 'tab-line-tab-special nil
+;;                             :slant 'normal))
+;;       (set-face-attribute 'tab-line nil
+;;                           :background base
+;;                           :foreground dark-fg
+;;                           :height 1.0
+;;                           :inherit nil
+;;                           :overline base
+;;                           :box (when (> box-width 0)
+;;                                  (list :line-width -1 :color base)))
+;;       (set-face-attribute 'tab-line-tab nil
+;;                           :foreground dark-fg
+;;                           :background bg
+;;                           :inherit nil
+;;                           :box (when (> box-width 0)
+;;                                  (list :line-width box-width :color bg)))
+;;       (set-face-attribute 'tab-line-tab-inactive nil
+;;                           :foreground dark-fg
+;;                           :background base
+;;                           :inherit nil
+;;                           :box (when (> box-width 0)
+;;                                  (list :line-width box-width :color base)))
+;;       (set-face-attribute 'tab-line-tab-current nil
+;;                           :foreground fg
+;;                           :background bg
+;;                           :inherit nil
+;;                           :overline overline
+;;                           :box (when (> box-width 0)
+;;                                  (list :line-width box-width :color bg)))))
+
+;;   (aorst/tabline-setup-faces)
+
+;;   (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
+;;     (select-window (posn-window (event-start e)))))
+
+(use-package moe-theme
+	:ensure t)
+
+(use-package melancholy-theme
+  :ensure t)
 
 (use-package doom-modeline
 	:commands doom-modeline
-																				;:config
-																				;(setq doom-modeline-height 15)
-																				;(setq doom-modeline-bar-width 3)
+	;;:config
+	;;(setq doom-modeline-height 15)
+	;;(setq doom-modeline-bar-width 3)
 	;;(setq doom-modeline-minor-modes (featurep 'minions))
-																				;(setq doom-modeline-buffer-file-name-style 'buffer-name)
-																				;(doom-modeline-set-timemachine-modeline)
-																				;(doom-modeline-time t)
+	;;(setq doom-modeline-buffer-file-name-style 'buffer-name)
+	;;(doom-modeline-set-timemachine-modeline)
+	;;(doom-modeline-time t)
 
 	:custom
 	(doom-modeline-set-timemachine-modeline)
@@ -585,9 +709,9 @@
 	:hook (after-init . doom-modeline-mode))
 
 ;; Define your custom doom-modeline
-;(doom-modeline-def-modeline 'my-simple-line
-;  '(bar matches buffer-info remote-host buffer-position selection-info parrot nyan)
-;  '(misc-info minor-modes input-method buffer-encoding major-mode process vcs checker))
+;;(doom-modeline-def-modeline 'my-simple-line
+;;  '(bar matches buffer-info remote-host buffer-position selection-info parrot nyan)
+;;  '(misc-info minor-modes input-method buffer-encoding major-mode process vcs checker))
 
 ;;(use-package term
 ;;  :commands term

@@ -136,6 +136,9 @@
 ;;/ Golang /;;
 ;;//////////;;
 
+(use-package 'company-go
+	:load-path "~/.emacs.d/local-packages/company-go")
+
 ;; Set up before-save hooks to format buffer and add/delete imports.
 ;; Make sure you don't have other gofmt/goimports hooks enabled.
 (defun lsp-go-install-save-hooks ()
