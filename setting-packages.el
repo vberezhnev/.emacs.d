@@ -79,225 +79,20 @@
 ;;   ("h" image-backward-hscroll :color red))
 
 (use-package elcord
-	:hook (after-init . doom-modeline-mode))
+	:hook (after-init . elcord-mode))
 
-;; (use-package org-superstar
-;;	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
-
-;; (use-package org
-;;   ;:straight (:type built-in)
-;;   :custom
-;;   (org-confirm-babel-evaluate nil)
-;;   (org-ellipsis "↴") ;; ↴, ▼, ▶, ⤵
-;;   (org-src-window-setup 'current-window)
-;;   (org-startup-indented t)
-;;   (org-startup-folded 'content)  ; show only headlines (and sub headlines, recursively) at startup
-;;   (org-startup-with-inline-images t)
-;;   (org-image-actual-width '(400))
-;;   (org-hierarchical-todo-statistics nil)
-;;   (org-checkbox-hierarchical-statistics nil)
-;;   (org-src-preserve-indentation t)
-;;   (org-adapt-indentation nil)
-;;   (org-tags-column 0)
-;;   (org-imenu-depth 20)
-;;   (org-hide-emphasis-markers t)
-;;   (org-catch-invisible-edits 'show-and-error)
-;;   (org-cycle-separator-lines 0)  ; Never leave empty lines between headings in collapsed view
-;;   ;;;; Getting Things Done ;;;;
-;;   (org-directory "~/org")  ; This is default already but lets declare explicitly
-;;   (org-agenda-files `(,(expand-file-name "agenda.org" org-directory)))
-;;   (org-agenda-start-on-weekday nil)
-;;   (org-deadline-warning-days 5)
-;;   (org-display-custom-times t)
-;;   (org-time-stamp-custom-formats '("<%d/%m/%Y %A>" . "<%d/%m/%Y %A %H:%M>"))
-;;   (org-bookmark-names-plist '())  ; Do not create bookmarks
-;;   (org-capture-templates '(("i" "Capture to inbox" entry
-;;                             (file "inbox.org")
-;;                             "* %?\nCREATED: %U"
-;;                             :empty-lines 1)))
-;;   (org-refile-targets '(("todos.org" :level . 1)
-;;                         ("someday.org" :level . 1)
-;;                         ("archive.org" :level . 1)
-;;                         ("agenda.org" :level . 1)))
-;;   (org-priority-default ?A)  ; Highest
-;;   ;; (org-log-done 'time)
-;;   (org-fontify-done-headline t)
-;;   (org-log-into-drawer t)  ; Log TODO state changes into :LOGBOOK: drawer insted of directly adding lines to the subtree
-;;   (org-todo-keywords '((sequence "TODO(t)" "WIP(w)" "HOLD(h)" "|" "DONE(d)")))
-;;   (org-todo-keyword-faces
-;;    '(("TODO" :foreground "orangered2" :weight bold)
-;;      ("WIP" :foreground "#86DC2F" :weight bold)
-;;      ("HOLD" :foreground "#DC752F" :weight bold)))
-;;   ;;;; Getting Things Done ;;;;
-;;   ;; :custom-face
-;;   ;; (org-block ((t (:family ,fk/default-font-family :extend t))))
-;;   ;; (org-ellipsis ((t (:foreground nil :inherit org-tag :weight light :height 0.9))))
-;;   ;; (org-checkbox ((t (:foreground "white"))))
-;;   ;; (org-level-1 ((t (:height 1.3 :weight bold))))
-;;   ;; (org-level-2 ((t (:height 1.2 :weight bold))))
-;;   ;; (org-level-3 ((t (:height 1.15 :weight bold))))
-;;   ;; (org-level-4 ((t (:height 1.1 :weight bold))))
-;;   ;; (org-level-5 ((t (:height 1.0 :weight bold))))
-;;   ;; (org-level-6 ((t (:height 1.0 :weight bold))))
-;;   ;; (org-level-7 ((t (:height 1.0 :weight bold))))
-;;   ;; (org-level-8 ((t (:height 1.0 :weight bold))))
-;;   ;; (org-drawer ((t (:foreground nil :inherit font-lock-comment-face))))
-;;   ;; (org-table ((t (:family ,fk/default-font-family :foreground "white"))))
-;;   ;; (org-document-title ((t (:family "AV Qest" :height 3.0))))
-;;   ;; (org-block-begin-line ((t (:foreground ,fk/light-color3 :background ,fk/background-color :extend t))))
-;;   ;; (org-document-info-keyword ((t (:foreground ,fk/background-color))))  ; Make #+TITLE: invisible
-;;   ;; (org-meta-line ((t (:foreground ,fk/light-color3))))  ; Less distractive
-;;   ;; (org-agenda-date ((t (:foreground "#ECBE7B"))))
-;;   ;; (org-agenda-date-today ((t (:foreground "LightGoldenrod"))))
-;;   ;; (org-agenda-current-time ((t (:foreground "LightGoldenrod"))))
-;;   ;; (org-agenda-calendar-event ((t (:weight bold))))
-;;   ;; :bind
-;;   ;; ( :map org
-;;   ;;   ("a" . fk/org-agenda-posframe)
-;;   ;;   ("f" . (lambda () (interactive) (helm-find-files-1 "~/org/")))
-;;   ;;   ("c" . (lambda () (interactive) (org-capture :keys "i")))
-;;   ;;   ("t" . fk/org-babel-tangle-block)
-;;   ;;   ("d" . (lambda () (interactive) (org-todo "DONE")))
-;;   ;;   :map org-mode-map
-;;   ;;   ("C-c C-e" . org-edit-special)
-;;   ;;   ("M-n" . org-next-visible-heading)
-;;   ;;   ("M-p" . org-previous-visible-heading)
-;;   ;;   ("C-x C-1" . outline-hide-other)
-;;   ;;   ("C-c C-r" . org-refile-hydra/body)
-;;   ;;   ("C-c C-a" . fk/org-refile-done)  ; "a" for archive
-;;   ;;   ("C-c C-t" . fk/org-refile-trash)
-;;   ;;   ("C-c t" . org-todo)
-;;   ;;   ("C-c C-p" . org-priority-down)
-;;   ;;   ("C-M-j" . org-open-at-point)
-;;   ;;   ("C-c r" . org-shiftright)
-;;   ;;   ("C-c l" . org-shiftleft)
-;;   ;;   ("C-c u" . org-shiftup)
-;;   ;;   ("C-c d" . org-shiftdown)
-;;   ;;   ("C-c R" . org-metaright)
-;;   ;;   ("C-c L" . org-metaleft)
-;;   ;;   ("C-c U" . org-metaup)
-;;   ;;   ("C-c D" . org-metadown)
-;;   ;;   :map org-src-mode-map
-;;   ;;   ("C-c C-c" . org-edit-src-exit)
-;;   ;;   ;; Better, intuitive movement when selecting a date for schedule or deadline
-;;   ;;   :map org-read-date-minibuffer-local-map
-;;   ;;   ("C-n". (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1))))
-;;   ;;   ("C-p". (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
-;;   ;;   ("C-f". (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
-;;   ;;   ("C-b". (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
-;;   ;;   ("C-v". (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-month 1))))
-;;   ;;   ("M-v". (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-month 1)))))
-;;   :hook
-;;   (org-babel-after-execute . org-redisplay-inline-images)
-;;   (org-mode . (lambda () (fk/add-local-hook 'before-save-hook 'org-redisplay-inline-images)))
-;;   (org-after-refile-insert . (lambda () (fk/org-sort-by-priority) (save-buffer)))
-;;   (org-capture-mode . delete-other-windows)  ; make capture buffer fullscreen
-;;   (org-agenda-mode . (lambda () (require 'org-habit)))
-;;   :config
-;;   (add-to-list 'org-emphasis-alist '("#" (:box '(:line-width -1))))  ; FIXME: does not work.
-;;   (setf (cdr (assoc "*" org-emphasis-alist)) '((:weight extra-bold :foreground "#DDDDDD")))
-
-;;   (defun fk/org-babel-load-languages ()
-;;     "Load languages I use."
-;;     (interactive)
-;;     (org-babel-do-load-languages 'org-babel-load-languages '((python . t)
-;;                                                              (emacs-lisp . t)
-;;                                                              (shell . t)
-;;                                                              (ein . t))))
-
-;;   (defun fk/org-babel-tangle-block()
-;;     (interactive)
-;;     (let ((current-prefix-arg '(4)))
-;;       (call-interactively 'org-babel-tangle)))
-
-;;   (with-eval-after-load 'org-agenda
-;;     (bind-key "m" 'org-agenda-month-view org-agenda-mode-map))
-
-;;   ;; Beautify org mode
-;;   (font-lock-add-keywords 'org-mode
-;;                           '(("^ *\\([-]\\) "
-;;                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-;;   (font-lock-add-keywords 'org-mode
-;;                           '(("^ *\\([+]\\) "
-;;                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
-;;   (defface org-checkbox-done-text
-;;     '((t (:inherit 'font-lock-comment-face :slant normal)))
-;;     "Face for the text part of a checked org-mode checkbox.")
-
-;;   (font-lock-add-keywords
-;;    'org-mode
-;;    `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?:X\\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)"
-;;       1 'org-checkbox-done-text prepend))
-;;    'append)
-
-;;   (defun fk/org-insert-created-time ()
-;;     (interactive)
-;;     (insert "CREATED: " (format-time-string (org-time-stamp-format t t) (current-time))))
-
-;;   (defun fk/org-refile-fixed-location (file headline)
-;;     "Refile headline without selecting from refile-targets."
-;;     (let ((pos (save-window-excursion
-;;                  (find-file file)
-;;                  (org-find-exact-headline-in-buffer headline))))
-;;       (org-refile nil nil (list headline file nil pos))))
-
-;;   (defun fk/org-refile-fixed-location-with-closed-timestamp (file headline)
-;;     "Refile headline without selecting from refile-targets. Add
-;;     \"CLOSED\" timestamp info."
-;;     (add-hook 'org-after-refile-insert-hook (lambda () (org-add-planning-info 'closed (org-current-effective-time))) -100)
-;;     (fk/org-refile-fixed-location file headline)
-;;     (remove-hook 'org-after-refile-insert-hook (lambda () (org-add-planning-info 'closed (org-current-effective-time)))))
-
-;;   (defun fk/org-refile-done ()
-;;     (interactive)
-;;     (fk/org-refile-fixed-location-with-closed-timestamp "archive.org" "Done"))
-
-;;   (defun fk/org-refile-trash ()
-;;     (interactive)
-;;     (fk/org-refile-fixed-location-with-closed-timestamp "archive.org" "Trash"))
-
-;;   (defhydra org-refile-hydra
-;;     (:color red :hint nil)
-;;     "
-;; ^Move^                 ^Todo^         ^Someday^          ^Archive^
-;; -----------------------------------------------------------
-;; _n_: Next              _w_: Work      _E_: Emacs         _d_: Done
-;; _p_: Previous          _e_: Emacs     _R_: Presentation  _x_: Trash
-;; _P_: Priority          _t_: Tech      _T_: Tech          ^^
-;; _1_: Low Priority      _h_: Home      _M_: Movie         ^^
-;; _2_: Medium Priority   _o_: Other     _S_: TV Show       ^^
-;; _3_: High Priority     ^^             _A_: Anime         ^^
-;; ^^                     ^^             _V_: Video         ^^
-;; ^^                     ^^             _B_: Book          ^^
-;; ^^                     ^^             _F_: Food          ^^
-;; ^^                     ^^             _O_: Other         ^^
-
-;; "
-;;     ;; Move
-;;     ("n" next-line)
-;;     ("p" previous-line)
-;;     ("P" org-priority-down)
-;;     ("1" (lambda () (interactive) (org-priority ?C)))
-;;     ("2" (lambda () (interactive) (org-priority ?B)))
-;;     ("3" (lambda () (interactive) (org-priority ?A)))
-;;     ;; Archive
-;;     ("d" fk/org-refile-done)
-;;     ("x" fk/org-refile-trash)
-;;     ;; General
-;;     ("m" org-refile "Refile manually")
-;;     ("s" save-buffer "Save buffer")
-;;     ("q" nil "Quit" :color blue)))
+(use-package org-superstar
+	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
 (use-package multi-term
 	:bind
   ("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
-  ("C-x w" . multi-term) ;; Open default multi-term without automate spliting
-	)
+  ("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
 
 (use-package evil
-	;; :ensure t
+	:ensure t
   :init      ;; tweak evil's configuration before loading it
-																				;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+	;;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
@@ -315,24 +110,6 @@
 ;;   :config
 ;; 	:ensure t
 ;;   (general-evil-setup t))
-
-(use-package js2-mode :ensure t :defer 20
-  :mode
-  (("\\.js\\'" . js2-mode))
-  :custom
-  (js2-include-node-externs t)
-  (js2-global-externs '("customElements"))
-  (js2-highlight-level 3)
-  (js2r-prefer-let-over-var t)
-  (js2r-prefered-quote-type 2)
-  (js-indent-align-list-continuation t)
-  (global-auto-highlight-symbol-mode t)
-  :config
-  (setq js-indent-level 2)
-  ;; patch in basic private field support
-  (advice-add #'js2-identifier-start-p
-							:after-until
-							(lambda (c) (eq c ?#))))
 
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
@@ -356,20 +133,6 @@
   :bind (:package json-mode-map
 									:map json-mode-map
 									("C-c <tab>" . json-mode-beautify)))
-
-;; (use-package web-mode  :ensure t
-;;   :mode (("\\.js\\'" . web-mode)
-;;          ("\\.jsx\\'" . web-mode)
-;;          ("\\.ts\\'" . web-mode)
-;;          ("\\.tsx\\'" . web-mode)
-;;          ("\\.html\\'" . web-mode)
-;;          ;("\\.vue\\'" . web-mode)
-;; 	 ("\\.json\\'" . web-mode))
-;;   :commands web-mode
-;;   :config
-;;   (setq web-mode-content-types-alist
-;; 	'(("jsx" . "\\.js[x]?\\'")))
-;;   )
 
 (use-package treemacs
   :ensure t
@@ -483,21 +246,22 @@
 ;;   (global-set-key (kbd "C-z")   'undo-fu-only-undo)
 ;;   (global-set-key (kbd "C-S-z") 'undo-fu-only-redo))
 
+
+(centaur-tabs-mode t)
 (use-package centaur-tabs
-	 :ensure t
-	 :config
+	:ensure t
+	:config
   (setq centaur-tabs-style "bar"
-	  centaur-tabs-height 32
-	  centaur-tabs-set-icons t
-	  centaur-tabs-set-modified-marker t
-	  ;; centaur-tabs-show-navigation-buttons t
-	  centaur-tabs-set-bar 'over
-	  x-underline-at-descent-line t)
-  (centaur-tabs-headline-match)
-  ;; (setq centaur-tabs-gray-out-icons 'buffer)
+				centaur-tabs-height 32
+				centaur-tabs-set-icons t
+				centaur-tabs-set-modified-marker t
+				;; centaur-tabs-show-navigation-buttons t
+				centaur-tabs-set-bar 'over
+				x-underline-at-descent-line t)
+	(centaur-tabs-headline-match)
+  (setq centaur-tabs-gray-out-icons 'buffer)
   ;; (centaur-tabs-enable-buffer-reordering)
   ;; (setq centaur-tabs-adjust-buffer-order t)
-  (centaur-tabs-mode t)
   (setq uniquify-separator "/")
   (setq uniquify-buffer-name-style 'forward)
   (defun centaur-tabs-buffer-groups ()
@@ -508,40 +272,40 @@ All buffer name start with * will group to \"Emacs\".
 Other buffer group by `centaur-tabs-get-group-name' with project name."
     (list
      (cond
-	;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-	;; "Remote")
-	((or (string-equal "*" (substring (buffer-name) 0 1))
-	     (memq major-mode '(magit-process-mode
-				magit-status-mode
-				magit-diff-mode
-				magit-log-mode
-				magit-file-mode
-				magit-blob-mode
-				magit-blame-mode
-				)))
-	 "Emacs")
-	((derived-mode-p 'prog-mode)
-	 "Editing")
-	((derived-mode-p 'dired-mode)
-	 "Dired")
-	((memq major-mode '(helpful-mode
-			    help-mode))
-	 "Help")
-	((memq major-mode '(org-mode
-			    org-agenda-clockreport-mode
-			    org-src-mode
-			    org-agenda-mode
-			    org-beamer-mode
-			    org-indent-mode
-			    org-bullets-mode
-			    org-cdlatex-mode
-			    org-agenda-log-mode
-			    diary-mode))
-	 "OrgMode")
-	(t
-	 (centaur-tabs-get-group-name (current-buffer))))))
+			;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+			;; "Remote")
+			((or (string-equal "*" (substring (buffer-name) 0 1))
+					 (memq major-mode '(magit-process-mode
+															magit-status-mode
+															magit-diff-mode
+															magit-log-mode
+															magit-file-mode
+															magit-blob-mode
+															magit-blame-mode
+															)))
+			 "Emacs")
+			((derived-mode-p 'prog-mode)
+			 "Editing")
+			((derived-mode-p 'dired-mode)
+			 "Dired")
+			((memq major-mode '(helpful-mode
+													help-mode))
+			 "Help")
+			((memq major-mode '(org-mode
+													org-agenda-clockreport-mode
+													org-src-mode
+													org-agenda-mode
+													org-beamer-mode
+													org-indent-mode
+													org-bullets-mode
+													org-cdlatex-mode
+													org-agenda-log-mode
+													diary-mode))
+			 "OrgMode")
+			(t
+			 (centaur-tabs-get-group-name (current-buffer))))))
   :hook
-  ;;(dashboard-mode . centaur-tabs-local-mode)
+  (dashboard-mode . centaur-tabs-local-mode)
   (term-mode . centaur-tabs-local-mode)
   (calendar-mode . centaur-tabs-local-mode)
   (org-agenda-mode . centaur-tabs-local-mode)
@@ -553,136 +317,8 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
   ("C-c t p" . centaur-tabs-group-by-projectile-project)
   ("C-c t g" . centaur-tabs-group-buffer-groups)
   (:map evil-normal-state-map
-	  ("g t" . centaur-tabs-forward)
-	  ("g T" . centaur-tabs-backward)))
-
-;; ;; (use-package tab-line
-;; ;;   :straight nil
-;; ;;   :when window-system
-;; ;;   :hook ((after-init . global-tab-line-mode)
-;; ;;          (aorst--theme-change . aorst/tabline-setup-faces))
-;; ;;   :config
-;; ;;   (defun tab-line-close-tab (&optional e)
-;; ;;     "Close the selected tab.
-
-;; ;; If tab is presented in another window, close the tab by using
-;; ;; `bury-buffer` function.  If tab is unique to all existing
-;; ;; windows, kill the buffer with `kill-buffer` function.  Lastly, if
-;; ;; no tabs left in the window, it is deleted with `delete-window`
-;; ;; function."
-;; ;;     (interactive "e")
-;; ;;     (let* ((posnp (event-start e))
-;; ;;            (window (posn-window posnp))
-;; ;;            (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
-;; ;;       (with-selected-window window
-;; ;;         (let ((tab-list (tab-line-tabs-window-buffers))
-;; ;;               (buffer-list (flatten-list
-;; ;;                             (seq-reduce (lambda (list window)
-;; ;;                                           (select-window window t)
-;; ;;                                           (cons (tab-line-tabs-window-buffers) list))
-;; ;;                                         (window-list) nil))))
-;; ;;           (select-window window)
-;; ;;           (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
-;; ;;               (progn
-;; ;;                 (if (eq buffer (current-buffer))
-;; ;;                     (bury-buffer)
-;; ;;                   (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-;; ;;                   (set-window-next-buffers window (delq buffer (window-next-buffers))))
-;; ;;                 (unless (cdr tab-list)
-;; ;;                   (ignore-errors (delete-window window))))
-;; ;;             (and (kill-buffer buffer)
-;; ;;                  (unless (cdr tab-list)
-;; ;;                    (ignore-errors (delete-window window)))))))))
-
-
-;; ;;   (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
-;; ;;     "Create name for tab with padding and truncation.
-
-;; ;; If buffer name is shorter than `tab-line-tab-max-width' it gets
-;; ;; centered with spaces, otherwise it is truncated, to preserve
-;; ;; equal width for all tabs.  This function also tries to fit as
-;; ;; many tabs in window as possible, so if there are no room for tabs
-;; ;; with maximum width, it calculates new width for each tab and
-;; ;; truncates text if needed.  Minimal width can be set with
-;; ;; `tab-line-tab-min-width' variable."
-;; ;;     (with-current-buffer buffer
-;; ;;       (let ((buffer (string-trim (buffer-name)))
-;; ;;             (right-pad (if tab-line-close-button-show "" " ")))
-;; ;;         (propertize (concat " " buffer right-pad)
-;; ;;                     'help-echo (when-let ((name (buffer-file-name)))
-;; ;;                                  (abbreviate-file-name name))))))
-
-
-;; ;;   (setq tab-line-close-button-show t
-;; ;;         tab-line-new-button-show nil
-;; ;;         tab-line-separator ""
-;; ;;         tab-line-tab-name-function #'aorst/tab-line-name-buffer
-;; ;;         tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
-;; ;;                                           'keymap tab-line-right-map
-;; ;;                                           'mouse-face 'tab-line-highlight
-;; ;;                                           'help-echo "Click to scroll right")
-;; ;;         tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
-;; ;;                                          'keymap tab-line-left-map
-;; ;;                                          'mouse-face 'tab-line-highlight
-;; ;;                                          'help-echo "Click to scroll left")
-;; ;;         tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
-;; ;;                                           'keymap tab-line-tab-close-map
-;; ;;                                           'mouse-face 'tab-line-close-highlight
-;; ;;                                           'help-echo "Click to close tab")
-;; ;;         tab-line-exclude-modes '(ediff-mode
-;; ;;                                  process-menu-mode
-;; ;;                                  term-mode
-;; ;;                                  vterm-mode
-;; ;;                                  treemacs-mode
-;; ;;                                  imenu-list-major-mode))
-
-
-;;   (defun aorst/tabline-setup-faces ()
-;;     (let ((bg (face-attribute 'default :background))
-;;           (fg (face-attribute 'default :foreground))
-;;           (dark-fg (face-attribute 'shadow :foreground))
-;;           (overline (face-attribute 'font-lock-keyword-face :foreground))
-;;           (base (if (and (facep 'solaire-default-face)
-;;                          (not (eq (face-attribute 'solaire-default-face :background)
-;;                                   'unspecified)))
-;;                     (face-attribute 'solaire-default-face :background)
-;;                   (face-attribute 'mode-line :background)))
-;;           (box-width (/ aorst--line-pixel-height 5)))
-;;       (when (facep 'tab-line-tab-special)
-;;         (set-face-attribute 'tab-line-tab-special nil
-;;                             :slant 'normal))
-;;       (set-face-attribute 'tab-line nil
-;;                           :background base
-;;                           :foreground dark-fg
-;;                           :height 1.0
-;;                           :inherit nil
-;;                           :overline base
-;;                           :box (when (> box-width 0)
-;;                                  (list :line-width -1 :color base)))
-;;       (set-face-attribute 'tab-line-tab nil
-;;                           :foreground dark-fg
-;;                           :background bg
-;;                           :inherit nil
-;;                           :box (when (> box-width 0)
-;;                                  (list :line-width box-width :color bg)))
-;;       (set-face-attribute 'tab-line-tab-inactive nil
-;;                           :foreground dark-fg
-;;                           :background base
-;;                           :inherit nil
-;;                           :box (when (> box-width 0)
-;;                                  (list :line-width box-width :color base)))
-;;       (set-face-attribute 'tab-line-tab-current nil
-;;                           :foreground fg
-;;                           :background bg
-;;                           :inherit nil
-;;                           :overline overline
-;;                           :box (when (> box-width 0)
-;;                                  (list :line-width box-width :color bg)))))
-
-;;   (aorst/tabline-setup-faces)
-
-;;   (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
-;;     (select-window (posn-window (event-start e)))))
+				("g t" . centaur-tabs-forward)
+				("g T" . centaur-tabs-backward)))
 
 (use-package moe-theme
 	:ensure t)
@@ -844,7 +480,7 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
 ;; 	:ensure t
 ;; 	:hook 'prog-mode-hook 'fic-mode)
 
-																				; Setting dashboard
+;; Setting dashboard
 (use-package dashboard
   :init      ;; tweak dashboard config before loading it
   (setq dashboard-center-content t)

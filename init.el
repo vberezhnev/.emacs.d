@@ -11,8 +11,13 @@
 (load "~/.emacs.d/setting-packages")
 (load "~/.emacs.d/setting-lsp")
 (load "~/.emacs.d/setting-font-face")
+(load "~/.emacs.d/setting-performance.el")
 
-(load-theme 'doom-gruvbox t)
+(load "~/.emacs.d/local-packages/company-go")
+
+(require 'company-go)
+
+(load-theme 'doom-one t)
 
 (setq frame-resize-pixelwise t)
 (dotimes (n 3)
@@ -60,19 +65,7 @@
 	(display-line-numbers-width 4)
   (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t)
-  :config
-  ;; (define-advice previous-line (:around (f &rest args) aorst:previous-line-margin)
-	;;     "The `display-line-numbers' mode affects `scroll-margin' variable.
-
-	;; This advice recalculates the amount of lines needed to scroll to
-	;; ensure `scroll-margin' preserved."
-	;;     (apply f args)
-	;;     (let ((diff (- scroll-margin
-	;;                    (- (line-number-at-pos (point))
-	;;                       (line-number-at-pos (window-start))))))
-	;;       (when (> diff 0)
-	;;         (scroll-down diff))))
-  )
+	)
 
 (scroll-bar-mode -1)        ; Disable visible scrollbar
 (tool-bar-mode -1)          ; Disable the toolbar
@@ -179,10 +172,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("b6c43bb2aea78890cf6bd4a970e6e0277d2daf0075272817ea8bb53f9c6a7f0a" "0ed3d96a506b89c1029a1ed904b11b5adcebeb2e0c16098c99c0ad95cb124729" "ae426fc51c58ade49774264c17e666ea7f681d8cae62570630539be3d06fd964" "bf948e3f55a8cd1f420373410911d0a50be5a04a8886cabe8d8e471ad8fdba8e" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "58c996beb973f7e988ee4fd21c367b7a5bbdb0622ddfbbd112672a7b4e3d3b81" "636b135e4b7c86ac41375da39ade929e2bd6439de8901f53f88fde7dd5ac3561" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "2627707bc15dd427ef165fc8ff9868e3e184f6a151f139c092561bbc39734364" default))
+	 '("b189e1cc9e17572cc8f0f7c21a1c7998c234936b40fba566ecaee49f2166ad0c" "b6c43bb2aea78890cf6bd4a970e6e0277d2daf0075272817ea8bb53f9c6a7f0a" "0ed3d96a506b89c1029a1ed904b11b5adcebeb2e0c16098c99c0ad95cb124729" "ae426fc51c58ade49774264c17e666ea7f681d8cae62570630539be3d06fd964" "bf948e3f55a8cd1f420373410911d0a50be5a04a8886cabe8d8e471ad8fdba8e" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "58c996beb973f7e988ee4fd21c367b7a5bbdb0622ddfbbd112672a7b4e3d3b81" "636b135e4b7c86ac41375da39ade929e2bd6439de8901f53f88fde7dd5ac3561" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "2627707bc15dd427ef165fc8ff9868e3e184f6a151f139c092561bbc39734364" default))
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(ample-theme melancholy-theme moe-theme lua-mode zoom nyan-mode parrot catppuccin-theme rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground))
+	 '(go-mode ample-theme melancholy-theme moe-theme lua-mode zoom nyan-mode parrot catppuccin-theme rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground))
  '(warning-suppress-types '((use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

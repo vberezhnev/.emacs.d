@@ -116,6 +116,38 @@
 ;; ;;/ JAVASCRIPT /;;
 ;; ;;//////////////;;
 
+;; (use-package web-mode  :ensure t
+;;   :mode (("\\.js\\'" . web-mode)
+;;          ("\\.jsx\\'" . web-mode)
+;;          ("\\.ts\\'" . web-mode)
+;;          ("\\.tsx\\'" . web-mode)
+;;          ("\\.html\\'" . web-mode)
+;;          ;("\\.vue\\'" . web-mode)
+;; 	 ("\\.json\\'" . web-mode))
+;;   :commands web-mode
+;;   :config
+;;   (setq web-mode-content-types-alist
+;; 	'(("jsx" . "\\.js[x]?\\'")))
+;;   )
+
+(use-package js2-mode :ensure t :defer 20
+  :mode
+  (("\\.js\\'" . js2-mode))
+  :custom
+  (js2-include-node-externs t)
+  (js2-global-externs '("customElements"))
+  (js2-highlight-level 3)
+  (js2r-prefer-let-over-var t)
+  (js2r-prefered-quote-type 2)
+  (js-indent-align-list-continuation t)
+  (global-auto-highlight-symbol-mode t)
+  :config
+  (setq js-indent-level 2)
+  ;; patch in basic private field support
+  (advice-add #'js2-identifier-start-p
+							:after-until
+							(lambda (c) (eq c ?#))))
+
 ;; (use-package javascript-mode
 ;;   :after tree-sitter
 ;;   :config
@@ -135,9 +167,6 @@
 ;;//////////;;
 ;;/ Golang /;;
 ;;//////////;;
-
-(use-package 'company-go
-	:load-path "~/.emacs.d/local-packages/company-go")
 
 ;; Set up before-save hooks to format buffer and add/delete imports.
 ;; Make sure you don't have other gofmt/goimports hooks enabled.

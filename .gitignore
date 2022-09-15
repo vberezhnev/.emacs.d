@@ -7,6 +7,9 @@ site-lisp/
 elpa/
 quelpa/
 
+rust-playground/
+url/
+
 .local/
 .cache/
 
