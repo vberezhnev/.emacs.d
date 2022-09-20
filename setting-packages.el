@@ -29,82 +29,101 @@
 							("b"  . pdf-view-set-slice-from-bounding-box)
 							("r"  . pdf-view-reset-slice)))
 
-;; (defhydra hydra-pdftools (:color blue :hint nil)
-;;   "
-;;                                                                      ╭───────────┐
-;;       Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-;;   ╭──────────────────────────────────────────────────────────────────┴───────────╯
-;;         ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-;;         ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-;;         ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-;;         ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-;;    _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-;;         ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-;;         ^^_n_^^      ^ ^  _r_eset slice box
-;;         ^^^↓^^^
-;;         ^^_G_^^
-;;   --------------------------------------------------------------------------------
-;;        "
-;;   ("\\" hydra-master/body "back")
-;;   ("<ESC>" nil "quit")
-;;   ("al" pdf-annot-list-annotations)
-;;   ("ad" pdf-annot-delete)
-;;   ("aa" pdf-annot-attachment-dired)
-;;   ("am" pdf-annot-add-markup-annotation)
-;;   ("at" pdf-annot-add-text-annotation)
-;;   ("y"  pdf-view-kill-ring-save)
-;;   ("+" pdf-view-enlarge :color red)
-;;   ("-" pdf-view-shrink :color red)
-;;   ("0" pdf-view-scale-reset)
-;;   ("H" pdf-view-fit-height-to-window)
-;;   ("W" pdf-view-fit-width-to-window)
-;;   ("P" pdf-view-fit-page-to-window)
-;;   ("n" pdf-view-next-page-command :color red)
-;;   ("p" pdf-view-previous-page-command :color red)
-;;   ("d" pdf-view-dark-minor-mode)
-;;   ("b" pdf-view-set-slice-from-bounding-box)
-;;   ("r" pdf-view-reset-slice)
-;;   ("g" pdf-view-first-page)
-;;   ("G" pdf-view-last-page)
-;;   ("e" pdf-view-goto-page)
-;;   ("o" pdf-outline)
-;;   ("s" pdf-occur)
-;;   ("i" pdf-misc-display-metadata)
-;;   ("u" pdf-view-revert-buffer)
-;;   ("F" pdf-links-action-perfom)
-;;   ("f" pdf-links-isearch-link)
-;;   ("B" pdf-history-backward :color red)
-;;   ("N" pdf-history-forward :color red)
-;;   ("l" image-forward-hscroll :color red)
-;;   ("h" image-backward-hscroll :color red))
+(defhydra hydra-pdftools (:color blue :hint nil)
+  "
+                                                                     ╭───────────┐
+      Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+  ╭──────────────────────────────────────────────────────────────────┴───────────╯
+        ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+        ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+        ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+        ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+   _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+        ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+        ^^_n_^^      ^ ^  _r_eset slice box
+        ^^^↓^^^
+        ^^_G_^^
+  --------------------------------------------------------------------------------
+       "
+  ("\\" hydra-master/body "back")
+  ("<ESC>" nil "quit")
+  ("al" pdf-annot-list-annotations)
+  ("ad" pdf-annot-delete)
+  ("aa" pdf-annot-attachment-dired)
+  ("am" pdf-annot-add-markup-annotation)
+  ("at" pdf-annot-add-text-annotation)
+  ("y"  pdf-view-kill-ring-save)
+  ("+" pdf-view-enlarge :color red)
+  ("-" pdf-view-shrink :color red)
+  ("0" pdf-view-scale-reset)
+  ("H" pdf-view-fit-height-to-window)
+  ("W" pdf-view-fit-width-to-window)
+  ("P" pdf-view-fit-page-to-window)
+  ("n" pdf-view-next-page-command :color red)
+  ("p" pdf-view-previous-page-command :color red)
+  ("d" pdf-view-dark-minor-mode)
+  ("b" pdf-view-set-slice-from-bounding-box)
+  ("r" pdf-view-reset-slice)
+  ("g" pdf-view-first-page)
+  ("G" pdf-view-last-page)
+  ("e" pdf-view-goto-page)
+  ("o" pdf-outline)
+  ("s" pdf-occur)
+  ("i" pdf-misc-display-metadata)
+  ("u" pdf-view-revert-buffer)
+  ("F" pdf-links-action-perfom)
+  ("f" pdf-links-isearch-link)
+  ("B" pdf-history-backward :color red)
+  ("N" pdf-history-forward :color red)
+  ("l" image-forward-hscroll :color red)
+  ("h" image-backward-hscroll :color red))
 
 (use-package elcord
-	:hook (after-init . elcord-mode))
+  :hook (after-init . elcord-mode))
 
 (use-package org-superstar
-	:hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+	:init
+	(setq org-superstar-mode t)
+	:config
+	(setq org-superstar-headline-bullets-list '("⁖" "◉" "○" "✸" "✿")))
 
 (use-package multi-term
-	:bind
+  :bind
   ("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
   ("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
 
 (use-package evil
-	:ensure t
+  :ensure t
   :init      ;; tweak evil's configuration before loading it
-	;;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+  ;;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (evil-mode))
 (use-package evil-collection
   :after evil
-	:ensure t
+  :ensure t
   :config
   (setq evil-collection-mode-list '(dashboard dired ibuffer))
   (evil-collection-init))
 (use-package evil-tutor
-	:ensure t)
+  :ensure t)
+
+(use-package fzf
+	:ensure t
+  :bind
+    ;; Don't forget to set keybinds!
+  :config
+  (setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
+        fzf/executable "fzf"
+        fzf/git-grep-args "-i --line-number %s"
+        ;; command used for `fzf-grep-*` functions
+        ;; example usage for ripgrep:
+        ;; fzf/grep-command "rg --no-heading -nH"
+        fzf/grep-command "grep -nrH"
+        ;; If nil, the fzf buffer will appear at the top of the window
+        fzf/position-bottom t
+        fzf/window-height 15))
 
 ;; (use-package general
 ;;   :config
@@ -222,13 +241,17 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
+(use-package treemacs-all-the-icons
+  :ensure t)
+(treemacs-load-theme "all-the-icons")
+
 (use-package treemacs-evil
   :after (treemacs evil)
   :ensure t)
 
 (use-package format-all
-	:ensure t
-	:preface
+  :ensure t
+  :preface
   (defun ian/format-code ()
     "Auto-format whole buffer."
     (interactive)
@@ -247,29 +270,30 @@
 ;;   (global-set-key (kbd "C-S-z") 'undo-fu-only-redo))
 
 
-(centaur-tabs-mode t)
 (use-package centaur-tabs
-	:ensure t
-	:config
+  ;; :load-path "~/.emacs.d/other/centaur-tabs"
+  :config
   (setq centaur-tabs-style "bar"
 				centaur-tabs-height 32
 				centaur-tabs-set-icons t
 				centaur-tabs-set-modified-marker t
 				;; centaur-tabs-show-navigation-buttons t
 				centaur-tabs-set-bar 'over
-				x-underline-at-descent-line t)
-	(centaur-tabs-headline-match)
-  (setq centaur-tabs-gray-out-icons 'buffer)
+				;; x-underline-at-descent-line t
+				)
+  (centaur-tabs-headline-match)
+  ;; (setq centaur-tabs-gray-out-icons 'buffer)
   ;; (centaur-tabs-enable-buffer-reordering)
   ;; (setq centaur-tabs-adjust-buffer-order t)
+  (centaur-tabs-mode t)
   (setq uniquify-separator "/")
   (setq uniquify-buffer-name-style 'forward)
   (defun centaur-tabs-buffer-groups ()
     "`centaur-tabs-buffer-groups' control buffers' group rules.
 
-Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
-All buffer name start with * will group to \"Emacs\".
-Other buffer group by `centaur-tabs-get-group-name' with project name."
+ Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+ All buffer name start with * will group to \"Emacs\".
+ Other buffer group by `centaur-tabs-get-group-name' with project name."
     (list
      (cond
 			;; ((not (eq (file-remote-p (buffer-file-name)) nil))
@@ -321,28 +345,32 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
 				("g T" . centaur-tabs-backward)))
 
 (use-package moe-theme
-	:ensure t)
+  :ensure t)
 
 (use-package melancholy-theme
   :ensure t)
 
 (use-package doom-modeline
-	:commands doom-modeline
-	;;:config
-	;;(setq doom-modeline-height 15)
-	;;(setq doom-modeline-bar-width 3)
-	;;(setq doom-modeline-minor-modes (featurep 'minions))
-	;;(setq doom-modeline-buffer-file-name-style 'buffer-name)
-	;;(doom-modeline-set-timemachine-modeline)
-	;;(doom-modeline-time t)
+  :commands doom-modeline
+  ;;:config
+  ;;(setq doom-modeline-height 15)
+  ;;(setq doom-modeline-bar-width 3)
+  ;;(setq doom-modeline-minor-modes (featurep 'minions))
+  ;;(setq doom-modeline-buffer-file-name-style 'buffer-name)
+  ;;(doom-modeline-set-timemachine-modeline)
+  ;;(doom-modeline-time t)
 
-	:custom
-	(doom-modeline-set-timemachine-modeline)
-	(doom-modeline-time t)
+  :custom
+  (doom-modeline-set-timemachine-modeline)
+	(doom-modeline-buffer-name t)
 	(display-battery-mode 1)
-																				;(doom-modeline-height 15)
-	(doom-modeline-bar-width 3)
-	:hook (after-init . doom-modeline-mode))
+	(doom-modeline-time-icon t)
+	;; (doom-modeline-height 15)
+  (doom-modeline-bar-width 3)
+  :hook (after-init . doom-modeline-mode))
+
+(use-package parrot
+  :hook (after-init . parrot-mode))
 
 ;; Define your custom doom-modeline
 ;;(doom-modeline-def-modeline 'my-simple-line
@@ -372,21 +400,21 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
   ;; auto-complete compatibility
   (defun my-company-visible-and-explicit-action-p ()
     (and (company-tooltip-visible-p)
-         (company-explicit-action-p)))
+				 (company-explicit-action-p)))
   (defun company-ac-setup ()
     "Sets up `company-mode' to behave similarly to `auto-complete-mode'."
     (setq company-require-match nil)
     (setq company-auto-complete #'my-company-visible-and-explicit-action-p)
     (setq company-frontends '(company-echo-metadata-frontend
-                              company-pseudo-tooltip-unless-just-one-frontend-with-delay
-                              company-preview-frontend))
+															company-pseudo-tooltip-unless-just-one-frontend-with-delay
+															company-preview-frontend))
     (define-key company-active-map [tab]
-      'company-select-next-if-tooltip-visible-or-complete-selection)
+			'company-select-next-if-tooltip-visible-or-complete-selection)
     (define-key company-active-map (kbd "TAB")
-      'company-select-next-if-tooltip-visible-or-complete-selection))
+			'company-select-next-if-tooltip-visible-or-complete-selection))
 
   (company-ac-setup)
-	(add-hook 'js2-mode-hook (lambda () (company-mode))))
+  (add-hook 'js2-mode-hook (lambda () (company-mode))))
 
 ;; (use-package all-the-icons
 ;;   :if (display-graphic-p))
@@ -402,7 +430,7 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
 ;; TODO: Add a function to set window width to fill column width
 ;; according to current major mode
 (use-package zoom
-	:ensure t
+  :ensure t
   :commands zoom-mode
   :preface
   (defvar fk/zoom-default-size '(120 . 40))
@@ -416,12 +444,12 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
   ;; TODO: handle when zoom-mode active
   (defun fk/adjust-window-width (percentage)
     (if (and olivetti-mode (= (count-windows) 1))
-        (if (> percentage 1.0) (olivetti-expand) (olivetti-shrink))
-      (let* ((new-width (round (* (window-width) percentage)))
-             (zoom-size (cons new-width (cdr zoom-size))))
-        (if (> percentage 1.0)  ; TODO: fk/smooth-zoom do not shrink
-            (fk/smooth-zoom)
-          (zoom)))))
+				(if (> percentage 1.0) (olivetti-expand) (olivetti-shrink))
+			(let* ((new-width (round (* (window-width) percentage)))
+						 (zoom-size (cons new-width (cdr zoom-size))))
+				(if (> percentage 1.0)  ; TODO: fk/smooth-zoom do not shrink
+						(fk/smooth-zoom)
+					(zoom)))))
 
   (defun fk/enlarge-window ()
     (interactive)
@@ -437,8 +465,8 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
   (defun fk/floor (number)
     "Floor by absolute value."
     (if (< number 0)
-        (ceiling number)
-      (floor number)))
+				(ceiling number)
+			(floor number)))
 
   (defun fk/smooth-zoom ()
     "Smooth (animated) version of `zoom'."
@@ -447,33 +475,33 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
     (setq fk/smooth-zoom-sizes '())
     (setq fk/smooth-zoom-window (get-buffer-window))
     (let* ((current-size (cons (window-width) (window-height)))
-           (desired-size zoom-size)
-           (distances (cons (- (car desired-size) (car current-size))
-                            (- (cdr desired-size) (cdr current-size))))
-           (step-distance (cons (fk/floor (/ (car distances) (float fk/smooth-zoom-steps)))
-                                (fk/floor (/ (cdr distances) (float fk/smooth-zoom-steps))))))
-      (dotimes (i fk/smooth-zoom-steps)
-        (let* ((zoom-size (if (< i (1- fk/smooth-zoom-steps))
-                              (cons (+ (car step-distance) (car current-size))
-                                    (+ (cdr step-distance) (cdr current-size)))
-                            desired-size))
-               (time (concat (number-to-string (round (* i fk/smooth-zoom-period 1000))) " millisec")))
-          (setq current-size zoom-size)
-          (add-to-list 'fk/smooth-zoom-sizes current-size t)
-          (run-at-time time nil 'fk/smooth-zoom--resize)))))
+					 (desired-size zoom-size)
+					 (distances (cons (- (car desired-size) (car current-size))
+														(- (cdr desired-size) (cdr current-size))))
+					 (step-distance (cons (fk/floor (/ (car distances) (float fk/smooth-zoom-steps)))
+																(fk/floor (/ (cdr distances) (float fk/smooth-zoom-steps))))))
+			(dotimes (i fk/smooth-zoom-steps)
+				(let* ((zoom-size (if (< i (1- fk/smooth-zoom-steps))
+															(cons (+ (car step-distance) (car current-size))
+																		(+ (cdr step-distance) (cdr current-size)))
+														desired-size))
+							 (time (concat (number-to-string (round (* i fk/smooth-zoom-period 1000))) " millisec")))
+					(setq current-size zoom-size)
+					(add-to-list 'fk/smooth-zoom-sizes current-size t)
+					(run-at-time time nil 'fk/smooth-zoom--resize)))))
 
   (defun fk/smooth-zoom--resize ()
     (with-selected-window fk/smooth-zoom-window
-      (let ((zoom-size (pop fk/smooth-zoom-sizes)))
-        (zoom--resize)))))
+			(let ((zoom-size (pop fk/smooth-zoom-sizes)))
+				(zoom--resize)))))
 
 (use-package projectile
   :ensure t
   :init
   (projectile-mode +1)
   :bind (:map projectile-mode-map
-              ("s-p" . projectile-command-map)
-              ("C-c p" . projectile-command-map)))
+							("s-p" . projectile-command-map)
+							("C-c p" . projectile-command-map)))
 
 ;; Highlight TODO, FIXME, ... in any programming mode
 ;; (use-package 'fic-mode
@@ -491,11 +519,12 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
   (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
   ;;(setq dashboard-startup-banner "~/Изображения/Logos/dailyminimal/Olivia Black.jpeg")  ;; use custom image as banner
   (setq dashboard-startup-banner "~/.emacs.d/images/RMS.png")  ;; use custom image as banner
-  (setq dashboard-items '((recents . 5)
-                          (agenda . 5 )
-                          (bookmarks . 3)
-                          (projects . 3)
-                          (registers . 3)))
+  (setq dashboard-items '(
+													(recents . 5)
+													;;(agenda . 5 )
+													(bookmarks . 3)
+													(projects . 5)))
+	;;(registers . 3)))
   :config
   (dashboard-setup-startup-hook)
   (dashboard-modify-heading-icons '((recents . "file-text")

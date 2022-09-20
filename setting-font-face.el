@@ -1,5 +1,5 @@
 (set-face-attribute 'default nil
-  :font "Fira Code"
+  :font "Iosevka"
   :height 100
   :weight 'medium)
 ;(set-face-attribute 'variable-pitch nil
@@ -7,7 +7,7 @@
 ;  :height 120
 ;  :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
-  :font "Fira Code"
+  :font "Iosevka"
   :height 100
   :weight 'medium)
 ;; Makes commented text and keywords italics.
@@ -22,7 +22,7 @@
 ;(setq-default line-spacing 0.12)
 
 ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-(add-to-list 'default-frame-alist '(font . "Fira Code"))
+(add-to-list 'default-frame-alist '(font . "Iosevka"))
 ;; changes certain keywords to symbols, such as lamda!
 (setq global-prettify-symbols-mode t)
 
@@ -37,9 +37,10 @@
   ;; Enable custom neotree theme (all-the-icons must be installed!)
   ;;(doom-themes-neotree-config)
   ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+
 
 (set-cursor-color "#C3B5FA")
