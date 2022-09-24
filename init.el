@@ -4,171 +4,36 @@
 (add-to-list 'package-archives '("elpa" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
+;; ;; Install straight.el
+;; (defvar bootstrap-version)
+;; (let ((bootstrap-file
+;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+;;       (bootstrap-version 5))
+;;   (unless (file-exists-p bootstrap-file)
+;;     (with-current-buffer
+;;         (url-retrieve-synchronously
+;;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+;;          'silent 'inhibit-cookies)
+;;       (goto-char (point-max))
+;;       (eval-print-last-sexp)))
+;;   (load bootstrap-file nil 'nomessage))
+
+;; Install use-package
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
   (package-install 'use-package))
 
-(load "~/.emacs.d/setting-packages")
-(load "~/.emacs.d/setting-lsp")
-(load "~/.emacs.d/setting-font-face")
-(load "~/.emacs.d/setting-performance.el")
+;; (load "~/.emacs.d/setting-packages")
+;; (load "~/.emacs.d/setting-lsp")
+;; (load "~/.emacs.d/setting-font-face")
+;; (load "~/.emacs.d/setting-performance.el")
 
-(load "~/.emacs.d/local-packages/company-go")
+(load-theme 'atom-one-dark t)
 
-(require 'company-go)
-
-(load-theme 'doom-one t)
-
-;; Disable backup
-(setq backup-inhibited t)
-;; Disable auto save
-(setq auto-save-default nil)
-
-
-(setq frame-resize-pixelwise t)
-(dotimes (n 3)
-  (toggle-frame-maximized))
-
-(setq-default message-log-max nil)
-(kill-buffer "*Messages*")
-
-(add-hook 'minibuffer-exit-hook
-					'(lambda ()
-						 (let ((buffer "*Completions*"))
-							 (and (get-buffer buffer)
-	  								(kill-buffer buffer)))))
-
-(setq initial-major-mode (quote fundamental-mode))
-
-(xterm-mouse-mode t)
-
-;; Prompt for y or n instead of yes or no.
-(use-package subr
-  :straight nil
-  :no-require t
-  :init
-  (fset 'yes-or-no-p 'y-or-n-p))
-
-(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
-(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
-
-(dolist (mode '(org-mode-hook ; Disable line numbers for some modes
-                term-mode-hook
-                shell-mode-hook
-                treemacs-mode-hook
-                eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
-
-
-(global-display-line-numbers-mode t)
-(use-package display-line-numbers
-  ;;:straight nil
-  ;; :hook (prog-mode . display-line-numbers-mode)
-  :custom
-	;;(setq display-line-numbers-type 'relative)
-	(display-line-numbers-width 4)
-  (display-line-numbers-grow-only t)
-  (display-line-numbers-width-start t)
-	)
-
-(scroll-bar-mode -1)        ; Disable visible scrollbar
-(tool-bar-mode -1)          ; Disable the toolbar
-(tooltip-mode -1)           ; Disable tooltips
-(set-fringe-mode 10)        ; Give some breathing room
-;;(menu-bar-mode -1)        ; Disable the menu bar
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;; Keymap ;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; zoom in/out like we do everywhere else.
-(global-set-key (kbd "C-=") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-																				; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-(global-auto-revert-mode t)
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-
-;; Ctrl+C, Ctrl+V copy, paste mode
-;;(global-set-key (kbd "C-c") 'kill-ring-save)
-;;(global-set-key (kbd "C-v") 'yank)
-
-;;;; Custom modeline ;;;;
-
-;;(defun mode-line-fill (face reserve)
-;;  "Return empty space using FACE and leaving RESERVE space on the right."
-;;  (when
-;;      (and window-system (eq 'right (get-scroll-bar-mode)))
-;;    (setq reserve (- reserve 3)))
-;;  (propertize " "
-;;              'display
-;;              `((space :align-to (- (+ right right-fringe right-margin) ,reserve)))
-;;              'face face
-;;              )
-;;  )
-;;
-;;(use-package nyan-mode
-;;  :config
-;;  (setq nyan-bar-length 15)
-;;  )
-;;(require 'nyan-mode)
-;;
-;;;;;(let (sndr-font-base (cdr (assoc "zenbu-salmon" zenbu-colors-alist)) )
-;;;; ■◧  ▥
-;;
-;;(defun get-evil-state-icons()
-;;  (interactive)
-;;  (cond
-;;   ((memq evil-state '(emacs))
-;;    (propertize "⭘ ⭘" 'face '((:foreground "orange" :weight bold )))
-;;    )
-;;
-;;   ((memq evil-state '(hybrid insert))
-;;    (propertize " " 'face '((:foreground "green" :weight bold )))
-;;    )
-;;
-;;   ((memq evil-state '(visual))
-;;    (propertize "⭘ ⭘" 'face '((:foreground "red" :weight bold )))
-;;    )
-;;
-;;   (t
-;;    (propertize "⭘ ⭘" 'face '((:weight ultra-light )))
-;;    )
-;;   )
-;;  )
-;;
-;;(setq-default mode-line-format
-;;              (list
-;;               " "
-;;               '(:eval (get-evil-state-icons) );; end evil-state
-;;               " "
-;;               '(:eval (when buffer-read-only
-;;                         (propertize " " 'help-echo "Buffer is read-only")))
-;;               '(:eval
-;;                 (if (buffer-modified-p)
-;;                     (propertize " %b " 'face '((:weight bold )) 'help-echo (buffer-file-name) )
-;;                   (propertize "%b " 'help-echo (buffer-file-name))
-;;                   ))
-;;               (propertize " · " 'face 'font-lock-type-face)
-;;               ;; '%02' to set to 2 chars at least; prevents flickering
-;;               (propertize "%02l, %02c" 'face 'font-lock-type-face)
-;;               ;; the current major mode for the buffer.
-;;               (propertize " · %m ·" 'face 'font-lock-type-face)
-;;               mode-line-misc-info
-;;               (propertize " · " 'face 'font-lock-type-face)
-;;               (mode-line-fill 'mode-line 30)
-;;               (propertize " · " 'face 'font-lock-type-face)
-;;               '(:eval (list (nyan-create)))
-;;               (propertize " · " 'face 'font-lock-type-face)
-;;               '(:eval (if-let (vc vc-mode)
-;;                           (list "  " (substring vc 5))
-;;                         (list "        " )
-;;                         ))
-;;               ))
-
+(org-babel-load-file
+ (expand-file-name
+  "README.org"
+  user-emacs-directory))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -176,14 +41,14 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-	 '("e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" "b189e1cc9e17572cc8f0f7c21a1c7998c234936b40fba566ecaee49f2166ad0c" "b6c43bb2aea78890cf6bd4a970e6e0277d2daf0075272817ea8bb53f9c6a7f0a" "0ed3d96a506b89c1029a1ed904b11b5adcebeb2e0c16098c99c0ad95cb124729" "ae426fc51c58ade49774264c17e666ea7f681d8cae62570630539be3d06fd964" "bf948e3f55a8cd1f420373410911d0a50be5a04a8886cabe8d8e471ad8fdba8e" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "58c996beb973f7e988ee4fd21c367b7a5bbdb0622ddfbbd112672a7b4e3d3b81" "636b135e4b7c86ac41375da39ade929e2bd6439de8901f53f88fde7dd5ac3561" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "2627707bc15dd427ef165fc8ff9868e3e184f6a151f139c092561bbc39734364" default))
+	 '("171d1ae90e46978eb9c342be6658d937a83aaa45997b1d7af7657546cae5985b" "43b78a08f245bc198dadf35b324f445472c92dda3f1b6d1746cefee9f2ade177" "7f954d5bee47a27cc6cc83d1d6b80f7a32d82f744a725375d6e22b65758f9a5e" "8d68cd652ab405df5db91acc66be58307e008bfac3ddc4beef7d7f814d37026c" "df069ec238487ceab1cec64809a3c1dcef1393123ecdf430bdb7b94537ca2c6a" "92cfd42cedb42fdd3ea0d84d518825a94f29b30be20f65978dab7d7c8fa30c6a" "06a2eef27703cd3c8b017c90d9025d766ade307971826362c487a5273e14cc5a" "e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" "b189e1cc9e17572cc8f0f7c21a1c7998c234936b40fba566ecaee49f2166ad0c" "b6c43bb2aea78890cf6bd4a970e6e0277d2daf0075272817ea8bb53f9c6a7f0a" "0ed3d96a506b89c1029a1ed904b11b5adcebeb2e0c16098c99c0ad95cb124729" "ae426fc51c58ade49774264c17e666ea7f681d8cae62570630539be3d06fd964" "bf948e3f55a8cd1f420373410911d0a50be5a04a8886cabe8d8e471ad8fdba8e" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "58c996beb973f7e988ee4fd21c367b7a5bbdb0622ddfbbd112672a7b4e3d3b81" "636b135e4b7c86ac41375da39ade929e2bd6439de8901f53f88fde7dd5ac3561" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "2627707bc15dd427ef165fc8ff9868e3e184f6a151f139c092561bbc39734364" default))
  '(inhibit-startup-screen t)
  '(package-selected-packages
-	 '(nano-modeline nano-theme go-mode ample-theme melancholy-theme moe-theme lua-mode zoom nyan-mode parrot catppuccin-theme rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground))
- '(warning-suppress-types '((use-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-button ((t (:background "RoyalBlue1" :foreground "white" :box (:line-width (2 . 2) :style released-button))))))
+	 '(org-make-toc org-preview-html evil-multiedit mood-line powerline-evil atom-one-dark-theme ef-themes nano-modeline nano-theme go-mode ample-theme melancholy-theme moe-theme lua-mode zoom nyan-mode parrot catppuccin-theme rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground))
+ '(warning-suppress-types
+	 '((use-package)
+		 (use-package)
+		 (use-package)
+		 (use-package)
+		 (use-package)
+		 (use-package))))

@@ -6,6 +6,7 @@ eshell/
 site-lisp/
 elpa/
 quelpa/
+straight/
 
 rust-playground/
 url/
@@ -22,3 +23,5 @@ projectile-bookmarks.eld
 .lsp-session*
 
 #*
+README.el
+README.html
