@@ -6,7 +6,7 @@
 #+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
 #+OPTIONS: num:nil ^:{}
 
-I don't want to use init.el to config Emacs.  I want to use an org file to config Emacs because I like literate configs with lots of comments.  The following code block should be your init.el.  This tells init.el to use the source code blocks from this file (config.org).
+I don't want to use init.el to config Emacs.  I want to use an org file to config Emacs because I like literate configs with lots of comments.  The following code block should be your init.el.  This tells init.el to use the source code blocks from this file (README.org).
 
 * File structure of files
 #+BEGIN_SRC example 
@@ -28,10 +28,21 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+END_SRC
 
 * Setting base of Emacs
+** Functions
+#+begin_src emacs-lisp
+(defun indent-org-block-automatically ()
+  (when (org-in-src-block-p)
+   (org-edit-special)
+    (indent-region (point-min) (point-max))
+    (org-edit-src-exit)))
+
+(run-at-time 1 10 'indent-org-block-automatically)
+#+end_src
+
 ** Import local files
 #+begin_src emacs-lisp
-(load "~/.emacs.d/local-packages/company-go")
-(require 'company-go)
+	(load "~/.emacs.d/local-packages/company-go")
+	(require 'company-go)
 
 	;; (use-package company-go
 	;; :defer t
@@ -79,50 +90,50 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting keymap
 #+begin_src emacs-lisp
-;; zoom in/out like we do everywhere else.
-(global-set-key (kbd "C-=") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-																				; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+	;; zoom in/out like we do everywhere else.
+	(global-set-key (kbd "C-=") 'text-scale-increase)
+	(global-set-key (kbd "C--") 'text-scale-decrease)
+	(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+	(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+																					; Make ESC quit prompts
+	(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(global-auto-revert-mode t)
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+	(global-auto-revert-mode t)
+	(global-set-key (kbd "C-x C-b") 'ibuffer)
 #+end_src
 
 #+begin_src emacs-lisp 
-(xterm-mouse-mode t)
+	(xterm-mouse-mode t)
 
-;; Prompt for y or n instead of yes or no.
-(use-package subr
-	:no-require t
-	:init
-	(fset 'yes-or-no-p 'y-or-n-p))
+	;; Prompt for y or n instead of yes or no.
+	(use-package subr
+		:no-require t
+		:init
+		(fset 'yes-or-no-p 'y-or-n-p))
 
-(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
-(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
+	(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
+	(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
 
-(dolist (mode '(org-mode-hook ; Disable line numbers for some modes
-								term-mode-hook
-								shell-mode-hook
-								treemacs-mode-hook
-								eshell-mode-hook))
-	(add-hook mode (lambda () (display-line-numbers-mode 0))))
+	(dolist (mode '(org-mode-hook ; Disable line numbers for some modes
+									term-mode-hook
+									shell-mode-hook
+									treemacs-mode-hook
+									eshell-mode-hook))
+		(add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
 ** Setting line numbers
 #+begin_src emacs-lisp
-(global-display-line-numbers-mode t)
-(use-package display-line-numbers
-	;;:straight nil
-	:hook (prog-mode . display-line-numbers-mode)
-	:custom
-	;;(setq display-line-numbers-type 'relative)
-	(display-line-numbers-width 4)
-	(display-line-numbers-grow-only t)
-	(display-line-numbers-width-start t)
-	)
+	(global-display-line-numbers-mode t)
+	(use-package display-line-numbers
+		;;:straight nil
+		:hook (prog-mode . display-line-numbers-mode)
+		:custom
+		;;(setq display-line-numbers-type 'relative)
+		(display-line-numbers-width 4)
+		(display-line-numbers-grow-only t)
+		(display-line-numbers-width-start t)
+		)
 #+end_src
 
 * Setting font face
@@ -192,433 +203,413 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 * Setting Packages
 #+begin_src emacs-lisp
-			 ;; (defvar straight-process-buffer)
-			 ;; (setq-default straight-process-buffer " *straight-process*")
+	(use-package pdf-tools
+		:defer t
+		:mode (("\\.pdf\\'" . pdf-view-mode))
+		:config
+		(pdf-tools-install)
+		(setq-default pdf-view-display-size 'fit-page)
+		:bind (:map pdf-view-mode-map
+								("\\" . hydra-pdftools/body)
+								("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+								("g"  . pdf-view-first-page)
+								("G"  . pdf-view-last-page)
+								("l"  . image-forward-hscroll)
+								("h"  . image-backward-hscroll)
+								("j"  . pdf-view-next-page)
+								("k"  . pdf-view-previous-page)
+								("e"  . pdf-view-goto-page)
+								("u"  . pdf-view-revert-buffer)
+								("al" . pdf-annot-list-annotations)
+								("ad" . pdf-annot-delete)
+								("aa" . pdf-annot-attachment-dired)
+								("am" . pdf-annot-add-markup-annotation)
+								("at" . pdf-annot-add-text-annotation)
+								("y"  . pdf-view-kill-ring-save)
+								("i"  . pdf-misc-display-metadata)
+								("s"  . pdf-occur)
+								("b"  . pdf-view-set-slice-from-bounding-box)
+								("r"  . pdf-view-reset-slice)))
 
-			 ;; (defvar straight-build-dir)
-			 ;; (setq straight-build-dir (format "build-%s" emacs-version))
+	;; (defhydra hydra-pdftools (:color blue :hint nil)
+	;;   "
+	;;                                                                      ╭───────────┐
+	;;       Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+	;;   ╭──────────────────────────────────────────────────────────────────┴───────────╯
+	;;         ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+	;;         ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+	;;         ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+	;;         ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+	;;    _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+	;;         ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+	;;         ^^_n_^^      ^ ^  _r_eset slice box
+	;;         ^^^↓^^^
+	;;         ^^_G_^^
+	;;   --------------------------------------------------------------------------------
+	;;        "
+	;;   ("\\" hydra-master/body "back")
+	;;   ("<ESC>" nil "quit")
+	;;   ("al" pdf-annot-list-annotations)
+	;;   ("ad" pdf-annot-delete)
+	;;   ("aa" pdf-annot-attachment-dired)
+	;;   ("am" pdf-annot-add-markup-annotation)
+	;;   ("at" pdf-annot-add-text-annotation)
+	;;   ("y"  pdf-view-kill-ring-save)
+	;;   ("+" pdf-view-enlarge :color red)
+	;;   ("-" pdf-view-shrink :color red)
+	;;   ("0" pdf-view-scale-reset)
+	;;   ("H" pdf-view-fit-height-to-window)
+	;;   ("W" pdf-view-fit-width-to-window)
+	;;   ("P" pdf-view-fit-page-to-window)
+	;;   ("n" pdf-view-next-page-command :color red)
+	;;   ("p" pdf-view-previous-page-command :color red)
+	;;   ("d" pdf-view-dark-minor-mode)
+	;;   ("b" pdf-view-set-slice-from-bounding-box)
+	;;   ("r" pdf-view-reset-slice)
+	;;   ("g" pdf-view-first-page)
+	;;   ("G" pdf-view-last-page)
+	;;   ("e" pdf-view-goto-page)
+	;;   ("o" pdf-outline)
+	;;   ("s" pdf-occur)
+	;;   ("i" pdf-misc-display-metadata)
+	;;   ("u" pdf-view-revert-buffer)
+	;;   ("F" pdf-links-action-perfom)
+	;;   ("f" pdf-links-isearch-link)
+	;;   ("B" pdf-history-backward :color red)
+	;;   ("N" pdf-history-forward :color red)
+	;;   ("l" image-forward-hscroll :color red)
+	;;   ("h" image-backward-hscroll :color red))
 
-			 ;; (defvar bootstrap-version)
-			 ;; (let ((bootstrap-file
-			 ;; 	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-			 ;; 	(bootstrap-version 5))
-			 ;;   (unless (file-exists-p bootstrap-file)
-			 ;;     (with-current-buffer
-			 ;; 	  (url-retrieve-synchronously
-			 ;; 	   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-			 ;; 	   'silent 'inhibit-cookies)
-			 ;; 	(goto-char (point-max))
-			 ;; 	(eval-print-last-sexp)))
-			 ;;   (load bootstrap-file nil 'nomessage))
+	(use-package elcord :defer t)
 
-			(use-package pdf-tools
-				:defer t
-				:config
-				(pdf-tools-install)
-				(setq-default pdf-view-display-size 'fit-page)
-				:bind (:map pdf-view-mode-map
-										("\\" . hydra-pdftools/body)
-										("<s-spc>" .  pdf-view-scroll-down-or-next-page)
-										("g"  . pdf-view-first-page)
-										("G"  . pdf-view-last-page)
-										("l"  . image-forward-hscroll)
-										("h"  . image-backward-hscroll)
-										("j"  . pdf-view-next-page)
-										("k"  . pdf-view-previous-page)
-										("e"  . pdf-view-goto-page)
-										("u"  . pdf-view-revert-buffer)
-										("al" . pdf-annot-list-annotations)
-										("ad" . pdf-annot-delete)
-										("aa" . pdf-annot-attachment-dired)
-										("am" . pdf-annot-add-markup-annotation)
-										("at" . pdf-annot-add-text-annotation)
-										("y"  . pdf-view-kill-ring-save)
-										("i"  . pdf-misc-display-metadata)
-										("s"  . pdf-occur)
-										("b"  . pdf-view-set-slice-from-bounding-box)
-										("r"  . pdf-view-reset-slice)))
+	(use-package org-superstar
+		:ensure t
+		:defer t
+		:config
+		(setq org-superstar-headline-bullets-list '("◉" "⬢" "○" "✸" "✿")))
 
-			;; (defhydra hydra-pdftools (:color blue :hint nil)
-			;;   "
-			;;                                                                      ╭───────────┐
-			;;       Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-			;;   ╭──────────────────────────────────────────────────────────────────┴───────────╯
-			;;         ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-			;;         ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-			;;         ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-			;;         ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-			;;    _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-			;;         ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-			;;         ^^_n_^^      ^ ^  _r_eset slice box
-			;;         ^^^↓^^^
-			;;         ^^_G_^^
-			;;   --------------------------------------------------------------------------------
-			;;        "
-			;;   ("\\" hydra-master/body "back")
-			;;   ("<ESC>" nil "quit")
-			;;   ("al" pdf-annot-list-annotations)
-			;;   ("ad" pdf-annot-delete)
-			;;   ("aa" pdf-annot-attachment-dired)
-			;;   ("am" pdf-annot-add-markup-annotation)
-			;;   ("at" pdf-annot-add-text-annotation)
-			;;   ("y"  pdf-view-kill-ring-save)
-			;;   ("+" pdf-view-enlarge :color red)
-			;;   ("-" pdf-view-shrink :color red)
-			;;   ("0" pdf-view-scale-reset)
-			;;   ("H" pdf-view-fit-height-to-window)
-			;;   ("W" pdf-view-fit-width-to-window)
-			;;   ("P" pdf-view-fit-page-to-window)
-			;;   ("n" pdf-view-next-page-command :color red)
-			;;   ("p" pdf-view-previous-page-command :color red)
-			;;   ("d" pdf-view-dark-minor-mode)
-			;;   ("b" pdf-view-set-slice-from-bounding-box)
-			;;   ("r" pdf-view-reset-slice)
-			;;   ("g" pdf-view-first-page)
-			;;   ("G" pdf-view-last-page)
-			;;   ("e" pdf-view-goto-page)
-			;;   ("o" pdf-outline)
-			;;   ("s" pdf-occur)
-			;;   ("i" pdf-misc-display-metadata)
-			;;   ("u" pdf-view-revert-buffer)
-			;;   ("F" pdf-links-action-perfom)
-			;;   ("f" pdf-links-isearch-link)
-			;;   ("B" pdf-history-backward :color red)
-			;;   ("N" pdf-history-forward :color red)
-			;;   ("l" image-forward-hscroll :color red)
-			;;   ("h" image-backward-hscroll :color red))
+	(use-package multi-term
+		:bind
+		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
+		("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
 
-			(use-package elcord :defer t)
+	(use-package evil
+		:ensure t
+		:init      ;; tweak evil's configuration before loading it
+		;;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+		(setq evil-want-keybinding nil)
+		(setq evil-vsplit-window-right t)
+		(setq evil-split-window-below t)
+		(evil-mode))
+	(use-package evil-collection
+		:after evil
+		:ensure t
+		:config
+		(setq evil-collection-mode-list '(dashboard dired ibuffer))
+		(evil-collection-init))
+	;;(use-package evil-tutor
+	;;	:ensure t)
 
-			(use-package org-superstar
-				:ensure t
-				:defer t
-				:config
-				(setq org-superstar-headline-bullets-list '("◉" "⬢" "○" "✸" "✿")))
+	;; Evil multiple cursors
+	(use-package evil-multiedit
+		:after evil
+		:bind
+		(:map evil-normal-state-map
+					("M-d". evil-multiedit-match-symbol-and-next)
+					("M-D". evil-multiedit-match-symbol-and-prev)
+					("C-M-d". evil-multiedit-match-all)
+					:map evil-visual-state-map
+					("M-d". evil-multiedit-match-and-next)
+					("M-D". evil-multiedit-match-and-prev)
+					("C-M-d". evil-multiedit-match-all)))
 
-			(use-package multi-term
-				:bind
-				("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
-				("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
+	(use-package fzf
+		:ensure t
+		:bind
+		;; Don't forget to set keybinds!
+		:config
+		(setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
+					fzf/executable "fzf"
+					fzf/git-grep-args "-i --line-number %s"
+					;; command used for `fzf-grep-*` functions
+					;; example usage for ripgrep:
+					;; fzf/grep-command "rg --no-heading -nH"
+					fzf/grep-command "grep -nrH"
+					;; If nil, the fzf buffer will appear at the top of the window
+					fzf/position-bottom t
+					fzf/window-height 15))
 
-			(use-package evil
-				:ensure t
-				:init      ;; tweak evil's configuration before loading it
-				;;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-				(setq evil-want-keybinding nil)
-				(setq evil-vsplit-window-right t)
-				(setq evil-split-window-below t)
-				(evil-mode))
-			(use-package evil-collection
-				:after evil
-				:ensure t
-				:config
-				(setq evil-collection-mode-list '(dashboard dired ibuffer))
-				(evil-collection-init))
-			;;(use-package evil-tutor
-			;;	:ensure t)
+	(use-package general
+		:config
+		(general-evil-setup t))
 
-			;; Evil multiple cursors
-			(use-package evil-multiedit
-				:after evil
-				:bind
-				(:map evil-normal-state-map
-				 ("M-d". evil-multiedit-match-symbol-and-next)
-				 ("M-D". evil-multiedit-match-symbol-and-prev)
-				 ("C-M-d". evil-multiedit-match-all)
-				 :map evil-visual-state-map
-				 ("M-d". evil-multiedit-match-and-next)
-				 ("M-D". evil-multiedit-match-and-prev)
-				 ("C-M-d". evil-multiedit-match-all)))
+	(defun enable-minor-mode (my-pair)
+		"Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+		(if (buffer-file-name)
+				(if (string-match (car my-pair) buffer-file-name)
+						(funcall (cdr my-pair)))))
 
-			(use-package fzf
-				:ensure t
-				:bind
-				;; Don't forget to set keybinds!
-				:config
-				(setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
-							fzf/executable "fzf"
-							fzf/git-grep-args "-i --line-number %s"
-							;; command used for `fzf-grep-*` functions
-							;; example usage for ripgrep:
-							;; fzf/grep-command "rg --no-heading -nH"
-							fzf/grep-command "grep -nrH"
-							;; If nil, the fzf buffer will appear at the top of the window
-							fzf/position-bottom t
-							fzf/window-height 15))
+	(use-package treemacs
+		:ensure t
+		:defer t
+		:init
+		(with-eval-after-load 'winum
+			(define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+		:config
+		(progn
+			(setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+						treemacs-deferred-git-apply-delay        0.5
+						treemacs-directory-name-transformer      #'identity
+						treemacs-display-in-side-window          t
+						treemacs-eldoc-display                   'simple
+						treemacs-file-event-delay                5000
+						treemacs-file-extension-regex            treemacs-last-period-regex-value
+						treemacs-file-follow-delay               0.2
+						treemacs-file-name-transformer           #'identity
+						treemacs-follow-after-init               t
+						treemacs-expand-after-init               t
+						treemacs-find-workspace-method           'find-for-file-or-pick-first
+						treemacs-git-command-pipe                ""
+						treemacs-goto-tag-strategy               'refetch-index
+						treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+						treemacs-hide-dot-git-directory          t
+						treemacs-indentation                     2
+						treemacs-indentation-string              " "
+						treemacs-is-never-other-window           nil
+						treemacs-max-git-entries                 5000
+						treemacs-missing-project-action          'ask
+						treemacs-move-forward-on-expand          nil
+						treemacs-no-png-images                   nil
+						treemacs-no-delete-other-windows         t
+						treemacs-project-follow-cleanup          nil
+						treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+						treemacs-position                        'left
+						treemacs-read-string-input               'from-child-frame
+						treemacs-recenter-distance               0.1
+						treemacs-recenter-after-file-follow      nil
+						treemacs-recenter-after-tag-follow       nil
+						treemacs-recenter-after-project-jump     'always
+						treemacs-recenter-after-project-expand   'on-distance
+						treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+						treemacs-show-cursor                     nil
+						treemacs-show-hidden-files               nil
+						treemacs-silent-filewatch                nil
+						treemacs-silent-refresh                  nil
+						treemacs-sorting                         'alphabetic-asc
+						treemacs-select-when-already-in-treemacs 'move-back
+						treemacs-space-between-root-nodes        t
+						treemacs-tag-follow-cleanup              t
+						treemacs-tag-follow-delay                1.5
+						treemacs-text-scale                      nil
+						treemacs-user-mode-line-format           nil
+						treemacs-user-header-line-format         nil
+						treemacs-wide-toggle-width               70
+						treemacs-width                           35
+						treemacs-width-increment                 1
+						treemacs-width-is-initially-locked       t
+						treemacs-workspace-switch-cleanup        nil)
 
-			(use-package general
-				:config
-				:ensure t
-				(general-evil-setup t))
+			;; The default width and height of the icons is 22 pixels. If you are
+			;; using a Hi-DPI display, uncomment this to double the icon size.
+			;; (treemacs-resize-icons 48)
 
-			(defun enable-minor-mode (my-pair)
-				"Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
-				(if (buffer-file-name)
-						(if (string-match (car my-pair) buffer-file-name)
-								(funcall (cdr my-pair)))))
+			(treemacs-follow-mode t)
+			(treemacs-filewatch-mode t)
+			(treemacs-fringe-indicator-mode 'always)
+			(when treemacs-python-executable
+				(treemacs-git-commit-diff-mode t))
 
-			(use-package treemacs
-				:ensure t
-				:defer t
-				:init
-				(with-eval-after-load 'winum
-					(define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-				:config
-				(progn
-					(setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
-								treemacs-deferred-git-apply-delay        0.5
-								treemacs-directory-name-transformer      #'identity
-								treemacs-display-in-side-window          t
-								treemacs-eldoc-display                   'simple
-								treemacs-file-event-delay                5000
-								treemacs-file-extension-regex            treemacs-last-period-regex-value
-								treemacs-file-follow-delay               0.2
-								treemacs-file-name-transformer           #'identity
-								treemacs-follow-after-init               t
-								treemacs-expand-after-init               t
-								treemacs-find-workspace-method           'find-for-file-or-pick-first
-								treemacs-git-command-pipe                ""
-								treemacs-goto-tag-strategy               'refetch-index
-								treemacs-header-scroll-indicators        '(nil . "^^^^^^")
-								treemacs-hide-dot-git-directory          t
-								treemacs-indentation                     2
-								treemacs-indentation-string              " "
-								treemacs-is-never-other-window           nil
-								treemacs-max-git-entries                 5000
-								treemacs-missing-project-action          'ask
-								treemacs-move-forward-on-expand          nil
-								treemacs-no-png-images                   nil
-								treemacs-no-delete-other-windows         t
-								treemacs-project-follow-cleanup          nil
-								treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-								treemacs-position                        'left
-								treemacs-read-string-input               'from-child-frame
-								treemacs-recenter-distance               0.1
-								treemacs-recenter-after-file-follow      nil
-								treemacs-recenter-after-tag-follow       nil
-								treemacs-recenter-after-project-jump     'always
-								treemacs-recenter-after-project-expand   'on-distance
-								treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
-								treemacs-show-cursor                     nil
-								treemacs-show-hidden-files               nil
-								treemacs-silent-filewatch                nil
-								treemacs-silent-refresh                  nil
-								treemacs-sorting                         'alphabetic-asc
-								treemacs-select-when-already-in-treemacs 'move-back
-								treemacs-space-between-root-nodes        t
-								treemacs-tag-follow-cleanup              t
-								treemacs-tag-follow-delay                1.5
-								treemacs-text-scale                      nil
-								treemacs-user-mode-line-format           nil
-								treemacs-user-header-line-format         nil
-								treemacs-wide-toggle-width               70
-								treemacs-width                           35
-								treemacs-width-increment                 1
-								treemacs-width-is-initially-locked       t
-								treemacs-workspace-switch-cleanup        nil)
+			(pcase (cons (not (null (executable-find "git")))
+									 (not (null treemacs-python-executable)))
+				(`(t . t)
+				 (treemacs-git-mode 'deferred))
+				(`(t . _)
+				 (treemacs-git-mode 'simple)))
 
-					;; The default width and height of the icons is 22 pixels. If you are
-					;; using a Hi-DPI display, uncomment this to double the icon size.
-					;; (treemacs-resize-icons 48)
+			(treemacs-hide-gitignored-files-mode nil))
+		:bind
+		(:map global-map
+					("M-0"       . treemacs-select-window)
+					("C-x t 1"   . treemacs-delete-other-windows)
+					("C-x t t"   . treemacs)
+					("C-x t d"   . treemacs-select-directory)
+					("C-x t B"   . treemacs-bookmark)
+					("C-x t C-t" . treemacs-find-file)
+					("C-x t M-t" . treemacs-find-tag)))
 
-					(treemacs-follow-mode t)
-					(treemacs-filewatch-mode t)
-					(treemacs-fringe-indicator-mode 'always)
-					(when treemacs-python-executable
-						(treemacs-git-commit-diff-mode t))
+	(use-package treemacs-all-the-icons
+		:ensure t)
+	(treemacs-load-theme "all-the-icons")
 
-					(pcase (cons (not (null (executable-find "git")))
-											 (not (null treemacs-python-executable)))
-						(`(t . t)
-						 (treemacs-git-mode 'deferred))
-						(`(t . _)
-						 (treemacs-git-mode 'simple)))
+	(use-package treemacs-evil
+		:after (treemacs evil)
+		:ensure t)
 
-					(treemacs-hide-gitignored-files-mode nil))
-				:bind
-				(:map global-map
-							("M-0"       . treemacs-select-window)
-							("C-x t 1"   . treemacs-delete-other-windows)
-							("C-x t t"   . treemacs)
-							("C-x t d"   . treemacs-select-directory)
-							("C-x t B"   . treemacs-bookmark)
-							("C-x t C-t" . treemacs-find-file)
-							("C-x t M-t" . treemacs-find-tag)))
+	(use-package format-all
+		:ensure t
+		:preface
+		(defun ian/format-code ()
+			"Auto-format whole buffer."
+			(interactive)
+			(if (derived-mode-p 'prolog-mode)
+					(prolog-indent-buffer)
+				(format-all-buffer)))
+		:config
+		(global-set-key (kbd "M-F") #'ian/format-code)
+		(add-hook 'prog-mode-hook #'format-all-ensure-formatter))
 
-			(use-package treemacs-all-the-icons
-				:ensure t)
-			(treemacs-load-theme "all-the-icons")
+	(use-package centaur-tabs
+		:config
+		(setq centaur-tabs-style "bar"
+					centaur-tabs-height 32
+					centaur-tabs-set-icons t
+					centaur-tabs-set-modified-marker t
+					;; centaur-tabs-show-navigation-buttons t
+					centaur-tabs-set-bar 'over
+					;; x-underline-at-descent-line t
+					)
+		(centaur-tabs-headline-match)
+		;; (setq centaur-tabs-gray-out-icons 'buffer)
+		;; (centaur-tabs-enable-buffer-reordering)
+		;; (setq centaur-tabs-adjust-buffer-order t)
+		(centaur-tabs-mode t)
+		(setq uniquify-separator "/")
+		(setq uniquify-buffer-name-style 'forward)
+		(defun centaur-tabs-buffer-groups ()
+			"`centaur-tabs-buffer-groups' control buffers' group rules.
 
-			(use-package treemacs-evil
-				:after (treemacs evil)
-				:ensure t)
-
-			(use-package format-all
-				:ensure t
-				:preface
-				(defun ian/format-code ()
-					"Auto-format whole buffer."
-					(interactive)
-					(if (derived-mode-p 'prolog-mode)
-							(prolog-indent-buffer)
-						(format-all-buffer)))
-				:config
-				(global-set-key (kbd "M-F") #'ian/format-code)
-				(add-hook 'prog-mode-hook #'format-all-ensure-formatter))
-
-			(use-package centaur-tabs
-				:config
-				(setq centaur-tabs-style "bar"
-							centaur-tabs-height 32
-							centaur-tabs-set-icons t
-							centaur-tabs-set-modified-marker t
-							;; centaur-tabs-show-navigation-buttons t
-							centaur-tabs-set-bar 'over
-							;; x-underline-at-descent-line t
-							)
-				(centaur-tabs-headline-match)
-				;; (setq centaur-tabs-gray-out-icons 'buffer)
-				;; (centaur-tabs-enable-buffer-reordering)
-				;; (setq centaur-tabs-adjust-buffer-order t)
-				(centaur-tabs-mode t)
-				(setq uniquify-separator "/")
-				(setq uniquify-buffer-name-style 'forward)
-				(defun centaur-tabs-buffer-groups ()
-					"`centaur-tabs-buffer-groups' control buffers' group rules.
-
-			 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
-			 All buffer name start with * will group to \"Emacs\".
-			 Other buffer group by `centaur-tabs-get-group-name' with project name."
-					(list
-					 (cond
-						;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-						;; "Remote")
-						((or (string-equal "*" (substring (buffer-name) 0 1))
-								 (memq major-mode '(magit-process-mode
-																		magit-status-mode
-																		magit-diff-mode
-																		magit-log-mode
-																		magit-file-mode
-																		magit-blob-mode
-																		magit-blame-mode
-																		)))
-						 "Emacs")
-						((derived-mode-p 'prog-mode)
-						 "Editing")
-						((derived-mode-p 'dired-mode)
-						 "Dired")
-						((memq major-mode '(helpful-mode
-																help-mode))
-						 "Help")
-						((memq major-mode '(org-mode
-																org-agenda-clockreport-mode
-																org-src-mode
-																org-agenda-mode
-																org-beamer-mode
-																org-indent-mode
-																org-bullets-mode
-																org-cdlatex-mode
-																org-agenda-log-mode
-																diary-mode))
-						 "OrgMode")
-						(t
-						 (centaur-tabs-get-group-name (current-buffer))))))
-				:hook
-				(dashboard-mode . centaur-tabs-local-mode)
-				(term-mode . centaur-tabs-local-mode)
-				(calendar-mode . centaur-tabs-local-mode)
-				(org-agenda-mode . centaur-tabs-local-mode)
-				(helpful-mode . centaur-tabs-local-mode)
-				:bind
-				("C-<prior>" . centaur-tabs-backward)
-				("C-<next>" . centaur-tabs-forward)
-				("C-c t s" . centaur-tabs-counsel-switch-group)
-				("C-c t p" . centaur-tabs-group-by-projectile-project)
-				("C-c t g" . centaur-tabs-group-buffer-groups)
-				(:map evil-normal-state-map
-							("g t" . centaur-tabs-forward)
-							("g T" . centaur-tabs-backward)))
+		 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+		 All buffer name start with * will group to \"Emacs\".
+		 Other buffer group by `centaur-tabs-get-group-name' with project name."
+			(list
+			 (cond
+				;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+				;; "Remote")
+				((or (string-equal "*" (substring (buffer-name) 0 1))
+						 (memq major-mode '(magit-process-mode
+																magit-status-mode
+																magit-diff-mode
+																magit-log-mode
+																magit-file-mode
+																magit-blob-mode
+																magit-blame-mode
+																)))
+				 "Emacs")
+				((derived-mode-p 'prog-mode)
+				 "Editing")
+				((derived-mode-p 'dired-mode)
+				 "Dired")
+				((memq major-mode '(helpful-mode
+														help-mode))
+				 "Help")
+				((memq major-mode '(org-mode
+														org-agenda-clockreport-mode
+														org-src-mode
+														org-agenda-mode
+														org-beamer-mode
+														org-indent-mode
+														org-bullets-mode
+														org-cdlatex-mode
+														org-agenda-log-mode
+														diary-mode))
+				 "OrgMode")
+				(t
+				 (centaur-tabs-get-group-name (current-buffer))))))
+		:hook
+		(dashboard-mode . centaur-tabs-local-mode)
+		(term-mode . centaur-tabs-local-mode)
+		(calendar-mode . centaur-tabs-local-mode)
+		(org-agenda-mode . centaur-tabs-local-mode)
+		(helpful-mode . centaur-tabs-local-mode)
+		:bind
+		("C-<prior>" . centaur-tabs-backward)
+		("C-<next>" . centaur-tabs-forward)
+		("C-c t s" . centaur-tabs-counsel-switch-group)
+		("C-c t p" . centaur-tabs-group-by-projectile-project)
+		("C-c t g" . centaur-tabs-group-buffer-groups)
+		(:map evil-normal-state-map
+					("g t" . centaur-tabs-forward)
+					("g T" . centaur-tabs-backward)))
 
 
-			(use-package doom-modeline
-				:commands doom-modeline
-				:custom
-				(doom-modeline-set-timemachine-modeline)
-				(doom-modeline-buffer-name t)
-				(display-battery-mode 1)
-				(doom-modeline-time-icon t)
-				;; (doom-modeline-height 15)
-				(doom-modeline-bar-width 3)
-				:hook (after-init . doom-modeline-mode))
+	(use-package doom-modeline
+		:commands doom-modeline
+		:custom
+		(doom-modeline-set-timemachine-modeline)
+		(doom-modeline-buffer-name t)
+		(display-battery-mode 1)
+		(doom-modeline-time-icon t)
+		;; (doom-modeline-height 15)
+		(doom-modeline-bar-width 3)
+		:hook (after-init . doom-modeline-mode))
 
-		(use-package parrot
-			:ensure t
-			:defer t)
+	(use-package parrot
+		:ensure t
+		:defer t)
 
-			;; Needed for `:after char-fold' to work
-			(use-package char-fold
-				:custom
-				(char-fold-symmetric t)
-				(search-default-mode #'char-fold-to-regexp))
+	;; Needed for `:after char-fold' to work
+	(use-package char-fold
+		:custom
+		(char-fold-symmetric t)
+		(search-default-mode #'char-fold-to-regexp))
 
-			(use-package reverse-im
-				:ensure t ; install `reverse-im' using package.el
-				:demand t ; always load it
-				:after char-fold ; but only after `char-fold' is loaded
-				:bind
-				("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
-				:custom
-				(reverse-im-char-fold t) ; use lax matching
-				(reverse-im-read-char-advice-function #'reverse-im-read-char-include)
-				(reverse-im-input-methods '("ukrainian-computer")) ; translate these methods
-				:config
-				(reverse-im-mode t)) ; turn the mode on
+	(use-package reverse-im
+		:ensure t ; install `reverse-im' using package.el
+		:demand t ; always load it
+		:after char-fold ; but only after `char-fold' is loaded
+		:bind
+		("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
+		:custom
+		(reverse-im-char-fold t) ; use lax matching
+		(reverse-im-read-char-advice-function #'reverse-im-read-char-include)
+		(reverse-im-input-methods '("ukrainian-computer")) ; translate these methods
+		:config
+		(reverse-im-mode t)) ; turn the mode on
 
-			(use-package projectile
-				:ensure t
-				:init
-				(projectile-mode +1)
-				:bind (:map projectile-mode-map
-										("s-p" . projectile-command-map)
-										("C-c p" . projectile-command-map)))
+	(use-package projectile
+		:ensure t
+		:init
+		(projectile-mode +1)
+		:bind (:map projectile-mode-map
+								("s-p" . projectile-command-map)
+								("C-c p" . projectile-command-map)))
 
-			;; Highlight TODO, FIXME, ... in any programming mode
-			;; (use-package 'fic-mode
-			;; 	:ensure t
-			;; 	:hook 'prog-mode-hook 'fic-mode)
+	;; Highlight TODO, FIXME, ... in any programming mode
+	;; (use-package 'fic-mode
+	;; 	:ensure t
+	;; 	:hook 'prog-mode-hook 'fic-mode)
 
-			;; Setting dashboard
-			(use-package dashboard
-				:init      ;; tweak dashboard config before loading it
-				(setq dashboard-center-content t)
-																							;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-				(setq dashboard-set-heading-icons t)
-				(setq dashboard-set-file-icons t)
-				(setq dashboard-banner-logo-title "Emacs is more than a text editor!")
-				(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-				(setq dashboard-startup-banner "~/.emacs.d/images/RMS.png")  ;; use custom image as banner
-				(setq dashboard-items '(
-																(recents . 5)
-																;;(agenda . 5 )
-																(bookmarks . 3)
-																(projects . 5)))
-				;;(registers . 3)))
-				:config
-				(dashboard-setup-startup-hook)
-				(dashboard-modify-heading-icons '((recents . "file-text")
-																					(bookmarks . "book"))))
+	;; Setting dashboard
+	(use-package dashboard
+		:init      ;; tweak dashboard config before loading it
+		(setq dashboard-center-content t)
+																					;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+		(setq dashboard-set-heading-icons t)
+		(setq dashboard-set-file-icons t)
+		(setq dashboard-banner-logo-title "Emacs is more than a text editor!")
+		(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+		(setq dashboard-startup-banner "~/.emacs.d/images/RMS.png")  ;; use custom image as banner
+		(setq dashboard-items '(
+														(recents . 5)
+														;;(agenda . 5 )
+														(bookmarks . 3)
+														(projects . 5)))
+		;;(registers . 3)))
+		:config
+		(dashboard-setup-startup-hook)
+		(dashboard-modify-heading-icons '((recents . "file-text")
+																			(bookmarks . "book"))))
 #+end_src
 
 * Setting LSP
 #+begin_src emacs-lisp
-;;(lsp-treemacs-sync-mode 1)
+	;;(lsp-treemacs-sync-mode 1)
 
-(add-hook 'web-mode-hook  'emmet-mode)
-(helm-mode)
+	(add-hook 'web-mode-hook  'emmet-mode)
+	(helm-mode)
 
-(use-package react-snippets)
+	(use-package react-snippets)
 #+end_src
-
 
 ** Setting Company
 #+begin_src emacs-lisp
@@ -673,51 +664,51 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 ** Setting LSP-Mode
 *** LSP-Mode
 #+begin_src emacs-lisp
-(use-package lsp-mode
+	(use-package lsp-mode
 		:init
 		;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
 		(setq lsp-keymap-prefix "C-c l")
 		:hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-						(go-mode . lsp)
-						(javascript-mode . lsp)
-						(typescript-mode . lsp)
-						;; if you want which-key integration
-						(lsp-mode . lsp-enable-which-key-integration))
+					 (go-mode . lsp)
+					 (javascript-mode . lsp)
+					 (typescript-mode . lsp)
+					 ;; if you want which-key integration
+					 (lsp-mode . lsp-enable-which-key-integration))
 		:commands lsp)
 
-;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-;; if you are helm user
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-;; Symbol highlighting
-(setq lsp-enable-symbol-highlighting nil)
+	;; optionally
+	(use-package lsp-ui :commands lsp-ui-mode)
+	;; if you are helm user
+	(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+	;; if you are ivy user
+	(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+	;; Symbol highlighting
+	(setq lsp-enable-symbol-highlighting nil)
 
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+	(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
-;; optionally if you want to use debugger
-(use-package dap-mode)
-;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+	;; optionally if you want to use debugger
+	(use-package dap-mode)
+	;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
-;; optional if you want which-key integration
-;;(use-package which-key
-;;		:config
-;;		(which-key-mode))
+	;; optional if you want which-key integration
+	;;(use-package which-key
+	;;		:config
+	;;		(which-key-mode))
 #+end_src
 
 *** JSON
 #+begin_src emacs-lisp
-(use-package json-mode :ensure t :defer 20
-	:custom
-	(json-reformat:indent-width 2)
-	:mode (("\\.bowerrc$"     . json-mode)
-				 ("\\.jshintrc$"    . json-mode)
-				 ("\\.json_schema$" . json-mode)
-				 ("\\.json\\'" . json-mode))
-	:bind (:package json-mode-map
-									:map json-mode-map
-									("C-c <tab>" . json-mode-beautify)))
+	(use-package json-mode :ensure t :defer 20
+		:custom
+		(json-reformat:indent-width 2)
+		:mode (("\\.bowerrc$"     . json-mode)
+					 ("\\.jshintrc$"    . json-mode)
+					 ("\\.json_schema$" . json-mode)
+					 ("\\.json\\'" . json-mode))
+		:bind (:package json-mode-map
+										:map json-mode-map
+										("C-c <tab>" . json-mode-beautify)))
 #+end_src
 *** Vue.js (disabled)
 #+begin_src example
@@ -754,25 +745,25 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 *** JavaScript
 #+begin_src emacs-lisp
-(use-package web-mode  :ensure t
-  :mode (("\\.js\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode)
-         ("\\.ts\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.html\\'" . web-mode)
-         ;;("\\.vue\\'" . web-mode)
-	 ("\\.json\\'" . web-mode))
-  :commands web-mode
-  :config
-  (setq web-mode-content-types-alist
-	'(("jsx" . "\\.js[x]?\\'")))
-  )
+	(use-package web-mode  :ensure t
+		:mode (("\\.js\\'" . web-mode)
+					 ("\\.jsx\\'" . web-mode)
+					 ("\\.ts\\'" . web-mode)
+					 ("\\.tsx\\'" . web-mode)
+					 ("\\.html\\'" . web-mode)
+					 ;;("\\.vue\\'" . web-mode)
+					 ("\\.json\\'" . web-mode))
+		:commands web-mode
+		:config
+		(setq web-mode-content-types-alist
+					'(("jsx" . "\\.js[x]?\\'")))
+		)
 
-;; JSX syntax highlighting
-;;add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
-;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+	;; JSX syntax highlighting
+	;;add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
+	;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
-(use-package js2-mode :ensure t :defer 20
+	(use-package js2-mode :ensure t :defer 20
 		:mode
 		(("\\.js\\'" . js2-mode))
 		:custom
@@ -790,25 +781,25 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 								:after-until
 								(lambda (c) (eq c ?#))))
 
-;; (use-package javascript-mode
-;;   :after tree-sitter
-;;   :config
-;;   ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
-;;   ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
-;;   (define-derived-mode typescriptreact-mode typescript-mode
-;;     "JavaScript TSX")
+	;; (use-package javascript-mode
+	;;   :after tree-sitter
+	;;   :config
+	;;   ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
+	;;   ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
+	;;   (define-derived-mode typescriptreact-mode typescript-mode
+	;;     "JavaScript TSX")
 
-;;   ;; use our derived mode for tsx files
-;;   (add-to-list 'auto-mode-alist '("\\.jsx?\\'" . javascript-mode))
-;;   ;; by default, typescript-mode is mapped to the treesitter typescript parser
-;;   ;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
-;;   (add-to-list 'tree-sitter-major-mode-language-alist '(javascript-mode . jsx)))
+	;;   ;; use our derived mode for tsx files
+	;;   (add-to-list 'auto-mode-alist '("\\.jsx?\\'" . javascript-mode))
+	;;   ;; by default, typescript-mode is mapped to the treesitter typescript parser
+	;;   ;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
+	;;   (add-to-list 'tree-sitter-major-mode-language-alist '(javascript-mode . jsx)))
 
-(add-hook 'web-mode-hook #'(lambda ()
-														 (enable-minor-mode
-															'("\\.jsx?\\'" . prettier-js-mode))))
+	(add-hook 'web-mode-hook #'(lambda ()
+															 (enable-minor-mode
+																'("\\.jsx?\\'" . prettier-js-mode))))
 
-(add-hook 'web-mode-hook 'prettier-js-mode)
+	(add-hook 'web-mode-hook 'prettier-js-mode)
 #+end_src
 
 *** Golang
