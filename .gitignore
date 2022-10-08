@@ -21,6 +21,7 @@ projectile-bookmarks.eld
 
 .dap-breakpoints
 .lsp-session*
+tmp*
 
 #*
 README.el
