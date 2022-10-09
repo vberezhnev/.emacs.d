@@ -30,31 +30,27 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting base of Emacs
 ** Functions
 #+begin_src emacs-lisp
-(defun indent-org-block-automatically ()
-  (when (org-in-src-block-p)
-   (org-edit-special)
-    (indent-region (point-min) (point-max))
-    (org-edit-src-exit)))
+	(defun indent-org-block-automatically ()
+		(when (org-in-src-block-p)
+			(org-edit-special)
+			(indent-region (point-min) (point-max))
+			(org-edit-src-exit)))
 
-(run-at-time 1 10 'indent-org-block-automatically)
+	(run-at-time 1 10 'indent-org-block-automatically)
 #+end_src
 
 ** Import local files
 #+begin_src emacs-lisp
 	(load "~/.emacs.d/local-packages/company-go")
 	(require 'company-go)
-
-	;; (use-package company-go
-	;; :defer t
-	;; 	:load-path "~/.emacs.d/local-packages/company-go")	
 #+end_src
 
 ** Disable backup and auto save
 #+begin_src emacs-lisp
-;; Disable backup
-(setq backup-inhibited t)
-;; Disable auto save
-(setq auto-save-default nil)
+	;; Disable backup
+	(setq backup-inhibited t)
+	;; Disable auto save
+	(setq auto-save-default nil)
 #+end_src
 
 ** Pixelwise for frames
@@ -85,7 +81,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(tool-bar-mode -1)          ; Disable the toolbar
 	(tooltip-mode -1)           ; Disable tooltips
 	(set-fringe-mode 10)        ; Give some breathing room
-	(menu-bar-mode -1)        ; Disable the menu bar
+	(menu-bar-mode -1)          ; Disable the menu bar
 #+end_src
 
 ** Setting keymap
@@ -137,10 +133,11 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 * Setting font face
+** Setting fonts
 #+begin_src emacs-lisp
 	(set-face-attribute 'default nil
 											:font "Fira Code"
-											:height 100
+											:height 110
 											:weight 'medium)
 	(set-face-attribute 'variable-pitch nil
 											:font "Fira Code"
@@ -148,7 +145,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 											:weight 'medium)
 	(set-face-attribute 'fixed-pitch nil
 											:font "Fira Code"
-											:height 100
+											:height 110
 											:weight 'medium)
 	;; Makes commented text and keywords italics.
 	;; This is working in emacsclient but not emacs.
@@ -168,7 +165,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 ** Setting and installing themes
-#+begin_src example
+#+begin_src emacs-lisp
+	(load-theme 'atom-one-dark t)
 	(use-package atom-one-dark
 		:ensure t)
 
@@ -177,7 +175,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 	(use-package melancholy-theme
 		:ensure t)
-	
+
 	(use-package solo-jazz-theme
 		:ensure t)
 
@@ -537,7 +535,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		:custom
 		(doom-modeline-set-timemachine-modeline)
 		(doom-modeline-buffer-name t)
-		(display-battery-mode 1)
+		;;(display-battery-mode 1)
 		(doom-modeline-time-icon t)
 		;; (doom-modeline-height 15)
 		(doom-modeline-bar-width 3)
@@ -613,52 +611,52 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting Company
 #+begin_src emacs-lisp
-			;; Install company
-		(use-package company
+	;; Install company
+	(use-package company
 		:ensure t
-	  :defer 20
-				;; This is not perfect yet. It completes too quickly outside programming modes, but while programming it is just right.
-				:custom
-				(company-idle-delay 0.1)
-				(global-company-mode t)
-				(debug-on-error nil) ;; otherwise this throws lots of errors on completion errors
-				:config
-				(define-key company-active-map (kbd "TAB") 'company-complete-selection)
-				(define-key company-active-map (kbd "<tab>") 'company-complete-selection)
-				(define-key company-active-map [return] 'company-complete-selection)
-				(define-key company-active-map (kbd "RET") 'company-complete-selection)
-				;; auto-complete compatibility
-				(defun my-company-visible-and-explicit-action-p ()
-					(and (company-tooltip-visible-p)
-							 (company-explicit-action-p)))
-				(defun company-ac-setup ()
-					"Sets up `company-mode' to behave similarly to `auto-complete-mode'."
-					(setq company-require-match nil)
-					(setq company-auto-complete #'my-company-visible-and-explicit-action-p)
-					(setq company-frontends '(company-echo-metadata-frontend
-																		company-pseudo-tooltip-unless-just-one-frontend-with-delay
-																		company-preview-frontend))
-					(define-key company-active-map [tab]
-						'company-select-next-if-tooltip-visible-or-complete-selection)
-					(define-key company-active-map (kbd "TAB")
-						'company-select-next-if-tooltip-visible-or-complete-selection))
+		:defer 20
+		;; This is not perfect yet. It completes too quickly outside programming modes, but while programming it is just right.
+		:custom
+		(company-idle-delay 0.1)
+		(global-company-mode t)
+		(debug-on-error nil) ;; otherwise this throws lots of errors on completion errors
+		:config
+		(define-key company-active-map (kbd "TAB") 'company-complete-selection)
+		(define-key company-active-map (kbd "<tab>") 'company-complete-selection)
+		(define-key company-active-map [return] 'company-complete-selection)
+		(define-key company-active-map (kbd "RET") 'company-complete-selection)
+		;; auto-complete compatibility
+		(defun my-company-visible-and-explicit-action-p ()
+			(and (company-tooltip-visible-p)
+					 (company-explicit-action-p)))
+		(defun company-ac-setup ()
+			"Sets up `company-mode' to behave similarly to `auto-complete-mode'."
+			(setq company-require-match nil)
+			(setq company-auto-complete #'my-company-visible-and-explicit-action-p)
+			(setq company-frontends '(company-echo-metadata-frontend
+																company-pseudo-tooltip-unless-just-one-frontend-with-delay
+																company-preview-frontend))
+			(define-key company-active-map [tab]
+				'company-select-next-if-tooltip-visible-or-complete-selection)
+			(define-key company-active-map (kbd "TAB")
+				'company-select-next-if-tooltip-visible-or-complete-selection))
 
-				(company-ac-setup)
-				(add-hook 'js2-mode-hook (lambda () (company-mode))))
+		(company-ac-setup)
+		(add-hook 'js2-mode-hook (lambda () (company-mode))))
 
-			;; (use-package company
-			;; 	:ensure t
-			;; 	:config (add-hook 'prog-mode-hook 'company-mode)
-			;; 	(global-set-key (kbd "M-i") 'company-complete))
+	;; (use-package company
+	;; 	:ensure t
+	;; 	:config (add-hook 'prog-mode-hook 'company-mode)
+	;; 	(global-set-key (kbd "M-i") 'company-complete))
 
-			(use-package company-anaconda
-				:defer
-				:after company
-				:config (add-to-list 'company-backends 'company-anaconda))
+	(use-package company-anaconda
+		:defer
+		:after company
+		:config (add-to-list 'company-backends 'company-anaconda))
 
-				;; Company mode
-				(setq company-idle-delay 0)
-				(setq company-minimum-prefix-length 1)
+	;; Company mode
+	(setq company-idle-delay 0)
+	(setq company-minimum-prefix-length 1)
 #+end_src
 
 ** Setting LSP-Mode
@@ -728,19 +726,19 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 *** TypeScript
 #+begin_src emacs-lisp
-(use-package typescript-mode
-:after tree-sitter
-:config
-;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
-;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
-(define-derived-mode typescriptreact-mode typescript-mode
-		"TypeScript TSX")
+	(use-package typescript-mode
+		:after tree-sitter
+		:config
+		;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
+		;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
+		(define-derived-mode typescriptreact-mode typescript-mode
+			"TypeScript TSX")
 
-;; use our derived mode for tsx files
-(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
-;; by default, typescript-mode is mapped to the treesitter typescript parser
-;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
-(add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
+		;; use our derived mode for tsx files
+		(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
+		;; by default, typescript-mode is mapped to the treesitter typescript parser
+		;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
+		(add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
 #+end_src
 
 *** JavaScript
@@ -749,7 +747,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		:mode (("\\.js\\'" . web-mode)
 					 ("\\.jsx\\'" . web-mode)
 					 ("\\.ts\\'" . web-mode)
-					 ("\\.tsx\\'" . web-mode)
+					 ;;("\\.tsx\\'" . web-mode)
 					 ("\\.html\\'" . web-mode)
 					 ;;("\\.vue\\'" . web-mode)
 					 ("\\.json\\'" . web-mode))
@@ -763,23 +761,23 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	;;add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
 	;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
-	(use-package js2-mode :ensure t :defer 20
-		:mode
-		(("\\.js\\'" . js2-mode))
-		:custom
-		(js2-include-node-externs t)
-		;;(js2-global-externs '("customElements"))
-		(js2-highlight-level 3)
-		(js2r-prefer-let-over-var t)
-		(js2r-prefered-quote-type 2)
-		(js-indent-align-list-continuation t)
-		(global-auto-highlight-symbol-mode t)
-		:config
-		(setq js-indent-level 2)
-		;; patch in basic private field support
-		(advice-add #'js2-identifier-start-p
-								:after-until
-								(lambda (c) (eq c ?#))))
+	;; (use-package js2-mode :ensure t :defer 20
+	;; 	:mode
+	;; 	(("\\.js\\'" . js2-mode))
+	;; 	:custom
+	;; 	(js2-include-node-externs t)
+	;; 	;;(js2-global-externs '("customElements"))
+	;; 	(js2-highlight-level 3)
+	;; 	(js2r-prefer-let-over-var t)
+	;; 	(js2r-prefered-quote-type 2)
+	;; 	(js-indent-align-list-continuation t)
+	;; 	(global-auto-highlight-symbol-mode t)
+	;; 	:config
+	;; 	(setq js-indent-level 2)
+	;; 	;; patch in basic private field support
+	;; 	(advice-add #'js2-identifier-start-p
+	;; 							:after-until
+	;; 							(lambda (c) (eq c ?#))))
 
 	;; (use-package javascript-mode
 	;;   :after tree-sitter

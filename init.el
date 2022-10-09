@@ -29,8 +29,6 @@
 ;; (load "~/.emacs.d/setting-font-face")
 ;; (load "~/.emacs.d/setting-performance.el")
 
-(load-theme 'atom-one-dark t)
-
 (org-babel-load-file
  (expand-file-name
   "README.org"
@@ -46,9 +44,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
 	 '(org-make-toc org-preview-html evil-multiedit mood-line powerline-evil atom-one-dark-theme ef-themes nano-modeline nano-theme go-mode ample-theme melancholy-theme moe-theme lua-mode zoom nyan-mode parrot catppuccin-theme rust-playground rust-mode org-pdftools yasnippet-snippets multi-term org-pdfview telega vterm pdf-tools js3-mode prettier-js org-superstar quelpa tree-sitter-ispell xah-fly-keys yasnippet-lean react-snippets use-package yasnippet-classic-snippets doom-themes doom-modeline material-theme emmet-mode web-mode vue-mode spacemacs-theme typescript-mode all-the-icons ivy auto-complete monokai-theme elcord lsp-mode lsp-ui yasnippet lsp-treemacs helm-mode helm-lsp projectile hydra flycheck avy which-key helm-xref dap-mode gruvbox-theme json-mode dashboard fic-mode rust-mode rust-playground))
- '(warning-suppress-types
-	 '((use-package)
-		 (use-package))))
+ '(warning-suppress-types '((use-package) (use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
