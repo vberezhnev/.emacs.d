@@ -45,6 +45,12 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(require 'company-go)
 #+end_src
 
+** Integrate clipboard with X11 (Need for Emacs TTY)
+#+begin_src emacs-lisp
+	(use-package xclip
+		:ensure t)
+	(xclip-mode 1)
+#+end_src
 ** Disable backup and auto save
 #+begin_src emacs-lisp
 	;; Disable backup
@@ -96,6 +102,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 	(global-auto-revert-mode t)
 	(global-set-key (kbd "C-x C-b") 'ibuffer)
+	(global-set-key (kbd "M-x") 'helm-M-x)
 #+end_src
 
 #+begin_src emacs-lisp 
@@ -166,9 +173,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting and installing themes
 #+begin_src emacs-lisp
-	(load-theme 'atom-one-dark t)
-	(use-package atom-one-dark
-		:ensure t)
+	(load-theme 'gruvbox-dark-soft t)
+	;; (use-package atom-one-dark)
 
 	(use-package moe-theme
 		:ensure t)
@@ -280,6 +286,9 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 	(use-package elcord :defer t)
 
+	(use-package helm
+		:ensure t)
+
 	(use-package org-superstar
 		:ensure t
 		:defer t
@@ -337,9 +346,9 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 					fzf/position-bottom t
 					fzf/window-height 15))
 
-	(use-package general
-		:config
-		(general-evil-setup t))
+	;; (use-package general
+	;; 	:config
+	;; 	(general-evil-setup t))
 
 	(defun enable-minor-mode (my-pair)
 		"Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
@@ -535,7 +544,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		:custom
 		(doom-modeline-set-timemachine-modeline)
 		(doom-modeline-buffer-name t)
-		;;(display-battery-mode 1)
+		(display-battery-mode 1)
 		(doom-modeline-time-icon t)
 		;; (doom-modeline-height 15)
 		(doom-modeline-bar-width 3)
@@ -604,7 +613,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	;;(lsp-treemacs-sync-mode 1)
 
 	(add-hook 'web-mode-hook  'emmet-mode)
-	(helm-mode)
+	(helm-mode 1)
 
 	(use-package react-snippets)
 #+end_src
