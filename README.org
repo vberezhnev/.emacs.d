@@ -40,7 +40,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 ** Import local files
-#+begin_src emacs-lisp
+#+begin_src example
 	(load "~/.emacs.d/local-packages/company-go")
 	(require 'company-go)
 #+end_src
@@ -85,8 +85,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
 	(scroll-bar-mode -1)        ; Disable visible scrollbar
 	(tool-bar-mode -1)          ; Disable the toolbar
-	(tooltip-mode -1)           ; Disable tooltips
-	(set-fringe-mode 10)        ; Give some breathing room
+	;; (tooltip-mode -1)           ; Disable tooltips
+	;; (set-fringe-mode 10)        ; Give some breathing room
 	(menu-bar-mode -1)          ; Disable the menu bar
 #+end_src
 
@@ -121,7 +121,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 									term-mode-hook
 									shell-mode-hook
 									treemacs-mode-hook
-									eshell-mode-hook))
+									eshell-mode-hook
+									neotree-mode-hook))
 		(add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
@@ -206,100 +207,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 * Setting Packages
+** Evil
 #+begin_src emacs-lisp
-	(use-package pdf-tools
-		:defer t
-		:mode (("\\.pdf\\'" . pdf-view-mode))
-		:config
-		(pdf-tools-install)
-		(setq-default pdf-view-display-size 'fit-page)
-		:bind (:map pdf-view-mode-map
-								("\\" . hydra-pdftools/body)
-								("<s-spc>" .  pdf-view-scroll-down-or-next-page)
-								("g"  . pdf-view-first-page)
-								("G"  . pdf-view-last-page)
-								("l"  . image-forward-hscroll)
-								("h"  . image-backward-hscroll)
-								("j"  . pdf-view-next-page)
-								("k"  . pdf-view-previous-page)
-								("e"  . pdf-view-goto-page)
-								("u"  . pdf-view-revert-buffer)
-								("al" . pdf-annot-list-annotations)
-								("ad" . pdf-annot-delete)
-								("aa" . pdf-annot-attachment-dired)
-								("am" . pdf-annot-add-markup-annotation)
-								("at" . pdf-annot-add-text-annotation)
-								("y"  . pdf-view-kill-ring-save)
-								("i"  . pdf-misc-display-metadata)
-								("s"  . pdf-occur)
-								("b"  . pdf-view-set-slice-from-bounding-box)
-								("r"  . pdf-view-reset-slice)))
-
-	;; (defhydra hydra-pdftools (:color blue :hint nil)
-	;;   "
-	;;                                                                      ╭───────────┐
-	;;       Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-	;;   ╭──────────────────────────────────────────────────────────────────┴───────────╯
-	;;         ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-	;;         ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-	;;         ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-	;;         ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-	;;    _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-	;;         ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-	;;         ^^_n_^^      ^ ^  _r_eset slice box
-	;;         ^^^↓^^^
-	;;         ^^_G_^^
-	;;   --------------------------------------------------------------------------------
-	;;        "
-	;;   ("\\" hydra-master/body "back")
-	;;   ("<ESC>" nil "quit")
-	;;   ("al" pdf-annot-list-annotations)
-	;;   ("ad" pdf-annot-delete)
-	;;   ("aa" pdf-annot-attachment-dired)
-	;;   ("am" pdf-annot-add-markup-annotation)
-	;;   ("at" pdf-annot-add-text-annotation)
-	;;   ("y"  pdf-view-kill-ring-save)
-	;;   ("+" pdf-view-enlarge :color red)
-	;;   ("-" pdf-view-shrink :color red)
-	;;   ("0" pdf-view-scale-reset)
-	;;   ("H" pdf-view-fit-height-to-window)
-	;;   ("W" pdf-view-fit-width-to-window)
-	;;   ("P" pdf-view-fit-page-to-window)
-	;;   ("n" pdf-view-next-page-command :color red)
-	;;   ("p" pdf-view-previous-page-command :color red)
-	;;   ("d" pdf-view-dark-minor-mode)
-	;;   ("b" pdf-view-set-slice-from-bounding-box)
-	;;   ("r" pdf-view-reset-slice)
-	;;   ("g" pdf-view-first-page)
-	;;   ("G" pdf-view-last-page)
-	;;   ("e" pdf-view-goto-page)
-	;;   ("o" pdf-outline)
-	;;   ("s" pdf-occur)
-	;;   ("i" pdf-misc-display-metadata)
-	;;   ("u" pdf-view-revert-buffer)
-	;;   ("F" pdf-links-action-perfom)
-	;;   ("f" pdf-links-isearch-link)
-	;;   ("B" pdf-history-backward :color red)
-	;;   ("N" pdf-history-forward :color red)
-	;;   ("l" image-forward-hscroll :color red)
-	;;   ("h" image-backward-hscroll :color red))
-
-	(use-package elcord :defer t)
-
-	(use-package helm
-		:ensure t)
-
-	(use-package org-superstar
-		:ensure t
-		:defer t
-		:config
-		(setq org-superstar-headline-bullets-list '("◉" "⬢" "○" "✸" "✿")))
-
-	(use-package multi-term
-		:bind
-		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
-		("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
-
 	(use-package evil
 		:ensure t
 		:init      ;; tweak evil's configuration before loading it
@@ -329,33 +238,10 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 					("M-d". evil-multiedit-match-and-next)
 					("M-D". evil-multiedit-match-and-prev)
 					("C-M-d". evil-multiedit-match-all)))
+#+end_src
 
-	(use-package fzf
-		:ensure t
-		:bind
-		;; Don't forget to set keybinds!
-		:config
-		(setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
-					fzf/executable "fzf"
-					fzf/git-grep-args "-i --line-number %s"
-					;; command used for `fzf-grep-*` functions
-					;; example usage for ripgrep:
-					;; fzf/grep-command "rg --no-heading -nH"
-					fzf/grep-command "grep -nrH"
-					;; If nil, the fzf buffer will appear at the top of the window
-					fzf/position-bottom t
-					fzf/window-height 15))
-
-	;; (use-package general
-	;; 	:config
-	;; 	(general-evil-setup t))
-
-	(defun enable-minor-mode (my-pair)
-		"Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
-		(if (buffer-file-name)
-				(if (string-match (car my-pair) buffer-file-name)
-						(funcall (cdr my-pair)))))
-
+** Treemacs
+#+begin_src emacs-lisp
 	(use-package treemacs
 		:ensure t
 		:defer t
@@ -451,19 +337,89 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(use-package treemacs-evil
 		:after (treemacs evil)
 		:ensure t)
+#+end_src
 
-	(use-package format-all
-		:ensure t
-		:preface
-		(defun ian/format-code ()
-			"Auto-format whole buffer."
-			(interactive)
-			(if (derived-mode-p 'prolog-mode)
-					(prolog-indent-buffer)
-				(format-all-buffer)))
-		:config
-		(global-set-key (kbd "M-F") #'ian/format-code)
-		(add-hook 'prog-mode-hook #'format-all-ensure-formatter))
+** PDF Tools
+#+begin_src emacs-lisp
+	;; (use-package pdf-tools
+	;; 	:defer t
+	;; 	:mode (("\\.pdf\\'" . pdf-view-mode))
+	;; 	:config
+	;; 	(pdf-tools-install)
+	;; 	(setq-default pdf-view-display-size 'fit-page)
+	;; 	:bind (:map pdf-view-mode-map
+	;; 							("\\" . hydra-pdftools/body)
+	;; 							("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+	;; 							("g"  . pdf-view-first-page)
+	;; 							("G"  . pdf-view-last-page)
+	;; 							("l"  . image-forward-hscroll)
+	;; 							("h"  . image-backward-hscroll)
+	;; 							("j"  . pdf-view-next-page)
+	;; 							("k"  . pdf-view-previous-page)
+	;; 							("e"  . pdf-view-goto-page)
+	;; 							("u"  . pdf-view-revert-buffer)
+	;; 							("al" . pdf-annot-list-annotations)
+	;; 							("ad" . pdf-annot-delete)
+	;; 							("aa" . pdf-annot-attachment-dired)
+	;; 							("am" . pdf-annot-add-markup-annotation)
+	;; 							("at" . pdf-annot-add-text-annotation)
+	;; 							("y"  . pdf-view-kill-ring-save)
+	;; 							("i"  . pdf-misc-display-metadata)
+	;; 							("s"  . pdf-occur)
+	;; 							("b"  . pdf-view-set-slice-from-bounding-box)
+	;; 							("r"  . pdf-view-reset-slice)))
+
+	;; (defhydra hydra-pdftools (:color blue :hint nil)
+	;;   "
+	;;                                                                      ╭───────────┐
+	;;       Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+	;;   ╭──────────────────────────────────────────────────────────────────┴───────────╯
+	;;         ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+	;;         ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+	;;         ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+	;;         ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+	;;    _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+	;;         ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+	;;         ^^_n_^^      ^ ^  _r_eset slice box
+	;;         ^^^↓^^^
+	;;         ^^_G_^^
+	;;   --------------------------------------------------------------------------------
+	;;        "
+	;;   ("\\" hydra-master/body "back")
+	;;   ("<ESC>" nil "quit")
+	;;   ("al" pdf-annot-list-annotations)
+	;;   ("ad" pdf-annot-delete)
+	;;   ("aa" pdf-annot-attachment-dired)
+	;;   ("am" pdf-annot-add-markup-annotation)
+	;;   ("at" pdf-annot-add-text-annotation)
+	;;   ("y"  pdf-view-kill-ring-save)
+	;;   ("+" pdf-view-enlarge :color red)
+	;;   ("-" pdf-view-shrink :color red)
+	;;   ("0" pdf-view-scale-reset)
+	;;   ("H" pdf-view-fit-height-to-window)
+	;;   ("W" pdf-view-fit-width-to-window)
+	;;   ("P" pdf-view-fit-page-to-window)
+	;;   ("n" pdf-view-next-page-command :color red)
+	;;   ("p" pdf-view-previous-page-command :color red)
+	;;   ("d" pdf-view-dark-minor-mode)
+	;;   ("b" pdf-view-set-slice-from-bounding-box)
+	;;   ("r" pdf-view-reset-slice)
+	;;   ("g" pdf-view-first-page)
+	;;   ("G" pdf-view-last-page)
+	;;   ("e" pdf-view-goto-page)
+	;;   ("o" pdf-outline)
+	;;   ("s" pdf-occur)
+	;;   ("i" pdf-misc-display-metadata)
+	;;   ("u" pdf-view-revert-buffer)
+	;;   ("F" pdf-links-action-perfom)
+	;;   ("f" pdf-links-isearch-link)
+	;;   ("B" pdf-history-backward :color red)
+	;;   ("N" pdf-history-forward :color red)
+	;;   ("l" image-forward-hscroll :color red)
+	;;   ("h" image-backward-hscroll :color red))
+#+end_src
+** Centaur Tabs
+#+begin_src emacs-lisp
 
 	(use-package centaur-tabs
 		:config
@@ -485,9 +441,9 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(defun centaur-tabs-buffer-groups ()
 			"`centaur-tabs-buffer-groups' control buffers' group rules.
 
-		 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
-		 All buffer name start with * will group to \"Emacs\".
-		 Other buffer group by `centaur-tabs-get-group-name' with project name."
+					 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+					 All buffer name start with * will group to \"Emacs\".
+					 Other buffer group by `centaur-tabs-get-group-name' with project name."
 			(list
 			 (cond
 				;; ((not (eq (file-remote-p (buffer-file-name)) nil))
@@ -537,14 +493,87 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(:map evil-normal-state-map
 					("g t" . centaur-tabs-forward)
 					("g T" . centaur-tabs-backward)))
+#+end_src
+** Setting dashboard
+#+begin_src emacs-lisp
+	;; Setting dashboard
+	(use-package dashboard
+		:init      ;; tweak dashboard config before loading it
+		(setq dashboard-center-content t)
+																					;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+		(setq dashboard-set-heading-icons t)
+		(setq dashboard-set-file-icons t)
+		(setq dashboard-banner-logo-title "Emacs is more than a text editor!")
+		(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+		;;(setq dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png")  ;; use custom image as banner
+		(setq dashboard-items '(
+														(recents . 5)
+														;;(agenda . 5 )
+														(bookmarks . 3)
+														(projects . 5)))
+		;;(registers . 3)))
+		:config
+		(dashboard-setup-startup-hook)
+		(dashboard-modify-heading-icons '((recents . "file-text")
+																			(bookmarks . "book"))))
+#+end_src
+** Other packages
+#+begin_src emacs-lisp
+	;; (use-package elcord :defer t)
 
+	(use-package helm
+		:ensure t)
+
+	(use-package org-superstar
+		:ensure t
+		:config
+		(setq org-superstar-headline-bullets-list '("◉" "⬢" "○" "✸" "✿")))
+	(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+
+	(use-package multi-term
+		:bind
+		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
+		("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
+
+	(use-package fzf
+		:ensure t
+		:bind
+		;; Don't forget to set keybinds!
+		:config
+		(setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
+					fzf/executable "fzf"
+					fzf/git-grep-args "-i --line-number %s"
+					;; command used for `fzf-grep-*` functions
+					;; example usage for ripgrep:
+					;; fzf/grep-command "rg --no-heading -nH"
+					fzf/grep-command "grep -nrH"
+					;; If nil, the fzf buffer will appear at the top of the window
+					fzf/position-bottom t
+					fzf/window-height 15))
+
+	;; (use-package general
+	;; 	:config
+	;; 	(general-evil-setup t))
+
+	(use-package format-all
+		:ensure t
+		:preface
+		(defun ian/format-code ()
+			"Auto-format whole buffer."
+			(interactive)
+			(if (derived-mode-p 'prolog-mode)
+					(prolog-indent-buffer)
+				(format-all-buffer)))
+		:config
+		(global-set-key (kbd "M-F") #'ian/format-code)
+		(add-hook 'prog-mode-hook #'format-all-ensure-formatter))
 
 	(use-package doom-modeline
 		:commands doom-modeline
 		:custom
 		(doom-modeline-set-timemachine-modeline)
 		(doom-modeline-buffer-name t)
-		(display-battery-mode 1)
+		;; (display-battery-mode 1)
 		(doom-modeline-time-icon t)
 		;; (doom-modeline-height 15)
 		(doom-modeline-bar-width 3)
@@ -582,30 +611,10 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 								("C-c p" . projectile-command-map)))
 
 	;; Highlight TODO, FIXME, ... in any programming mode
-	;; (use-package 'fic-mode
-	;; 	:ensure t
-	;; 	:hook 'prog-mode-hook 'fic-mode)
+	(use-package 'fic-mode
+		:ensure t
+		:hook 'prog-mode-hook 'fic-mode)
 
-	;; Setting dashboard
-	(use-package dashboard
-		:init      ;; tweak dashboard config before loading it
-		(setq dashboard-center-content t)
-																					;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-		(setq dashboard-set-heading-icons t)
-		(setq dashboard-set-file-icons t)
-		(setq dashboard-banner-logo-title "Emacs is more than a text editor!")
-		(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-		(setq dashboard-startup-banner "~/.emacs.d/images/RMS.png")  ;; use custom image as banner
-		(setq dashboard-items '(
-														(recents . 5)
-														;;(agenda . 5 )
-														(bookmarks . 3)
-														(projects . 5)))
-		;;(registers . 3)))
-		:config
-		(dashboard-setup-startup-hook)
-		(dashboard-modify-heading-icons '((recents . "file-text")
-																			(bookmarks . "book"))))
 #+end_src
 
 * Setting LSP
@@ -621,7 +630,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 ** Setting Company
 #+begin_src emacs-lisp
 	;; Install company
-	(use-package company
+	(use-package example
 		:ensure t
 		:defer 20
 		;; This is not perfect yet. It completes too quickly outside programming modes, but while programming it is just right.
@@ -670,7 +679,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting LSP-Mode
 *** LSP-Mode
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package lsp-mode
 		:init
 		;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
@@ -705,7 +714,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 *** JSON
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package json-mode :ensure t :defer 20
 		:custom
 		(json-reformat:indent-width 2)
@@ -734,7 +743,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 *** TypeScript
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package typescript-mode
 		:after tree-sitter
 		:config
@@ -751,7 +760,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 *** JavaScript
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package web-mode  :ensure t
 		:mode (("\\.js\\'" . web-mode)
 					 ("\\.jsx\\'" . web-mode)
@@ -810,7 +819,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 *** Golang
-#+begin_src emacs-lisp
+#+begin_src example
 ;; Set up before-save hooks to format buffer and add/delete imports.
 ;; Make sure you don't have other gofmt/goimports hooks enabled.
 (defun lsp-go-install-save-hooks ()
@@ -885,7 +894,7 @@ Make gc pauses faster by decreasing the threshold.
 #+end_src
 
 ** Disabling garbage collection
-#+begin_src emacs-lisp
+#+begin_src example
 	(defvar me/gc-cons-threshold 100000000)
 	(setq gc-cons-threshold most-positive-fixnum
 				gc-cons-percentage 0.6)
