@@ -1,28 +1,21 @@
-(package-initialize)
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;;(add-to-list 'package-archives '("elpa" . "https://elpa.gnu.org/packages/") t)
-;; (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-(package-refresh-contents)
+;; (setq package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+;;                          ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+(setq package-archives '(("elpa" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
 
-;; ;; Install straight.el
-;; (defvar bootstrap-version)
-;; (let ((bootstrap-file
-;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-;;       (bootstrap-version 5))
-;;   (unless (file-exists-p bootstrap-file)
-;;     (with-current-buffer
-;;         (url-retrieve-synchronously
-;;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-;;          'silent 'inhibit-cookies)
-;;       (goto-char (point-max))
-;;       (eval-print-last-sexp)))
-;;   (load bootstrap-file nil 'nomessage))
-
-;; Install use-package
-(when (not (package-installed-p 'use-package))
-  (package-refresh-contents)
+;; Initialize use-package on non-Linux platforms
+(unless (package-installed-p 'use-package)
+  (unless package-archive-contents
+    (package-refresh-contents))
   (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; Clean up all those temporary files
+(use-package no-littering)
 
 (org-babel-load-file
  (expand-file-name
@@ -33,13 +26,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-	 '("b4e786d88aeb48bce6c3b93a72d50e9c98966b759b2b09d837ea93e25acb8cc2" "e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" "f028e1985041fd072fa9063221ee9c9368a570d26bd6660edbd00052d112e8bb" "e8882a809fb14f2307410a659846a06bfa58a2279ffb1f5aca0c3aecbcb6aaee" default))
  '(package-selected-packages
-	 '(atom-one-dark zoom yasnippet-snippets xwwp-follow-link-helm xclip which-key web-mode vue-mode vterm use-package typescript-mode treemacs-evil treemacs-all-the-icons tree-sitter-langs telega solo-jazz-theme rust-playground rust-mode reverse-im react-snippets quelpa projectile prettier-js powerline-evil parrot org-superstar org-preview-html org-pdftools org-make-toc nyan-mode multi-term mood-line moe-theme melancholy-theme lua-mode lsp-ui json-mode js3-mode js2-mode ivy helm-lsp gruvbox-theme go-mode fzf format-all flycheck fic-mode evil-tutor evil-multiedit evil-collection elcord ef-themes doom-themes doom-modeline dashboard dap-mode company centaur-tabs catppuccin-theme atom-one-dark-theme apheleia ample-theme)))
+	 '(dired no-littering xclip web-mode use-package typescript-mode treemacs-evil treemacs-all-the-icons tree-sitter-langs reverse-im projectile pdf-tools parrot org-superstar multi-term magit-todos lsp-ui lsp-ivy json-mode helm-lsp gruvbox-theme go-mode fzf format-all flycheck-inline evil-multiedit evil-collection elfeed doom-themes doom-modeline diredfl dashboard dap-mode company-statistics company-quickhelp company-box company-anaconda blamer apheleia)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(blamer-face ((t :foreground "#E46876" :height 140 :italic t)))
+ '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
+ '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0))))
+ '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))

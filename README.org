@@ -20,11 +20,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 │   └── RMS.png             <~ Best photo ever.
 ├── local-packages
 │   └── company-go.el
-├── README.org              <~ (NEW) All settings with comments
-├── init.el                    <~ (OLD) Main init file
-├── setting-font-face.el       <~ (OLD) All settings of custom font face
-├── setting-lsp.el             <~ (OLD) Setting LSP Mode for many languages
-└── setting-packages.el        <~ (OLD) Setting all packages with use-package
+├── README.org              <~ All settings with comments
+├── init.el                 <~ Main init file
 #+END_SRC
 
 * Setting base of Emacs
@@ -39,10 +36,72 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(run-at-time 1 10 'indent-org-block-automatically)
 #+end_src
 
+** Window
+#+begin_src emacs-lisp
+	(eval-when-compile (defvar display-time-24hr-format t))
+	(eval-when-compile (defvar display-time-default-load-average nil))
+
+	(display-battery-mode t)		  ;; Show battery.
+	(display-time-mode t)			  ;; Show time.
+	(set-fringe-mode 1)               ;; Give us some space.
+	(delete-selection-mode nil)		  ;; Use a more sane delete mode than evil.
+	(fset 'yes-or-no-p 'y-or-n-p)     ;; Set yes or no to y/n
+	(global-font-lock-mode 1)         ;; always highlight code
+	(global-auto-revert-mode 1)       ;; refresh a buffer if changed on disk
+	(global-hl-line-mode 1)           ;; Highlight current line
+	(semantic-mode 1)                 ;; help out with semantics
+	(savehist-mode 1)                 ;; Save history
+	(save-place-mode 1)               ;; when buffer is closed, save the cursor position
+	(blink-cursor-mode 1)
+
+	;; Setup fonts
+	;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 160)
+	;; (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
+	;; (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
+	;; (variable-pitch-mode t)
+
+	(prefer-coding-system 'utf-8)
+	(set-default-coding-systems 'utf-8)
+	(set-terminal-coding-system 'utf-8)
+	(set-keyboard-coding-system 'utf-8)
+
+	(setq ad-redefinition-action            'accept
+				default-buffer-file-coding-system 'utf-8
+				blink-cursor-interval             0.6       ;; Little slower cursor blinking . default is 0.5
+				create-lockfiles                  nil
+				idle-update-delay                 1.2    ;; Speed things up by not updating so often
+				read-process-output-max           (* 8 1024 1024)
+				ediff-split-window-function       'split-window-horizontally
+				highlight-nonselected-windows     t
+				auto-mode-case-fold               nil
+				backup-by-copying                 t
+				byte-compile-warnings             '(ck-functions)
+				confirm-kill-processes            nil
+				fast-but-imprecise-scrolling      t
+				jit-lock-defer-time               0.0
+				echo-keystrokes                   0.2
+				kill-buffer-query-functions       nil    ;; Dont ask for closing spawned processes
+				line-number-mode                  nil
+				use-dialog-box                    nil
+				load-prefer-newer                 t
+				word-wrap                         nil
+				visible-bell                      nil
+				bidi-display-reordering           nil
+				x-stretch-cursor                  t   ;; stretch cursor on tabs
+				scroll-margin                     4   ;; scroll N to screen edge
+				undo-limit                        6710886400 ;; 64mb
+				undo-strong-limit                 100663296 ;; x 1.5 (96mb)
+				undo-outer-limit                  1006632960) ;; x 10 (960mb), (Emacs uses x100), but this seems too high.
+#+end_src 
 ** Import local files
-#+begin_src example
+#+begin_src emacs-lisp
 	(load "~/.emacs.d/local-packages/company-go")
 	(require 'company-go)
+
+	(load "~/.emacs.d/local-packages/chep-video")
+	(require 'chep-video)
+
+	;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
 #+end_src
 
 ** Integrate clipboard with X11 (Need for Emacs TTY)
@@ -50,6 +109,10 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(use-package xclip
 		:ensure t)
 	(xclip-mode 1)
+#+end_src
+** Make dired open in the same window
+#+begin_src emacs-lisp
+(setf dired-kill-when-opening-new-dired-buffer t)
 #+end_src
 ** Disable backup and auto save
 #+begin_src emacs-lisp
@@ -97,22 +160,21 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(global-set-key (kbd "C--") 'text-scale-decrease)
 	(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 	(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-																					; Make ESC quit prompts
+																					; Mak;; ESC quit prompts
 	(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 	(global-auto-revert-mode t)
 	(global-set-key (kbd "C-x C-b") 'ibuffer)
 	(global-set-key (kbd "M-x") 'helm-M-x)
 #+end_src
-
 #+begin_src emacs-lisp 
 	(xterm-mouse-mode t)
 
 	;; Prompt for y or n instead of yes or no.
-	(use-package subr
-		:no-require t
-		:init
-		(fset 'yes-or-no-p 'y-or-n-p))
+	;; (use-package subr
+	;; 	:no-require t
+	;; 	:init
+	;; 	(fset 'yes-or-no-p 'y-or-n-p))
 
 	(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
 	(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
@@ -128,16 +190,18 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting line numbers
 #+begin_src emacs-lisp
-	(global-display-line-numbers-mode t)
-	(use-package display-line-numbers
-		;;:straight nil
-		:hook (prog-mode . display-line-numbers-mode)
-		:custom
-		;;(setq display-line-numbers-type 'relative)
-		(display-line-numbers-width 4)
-		(display-line-numbers-grow-only t)
-		(display-line-numbers-width-start t)
-		)
+  (global-display-line-numbers-mode t)
+  (use-package display-line-numbers
+	  ;;:straight nil
+	  :hook (prog-mode . display-line-numbers-mode)
+	  :custom
+	  ;;(setq display-line-numbers-type 'relative)
+	  (display-line-numbers-width 4)
+	  (display-line-numbers-grow-only t)
+	  (display-line-numbers-width-start t)
+	  )
+(setq whitespace-face 'shadow)
+(setq whitespace-style '(face spaces space-mark))
 #+end_src
 
 * Setting font face
@@ -174,20 +238,23 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting and installing themes
 #+begin_src emacs-lisp
+
+
+	;;(use-package 'gruvbox-theme)
 	(load-theme 'gruvbox-dark-soft t)
 	;; (use-package atom-one-dark)
 
-	(use-package moe-theme
-		:ensure t)
+	;; (use-package moe-theme
+	;; 	:ensure t)
 
-	(use-package melancholy-theme
-		:ensure t)
+	;; (use-package melancholy-theme
+	;; 	:ensure t)
 
-	(use-package solo-jazz-theme
-		:ensure t)
+	;; (use-package solo-jazz-theme
+	;; 	:ensure t)
 
-	(use-package ef-themes
-		:ensure t)
+	;; (use-package ef-themes
+	;; 	:ensure t)
 
 	(use-package doom-themes
 		:ensure t
@@ -200,7 +267,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		;; Enable custom neotree theme (all-the-icons must be installed!)
 		;;(doom-themes-neotree-config)
 		;; or for treemacs users
-		(setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
+		;;(setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
 		(doom-themes-treemacs-config)
 		;; Corrects (and improves) org-mode's native fontification.
 		(doom-themes-org-config))
@@ -221,6 +288,12 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		:after evil
 		:ensure t
 		:config
+		(setq evil-emacs-state-cursor '("#FF5D62" box))
+		(setq evil-normal-state-cursor '("#FF5D62" box))
+		(setq evil-visual-state-cursor '("#98BB6C" box))
+		(setq evil-insert-state-cursor '("#E82424" bar))
+		(setq evil-replace-state-cursor '("#FF9E3B" hbar))
+		(setq evil-operator-state-cursor '("#7E9CD8" hollow))
 		(setq evil-collection-mode-list '(dashboard dired ibuffer))
 		(evil-collection-init))
 	;;(use-package evil-tutor
@@ -238,8 +311,220 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 					("M-d". evil-multiedit-match-and-next)
 					("M-D". evil-multiedit-match-and-prev)
 					("C-M-d". evil-multiedit-match-all)))
+
+	;; (use-package evil
+	;; 	:hook (after-init . evil-mode)
+	;; 	:init
+	;; 	(setq evil-want-integration t
+	;; 				evil-want-minibuffer t
+	;; 				evil-want-keybinding nil
+	;; 				evil-want-C-u-scroll t
+	;; 				evil-want-C-i-jump nil)
+	;; 	:config
+	;; 	(setq evil-emacs-state-cursor '("#FF5D62" box))
+	;; 	(setq evil-normal-state-cursor '("#FF5D62" box))
+	;; 	(setq evil-visual-state-cursor '("#98BB6C" box))
+	;; 	(setq evil-insert-state-cursor '("#E82424" bar))
+	;; 	(setq evil-replace-state-cursor '("#FF9E3B" hbar))
+	;; 	(setq evil-operator-state-cursor '("#7E9CD8" hollow)))
+
+	;; (add-to-list 'desktop-locals-to-save 'evil-markers-alist)
 #+end_src
 
+** RSS
+#+begin_src emacs-lisp
+	(use-package elfeed
+		:ensure t)
+
+	;; data is stored in ~/.elfee7
+	(setq elfeed-feeds
+				'(
+					;; programming
+					;;("https://news.ycombinator.com/rss" hacker)
+					("https://www.reddit.com/r/programming.rss" programming)
+					("https://www.reddit.com/r/emacs.rss" emacs)
+					("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
+					("https://habr.com/ru/rss/news/?fl=ru" habr-news)
+					("https://nuancesprog.ru/feed" nop)
+					("https://dev.to/feed" dev-to)
+
+					;; hobby
+					("https://www.reddit.com/r/nasa.rss" nasa)
+					("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
+					("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
+
+					;; programming languages
+					("https://www.reddit.com/r/javascript.rss" javascript)
+					("https://www.reddit.com/r/typescript.rss" typescript)
+					("https://www.reddit.com/r/golang.rss" golang)
+					("https://www.reddit.com/r/rust.rss" rust)
+
+					;; cloud
+					;;("https://www.reddit.com/r/aws.rss" aws)
+					;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
+					;;("https://www.reddit.com/r/azure.rss" azure)
+					;;("https://www.reddit.com/r/devops.rss" devops)
+					;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
+					))
+
+	(setq-default elfeed-search-filter "@7-days-ago +unread")
+	(setq-default elfeed-search-title-max-width 100)
+	(setq-default elfeed-search-title-min-width 100)
+#+end_src
+** PDF Tools
+#+begin_src emacs-lisp
+	(use-package pdf-tools
+		:defer t
+		:mode (("\\.pdf\\'" . pdf-view-mode))
+		:config
+		(pdf-tools-install)
+		(setq-default pdf-view-display-size 'fit-page)
+		:bind (:map pdf-view-mode-map
+								("\\" . hydra-pdftools/body)
+								("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+								("g"  . pdf-view-first-page)
+								("G"  . pdf-view-last-page)
+								("l"  . image-forward-hscroll)
+								("h"  . image-backward-hscroll)
+								("j"  . pdf-view-next-page)
+								("k"  . pdf-view-previous-page)
+								("e"  . pdf-view-goto-page)
+								("u"  . pdf-view-revert-buffer)
+								("al" . pdf-annot-list-annotations)
+								("ad" . pdf-annot-delete)
+								("aa" . pdf-annot-attachment-dired)
+								("am" . pdf-annot-add-markup-annotation)
+								("at" . pdf-annot-add-text-annotation)
+								("y"  . pdf-view-kill-ring-save)
+								("i"  . pdf-misc-display-metadata)
+								("s"  . pdf-occur)
+								("b"  . pdf-view-set-slice-from-bounding-box)
+								("r"  . pdf-view-reset-slice)))
+
+	;; (defhydra hydra-pdftools (:color blue :hint nil)
+	;; 	"
+	;; 																																		 ╭───────────┐
+	;; 			Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+	;; 	╭──────────────────────────────────────────────────────────────────┴───────────╯
+	;; 				^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+	;; 				^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+	;; 				^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+	;; 				^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+	;; 	 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+	;; 				^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+	;; 				^^_n_^^      ^ ^  _r_eset slice box
+	;; 				^^^↓^^^
+	;; 				^^_G_^^
+	;; 	--------------------------------------------------------------------------------
+	;; 			 "
+	;; 	("\\" hydra-master/body "back")
+	;; 	("<ESC>" nil "quit")
+	;; 	("al" pdf-annot-list-annotations)
+	;; 	("ad" pdf-annot-delete)
+	;; 	("aa" pdf-annot-attachment-dired)
+	;; 	("am" pdf-annot-add-markup-annotation)
+	;; 	("at" pdf-annot-add-text-annotation)
+	;; 	("y"  pdf-view-kill-ring-save)
+	;; 	("+" pdf-view-enlarge :color red)
+	;; 	("-" pdf-view-shrink :color red)
+	;; 	("0" pdf-view-scale-reset)
+	;; 	("H" pdf-view-fit-height-to-window)
+	;; 	("W" pdf-view-fit-width-to-window)
+	;; 	("P" pdf-view-fit-page-to-window)
+	;; 	("n" pdf-view-next-page-command :color red)
+	;; 	("p" pdf-view-previous-page-command :color red)
+	;; 	("d" pdf-view-dark-minor-mode)
+	;; 	("b" pdf-view-set-slice-from-bounding-box)
+	;; 	("r" pdf-view-reset-slice)
+	;; 	("g" pdf-view-first-page)
+	;; 	("G" pdf-view-last-page)
+	;; 	("e" pdf-view-goto-page)
+	;; 	("o" pdf-outline)
+	;; 	("s" pdf-occur)
+	;; 	("i" pdf-misc-display-metadata)
+	;; 	("u" pdf-view-revert-buffer)
+	;; 	("F" pdf-links-action-perfom)
+	;; 	("f" pdf-links-isearch-link)
+	;; 	("B" pdf-history-backward :color red)
+	;; 	("N" pdf-history-forward :color red)
+	;; 	("l" image-forward-hscroll :color red)
+	;; 	("h" image-backward-hscroll :color red))
+#+end_src
+** Centaur Tabs (disabled)
+#+begin_src example
+	(use-package centaur-tabs
+		:config
+		(setq centaur-tabs-style "bar"
+					centaur-tabs-height 32
+					centaur-tabs-set-icons t
+					centaur-tabs-set-modified-marker t
+					;; centaur-tabs-show-navigation-buttons t
+					centaur-tabs-set-bar 'over
+					;; x-underline-at-descent-line t
+					)
+		(centaur-tabs-headline-match)
+		;; (setq centaur-tabs-gray-out-icons 'buffer)
+		;; (centaur-tabs-enable-buffer-reordering)
+		;; (setq centaur-tabs-adjust-buffer-order t)
+		(centaur-tabs-mode t)
+		(setq uniquify-separator "/")
+		(setq uniquify-buffer-name-style 'forward)
+		(defun centaur-tabs-buffer-groups ()
+			"`centaur-tabs-buffer-groups' control buffers' group rules.
+
+					 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+					 All buffer name start with * will group to \"Emacs\".
+					 Other buffer group by `centaur-tabs-get-group-name' with project name."
+			(list
+			 (cond
+				;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+				;; "Remote")
+				((or (string-equal "*" (substring (buffer-name) 0 1))
+						 (memq major-mode '(magit-process-mode
+																magit-status-mode
+																magit-diff-mode
+																magit-log-mode
+																magit-file-mode
+																magit-blob-mode
+																magit-blame-mode
+																)))
+				 "Emacs")
+				((derived-mode-p 'prog-mode)
+				 "Editing")
+				((derived-mode-p 'dired-mode)
+				 "Dired")
+				((memq major-mode '(helpful-mode
+														help-mode))
+				 "Help")
+				((memq major-mode '(org-mode
+														org-agenda-clockreport-mode
+														org-src-mode
+														org-agenda-mode
+														org-beamer-mode
+														org-indent-mode
+														org-bullets-mode
+														org-cdlatex-mode
+														org-agenda-log-mode
+														diary-mode))
+				 "OrgMode")
+				(t
+				 (centaur-tabs-get-group-name (current-buffer))))))
+		:hook
+		(dashboard-mode . centaur-tabs-local-mode)
+		(term-mode . centaur-tabs-local-mode)
+		(calendar-mode . centaur-tabs-local-mode)
+		(org-agenda-mode . centaur-tabs-local-mode)
+		(helpful-mode . centaur-tabs-local-mode)
+		:bind
+		("C-<prior>" . centaur-tabs-backward)
+		("C-<next>" . centaur-tabs-forward)
+		("C-c t s" . centaur-tabs-counsel-switch-group)
+		("C-c t p" . centaur-tabs-group-by-projectile-project)
+		("C-c t g" . centaur-tabs-group-buffer-groups)
+		(:map evil-normal-state-map
+					("g t" . centaur-tabs-forward)
+					("g T" . centaur-tabs-backward)))
+#+end_src
 ** Treemacs
 #+begin_src emacs-lisp
 	(use-package treemacs
@@ -339,173 +624,39 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		:ensure t)
 #+end_src
 
-** PDF Tools
+** Doom modeline
 #+begin_src emacs-lisp
-	;; (use-package pdf-tools
-	;; 	:defer t
-	;; 	:mode (("\\.pdf\\'" . pdf-view-mode))
-	;; 	:config
-	;; 	(pdf-tools-install)
-	;; 	(setq-default pdf-view-display-size 'fit-page)
-	;; 	:bind (:map pdf-view-mode-map
-	;; 							("\\" . hydra-pdftools/body)
-	;; 							("<s-spc>" .  pdf-view-scroll-down-or-next-page)
-	;; 							("g"  . pdf-view-first-page)
-	;; 							("G"  . pdf-view-last-page)
-	;; 							("l"  . image-forward-hscroll)
-	;; 							("h"  . image-backward-hscroll)
-	;; 							("j"  . pdf-view-next-page)
-	;; 							("k"  . pdf-view-previous-page)
-	;; 							("e"  . pdf-view-goto-page)
-	;; 							("u"  . pdf-view-revert-buffer)
-	;; 							("al" . pdf-annot-list-annotations)
-	;; 							("ad" . pdf-annot-delete)
-	;; 							("aa" . pdf-annot-attachment-dired)
-	;; 							("am" . pdf-annot-add-markup-annotation)
-	;; 							("at" . pdf-annot-add-text-annotation)
-	;; 							("y"  . pdf-view-kill-ring-save)
-	;; 							("i"  . pdf-misc-display-metadata)
-	;; 							("s"  . pdf-occur)
-	;; 							("b"  . pdf-view-set-slice-from-bounding-box)
-	;; 							("r"  . pdf-view-reset-slice)))
-
-	;; (defhydra hydra-pdftools (:color blue :hint nil)
-	;;   "
-	;;                                                                      ╭───────────┐
-	;;       Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-	;;   ╭──────────────────────────────────────────────────────────────────┴───────────╯
-	;;         ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-	;;         ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-	;;         ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-	;;         ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-	;;    _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-	;;         ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-	;;         ^^_n_^^      ^ ^  _r_eset slice box
-	;;         ^^^↓^^^
-	;;         ^^_G_^^
-	;;   --------------------------------------------------------------------------------
-	;;        "
-	;;   ("\\" hydra-master/body "back")
-	;;   ("<ESC>" nil "quit")
-	;;   ("al" pdf-annot-list-annotations)
-	;;   ("ad" pdf-annot-delete)
-	;;   ("aa" pdf-annot-attachment-dired)
-	;;   ("am" pdf-annot-add-markup-annotation)
-	;;   ("at" pdf-annot-add-text-annotation)
-	;;   ("y"  pdf-view-kill-ring-save)
-	;;   ("+" pdf-view-enlarge :color red)
-	;;   ("-" pdf-view-shrink :color red)
-	;;   ("0" pdf-view-scale-reset)
-	;;   ("H" pdf-view-fit-height-to-window)
-	;;   ("W" pdf-view-fit-width-to-window)
-	;;   ("P" pdf-view-fit-page-to-window)
-	;;   ("n" pdf-view-next-page-command :color red)
-	;;   ("p" pdf-view-previous-page-command :color red)
-	;;   ("d" pdf-view-dark-minor-mode)
-	;;   ("b" pdf-view-set-slice-from-bounding-box)
-	;;   ("r" pdf-view-reset-slice)
-	;;   ("g" pdf-view-first-page)
-	;;   ("G" pdf-view-last-page)
-	;;   ("e" pdf-view-goto-page)
-	;;   ("o" pdf-outline)
-	;;   ("s" pdf-occur)
-	;;   ("i" pdf-misc-display-metadata)
-	;;   ("u" pdf-view-revert-buffer)
-	;;   ("F" pdf-links-action-perfom)
-	;;   ("f" pdf-links-isearch-link)
-	;;   ("B" pdf-history-backward :color red)
-	;;   ("N" pdf-history-forward :color red)
-	;;   ("l" image-forward-hscroll :color red)
-	;;   ("h" image-backward-hscroll :color red))
+(use-package doom-modeline
+  :hook (after-init . doom-modeline-mode)
+  :config
+  (setq doom-modeline-buffer-encoding nil
+        doom-modeline-buffer-file-name-style 'file-name
+        doom-modeline-checker-simple-format t
+        doom-modeline-vcs-max-length 50
+        doom-modeline-major-mode-icon nil
+        doom-modeline-icon t
+        doom-modeline-modal-icon t
+        doom-modeline-lsp nil
+        doom-modeline-major-mode-color-icon nil
+        doom-modeline-buffer-state-icon nil
+        doom-modeline-time-icon nil)
+  (custom-set-faces
+   '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
+   '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
+   '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95))))))
 #+end_src
-** Centaur Tabs
-#+begin_src emacs-lisp
-
-	(use-package centaur-tabs
-		:config
-		(setq centaur-tabs-style "bar"
-					centaur-tabs-height 32
-					centaur-tabs-set-icons t
-					centaur-tabs-set-modified-marker t
-					;; centaur-tabs-show-navigation-buttons t
-					centaur-tabs-set-bar 'over
-					;; x-underline-at-descent-line t
-					)
-		(centaur-tabs-headline-match)
-		;; (setq centaur-tabs-gray-out-icons 'buffer)
-		;; (centaur-tabs-enable-buffer-reordering)
-		;; (setq centaur-tabs-adjust-buffer-order t)
-		(centaur-tabs-mode t)
-		(setq uniquify-separator "/")
-		(setq uniquify-buffer-name-style 'forward)
-		(defun centaur-tabs-buffer-groups ()
-			"`centaur-tabs-buffer-groups' control buffers' group rules.
-
-					 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
-					 All buffer name start with * will group to \"Emacs\".
-					 Other buffer group by `centaur-tabs-get-group-name' with project name."
-			(list
-			 (cond
-				;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-				;; "Remote")
-				((or (string-equal "*" (substring (buffer-name) 0 1))
-						 (memq major-mode '(magit-process-mode
-																magit-status-mode
-																magit-diff-mode
-																magit-log-mode
-																magit-file-mode
-																magit-blob-mode
-																magit-blame-mode
-																)))
-				 "Emacs")
-				((derived-mode-p 'prog-mode)
-				 "Editing")
-				((derived-mode-p 'dired-mode)
-				 "Dired")
-				((memq major-mode '(helpful-mode
-														help-mode))
-				 "Help")
-				((memq major-mode '(org-mode
-														org-agenda-clockreport-mode
-														org-src-mode
-														org-agenda-mode
-														org-beamer-mode
-														org-indent-mode
-														org-bullets-mode
-														org-cdlatex-mode
-														org-agenda-log-mode
-														diary-mode))
-				 "OrgMode")
-				(t
-				 (centaur-tabs-get-group-name (current-buffer))))))
-		:hook
-		(dashboard-mode . centaur-tabs-local-mode)
-		(term-mode . centaur-tabs-local-mode)
-		(calendar-mode . centaur-tabs-local-mode)
-		(org-agenda-mode . centaur-tabs-local-mode)
-		(helpful-mode . centaur-tabs-local-mode)
-		:bind
-		("C-<prior>" . centaur-tabs-backward)
-		("C-<next>" . centaur-tabs-forward)
-		("C-c t s" . centaur-tabs-counsel-switch-group)
-		("C-c t p" . centaur-tabs-group-by-projectile-project)
-		("C-c t g" . centaur-tabs-group-buffer-groups)
-		(:map evil-normal-state-map
-					("g t" . centaur-tabs-forward)
-					("g T" . centaur-tabs-backward)))
-#+end_src
-** Setting dashboard
+** Dashboard
 #+begin_src emacs-lisp
 	;; Setting dashboard
 	(use-package dashboard
 		:init      ;; tweak dashboard config before loading it
 		(setq dashboard-center-content t)
-																					;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+		;;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 		(setq dashboard-set-heading-icons t)
 		(setq dashboard-set-file-icons t)
 		(setq dashboard-banner-logo-title "Emacs is more than a text editor!")
 		(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-		;;(setq dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png")  ;; use custom image as banner
+		;; (setq dashboard-startup-banner "~/.emacs.d/images/gnu.svg")  ;; use custom image as banner
 		(setq dashboard-items '(
 														(recents . 5)
 														;;(agenda . 5 )
@@ -517,18 +668,122 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(dashboard-modify-heading-icons '((recents . "file-text")
 																			(bookmarks . "book"))))
 #+end_src
-** Other packages
+** Dired
 #+begin_src emacs-lisp
-	;; (use-package elcord :defer t)
+	(use-package dired
+		:hook (dired-mode . dired-hide-details-mode)
+		:config
+		;; Colourful columns.
+		(use-package diredfl
+			:ensure t
+			:config
+			(diredfl-global-mode 1)))
+#+end_src
+** Org
+#+begin_src emacs-lisp
+	(use-package org
+		:hook (org-mode . mk/org-mode-setup)
+		:config
+		(set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+		(setq org-ellipsis " ᗐ"
+					org-hide-emphasis-markers t
+					org-hide-leading-stars t
+					org-log-into-drawer t
+					org-log-done 'time))
 
-	(use-package helm
-		:ensure t)
+	(with-eval-after-load 'org
+		(setq org-confirm-babel-evaluate nil)
+		(require 'org-tempo)
+
+		;; Setup fonts for org-mode
+		(set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
+		(set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+		(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+		(set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+		(set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+		(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+		(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+		(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+		(set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+		(set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+		(set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
+
+		(add-hook 'org-babel-after-execute-hook (lambda ()
+																							(when org-inline-image-overlays
+																								(org-redisplay-inline-images))))
+		;; (org-babel-do-load-languages 'org-babel-load-languages
+		;;                               '((emacs-lisp t))
+
+		;; (add-to-list 'org-structure-template-alist
+		;;              '("sh" . "src shell")
+		;;               ("elisp" . "src emacs-lisp")
+		;;               ("swift" . "src swift"))
+		(add-to-list 'org-modules 'org-tempo t))
+
 
 	(use-package org-superstar
 		:ensure t
 		:config
 		(setq org-superstar-headline-bullets-list '("◉" "⬢" "○" "✸" "✿")))
 	(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+
+	;; (use-package org-bullets
+	;; 	:hook (org-mode . org-bullets-mode)
+	;; 	:custom
+	;; 	(org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+end_src
+** Git
+#+begin_src emacs-lisp
+	(use-package magit
+		:commands (magit-status magit-ediff-show-working-tree)
+		:bind ("C-c C-d" . magit-ediff-show-working-tree)
+		:custom (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+	(use-package magit-todos
+		:commands (magit-todos-mode)
+		:hook (magit-mode . magit-todos-mode)
+		:config
+		(setq magit-todos-recursive t
+					magit-todos-depth 4
+					magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*"))
+		(custom-set-variables
+		 '(magit-todos-keywords (list "TODO" "FIXME" "HACK"))))
+
+	(use-package blamer
+		:commands (blamer-mode)
+		:config
+		(setq blamer-view 'overlay
+					blamer-type 'posframe-popup
+					blamer-max-commit-message-length 70
+					blamer-force-truncate-long-line nil
+					blamer-author-formatter " ✎ [%s] - "
+					blamer-commit-formatter "● %s ● ")
+		:custom
+		(blamer-idle-time 1.0)
+		:custom-face
+		(blamer-face ((t :foreground "#E46876"
+										 :height 140
+										 :italic t))))
+
+	;; (use-package git-gutter
+	;; 	:hook (prog-mode . git-gutter-mode)
+	;; 	:diminish git-gutter-mode
+	;; 	:config
+	;; 	(setq git-gutter:update-interval 0.5))
+
+	;; (use-package git-gutter-fringe
+	;; 	:after git-gutter
+	;; 	:config
+	;; 	(define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+	;; 	(define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+	;; 	(define-fringe-bitmap 'git-gutter-fr:deleted [224] nil nil '(center repeated)))
+#+end_src
+** Other packages
+#+begin_src emacs-lisp
+	;; (use-package elcord :defer t)
+
+	(use-package helm
+		:ensure t)
 
 	(use-package multi-term
 		:bind
@@ -568,17 +823,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(global-set-key (kbd "M-F") #'ian/format-code)
 		(add-hook 'prog-mode-hook #'format-all-ensure-formatter))
 
-	(use-package doom-modeline
-		:commands doom-modeline
-		:custom
-		(doom-modeline-set-timemachine-modeline)
-		(doom-modeline-buffer-name t)
-		;; (display-battery-mode 1)
-		(doom-modeline-time-icon t)
-		;; (doom-modeline-height 15)
-		(doom-modeline-bar-width 3)
-		:hook (after-init . doom-modeline-mode))
-
 	(use-package parrot
 		:ensure t
 		:defer t)
@@ -611,61 +855,116 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 								("C-c p" . projectile-command-map)))
 
 	;; Highlight TODO, FIXME, ... in any programming mode
-	(use-package 'fic-mode
-		:ensure t
-		:hook 'prog-mode-hook 'fic-mode)
+	;; (use-package 'fic-mode
+	;; 	:ensure t
+	;; 	:hook 'prog-mode-hook 'fic-mode)
 
 #+end_src
 
 * Setting LSP
 #+begin_src emacs-lisp
 	;;(lsp-treemacs-sync-mode 1)
-
-	(add-hook 'web-mode-hook  'emmet-mode)
 	(helm-mode 1)
-
-	(use-package react-snippets)
+	;;(use-package react-snippets)
+	;; (add-hook 'web-mode-hook  'emmet-mode)
 #+end_src
 
 ** Setting Company
 #+begin_src emacs-lisp
 	;; Install company
-	(use-package example
-		:ensure t
-		:defer 20
-		;; This is not perfect yet. It completes too quickly outside programming modes, but while programming it is just right.
-		:custom
-		(company-idle-delay 0.1)
-		(global-company-mode t)
-		(debug-on-error nil) ;; otherwise this throws lots of errors on completion errors
-		:config
-		(define-key company-active-map (kbd "TAB") 'company-complete-selection)
-		(define-key company-active-map (kbd "<tab>") 'company-complete-selection)
-		(define-key company-active-map [return] 'company-complete-selection)
-		(define-key company-active-map (kbd "RET") 'company-complete-selection)
-		;; auto-complete compatibility
-		(defun my-company-visible-and-explicit-action-p ()
-			(and (company-tooltip-visible-p)
-					 (company-explicit-action-p)))
-		(defun company-ac-setup ()
-			"Sets up `company-mode' to behave similarly to `auto-complete-mode'."
-			(setq company-require-match nil)
-			(setq company-auto-complete #'my-company-visible-and-explicit-action-p)
-			(setq company-frontends '(company-echo-metadata-frontend
-																company-pseudo-tooltip-unless-just-one-frontend-with-delay
-																company-preview-frontend))
-			(define-key company-active-map [tab]
-				'company-select-next-if-tooltip-visible-or-complete-selection)
-			(define-key company-active-map (kbd "TAB")
-				'company-select-next-if-tooltip-visible-or-complete-selection))
+	;; (use-package company
+	;; 	:ensure t
+	;; 	:defer 20
+	;; 	;; This is not perfect yet. It completes too quickly outside programming modes, but while programming it is just right.
+	;; 	:custom
+	;; 	(company-idle-delay 0.1)
+	;; 	(global-company-mode t)
+	;; 	(debug-on-error nil) ;; otherwise this throws lots of errors on completion errors
+	;; 	:config
+	;; 	(define-key company-active-map (kbd "TAB") 'company-complete-selection)
+	;; 	(define-key company-active-map (kbd "<tab>") 'company-complete-selection)
+	;; 	(define-key company-active-map [return] 'company-complete-selection)
+	;; 	(define-key company-active-map (kbd "RET") 'company-complete-selection)
+	;; 	;; auto-complete compatibility
+	;; 	(defun my-company-visible-and-explicit-action-p ()
+	;; 		(and (company-tooltip-visible-p)
+	;; 				 (company-explicit-action-p)))
+	;; 	(defun company-ac-setup ()
+	;; 		"Sets up `company-mode' to behave similarly to `auto-complete-mode'."
+	;; 		(setq company-require-match nil)
+	;; 		(setq company-auto-complete #'my-company-visible-and-explicit-action-p)
+	;; 		(setq company-frontends '(company-echo-metadata-frontend
+	;; 															company-pseudo-tooltip-unless-just-one-frontend-with-delay
+	;; 															company-preview-frontend))
+	;; 		(define-key company-active-map [tab]
+	;; 			'company-select-next-if-tooltip-visible-or-complete-selection)
+	;; 		(define-key company-active-map (kbd "TAB")
+	;; 			'company-select-next-if-tooltip-visible-or-complete-selection))
 
-		(company-ac-setup)
-		(add-hook 'js2-mode-hook (lambda () (company-mode))))
+	;; 	(company-ac-setup)
+	;; 	(add-hook 'js2-mode-hook (lambda () (company-mode))))
 
 	;; (use-package company
 	;; 	:ensure t
 	;; 	:config (add-hook 'prog-mode-hook 'company-mode)
 	;; 	(global-set-key (kbd "M-i") 'company-complete))
+
+	(use-package company
+		:defer t
+		:hook (prog-mode . company-mode)
+		:bind
+		(:map company-active-map
+					("RET" . company-complete-selection)
+					("<return>" . company-complete-selection)
+					("<tab>" . company-complete-selection))
+		:config
+		(setq company-transformers '(company-sort-by-backend-importance)
+					company-format-margin-function  'company-vscode-dark-icons-margin
+					company-tooltip-margin              0
+					company-dabbrev-downcase            nil
+					company-dabbrev-ignore-case         t
+					company-dabbrev-other-buffers       'all
+					company-minimum-prefix-length       1
+					company-tooltip-align-annotations   t
+					company-require-match               nil
+					company-tooltip-limit               25
+					company-tooltip-width-grow-only     nil
+					company-tooltip-flip-when-above     t
+					company-show-quick-access           'left
+					company-async-wait                  0.1
+					company-async-timeout               1
+					company-idle-delay                  0.1
+					company-frontends '(company-box-frontend))
+		(push '(company-semantic :with company-yasnippet) company-backends))
+
+	(use-package company-box
+		:after (company all-the-icons)
+		:hook (company-mode . company-box-mode)
+		:functions (all-the-icons-faicon
+								all-the-icons-material
+								all-the-icons-octicon
+								all-the-icons-alltheicon)
+		:config
+		(setq company-box-frame-behavior 'point
+					company-box-icons-alist 'company-box-icons-images
+					company-box-backends-colors t
+					company-box-icon-right-margin 0.5
+					company-box-backends-colors '((company-yasnippet
+																				 :all (:foreground "RosyBrown1" :background nil :italic t)
+																				 :selected (:foreground "black" :background "RosyBrown4")))
+					company-box-doc-delay 1))
+
+	(defun setup-swift-mode-company ()
+		"Setup company with separate bakends merged into one."
+		(setq-local company-backends
+								'((company-capf :with company-dabbrev-code company-yasnippet ))))
+
+	(use-package company-quickhelp
+		:hook (company-mode . company-quickhelp-mode))
+
+	(use-package company-statistics
+		:hook (company-mode . company-statistics-mode))
+
 
 	(use-package company-anaconda
 		:defer
@@ -679,7 +978,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting LSP-Mode
 *** LSP-Mode
-#+begin_src example
+#+begin_src emacs-lisp
 	(use-package lsp-mode
 		:init
 		;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
@@ -714,7 +1013,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 *** JSON
-#+begin_src example
+#+begin_src emacs-lisp
 	(use-package json-mode :ensure t :defer 20
 		:custom
 		(json-reformat:indent-width 2)
@@ -743,7 +1042,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 *** TypeScript
-#+begin_src example
+#+begin_src emacs-lisp
 	(use-package typescript-mode
 		:after tree-sitter
 		:config
@@ -760,7 +1059,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 *** JavaScript
-#+begin_src example
+#+begin_src emacs-lisp
 	(use-package web-mode  :ensure t
 		:mode (("\\.js\\'" . web-mode)
 					 ("\\.jsx\\'" . web-mode)
@@ -819,7 +1118,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 *** Golang
-#+begin_src example
+#+begin_src emacs-lisp
 ;; Set up before-save hooks to format buffer and add/delete imports.
 ;; Make sure you don't have other gofmt/goimports hooks enabled.
 (defun lsp-go-install-save-hooks ()
@@ -836,9 +1135,23 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 *** Rust
 [[https://rust-analyzer.github.io/manual.html#installation#Emacs][*Quick start with rust-analyzer*]]
 
-** Setting Tree Sitter
+** Flycheck
 #+begin_src emacs-lisp
-(use-package tree-sitter
+	(use-package flycheck
+		:hook (prog-mode . flycheck-mode)
+		:diminish
+		:custom
+		(flycheck-indication-mode 'left-fringe)
+		(flycheck-display-errors-delay 0.2)
+		(flycheck-check-syntax-automatically '(save idle-change))
+		(flycheck-idle-change-delay 2))
+
+	(use-package flycheck-inline
+		:hook (flycheck-mode . turn-on-flycheck-inline))
+#+end_src
+** Tree Sitter
+#+begin_src emacs-lisp
+	(use-package tree-sitter
 		:ensure t
 		:config
 		;; activate tree-sitter on any buffer containing code for which it has a parser available
@@ -847,35 +1160,35 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		;; by switching on and off
 		(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
-(use-package tree-sitter-langs
+	(use-package tree-sitter-langs
 		:ensure t
 		:after tree-sitter)
 
-;; https://github.com/orzechowskid/tsi.el/
-;; great tree-sitter-based indentation for typescript/tsx, css, json
-;;(use-package tsi
-;;  :after tree-sitter
-;;  :quelpa (tsi :fetcher github :repo "orzechowskid/tsi.el")
-;;  ;; define autoload definitions which when actually invoked will cause package to be loaded
-;;  :commands (tsi-typescript-mode tsi-json-mode tsi-css-mode)
-;;  :init
-;;  (add-hook 'typescript-mode-hook (lambda () (tsi-typescript-mode 1)))
-;;  (add-hook 'json-mode-hook (lambda () (tsi-json-mode 1)))
-;;  (add-hook 'css-mode-hook (lambda () (tsi-css-mode 1)))
-;;  (add-hook 'scss-mode-hook (lambda () (tsi-scss-mode 1))))
+	;; https://github.com/orzechowskid/tsi.el/
+	;; great tree-sitter-based indentation for typescript/tsx, css, json
+	;;(use-package tsi
+	;;  :after tree-sitter
+	;;  :quelpa (tsi :fetcher github :repo "orzechowskid/tsi.el")
+	;;  ;; define autoload definitions which when actually invoked will cause package to be loaded
+	;;  :commands (tsi-typescript-mode tsi-json-mode tsi-css-mode)
+	;;  :init
+	;;  (add-hook 'typescript-mode-hook (lambda () (tsi-typescript-mode 1)))
+	;;  (add-hook 'json-mode-hook (lambda () (tsi-json-mode 1)))
+	;;  (add-hook 'css-mode-hook (lambda () (tsi-css-mode 1)))
+	;;  (add-hook 'scss-mode-hook (lambda () (tsi-scss-mode 1))))
 
-;; auto-format different source code files extremely intelligently
-;; https://github.com/radian-software/apheleia
-(use-package apheleia
+	;; auto-format different source code files extremely intelligently
+	;; https://github.com/radian-software/apheleia
+	(use-package apheleia
 		:ensure t
 		:config
 		(apheleia-global-mode +1))
 
 
-;;(add-hook 'prog-mode-hook 'linum-mode)
-(add-hook 'prog-mode-hook 'visual-line-mode)
-(add-hook 'prog-mode-hook 'show-paren-mode)
-(add-hook 'prog-mode-hook 'hs-minor-mode)
+	;;(add-hook 'prog-mode-hook 'linum-mode)
+	;;(add-hook 'prog-mode-hook 'visual-line-mode)
+	;;(add-hook 'prog-mode-hook 'show-paren-mode)
+	;;(add-hook 'prog-mode-hook 'hs-minor-mode)
 #+end_src
 
 * Setting performance
@@ -890,11 +1203,12 @@ Make startup faster by reducing the frequency of garbage collection.  The defaul
 Make gc pauses faster by decreasing the threshold.
 
 #+begin_src emacs-lisp
-(setq gc-cons-threshold (* 2 1000 1000))
+	(setq gc-cons-threshold (eval-when-compile (* 50 1024 1024)))
+	(run-with-idle-timer 4 t (lambda () (garbage-collect)))
 #+end_src
 
 ** Disabling garbage collection
-#+begin_src example
+#+begin_src emacs-lisp
 	(defvar me/gc-cons-threshold 100000000)
 	(setq gc-cons-threshold most-positive-fixnum
 				gc-cons-percentage 0.6)
@@ -920,11 +1234,11 @@ Make gc pauses faster by decreasing the threshold.
 
 ** I/O acceleration
 #+begin_src emacs-lisp
-(when (boundp 'read-process-output-max)  
-  (setq read-process-output-max (* 1024 1024)))
+	(when (boundp 'read-process-output-max)  
+		(setq read-process-output-max (* 1024 1024)))
 #+end_src
 
 ** Don't compress the font cache
 #+begin_src emacs-lisp
-(setq inhibit-compacting-font-caches t)
+	(setq inhibit-compacting-font-caches t)
 #+end_src
