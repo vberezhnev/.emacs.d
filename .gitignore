@@ -26,6 +26,9 @@ tmp*
 recentf-save.el
 save-place.el
 savehist.el
+history
+flycheck_init.el
+company-statistics-cache.el
 
 #*
 README.el
