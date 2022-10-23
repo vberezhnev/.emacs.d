@@ -185,7 +185,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 	(global-auto-revert-mode t)
 	(global-set-key (kbd "C-x C-b") 'ibuffer)
-	(global-set-key (kbd "M-x") 'helm-M-x)
+	;;(global-set-key (kbd "M-x") 'helm-M-x)
 
 #+end_src
 
@@ -346,7 +346,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 				'(
 					;; programming
 					;;("https://news.ycombinator.com/rss" hacker)
-					("https://www.reddit.com/r/programming.rss" programming)
+					;;("https://www.reddit.com/r/programming.rss" programming)
 					("https://www.reddit.com/r/emacs.rss" emacs)
 					("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
 					("https://habr.com/ru/rss/news/?fl=ru" habr-news)
@@ -546,7 +546,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 						treemacs-directory-name-transformer      #'identity
 						treemacs-display-in-side-window          t
 						treemacs-eldoc-display                   'simple
-						treemacs-file-event-delay                5000
+						treemacs-file-event-delay                2000
 						treemacs-file-extension-regex            treemacs-last-period-regex-value
 						treemacs-file-follow-delay               0.2
 						treemacs-file-name-transformer           #'identity
@@ -576,7 +576,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 						treemacs-recenter-after-project-expand   'on-distance
 						treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
 						treemacs-show-cursor                     nil
-						treemacs-show-hidden-files               nil
+						treemacs-show-hidden-files               t
 						treemacs-silent-filewatch                nil
 						treemacs-silent-refresh                  nil
 						treemacs-sorting                         'alphabetic-asc
@@ -674,7 +674,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(dashboard-modify-heading-icons '((recents . "file-text")
 																			(bookmarks . "book"))))
 #+end_src
-#+title: Effortless File Management with Dired
 
 ** Dired
 *** Dired Basics
@@ -764,12 +763,12 @@ Use =dired-single= to help with this: https://github.com/crocket/dired-single
 
 #+begin_src emacs-lisp
 
-;; Inside `use-package dired`
-(use-package dired-single)
+	;; Inside `use-package dired`
+	(use-package dired-single)
 
-    (evil-collection-define-key 'normal 'dired-mode-map
-      "h" 'dired-single-up-directory
-      "l" 'dired-single-buffer))
+	(evil-collection-define-key 'normal 'dired-mode-map
+		"h" 'dired-single-up-directory
+		"l" 'dired-single-buffer)
 
 #+end_src
 
@@ -786,7 +785,8 @@ Use =dired-single= to help with this: https://github.com/crocket/dired-single
 
 - =!= or =&= to launch an external program on a file
 
-#+begin_src emacs-lisp
+BUG BUG BUG
+#+begin_src example
 
 	(use-package dired-open
 		:config
@@ -809,6 +809,7 @@ Use =dired-single= to help with this: https://github.com/crocket/dired-single
 			"H" 'dired-hide-dotfiles-mode))
 
 #+end_src
+
 ** Org
 #+begin_src emacs-lisp
 	(use-package org
@@ -884,7 +885,7 @@ Change TODO's states
            ("archived" .  "SlateBlue"))))
 #+end_src
 ** Git
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package magit
 		:commands (magit-status magit-ediff-show-working-tree)
 		:bind ("C-c C-d" . magit-ediff-show-working-tree)
@@ -932,7 +933,7 @@ Change TODO's states
 ** Indent mode
 Show vertical lines to guide indentation
 
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package indent-guide
 		:ensure t)
 	(indent-guide-mode t)
