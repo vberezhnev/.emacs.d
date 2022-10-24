@@ -27,13 +27,14 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting base of Emacs
 ** Functions
 #+begin_src emacs-lisp
-	(defun indent-org-block-automatically ()
-		(when (org-in-src-block-p)
-			(org-edit-special)
-			(indent-region (point-min) (point-max))
-			(org-edit-src-exit)))
+  (defun indent-org-block-automatically ()
+    (when (org-in-src-block-p)
+      (org-edit-special)
+      (indent-region (point-min) (point-max))
+      (org-edit-src-exit)))
 
-	(run-at-time 1 10 'indent-org-block-automatically)
+  (run-at-time 1 10 'indent-org-block-automatically)
+
 #+end_src
 
 ** Window
@@ -95,30 +96,30 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src 
 ** Import local files
 #+begin_src emacs-lisp
-  (load "~/.emacs.d/local-packages/company-go")
-  (require 'company-go)
+	(load "~/.emacs.d/local-packages/company-go")
+	(require 'company-go)
 
-  (load "~/.emacs.d/local-packages/chep-video")
-  (require 'chep-video)
+	(load "~/.emacs.d/local-packages/chep-video")
+	(require 'chep-video)
 
-  (load "~/.emacs.d/local-packages/dired+")
-  (require 'dired+)
+	(load "~/.emacs.d/local-packages/dired+")
+	(require 'dired+)
 
-  (load "~/.emacs.d/local-packages/nov")
-  (require 'nov)
+	(load "~/.emacs.d/local-packages/nov")
+	(require 'nov)
 
-  (load "~/.emacs.d/local-packages/novXvidget")
-  ;; (require 'novXvidget)
+	(load "~/.emacs.d/local-packages/novXvidget")
+	;; (require 'novXvidget)
 
-  ;; Best .epub reader
-  (use-package nov-xwidget
-    :demand t
-    :after nov
-    :config
-    (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
-    (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
+	;; Best .epub reader
+	(use-package nov-xwidget
+		:demand t
+		:after nov
+		:config
+		(define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
+		(add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
 
-  ;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
+	;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
 #+end_src
 
 ** Integrate clipboard with X11 (Need for Emacs TTY)
@@ -126,13 +127,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(use-package xclip
 		:ensure t)
 	(xclip-mode 1)
-#+end_src
-** Make dired open in the same window
-#+begin_src example
-  ;; (setf dired-kill-when-;; Make dired open in the same window when using RET or ^
-  (put 'dired-find-alternate-file 'disabled nil) ; disables warning
-  (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
-  (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directoryopening-new-dired-buffer t)
 #+end_src
 ** Disable backup and auto save
 #+begin_src emacs-lisp
@@ -168,8 +162,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
 	(scroll-bar-mode -1)        ; Disable visible scrollbar
 	(tool-bar-mode -1)          ; Disable the toolbar
-	;; (tooltip-mode -1)           ; Disable tooltips
-	;; (set-fringe-mode 10)        ; Give some breathing room
+	(tooltip-mode -1)           ; Disable tooltips
+	(set-fringe-mode 10)        ; Give some breathing room
 	(menu-bar-mode -1)          ; Disable the menu bar
 #+end_src
 
@@ -185,8 +179,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 	(global-auto-revert-mode t)
 	(global-set-key (kbd "C-x C-b") 'ibuffer)
-	;;(global-set-key (kbd "M-x") 'helm-M-x)
-
+	(global-set-key (kbd "M-x") 'helm-M-x)
 #+end_src
 
 #+begin_src emacs-lisp 
@@ -761,7 +754,7 @@ Closed Dired buffers are just buried!  They need to be refreshed if you go back 
 
 Use =dired-single= to help with this: https://github.com/crocket/dired-single
 
-#+begin_src emacs-lisp
+#+begin_src example
 
 	;; Inside `use-package dired`
 	(use-package dired-single)
@@ -774,7 +767,7 @@ Use =dired-single= to help with this: https://github.com/crocket/dired-single
 
 *** File icons
 
-#+begin_src emacs-lisp
+#+begin_src example
 
 (use-package all-the-icons-dired
   :hook (dired-mode . all-the-icons-dired-mode))
@@ -800,7 +793,7 @@ BUG BUG BUG
 
 *** Hide / show dotfiles
 
-#+begin_src emacs-lisp
+#+begin_src example
 
 	(use-package dired-hide-dotfiles
 		:hook (dired-mode . dired-hide-dotfiles-mode)
@@ -810,6 +803,13 @@ BUG BUG BUG
 
 #+end_src
 
+*** Make dired open in the same window
+#+begin_src emacs-lisp
+  ;; (setf dired-kill-when-;; Make dired open in the same window when using RET or ^
+  (put 'dired-find-alternate-file 'disabled nil) ; disables warning
+  (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
+  (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directoryopening-new-dired-buffer t)
+#+end_src
 ** Org
 #+begin_src emacs-lisp
 	(use-package org
@@ -885,7 +885,7 @@ Change TODO's states
            ("archived" .  "SlateBlue"))))
 #+end_src
 ** Git
-#+begin_src example
+#+begin_src emacs-lisp
 	(use-package magit
 		:commands (magit-status magit-ediff-show-working-tree)
 		:bind ("C-c C-d" . magit-ediff-show-working-tree)
@@ -933,7 +933,7 @@ Change TODO's states
 ** Indent mode
 Show vertical lines to guide indentation
 
-#+begin_src example
+#+begin_src emacs-lisp
 	(use-package indent-guide
 		:ensure t)
 	(indent-guide-mode t)
@@ -1373,7 +1373,7 @@ Show vertical lines to guide indentation
 Make startup faster by reducing the frequency of garbage collection.  The default is 800 kilobytes.  Measured in bytes.
 
 #+begin_src emacs-lisp
-(setq gc-cons-threshold (* 50 1000 1000))
+	(setq gc-cons-threshold (* 50 1000 1000))
 #+end_src
 
 ** GC setting

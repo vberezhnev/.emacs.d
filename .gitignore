@@ -7,6 +7,7 @@ site-lisp/
 elpa/
 quelpa/
 straight/
+places/*
 places/
 
 rust-playground/
