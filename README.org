@@ -27,14 +27,13 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting base of Emacs
 ** Functions
 #+begin_src emacs-lisp
-  (defun indent-org-block-automatically ()
-    (when (org-in-src-block-p)
-      (org-edit-special)
-      (indent-region (point-min) (point-max))
-      (org-edit-src-exit)))
+	(defun indent-org-block-automatically ()
+		(when (org-in-src-block-p)
+			(org-edit-special)
+			(indent-region (point-min) (point-max))
+			(org-edit-src-exit)))
 
-  (run-at-time 1 10 'indent-org-block-automatically)
-
+	(run-at-time 1 10 'indent-org-block-automatically)
 #+end_src
 
 ** Window
@@ -49,8 +48,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(fset 'yes-or-no-p 'y-or-n-p)     ;; Set yes or no to y/n
 	(global-font-lock-mode 1)         ;; always highlight code
 	(global-auto-revert-mode 1)       ;; refresh a buffer if changed on disk
-	(global-hl-line-mode 1)           ;; Highlight current line
-	(semantic-mode 1)                 ;; help out with semantics
+	;; (global-hl-line-mode 1)           ;; Highlight current line
+	;; (semantic-mode 1)								;; help out with semantics
 	(savehist-mode 1)                 ;; Save history
 	(save-place-mode 1)               ;; when buffer is closed, save the cursor position
 	(blink-cursor-mode 1)
@@ -59,12 +58,13 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 160)
 	;; (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
 	;; (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
-	;; (variable-pitch-mode t)
+	(variable-pitch-mode t)
 
 	(prefer-coding-system 'utf-8)
 	(set-default-coding-systems 'utf-8)
 	(set-terminal-coding-system 'utf-8)
 	(set-keyboard-coding-system 'utf-8)
+	(setq-default shell-file-name "/nix/store/wb01a20wxlgzwz56yik683n08i18x73l-system-path/bin/fish")
 
 	(setq ad-redefinition-action            'accept
 				default-buffer-file-coding-system 'utf-8
@@ -99,25 +99,25 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(load "~/.emacs.d/local-packages/company-go")
 	(require 'company-go)
 
-	(load "~/.emacs.d/local-packages/chep-video")
-	(require 'chep-video)
+	;; (load "~/.emacs.d/local-packages/chep-video")
+	;; (require 'chep-video)
 
-	(load "~/.emacs.d/local-packages/dired+")
-	(require 'dired+)
+	;; (load "~/.emacs.d/local-packages/dired+")
+	;; (require 'dired+)
 
-	(load "~/.emacs.d/local-packages/nov")
-	(require 'nov)
+	;; (load "~/.emacs.d/local-packages/nov")
+	;; (require 'nov)
 
-	(load "~/.emacs.d/local-packages/novXvidget")
+	;; (load "~/.emacs.d/local-packages/novXvidget")
 	;; (require 'novXvidget)
 
 	;; Best .epub reader
-	(use-package nov-xwidget
-		:demand t
-		:after nov
-		:config
-		(define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
-		(add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
+	;; (use-package nov-xwidget
+	;; 	:demand t
+	;; 	:after nov
+	;; 	:config
+	;; 	(define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
+	;; 	(add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
 
 	;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
 #+end_src
@@ -143,7 +143,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(toggle-frame-maximized))
 #+end_src
 
-** Disable *scratch*, *Messages* and *Completions* buffers
+** Disable *Messages* and *Completions* buffers
 #+begin_src emacs-lisp
 	(setq-default message-log-max nil)
 	(kill-buffer "*Messages*")
@@ -180,16 +180,16 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(global-auto-revert-mode t)
 	(global-set-key (kbd "C-x C-b") 'ibuffer)
 	(global-set-key (kbd "M-x") 'helm-M-x)
+
+	(global-set-key (kbd "C-c l") #'org-store-link)
+	(global-set-key (kbd "C-c a") #'org-agenda)
+	(global-set-key (kbd "C-c c") #'org-capture)
+	
+	(global-set-key (kbd "\C-c w") 'evil-window-map)
 #+end_src
 
 #+begin_src emacs-lisp 
 	(xterm-mouse-mode t)
-
-	;; Prompt for y or n instead of yes or no.
-	;; (use-package subr
-	;; 	:no-require t
-	;; 	:init
-	;; 	(fset 'yes-or-no-p 'y-or-n-p))
 
 	(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
 	(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
@@ -205,31 +205,30 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting line numbers
 #+begin_src emacs-lisp
-  (global-display-line-numbers-mode t)
-  (use-package display-line-numbers
-    ;;:straight nil
-    :hook (prog-mode . display-line-numbers-mode)
-    :custom
-    ;;(setq display-line-numbers-type 'relative)
-    (display-line-numbers-width 4)
-    (display-line-numbers-grow-only t)
-    (display-line-numbers-width-start t)
-    )
+	(global-display-line-numbers-mode t)
+	(use-package display-line-numbers
+		;;:straight nil
+		:hook (prog-mode . display-line-numbers-mode)
+		:custom
+		;;(setq display-line-numbers-type 'relative)
+		(display-line-numbers-width 4)
+		(display-line-numbers-grow-only t)
+		(display-line-numbers-width-start t))
 #+end_src
 
 * Setting font face
 ** Setting fonts
 #+begin_src emacs-lisp
 	(set-face-attribute 'default nil
-											:font "Fira Code"
+											:font "JetBrains Mono"
 											:height 110
 											:weight 'medium)
 	(set-face-attribute 'variable-pitch nil
-											:font "Fira Code"
+											:font "JetBrains Mono"
 											:height 120
 											:weight 'medium)
 	(set-face-attribute 'fixed-pitch nil
-											:font "Fira Code"
+											:font "JetBrains Mono"
 											:height 110
 											:weight 'medium)
 	;; Makes commented text and keywords italics.
@@ -244,20 +243,19 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(setq-default line-spacing 0.12)
 
 	;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-	(add-to-list 'default-frame-alist '(font . "Fira Code"))
+	;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
 	;; changes certain keywords to symbols, such as lamda!
 	(setq global-prettify-symbols-mode t)
 #+end_src
 
 ** Setting and installing themes
 #+begin_src emacs-lisp
-
-
-	;;(use-package 'gruvbox-theme)
-	(load-theme 'gruvbox-dark-soft t)
 	;; (use-package atom-one-dark)
 
-	;; (use-package moe-theme
+	;; (use-package 'gruvbox-theme
+	;; 	:ensure t)
+
+	;; (use-package 'modus-themes
 	;; 	:ensure t)
 
 	;; (use-package melancholy-theme
@@ -284,20 +282,26 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(doom-themes-treemacs-config)
 		;; Corrects (and improves) org-mode's native fontification.
 		(doom-themes-org-config))
+
+	(load-theme 'gruvbox-dark-soft t)
 #+end_src
 
 * Setting Packages
 ** Evil
+*** Set initial Evil
 #+begin_src emacs-lisp
 	(use-package evil
 		:ensure t
 		:init      ;; tweak evil's configuration before loading it
-		;;(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+		(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
 		(setq evil-want-keybinding nil)
 		(setq evil-vsplit-window-right t)
 		(setq evil-split-window-below t))
 	(evil-mode 1)
+#+end_src
 
+*** Evil collection 
+#+begin_src emacs-lisp
 	(use-package evil-collection
 		:after evil
 		:ensure t
@@ -308,10 +312,58 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(setq evil-insert-state-cursor '("#E82424" bar))
 		(setq evil-replace-state-cursor '("#FF9E3B" hbar))
 		(setq evil-operator-state-cursor '("#7E9CD8" hollow))
-		(setq evil-collection-mode-list '(dashboard ibuffer))
 		(evil-collection-init))
+#+end_src
 
-	;; Evil multiple cursors
+*** Evil leader (disabled)
+#+begin_src example
+	(use-package evil-leader
+		:init
+		(global-evil-leader-mode)
+		(evil-leader/set-leader "<SPC>")
+		(evil-leader/set-key
+		 ;; General
+		 ".f" 'consult-isearch
+		 ".q" 'delete-frame
+		 ".e" 'eval-region
+		 ;; Files
+		 "fr" 'consult-recent-file
+		 "fb" 'consult-bookmark
+		 "ff" 'find-file
+		 "fd" 'dired
+		 ;; Org
+		 "oa" 'org-agenda
+		 "fh" 'consult-org-heading
+		 ;; Open
+		 "om" 'mu4e
+		 "os" 'eshell
+		 ;; Notes
+		 "no" 'deft
+		 "nf" 'deft-find-file
+		 "nn" 'deft-new-file-named
+		 ;; Bufffers
+		 "bd" 'kill-current-buffer
+		 "bb" 'consult-buffer
+		 "bx" 'switch-to-scratch
+		 "bi" 'ibuffer
+		 ;; Windows
+		 "wv" 'split-window-right
+		 "wh" 'split-window-below
+		 "wt" 'window-split-toggle
+		 "ws" 'ace-window
+		 ;; Help
+		 "hh" 'help
+		 "hk" 'describe-key
+		 "hv" 'describe-variable
+		 "hF" 'describe-function
+		 "hf" 'describe-face
+		 "hs" 'describe-symbol
+		 "hm" 'describe-mode))
+
+#+end_src
+
+*** Evil multiple cursors (disabled)
+#+begin_src example
 	(use-package evil-multiedit
 		:after evil
 		:bind
@@ -323,10 +375,14 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 					("M-d". evil-multiedit-match-and-next)
 					("M-D". evil-multiedit-match-and-prev)
 					("C-M-d". evil-multiedit-match-all)))
+#+end_src
 
-
-	;;(use-package evil-tutor
-	;;	:ensure t)
+*** Set evil states
+#+begin_src emacs-lisp
+	(evil-set-initial-state 'ibuffer-mode 'normal)
+	(evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+	;; (evil-set-initial-state 'dired-mode 'emacs)
+	(evil-set-initial-state 'sunrise-mode 'emacs)
 #+end_src
 
 ** RSS
@@ -334,13 +390,14 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(use-package elfeed
 		:ensure t)
 
-	;; data is stored in ~/.elfee7
+	;; data is stored in ~/.elfeed
 	(setq elfeed-feeds
 				'(
 					;; programming
 					;;("https://news.ycombinator.com/rss" hacker)
 					;;("https://www.reddit.com/r/programming.rss" programming)
 					("https://www.reddit.com/r/emacs.rss" emacs)
+					("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
 					("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
 					("https://habr.com/ru/rss/news/?fl=ru" habr-news)
 					("https://nuancesprog.ru/feed" nop)
@@ -369,6 +426,13 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(setq-default elfeed-search-filter "@7-days-ago +unread")
 	(setq-default elfeed-search-title-max-width 100)
 	(setq-default elfeed-search-title-min-width 100)
+#+end_src
+** Telega.el
+#+begin_src emacs-lisp
+	(use-package telega
+		:ensure t
+		:config
+		(setq telega-server-libs-prefix "/nix/store/8rw7qncihpx075i5cn41rki2pm56wx21-tdlib-1.8.7"))
 #+end_src
 ** PDF Tools
 #+begin_src emacs-lisp
@@ -471,7 +535,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(defun centaur-tabs-buffer-groups ()
 			"`centaur-tabs-buffer-groups' control buffers' group rules.
 
-					 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+					 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `example-mode' `dired-mode' `org-mode' `magit-mode'.
 					 All buffer name start with * will group to \"Emacs\".
 					 Other buffer group by `centaur-tabs-get-group-name' with project name."
 			(list
@@ -531,7 +595,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		:defer t
 		:init
 		(with-eval-after-load 'winum
-			(define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+			(define-key winum-keymap (kbd "M-0") 'treemacs-select-window))
 		:config
 		(progn
 			(setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
@@ -625,47 +689,131 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Doom modeline
 #+begin_src emacs-lisp
-(use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
-  :config
-  (setq doom-modeline-buffer-encoding nil
-        doom-modeline-buffer-file-name-style 'file-name
-        doom-modeline-checker-simple-format t
-        doom-modeline-vcs-max-length 50
-        doom-modeline-major-mode-icon nil
-        doom-modeline-icon t
-        doom-modeline-modal-icon t
-        doom-modeline-lsp nil
-        doom-modeline-major-mode-color-icon nil
-        doom-modeline-buffer-state-icon nil
-        doom-modeline-time-icon nil)
-  (custom-set-faces
-   '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
-   '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
-   '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95))))))
+	(use-package doom-modeline
+		:hook (after-init . doom-modeline-mode)
+		:config
+		(setq doom-modeline-buffer-encoding nil
+					doom-modeline-buffer-file-name-style 'file-name
+					doom-modeline-checker-simple-format t
+					doom-modeline-vcs-max-length 50
+					doom-modeline-major-mode-icon nil
+					doom-modeline-icon t
+					doom-modeline-modal-icon t
+					doom-modeline-lsp nil
+					doom-modeline-major-mode-color-icon nil
+					doom-modeline-buffer-state-icon nil
+					doom-modeline-time-icon nil)
+		(custom-set-faces
+		 '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
+		 '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
+		 '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95))))))
+#+end_src
+** Modeline (simple variant) (disabled)
+#+begin_src example
+	(defun mode-line-render (left right)
+		"Return a string of `window-width' length.
+	Containing LEFT, and RIGHT aligned respectively."
+		(let ((available-width
+					 (- (window-width)
+							(+ (length (format-mode-line left))
+								 (length (format-mode-line right))))))
+			(append left
+							(list (format (format "%%%ds" available-width) ""))
+							right)))
+
+	(setq-default mode-line-format
+								'((:eval (mode-line-render
+													'((:eval (propertize " %b" 'face `(:slant italic)))
+														(:eval (if (and buffer-file-name (buffer-modified-p))
+																			 (propertize "*" 'face `(:inherit face-faded))))
+														(:eval (if (buffer-narrowed-p)
+																			 (propertize "-" 'face `(:inherit face-faded)))))
+													'("%p %l:%c "
+														(:eval (propertize " %m" 'face 'font-lock-string-face)))))))
+
+	(provide 'modeline)
+#+end_src
+
+** Calendar sync (disabled)
+#+begin_src example
+(setup (:pkg org-caldav)
+  (:delay)
+  (setq org-caldav-url "https://caldav.fastmail.com/dav/calendars/user/daviwil@fastmail.fm/"
+        ;; org-caldav-files '("~/Notes/Calendar/Personal.org" "~/Notes/Calendar/Work.org")
+        ;; org-caldav-inbox '("~/Notes/Calendar/Personal.org" "~/Notes/Calendar/Work.org")
+        org-caldav-calendar-id "fe098bfb-0726-4e10-bff2-55f8278c8a56"
+        org-caldav-files '("~/Notes/Calendar/Personal.org")
+        org-caldav-inbox "~/Notes/Calendar/PersonalInbox.org"
+        org-caldav-calendars
+         '((:calendar-id "fe098bfb-0726-4e10-bff2-55f8278c8a56"
+            :files ("~/Notes/Calendar/Personal.org")
+            :inbox "~/Notes/Calendar/PersonalInbox.org"))
+           ;; (:calendar-id "8f150437-cc57-4ba0-9200-d1d98389e2e4"
+           ;;  :files ("~/Notes/Calendar/Work.org")
+           ;;  :inbox "~/Notes/Calendar/Work.org"))
+        org-caldav-delete-org-entries 'always
+        org-caldav-delete-calendar-entries 'never))
 #+end_src
 ** Dashboard
 #+begin_src emacs-lisp
 	;; Setting dashboard
 	(use-package dashboard
+		:hook (dashboard-mode . (lambda ()
+															;; No title
+															(setq-local frame-title-format nil)
+															;; Enable `page-break-lines-mode'
+															(when (fboundp 'page-break-lines-mode)
+																(page-break-lines-mode 1))))
 		:init      ;; tweak dashboard config before loading it
-		(setq dashboard-center-content t)
-		;;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-		(setq dashboard-set-heading-icons t)
-		(setq dashboard-set-file-icons t)
-		(setq dashboard-banner-logo-title "Emacs is more than a text editor!")
-		(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-		;; (setq dashboard-startup-banner "~/.emacs.d/images/gnu.svg")  ;; use custom image as banner
-		(setq dashboard-items '(
+		(setq dashboard-set-heading-icons t
+					dashboard-set-file-icons t
+					dashboard-center-content t
+					dashboard-banner-logo-title "Welcome back, Darling!"
+					;; dashboard-startup-banner "~/.emacs.d/images/black-hole.png"
+					;; dashboard-page-separator ""
+					dashboard-set-navigator t
+					dashboard-items '(
 														(recents . 5)
-														;;(agenda . 5 )
-														(bookmarks . 3)
-														(projects . 5)))
-		;;(registers . 3)))
+														(agenda . 5 )
+														;;(registers . 3)
+														(bookmarks . 4)
+														(projects . 4))) ;; use standard emacs logo as banner
+
+		;; Format: "(icon title help action face prefix suffix)"
+		(setq dashboard-navigator-buttons
+					`(;; line1
+						((,(all-the-icons-octicon "code" :height 1.1 :v-adjust 0.0)
+							"Main site"
+							"Browse homepage"
+							(lambda (&rest _) (browse-url "homepage")))
+						 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+						 ("?" "" "?/h" #'show-help nil "<" ">"))
+						;; line 2
+						((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+							"Github"
+							""
+							(lambda (&rest _) (browse-url "homepage")))
+						 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+		(setq dashboard-footer-messages '("Richard Stallman is proud of you."))
+		(setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+																											 :height 1.1
+																											 :v-adjust -0.05
+																											 :face 'font-lock-keyword-face))
+
 		:config
-		(dashboard-setup-startup-hook)
 		(dashboard-modify-heading-icons '((recents . "file-text")
-																			(bookmarks . "book"))))
+																			(bookmarks . "book")))
+		(dashboard-setup-startup-hook)
+		)
+
+	(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+
+	(defun dashboard-refresh-buffer ()
+		(interactive)
+		(when (get-buffer dashboard-buffer-name)
+			(kill-buffer dashboard-buffer-name))
+		(dashboard-insert-startupify-lists)
+		(switch-to-buffer dashboard-buffer-name))
 #+end_src
 
 ** Dired
@@ -693,16 +841,16 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 - =dired-listing-switches:= Try =-agho --group-directories-first=
 - =g= / =g r= Refresh the buffer with =revert-buffer= after changing configuration (and after filesystem changes!)
 
- #+begin_src emacs-lisp
+ #+begin_src example
 
-  (use-package dired
-    :ensure nil
-    :commands (dired dired-jump)
-    :bind (("C-x C-j" . dired-jump))
-    :config
-    (evil-collection-define-key 'normal 'dired-mode-map
-      "h" 'dired-up-directory
-      "l" 'dired-find-file))
+	 (use-package dired
+		 :ensure nil
+		 :commands (dired dired-jump)
+		 :bind (("C-x C-j" . dired-jump))
+		 :config
+		 (evil-collection-define-key 'normal 'dired-mode-map
+			 "h" 'dired-up-directory
+			 "l" 'dired-find-file))
 
  #+end_src
  
@@ -766,12 +914,10 @@ Use =dired-single= to help with this: https://github.com/crocket/dired-single
 #+end_src
 
 *** File icons
-
-#+begin_src example
-
-(use-package all-the-icons-dired
-  :hook (dired-mode . all-the-icons-dired-mode))
-
+#+begin_src emacs-lisp
+	(use-package all-the-icons-dired
+		:ensure t
+		:hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 
 *** Open external files
@@ -784,7 +930,7 @@ BUG BUG BUG
 	(use-package dired-open
 		:config
 		;; Doesn't work as expected!
-		(add-to-list 'dired-open-functions #'dired-open-xdg t)
+		(add-to-list 'dired-open-functions 'dired-open-xdg t)
 		;; -- OR! --
 		(setq dired-open-extensions '(("png" . "feh")
 																	("mkv" . "mpv"))))
@@ -792,25 +938,39 @@ BUG BUG BUG
 #+end_src
 
 *** Hide / show dotfiles
-
 #+begin_src example
-
 	(use-package dired-hide-dotfiles
 		:hook (dired-mode . dired-hide-dotfiles-mode)
 		:config
 		(evil-collection-define-key 'normal 'dired-mode-map
 			"H" 'dired-hide-dotfiles-mode))
-
 #+end_src
 
 *** Make dired open in the same window
 #+begin_src emacs-lisp
-  ;; (setf dired-kill-when-;; Make dired open in the same window when using RET or ^
-  (put 'dired-find-alternate-file 'disabled nil) ; disables warning
-  (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
-  (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directoryopening-new-dired-buffer t)
+	;; (setf dired-kill-when-;; Make dired open in the same window when using RET or ^
+	(put 'dired-find-alternate-file 'disabled nil) ; disables warning
+	(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
+	(define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directoryopening-new-dired-buffer t)
 #+end_src
+*** Dired sort directories first
+#+begin_src emacs-lisp
+(defun sof/dired-sort ()
+  "Dired sort hook to list directories first."
+  (save-excursion
+   (let (buffer-read-only)
+     (forward-line 2) ;; beyond dir. header  
+     (sort-regexp-fields t "^.*$" "[ ]*." (point) (point-max))))
+  (and (featurep 'xemacs)
+       (fboundp 'dired-insert-set-properties)
+       (dired-insert-set-properties (point-min) (point-max)))
+  (set-buffer-modified-p nil))
+
+ (add-hook 'dired-after-readin-hook 'sof/dired-sort)
+#+end_src
+
 ** Org
+*** Setting Org
 #+begin_src emacs-lisp
 	(use-package org
 		:hook (org-mode . mk/org-mode-setup)
@@ -843,11 +1003,11 @@ BUG BUG BUG
 																							(when org-inline-image-overlays
 																								(org-redisplay-inline-images))))
 		;; (org-babel-do-load-languages 'org-babel-load-languages
-		;;                               '((emacs-lisp t))
+		;;                               '((example t))
 
 		;; (add-to-list 'org-structure-template-alist
 		;;              '("sh" . "src shell")
-		;;               ("elisp" . "src emacs-lisp")
+		;;               ("elisp" . "src example")
 		;;               ("swift" . "src swift"))
 		(add-to-list 'org-modules 'org-tempo t))
 
@@ -864,7 +1024,7 @@ BUG BUG BUG
 	;; 	(org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 #+end_src
 
-Change TODO's states
+*** Change TODO's states
 #+begin_src emacs-lisp
 	(with-eval-after-load 'org
 		(setq org-log-done 'time))
@@ -874,22 +1034,41 @@ Change TODO's states
 					'((sequence "TODO" "DOING" "BLOCKED" "REVIEW" "|" "DONE" "ARCHIVED"))))
 #+end_src
 
+#+begin_src emacs-lisp
+	(with-eval-after-load 'org
+		(setq org-todo-keyword-faces
+					'(("todo" . "SlateGray")
+						("doing" . "DarkOrchid")
+						("blocked" . "Firebrick")
+						("review" . "Teal")
+						("done" . "ForestGreen")
+						("archived" .  "SlateBlue"))))
+#+end_src
+*** Org agenda
+~C-c a t~ -- for entering in Org agenda
+#+begin_src emacs-lisp
+	;; (setq org-agenda-files (list "~/org/work.org"
+	;; 														 "~/org/school.org" 
+	;; 														 "~/org/home.org"))
+
+	(setq org-agenda-files   (list "~/org/")
+				org-log-done 'time
+				)
+#+end_src
+
+** Org modern (disabled)
 #+begin_src example
-  (with-eval-after-load 'org
-    (setq org-todo-keyword-faces
-         '(("todo" . "SlateGray")
-           ("doing" . "DarkOrchid")
-           ("blocked" . "Firebrick")
-           ("review" . "Teal")
-           ("done" . "ForestGreen")
-           ("archived" .  "SlateBlue"))))
+	(use-package org-modern
+		:ensure t
+		:config
+		(global-org-modern-mode))
 #+end_src
 ** Git
 #+begin_src emacs-lisp
 	(use-package magit
 		:commands (magit-status magit-ediff-show-working-tree)
 		:bind ("C-c C-d" . magit-ediff-show-working-tree)
-		:custom (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+		:custom (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
 
 	(use-package magit-todos
 		:commands (magit-todos-mode)
@@ -897,7 +1076,7 @@ Change TODO's states
 		:config
 		(setq magit-todos-recursive t
 					magit-todos-depth 4
-					magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*"))
+					magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/"))
 		(custom-set-variables
 		 '(magit-todos-keywords (list "TODO" "FIXME" "HACK"))))
 
@@ -917,39 +1096,36 @@ Change TODO's states
 										 :height 140
 										 :italic t))))
 
-	;; (use-package git-gutter
-	;; 	:hook (prog-mode . git-gutter-mode)
-	;; 	:diminish git-gutter-mode
-	;; 	:config
-	;; 	(setq git-gutter:update-interval 0.5))
+	(use-package git-gutter
+		:hook (prog-mode . git-gutter-mode)
+		:diminish git-gutter-mode
+		:config
+		(setq git-gutter:update-interval 0.5))
 
-	;; (use-package git-gutter-fringe
-	;; 	:after git-gutter
-	;; 	:config
-	;; 	(define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
-	;; 	(define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
-	;; 	(define-fringe-bitmap 'git-gutter-fr:deleted [224] nil nil '(center repeated)))
+	(use-package git-gutter-fringe
+		:after git-gutter
+		:config
+		(define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+		(define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+		(define-fringe-bitmap 'git-gutter-fr:deleted [224] nil nil '(center repeated)))
+#+end_src
+** Smooth scroll (good-scroll) (disabled)
+#+begin_src example
+	(use-package good-scroll
+		:ensure t
+		:config
+		(good-scroll-mode 1))
 #+end_src
 ** Indent mode
 Show vertical lines to guide indentation
-
 #+begin_src emacs-lisp
 	(use-package indent-guide
-		:ensure t)
-	(indent-guide-mode t)
+		:ensure t
+		:config
+		(indent-guide-global-mode))
 #+end_src
-** Other packages
+** FZF
 #+begin_src emacs-lisp
-	;; (use-package elcord :defer t)
-
-	(use-package helm
-		:ensure t)
-
-	(use-package multi-term
-		:bind
-		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
-		("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
-
 	(use-package fzf
 		:ensure t
 		:bind
@@ -965,6 +1141,18 @@ Show vertical lines to guide indentation
 					;; If nil, the fzf buffer will appear at the top of the window
 					fzf/position-bottom t
 					fzf/window-height 15))
+#+end_src
+** Other packages
+#+begin_src emacs-lisp
+	;; (use-package elcord :defer t)
+
+	(use-package helm
+		:ensure t)
+
+	(use-package multi-term
+		:bind
+		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
+		("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
 
 	;; (use-package general
 	;; 	:config
@@ -980,8 +1168,8 @@ Show vertical lines to guide indentation
 					(prolog-indent-buffer)
 				(format-all-buffer)))
 		:config
-		(global-set-key (kbd "M-F") #'ian/format-code)
-		(add-hook 'prog-mode-hook #'format-all-ensure-formatter))
+		(global-set-key (kbd "M-F") 'ian/format-code)
+		(add-hook 'prog-mode-hook 'format-all-ensure-formatter))
 
 	(use-package parrot
 		:ensure t
@@ -991,7 +1179,7 @@ Show vertical lines to guide indentation
 	(use-package char-fold
 		:custom
 		(char-fold-symmetric t)
-		(search-default-mode #'char-fold-to-regexp))
+		(search-default-mode 'char-fold-to-regexp))
 
 	(use-package reverse-im
 		:ensure t ; install `reverse-im' using package.el
@@ -1001,7 +1189,7 @@ Show vertical lines to guide indentation
 		("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
 		:custom
 		(reverse-im-char-fold t) ; use lax matching
-		(reverse-im-read-char-advice-function #'reverse-im-read-char-include)
+		(reverse-im-read-char-advice-function 'reverse-im-read-char-include)
 		(reverse-im-input-methods '("ukrainian-computer")) ; translate these methods
 		:config
 		(reverse-im-mode t)) ; turn the mode on
@@ -1018,34 +1206,77 @@ Show vertical lines to guide indentation
 	;; (use-package 'fic-mode
 	;; 	:ensure t
 	;; 	:hook 'prog-mode-hook 'fic-mode)
-
 #+end_src
 
 * Setting LSP
 #+begin_src emacs-lisp
 	;;(lsp-treemacs-sync-mode 1)
 	(helm-mode 1)
-	;;(use-package react-snippets)
-	;; (add-hook 'web-mode-hook  'emmet-mode)
 #+end_src
 
 ** Setting Company
 #+begin_src emacs-lisp
 	;; Install company
-	(use-package company
-		:ensure t
-		:defer 20
-		;; This is not perfect yet. It completes too quickly outside programming modes, but while programming it is just right.
-		:custom
-		(company-idle-delay 0.1)
-		(global-company-mode t)
-		(debug-on-error nil) ;; otherwise this throws lots of errors on completion errors
-		:config
-		(define-key company-active-map (kbd "TAB") 'company-complete-selection)
-		(define-key company-active-map (kbd "<tab>") 'company-complete-selection)
-		(define-key company-active-map [return] 'company-complete-selection)
-		(define-key company-active-map (kbd "RET") 'company-complete-selection)
+	;; (use-package company
+	;; 	:ensure t
+	;; 	:defer 20
+	;; 	;; This is not perfect yet. It completes too quickly outside programming modes, but while programming it is just right.
+	;; 	:custom
+	;; 	(company-idle-delay 0.1)
+	;; 	(global-company-mode t)
+	;; 	(debug-on-error nil) ;; otherwise this throws lots of errors on completion errors
+	;; 	:config
+	;; 	(define-key company-active-map (kbd "TAB") 'company-complete-selection)
+	;; 	(define-key company-active-map (kbd "<tab>") 'company-complete-selection)
+	;; 	(define-key company-active-map [return] 'company-complete-selection)
+	;; 	(define-key company-active-map (kbd "RET") 'company-complete-selection)
 
+	;; 	(setq company-transformers '(company-sort-by-backend-importance)
+	;; 				company-format-margin-function  'company-vscode-dark-icons-margin
+	;; 				company-tooltip-margin              0
+	;; 				company-dabbrev-downcase            nil
+	;; 				company-dabbrev-ignore-case         t
+	;; 				company-dabbrev-other-buffers       'all
+	;; 				company-minimum-prefix-length       1
+	;; 				company-tooltip-align-annotations   t
+	;; 				company-require-match               nil
+	;; 				company-tooltip-limit               25
+	;; 				company-tooltip-width-grow-only     nil
+	;; 				company-tooltip-flip-when-above     t
+	;; 				company-show-quick-access           'left
+	;; 				company-async-wait                  0.1
+	;; 				company-async-timeout               1
+	;; 				company-idle-delay                  0.1
+	;; 				company-frontends '(company-box-frontend))
+
+
+	;; (defun my-company-visible-and-explicit-action-p ()
+	;; 	(and (company-tooltip-visible-p)
+	;; 			 (company-explicit-action-p)))
+	;; (defun company-ac-setup ()
+	;; 	"Sets up `company-mode' to behave similarly to `auto-complete-mode'."
+	;; 	(setq company-require-match nil)
+	;; 	(setq company-auto-complete 'my-company-visible-and-explicit-action-p)
+	;; 	(setq company-frontends '(company-echo-metadata-frontend
+	;; 														company-pseudo-tooltip-unless-just-one-frontend-with-delay
+	;; 														company-preview-frontend))
+	;; 	(define-key company-active-map [tab]
+	;; 		'company-select-next-if-tooltip-visible-or-complete-selection)
+	;; 	(define-key company-active-map (kbd "TAB")
+	;; 		'company-select-next-if-tooltip-visible-or-complete-selection))
+
+	;; (company-ac-setup)
+	;; (add-hook 'js2-mode-hook (lambda () (company-mode)))
+
+	(use-package company
+		:defer t
+		:hook (prog-mode . company-mode)
+		:bind
+		(:map company-active-map
+					("RET" . company-complete-selection)
+					("<return>" . company-complete-selection)
+					("<tab>" . company-complete-selection))
+		:config
 		(setq company-transformers '(company-sort-by-backend-importance)
 					company-format-margin-function  'company-vscode-dark-icons-margin
 					company-tooltip-margin              0
@@ -1063,94 +1294,45 @@ Show vertical lines to guide indentation
 					company-async-timeout               1
 					company-idle-delay                  0.1
 					company-frontends '(company-box-frontend))
-		(defun my-company-visible-and-explicit-action-p ()
-			(and (company-tooltip-visible-p)
-					 (company-explicit-action-p)))
-		(defun company-ac-setup ()
-			"Sets up `company-mode' to behave similarly to `auto-complete-mode'."
-			(setq company-require-match nil)
-			(setq company-auto-complete #'my-company-visible-and-explicit-action-p)
-			(setq company-frontends '(company-echo-metadata-frontend
-																company-pseudo-tooltip-unless-just-one-frontend-with-delay
-																company-preview-frontend))
-			(define-key company-active-map [tab]
-				'company-select-next-if-tooltip-visible-or-complete-selection)
-			(define-key company-active-map (kbd "TAB")
-				'company-select-next-if-tooltip-visible-or-complete-selection))
+		(push '(company-semantic :with company-yasnippet) company-backends))
 
-		;; 	(company-ac-setup)
-		;; 	(add-hook 'js2-mode-hook (lambda () (company-mode))))
+	(use-package company-box
+		:after (company all-the-icons)
+		:hook (company-mode . company-box-mode)
+		:functions (all-the-icons-faicon
+								all-the-icons-material
+								all-the-icons-octicon
+								all-the-icons-alltheicon)
+		:config
+		(setq company-box-frame-behavior 'point
+					company-box-icons-alist 'company-box-icons-images
+					company-box-backends-colors t
+					company-box-icon-right-margin 0.5
+					company-box-backends-colors '((company-yasnippet
+																				 :all (:foreground "RosyBrown1" :background nil :italic t)
+																				 :selected (:foreground "black" :background "RosyBrown4")))
+					company-box-doc-delay 1))
 
-		;; (use-package company
-		;; 	:ensure t
-		;; 	:config (add-hook 'prog-mode-hook 'company-mode)
-		;; 	(global-set-key (kbd "M-i") 'company-complete))
+	;; (defun setup-swift-mode-company ()
+	;; 	"Setup company with separate bakends merged into one."
+	;; 	(setq-local company-backends
+	;; 							'((company-capf :with company-dabbrev-code company-yasnippet ))))
 
-		;; (use-package company
-		;; 	:defer t
-		;; 	:hook (prog-mode . company-mode)
-		;; 	:bind
-		;; 	(:map company-active-map
-		;; 				("RET" . company-complete-selection)
-		;; 				("<return>" . company-complete-selection)
-		;; 				("<tab>" . company-complete-selection))
-		;; 	:config
-		;; 	(setq company-transformers '(company-sort-by-backend-importance)
-		;; 				company-format-margin-function  'company-vscode-dark-icons-margin
-		;; 				company-tooltip-margin              0
-		;; 				company-dabbrev-downcase            nil
-		;; 				company-dabbrev-ignore-case         t
-		;; 				company-dabbrev-other-buffers       'all
-		;; 				company-minimum-prefix-length       1
-		;; 				company-tooltip-align-annotations   t
-		;; 				company-require-match               nil
-		;; 				company-tooltip-limit               25
-		;; 				company-tooltip-width-grow-only     nil
-		;; 				company-tooltip-flip-when-above     t
-		;; 				company-show-quick-access           'left
-		;; 				company-async-wait                  0.1
-		;; 				company-async-timeout               1
-		;; 				company-idle-delay                  0.1
-		;; 				company-frontends '(company-box-frontend))
-		;; 	(push '(company-semantic :with company-yasnippet) company-backends))
+	;; (use-package company-quickhelp
+	;; 	:hook (company-mode . company-quickhelp-mode))
 
-		(use-package company-box
-			:after (company all-the-icons)
-			:hook (company-mode . company-box-mode)
-			:functions (all-the-icons-faicon
-									all-the-icons-material
-									all-the-icons-octicon
-									all-the-icons-alltheicon)
-			:config
-			(setq company-box-frame-behavior 'point
-						company-box-icons-alist 'company-box-icons-images
-						company-box-backends-colors t
-						company-box-icon-right-margin 0.5
-						company-box-backends-colors '((company-yasnippet
-																					 :all (:foreground "RosyBrown1" :background nil :italic t)
-																					 :selected (:foreground "black" :background "RosyBrown4")))
-						company-box-doc-delay 1))
-
-		;; (defun setup-swift-mode-company ()
-		;; 	"Setup company with separate bakends merged into one."
-		;; 	(setq-local company-backends
-		;; 							'((company-capf :with company-dabbrev-code company-yasnippet ))))
-
-		;; (use-package company-quickhelp
-		;; 	:hook (company-mode . company-quickhelp-mode))
-
-		;; (use-package company-statistics
-		;; 	:hook (company-mode . company-statistics-mode))
+	;; (use-package company-statistics
+	;; 	:hook (company-mode . company-statistics-mode))
 
 
-		;; (use-package company-anaconda
-		;; 	:defer
-		;; 	:after company
-		;; 	:config (add-to-list 'company-backends 'company-anaconda))
+	;; (use-package company-anaconda
+	;; 	:defer
+	;; 	:after company
+	;; 	:config (add-to-list 'company-backends 'company-anaconda))
 
-		;; ;; Company mode
-		;; (setq company-idle-delay 0)
-		;; (setq company-minimum-prefix-length 1)
+	;; Company mode Show
+	;; (setq company-idle-delay 0)
+	;; (setq company-minimum-prefix-length 1)
 #+end_src
 
 ** Setting LSP-Mode
@@ -1189,6 +1371,53 @@ Show vertical lines to guide indentation
 	;;		(which-key-mode))
 #+end_src
 
+*** JavaScript
+#+begin_src emacs-lisp
+	;; (use-package web-mode  :ensure t
+	;; 	:mode (("\\.js\\'" . web-mode)
+	;; 				 ("\\.jsx\\'" . web-mode)
+	;; 				 ("\\.ts\\'" . web-mode)
+	;; 				 ;;("\\.tsx\\'" . web-mode)
+	;; 				 ("\\.html\\'" . web-mode)
+	;; 				 ("\\.vue\\'" . web-mode)
+	;; 				 ("\\.json\\'" . web-mode))
+	;; 	:commands web-mode
+	;; 	;; :config
+	;; 	;; (setq web-mode-content-types-alist
+	;; 	;; 			'(("jsx" . "\\.js[x]?\\'")))
+	;; 	)
+
+	;; JSX syntax highlighting
+	(add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
+	(setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+
+	(use-package js2-mode :ensure t :defer 20
+		:mode
+		(("\\.js\\'" . js2-mode))
+		:custom
+		(js2-include-node-externs t)
+		;;(js2-global-externs '("customElements"))
+		(js2-highlight-level 3)
+		(js2r-prefer-let-over-var t)
+		(js2r-prefered-quote-type 2)
+		(js-indent-align-list-continuation t)
+		(global-auto-highlight-symbol-mode t)
+		:config
+		(setq js-indent-level 2)
+		;; patch in basic private field support
+		(advice-add #'js2-identifier-start-p
+								:after-until
+								(lambda (c) (eq c ?#))))
+
+	(use-package import-js :ensure t)
+
+	(add-hook 'web-mode-hook #'(lambda ()
+															 (enable-minor-mode
+																'("\\.jsx?\\'" . prettier-js-mode))))
+
+	(add-hook 'web-mode-hook 'prettier-js-mode)
+#+end_src
+
 *** JSON
 #+begin_src emacs-lisp
 	(use-package json-mode :ensure t :defer 20
@@ -1207,7 +1436,7 @@ Show vertical lines to guide indentation
 (use-package vue-mode
 		:mode "\\.vue\\'"
 		:config
-		(add-hook 'vue-mode-hook #'lsp))
+		(add-hook 'vue-mode-hook 'lsp))
 
 (setq vue-mode-packages
 				'(vue-mode))
@@ -1235,82 +1464,28 @@ Show vertical lines to guide indentation
 		(add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
 #+end_src
 
-*** JavaScript
-#+begin_src emacs-lisp
-	(use-package web-mode  :ensure t
-		:mode (("\\.js\\'" . web-mode)
-					 ("\\.jsx\\'" . web-mode)
-					 ("\\.ts\\'" . web-mode)
-					 ;;("\\.tsx\\'" . web-mode)
-					 ("\\.html\\'" . web-mode)
-					 ;;("\\.vue\\'" . web-mode)
-					 ("\\.json\\'" . web-mode))
-		:commands web-mode
-		:config
-		(setq web-mode-content-types-alist
-					'(("jsx" . "\\.js[x]?\\'")))
-		)
-
-	;; JSX syntax highlighting
-	;;add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
-	;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
-
-	;; (use-package js2-mode :ensure t :defer 20
-	;; 	:mode
-	;; 	(("\\.js\\'" . js2-mode))
-	;; 	:custom
-	;; 	(js2-include-node-externs t)
-	;; 	;;(js2-global-externs '("customElements"))
-	;; 	(js2-highlight-level 3)
-	;; 	(js2r-prefer-let-over-var t)
-	;; 	(js2r-prefered-quote-type 2)
-	;; 	(js-indent-align-list-continuation t)
-	;; 	(global-auto-highlight-symbol-mode t)
-	;; 	:config
-	;; 	(setq js-indent-level 2)
-	;; 	;; patch in basic private field support
-	;; 	(advice-add #'js2-identifier-start-p
-	;; 							:after-until
-	;; 							(lambda (c) (eq c ?#))))
-
-	;; (use-package javascript-mode
-	;;   :after tree-sitter
-	;;   :config
-	;;   ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
-	;;   ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
-	;;   (define-derived-mode typescriptreact-mode typescript-mode
-	;;     "JavaScript TSX")
-
-	;;   ;; use our derived mode for tsx files
-	;;   (add-to-list 'auto-mode-alist '("\\.jsx?\\'" . javascript-mode))
-	;;   ;; by default, typescript-mode is mapped to the treesitter typescript parser
-	;;   ;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
-	;;   (add-to-list 'tree-sitter-major-mode-language-alist '(javascript-mode . jsx)))
-
-	(add-hook 'web-mode-hook #'(lambda ()
-															 (enable-minor-mode
-																'("\\.jsx?\\'" . prettier-js-mode))))
-
-	(add-hook 'web-mode-hook 'prettier-js-mode)
-#+end_src
-
 *** Golang
 #+begin_src emacs-lisp
-;; Set up before-save hooks to format buffer and add/delete imports.
-;; Make sure you don't have other gofmt/goimports hooks enabled.
-(defun lsp-go-install-save-hooks ()
-		(add-hook 'before-save-hook #'lsp-format-buffer t t)
-		(add-hook 'before-save-hook #'lsp-organize-imports t t))
+	;; Set up before-save hooks to format buffer and add/delete imports.
+	;; Make sure you don't have other gofmt/goimports hooks enabled.
+	(defun lsp-go-install-save-hooks ()
+		(add-hook 'before-save-hook 'lsp-format-buffer t t)
+		(add-hook 'before-save-hook 'lsp-organize-imports t t))
 
-(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+	(add-hook 'go-mode-hook 'lsp-go-install-save-hooks)
 
-(lsp-register-custom-settings
-		'(("gopls.completeUnimported" t t)
-		("gopls.staticcheck" t t)))
+	;; (lsp-register-custom-settings
+	;; 		'(("gopls.completeUnimported" t t)
+	;; 		("gopls.staticcheck" t t)))
 #+end_src
 
 *** Rust
 [[https://rust-analyzer.github.io/manual.html#installation#Emacs][*Quick start with rust-analyzer*]]
+
+#+begin_src emacs-lisp
+	(use-package rust-mode :ensure t)
+	(use-package rust-playground :ensure t)
+#+end_src
 
 ** Flycheck
 #+begin_src emacs-lisp
@@ -1335,24 +1510,11 @@ Show vertical lines to guide indentation
 		(global-tree-sitter-mode)
 		;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
 		;; by switching on and off
-		(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+		(add-hook 'tree-sitter-after-on-hook 'tree-sitter-hl-mode))
 
 	(use-package tree-sitter-langs
 		:ensure t
 		:after tree-sitter)
-
-	;; https://github.com/orzechowskid/tsi.el/
-	;; great tree-sitter-based indentation for typescript/tsx, css, json
-	;;(use-package tsi
-	;;  :after tree-sitter
-	;;  :quelpa (tsi :fetcher github :repo "orzechowskid/tsi.el")
-	;;  ;; define autoload definitions which when actually invoked will cause package to be loaded
-	;;  :commands (tsi-typescript-mode tsi-json-mode tsi-css-mode)
-	;;  :init
-	;;  (add-hook 'typescript-mode-hook (lambda () (tsi-typescript-mode 1)))
-	;;  (add-hook 'json-mode-hook (lambda () (tsi-json-mode 1)))
-	;;  (add-hook 'css-mode-hook (lambda () (tsi-css-mode 1)))
-	;;  (add-hook 'scss-mode-hook (lambda () (tsi-scss-mode 1))))
 
 	;; auto-format different source code files extremely intelligently
 	;; https://github.com/radian-software/apheleia
@@ -1362,10 +1524,10 @@ Show vertical lines to guide indentation
 		(apheleia-global-mode +1))
 
 
-	;;(add-hook 'prog-mode-hook 'linum-mode)
-	;;(add-hook 'prog-mode-hook 'visual-line-mode)
-	;;(add-hook 'prog-mode-hook 'show-paren-mode)
-	;;(add-hook 'prog-mode-hook 'hs-minor-mode)
+	;; (add-hook 'prog-mode-hook 'linum-mode)
+	(add-hook 'prog-mode-hook 'visual-line-mode)
+	(add-hook 'prog-mode-hook 'show-paren-mode)
+	(add-hook 'prog-mode-hook 'hs-minor-mode)
 #+end_src
 
 * Setting performance
@@ -1393,15 +1555,15 @@ Make gc pauses faster by decreasing the threshold.
 						(lambda ()
 							(setq gc-cons-threshold me/gc-cons-threshold
 										gc-cons-percentage 0.1)))
-(defun me/defer-garbage-collection-h ()
-  (setq gc-cons-threshold most-positive-fixnum))
+	(defun me/defer-garbage-collection-h ()
+		(setq gc-cons-threshold most-positive-fixnum))
 
-(defun me/restore-garbage-collection-h ()
-  (run-at-time
-   1 nil (lambda () (setq gc-cons-threshold me/gc-cons-threshold))))
+	(defun me/restore-garbage-collection-h ()
+		(run-at-time
+		 1 nil (lambda () (setq gc-cons-threshold me/gc-cons-threshold))))
 
-(add-hook 'minibuffer-setup-hook #'me/defer-garbage-collection-h)
-(add-hook 'minibuffer-exit-hook #'me/restore-garbage-collection-h)
+	(add-hook 'minibuffer-setup-hook 'me/defer-garbage-collection-h)
+	(add-hook 'minibuffer-exit-hook 'me/restore-garbage-collection-h)
 #+end_src
 
 ** Disable site-run
@@ -1420,3 +1582,242 @@ Make gc pauses faster by decreasing the threshold.
 	(setq inhibit-compacting-font-caches t)
 #+end_src
 
+
+
+
+dmenu
+#+begin_src emacs-lisp
+	(global-set-key (kbd "s-d") 'dmenu)
+#+end_src
+
+* EXWM
+** Multi-monitor setting
+#+begin_src emacs-lisp
+	(require 'exwm-randr)
+	(setq exwm-randr-workspace-output-plist '(1 "eDP-1"))
+	(add-hook 'exwm-randr-screen-change-hook
+						(lambda ()
+							(start-process-shell-command
+							 "xrandr" nil "xrandr --output eDP-1 --right-of HDMI-1")))
+	(exwm-randr-enable)
+#+end_src
+
+** System tray
+#+begin_src emacs-lisp
+	(require 'exwm-systemtray)
+	(exwm-systemtray-enable)
+#+end_src
+** EXWM complete config
+Code has been copied from https://github.com/ch11ng/exwm/blob/master/exwm-config.el, changing the names so they can not collide with exwm proper. The code has then been modified, mainly with settings from the ambrevar configuration.
+A hook function that executes xmodmap is defined and added to exwm-manage-finish-hook.
+browse-url-generic-program is redefined to use google-chrome, if not overridden by the “BROWSER” environment variable, or it is defined via xdg-mime.
+EXWM buffer names are changed to be much more human readable. For example, the buffer for a google-chrome window, will get its name from the title of the currently selected tab in that window.
+The EXWM keybindings are all defined as one element sequences. This is required, except for some special cases such as “C-c C-q”. To avoid collisions with other emacs keybindings the exwm-input-global-keys use the “Super” modifier key, and the simulation keys use the “Hyper” modifier key.
+
+The key bindings under
+;; ‘S-s-N’: Move window to, and switch to, a certain workspace.
+are keyboard layout specific. The provided configuration is for an ascii keyboard.
+To support a mode-line indicator for EXWM “line-mode”/”char-mode” a hook is set to force a redisplay of the current buffers mode line.
+Support for resizing windows, using the mouse. Position the mouse on the divider line between two windows, the mouse pointer should then change to a double arrow. Press the left mouse button, and move the mouse.
+
+#+begin_src emacs-lisp
+	(require 'ido)
+	(use-package windower
+		:ensure t)
+	(require 'browse-url)
+	(require 'exwm-manage)
+
+	(defun ambrevar/call-process-to-string (program &rest args)
+		"Call PROGRAM with ARGS and return output.
+	See also `process-lines'."
+		;; Or equivalently:
+		;; (with-temp-buffer
+		;;   (apply 'process-file program nil t nil args)
+		;;   (buffer-string))
+		(with-output-to-string
+			(with-current-buffer standard-output
+				(apply 'process-file program nil t nil args))))
+
+	(defun jw/xmodmap ()
+		"Execute xmodmap"
+		(progn
+			;; (remove-hook 'exwm-manage-finish-hook 'jw/xmodmap)
+			(ambrevar/call-process-to-string "/home/jw/set_xmodmap.sh")))
+
+	(setq browse-url-generic-program
+				(or
+				 (executable-find (or (getenv "BROWSER") ""))
+				 (when (executable-find "xdg-mime")
+					 (let ((desktop-browser (ambrevar/call-process-to-string "xdg-mime" "query" "default" "text/html")))
+						 (substring desktop-browser 0 (string-match "\\.desktop" desktop-browser))))
+				 (executable-find browse-url-chrome-program)))
+
+	(defun my-exwm-config-setup ()
+		"My modified configuration for EXWM. Based on exwm-config.el"
+		;; Set the initial workspace number.
+		(unless (get 'exwm-workspace-number 'saved-value)
+			(setq exwm-workspace-number 4))
+		;; Make class name the buffer name
+		(add-hook 'exwm-update-class-hook
+							(lambda ()
+								(exwm-workspace-rename-buffer exwm-class-name)))
+		;; Global keybindings. 0-9 bcDfFgGhHijJkKlLmoOQrRwW !@#$%^&*() tab f2 backspace
+		(unless (get 'exwm-input-global-keys 'saved-value)
+			(setq exwm-input-global-keys
+						`(
+							;; (,(kbd "s-b") . exwm-workspace-switch-to-buffer)
+							(,(kbd "s-b") . helm-mini) ;; list and select buffers
+							(,(kbd "s-c") . helm-resume) ;; Continue in latest helm selection buffer
+							(,(kbd "s-G") . helm-locate) ;; locate file, based in Linux locate command
+							;; (,(kbd "s-g") . mu-helm-file-search) ;; Grep search in files, see https://www.manueluberti.eu/emacs/2020/02/22/ripgrepping-with-helm/
+							;; (,(kbd "s-g") . ambrevar/helm-grep-git-or-ag) ;; Grep search in files, see https://gitlab.com/ambrevar/dotfiles/-/blob/master/.emacs.d/lisp/init-helm.el
+							(,(kbd "s-g") . helm-do-grep-ag) ;; Grep search in files
+							(,(kbd "s-r") . helm-run-external-command) ;; Start an application, such as google-chrome
+							(,(kbd "s-W") . helm-exwm-switch-browser) ;; Switch to some browser windows
+							(,(kbd "s-m") . (lambda () ;; Toggle display of mode-line and minibuffer, in an EXWM window
+																(interactive)
+																(exwm-layout-toggle-mode-line)
+																(exwm-workspace-toggle-minibuffer)))
+							(,(kbd "s-i") . exwm-input-toggle-keyboard) ;; Toggle between "line-mode" and "char-mode" in an EXWM window
+							;; 's-r': Reset (to line-mode).
+							(,(kbd "s-R") . exwm-reset) ;; Try to reset EXWM to a sane mode. Panic key
+							;; Interactively select, and switch to, a workspace. Only works in non EXWM windows.
+							(,(kbd "s-w") . exwm-workspace-switch)
+							;; 's-a': Launch application.
+							;; (,(kbd "s-a") . (lambda (command)
+							;;              (interactive (list (read-shell-command "$ ")))
+							;;              (start-process-shell-command command nil command)))
+							;; 's-N': Switch to a certain workspace.
+							,@(mapcar (lambda (i)
+													`(,(kbd (format "s-%d" i)) .
+														(lambda ()
+															(interactive)
+															(exwm-workspace-switch-create ,i))))
+												(number-sequence 0 9))
+							;; 'S-s-N': Move window to, and switch to, a certain workspace.
+							,@(cl-mapcar (lambda (c n)
+														 `(,(kbd (format "s-%c" c)) .
+															 (lambda ()
+																 (interactive)
+																 (exwm-workspace-move-window ,n)
+																 (exwm-workspace-switch ,n))))
+													 '(?\) ?! ?@ ?# ?$ ?% ?^ ?& ?* ?\()
+													 ;; '(?\= ?! ?\" ?# ?¤ ?% ?& ?/ ?\( ?\))
+													 (number-sequence 0 9))
+
+							;; Bind "s-<f2>" to "slock", a simple X display locker.
+							(,(kbd "s-<f2>") . (lambda ()
+																	 (interactive)
+																	 (start-process "" nil "/usr/bin/slock")))
+							(,(kbd "s-h") . windmove-left)  ;; Move to window to the left of current one. Uses universal arg
+							(,(kbd "s-j") . windmove-down)  ;; Move to window below current one. Uses universal arg
+							(,(kbd "s-k") . windmove-up)    ;; Move to window above current one. Uses universal arg
+							(,(kbd "s-l") . windmove-right) ;; Move to window to the right of current one. Uses universal arg
+							;; (,(kbd "s-f") . find-file)
+							(,(kbd "s-f") . helm-find-files)
+							(,(kbd "s-<tab>") . windower-switch-to-last-buffer) ;; Switch to last open buffer in current window
+							(,(kbd "s-o") . windower-toggle-single) ;; Toggle between multiple windows, and a single window
+							(,(kbd "s-O") . windower-toggle-split)  ;; Toggle between vertical and horizontal split. Only works with exactly two windows.
+							(,(kbd "s-H") . windower-swap-left)  ;; Swap current window with the window to the left
+							(,(kbd "s-J") . windower-swap-below) ;; Swap current window with the window below
+							(,(kbd "s-K") . windower-swap-above) ;; Swap current window with the window above
+							(,(kbd "s-L") . windower-swap-right) ;; Swap current window with the window to the right
+							(,(kbd "s-F") . exwm-floating-toggle-floating) ;; Toggle the current window between floating and non-floating states
+							(,(kbd "s-Q") . exwm-layout-toggle-fullscreen) ;; Toggle fullscreen mode, when in an EXWM window.
+							(,(kbd "s-D") . kill-this-buffer)
+							(,(kbd "s-<backspace>") . kill-this-buffer)
+							)))
+		;; Line-editing shortcuts: abBcdefFknpqsvwx
+		(unless (get 'exwm-input-simulation-keys 'saved-value)
+			(setq exwm-input-simulation-keys
+						`((,(kbd "H-b") . ,(kbd "<left>"))
+							(,(kbd "H-B") . ,(kbd "C-<left>"))
+							(,(kbd "H-f") . ,(kbd "<right>"))
+							(,(kbd "H-F") . ,(kbd "C-<right>"))
+							(,(kbd "H-p") . ,(kbd "<up>"))
+							(,(kbd "H-n") . ,(kbd "<down>"))
+							(,(kbd "H-a") . ,(kbd "<home>"))
+							(,(kbd "H-e") . ,(kbd "<end>"))
+							;; q and w are convenient if Caps Lock key is Hyper key
+							(,(kbd "H-q") . ,(kbd "<prior>"))
+							(,(kbd "H-w") . ,(kbd "<next>"))
+							(,(kbd "H-d") . ,(kbd "<delete>"))
+							(,(kbd "H-k") . ,(kbd "S-<end> <delete>"))
+							;; cut/paste.
+							(,(kbd "H-x") . ,(kbd "C-x"))
+							(,(kbd "H-c") . ,(kbd "C-c"))
+							(,(kbd "H-v") . ,(kbd "C-v"))
+							;; search
+							(,(kbd "H-s") . ,(kbd "C-f"))
+							)))
+		;; Default is save-buffers-kill-terminal, but that may kill daemon before its finished
+		(global-set-key (kbd "C-x C-c") 'save-buffers-kill-emacs)
+		(add-hook 'exwm-update-title-hook 'ambrevar/exwm-rename-buffer-to-title)
+		;; Ensure that EXWM input mode is displayed in mode line
+		(add-hook 'exwm-input--input-mode-change-hook
+							'force-mode-line-update)
+		;; Called once, to configure X11 keyboard layout
+		(add-hook 'exwm-manage-finish-hook
+							'jw/xmodmap t)
+		;; Allow resizing of non-floating windows, with mouse.
+		(setq window-divider-default-bottom-width 2
+					window-divider-default-right-width 2)
+		(window-divider-mode)
+		;; Allow switching to EXWM buffers not belonging to current workspace.
+		;; This behaviour takes some getting used to, I guess thats why its not default
+		(setq exwm-layout-show-all-buffers t)
+		;; Configure Ido
+		(my-exwm-config-ido)
+		;; Other configurations
+		(my-exwm-config-misc))
+
+	;; This is copied from exwm-config.el
+	(defun my-exwm-config--fix/ido-buffer-window-other-frame ()
+		"Fix `ido-buffer-window-other-frame'."
+		(defalias 'exwm-config-ido-buffer-window-other-frame
+			(symbol-function #'ido-buffer-window-other-frame))
+		(defun ido-buffer-window-other-frame (buffer)
+			"This is a version redefined by EXWM.
+
+	You can find the original one at `exwm-config-ido-buffer-window-other-frame'."
+			(with-current-buffer (window-buffer (selected-window))
+				(if (and (derived-mode-p 'exwm-mode)
+								 exwm--floating-frame)
+						;; Switch from a floating frame.
+						(with-current-buffer buffer
+							(if (and (derived-mode-p 'exwm-mode)
+											 exwm--floating-frame
+											 (eq exwm--frame exwm-workspace--current))
+									;; Switch to another floating frame.
+									(frame-root-window exwm--floating-frame)
+								;; Do not switch if the buffer is not on the current workspace.
+								(or (get-buffer-window buffer exwm-workspace--current)
+										(selected-window))))
+					(with-current-buffer buffer
+						(when (derived-mode-p 'exwm-mode)
+							(if (eq exwm--frame exwm-workspace--current)
+									(when exwm--floating-frame
+										;; Switch to a floating frame on the current workspace.
+										(frame-selected-window exwm--floating-frame))
+								;; Do not switch to exwm-mode buffers on other workspace (which
+								;; won't work unless `exwm-layout-show-all-buffers' is set)
+								(unless exwm-layout-show-all-buffers
+									(selected-window)))))))))
+
+	(defun my-exwm-config-ido ()
+		"Configure Ido to work with EXWM."
+		;; (ido-mode 1)
+		(add-hook 'exwm-init-hook #'my-exwm-config--fix/ido-buffer-window-other-frame))
+
+	(defun my-exwm-config-misc ()
+		"Other configurations."
+		;; Make more room
+		(menu-bar-mode -1)
+		(tool-bar-mode -1)
+		(scroll-bar-mode -1))
+
+	;; Rename buffer to window title.
+	(defun ambrevar/exwm-rename-buffer-to-title () (exwm-workspace-rename-buffer exwm-title))
+
+	(my-exwm-config-setup) ;; Does not start X11 or EXWM. Start should be done from commandline.
+#+end_src

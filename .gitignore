@@ -9,6 +9,14 @@ quelpa/
 straight/
 places/*
 places/
+var/
+emojis/
+eln-cache/
+dmenu-items
+
+nov-places
+places
+session*
 
 rust-playground/
 url/
