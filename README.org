@@ -435,6 +435,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(setq telega-server-libs-prefix "/nix/store/8rw7qncihpx075i5cn41rki2pm56wx21-tdlib-1.8.7"))
 #+end_src
 ** PDF Tools
+*** pdf-tools
 #+begin_src emacs-lisp
 	(use-package pdf-tools
 		:defer t
@@ -512,6 +513,11 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	;; 	("N" pdf-history-forward :color red)
 	;; 	("l" image-forward-hscroll :color red)
 	;; 	("h" image-backward-hscroll :color red))
+#+end_src
+*** pdf-view-restore
+#+begin_src emacs-lisp
+	(use-package pdf-view-restore
+		:ensure t)
 #+end_src
 ** Centaur Tabs (disabled)
 #+begin_src example
@@ -1047,13 +1053,8 @@ BUG BUG BUG
 *** Org agenda
 ~C-c a t~ -- for entering in Org agenda
 #+begin_src emacs-lisp
-	;; (setq org-agenda-files (list "~/org/work.org"
-	;; 														 "~/org/school.org" 
-	;; 														 "~/org/home.org"))
-
-	(setq org-agenda-files   (list "~/org/")
-				org-log-done 'time
-				)
+	(setq org-agenda-files   (list "~/Org/")
+				org-log-done 'time)
 #+end_src
 
 *** Colorize block
