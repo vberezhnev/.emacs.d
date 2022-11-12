@@ -64,7 +64,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(set-default-coding-systems 'utf-8)
 	(set-terminal-coding-system 'utf-8)
 	(set-keyboard-coding-system 'utf-8)
-	(setq-default shell-file-name "/nix/store/wb01a20wxlgzwz56yik683n08i18x73l-system-path/bin/fish")
+	(setq-default shell-file-name "/nix/store/bdx6s73gwc22m0psyfmc62kz77hnv33a-system-path/bin/fish")
 
 	(setq ad-redefinition-action            'accept
 				default-buffer-file-coding-system 'utf-8
@@ -96,6 +96,9 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src 
 ** Import local files
 #+begin_src emacs-lisp
+	(use-package go-mode :ensure t)
+	(use-package company :ensure t)
+
 	(load "~/.emacs.d/local-packages/company-go")
 	(require 'company-go)
 
@@ -167,42 +170,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(menu-bar-mode -1)          ; Disable the menu bar
 #+end_src
 
-** Setting keymap
-#+begin_src emacs-lisp
-	;; zoom in/out like we do everywhere else.
-	(global-set-key (kbd "C-=") 'text-scale-increase)
-	(global-set-key (kbd "C--") 'text-scale-decrease)
-	(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-	(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-																					; Mak;; ESC quit prompts
-	(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-	(global-auto-revert-mode t)
-	(global-set-key (kbd "C-x C-b") 'ibuffer)
-	(global-set-key (kbd "M-x") 'helm-M-x)
-
-	(global-set-key (kbd "C-c l") #'org-store-link)
-	(global-set-key (kbd "C-c a") #'org-agenda)
-	(global-set-key (kbd "C-c c") #'org-capture)
-	
-	(global-set-key (kbd "\C-c w") 'evil-window-map)
-#+end_src
-
-#+begin_src emacs-lisp 
-	(xterm-mouse-mode t)
-
-	(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
-	(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
-
-	(dolist (mode '(org-mode-hook ; Disable line numbers for some modes
-									term-mode-hook
-									shell-mode-hook
-									treemacs-mode-hook
-									eshell-mode-hook
-									neotree-mode-hook))
-		(add-hook mode (lambda () (display-line-numbers-mode 0))))
-#+end_src
-
 ** Setting line numbers
 #+begin_src emacs-lisp
 	(global-display-line-numbers-mode t)
@@ -221,7 +188,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
 	(set-face-attribute 'default nil
 											:font "JetBrains Mono"
-											:height 110
+											:height 120
 											:weight 'medium)
 	(set-face-attribute 'variable-pitch nil
 											:font "JetBrains Mono"
@@ -229,7 +196,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 											:weight 'medium)
 	(set-face-attribute 'fixed-pitch nil
 											:font "JetBrains Mono"
-											:height 110
+											:height 120
 											:weight 'medium)
 	;; Makes commented text and keywords italics.
 	;; This is working in emacsclient but not emacs.
@@ -253,7 +220,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	;; (use-package atom-one-dark)
 
 	;; (use-package 'gruvbox-theme
-	;; 	:ensure t)
+	;;   :ensure t)
 
 	;; (use-package 'modus-themes
 	;; 	:ensure t)
@@ -283,7 +250,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		;; Corrects (and improves) org-mode's native fontification.
 		(doom-themes-org-config))
 
-	(load-theme 'gruvbox-dark-soft t)
+						;; (load-theme 'gruvbox-dark-soft t)
 #+end_src
 
 * Setting Packages
@@ -432,7 +399,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(use-package telega
 		:ensure t
 		:config
-		(setq telega-server-libs-prefix "/nix/store/8rw7qncihpx075i5cn41rki2pm56wx21-tdlib-1.8.7"))
+		(setq telega-server-libs-prefix "/nix/store/5g56izbswyf25r22yp70dqrmmv1lr8k5-tdlib-1.8.3.drv"))
 #+end_src
 ** PDF Tools
 *** pdf-tools
@@ -696,6 +663,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 ** Doom modeline
 #+begin_src emacs-lisp
 	(use-package doom-modeline
+		:ensure t
 		:hook (after-init . doom-modeline-mode)
 		:config
 		(setq doom-modeline-buffer-encoding nil
@@ -764,6 +732,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
 	;; Setting dashboard
 	(use-package dashboard
+		:ensure t
 		:hook (dashboard-mode . (lambda ()
 															;; No title
 															(setq-local frame-title-format nil)
@@ -1086,6 +1055,10 @@ BUG BUG BUG
 
 	(add-hook 'org-agenda-finalize-hook #'org-agenda-log-mode-colorize-block)
 #+end_src
+*** Org timer (Pomodoro)
+#+begin_src emacs-lisp
+	(setq org-clock-sound "~/.emacs.d/sound.wav")
+#+end_src
 ** Org modern (disabled)
 #+begin_src example
 	(use-package org-modern
@@ -1176,6 +1149,10 @@ Show vertical lines to guide indentation
 					fzf/position-bottom t
 					fzf/window-height 15))
 #+end_src
+** Emojify
+#+begin_src emacs-lisp
+	(use-package emojify :ensure t)
+#+end_src
 ** Other packages
 #+begin_src emacs-lisp
 	;; (use-package elcord :defer t)
@@ -1184,6 +1161,7 @@ Show vertical lines to guide indentation
 		:ensure t)
 
 	(use-package multi-term
+		:ensure t
 		:bind
 		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
 		("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
@@ -1240,6 +1218,44 @@ Show vertical lines to guide indentation
 	;; (use-package 'fic-mode
 	;; 	:ensure t
 	;; 	:hook 'prog-mode-hook 'fic-mode)
+#+end_src
+
+* Setting keymap
+#+begin_src emacs-lisp
+	;; zoom in/out like we do everywhere else.
+	(global-set-key (kbd "C-=") 'text-scale-increase)
+	(global-set-key (kbd "C--") 'text-scale-decrease)
+	(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+	(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+																					; Mak;; ESC quit prompts
+	(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+	(global-auto-revert-mode t)
+	(global-set-key (kbd "C-x C-b") 'ibuffer)
+	(global-set-key (kbd "M-x") 'helm-M-x)
+
+	(global-set-key (kbd "C-c l") #'org-store-link)
+	(global-set-key (kbd "C-c a") #'org-agenda)
+	(global-set-key (kbd "C-c c") #'org-capture)
+
+	(global-set-key (kbd "C-c t") #'org-timer-set-timer)
+
+	(global-set-key (kbd "\C-c w") 'evil-window-map)
+#+end_src
+
+#+begin_src emacs-lisp 
+	(xterm-mouse-mode t)
+
+	(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
+	(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
+
+	(dolist (mode '(org-mode-hook ; Disable line numbers for some modes
+									term-mode-hook
+									shell-mode-hook
+									treemacs-mode-hook
+									eshell-mode-hook
+									neotree-mode-hook))
+		(add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
 * Setting LSP
@@ -1396,7 +1412,7 @@ Show vertical lines to guide indentation
 	(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 	;; optionally if you want to use debugger
-	(use-package dap-mode)
+	(use-package dap-mode :ensure t)
 	;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
 	;; optional if you want which-key integration
@@ -1484,6 +1500,7 @@ Show vertical lines to guide indentation
 *** TypeScript
 #+begin_src emacs-lisp
 	(use-package typescript-mode
+		:ensure t
 		:after tree-sitter
 		:config
 		;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
@@ -1539,13 +1556,14 @@ Show vertical lines to guide indentation
 #+begin_src emacs-lisp
 	(use-package tree-sitter
 		:ensure t
-		:config
-		;; activate tree-sitter on any buffer containing code for which it has a parser available
-		(global-tree-sitter-mode)
-		;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
-		;; by switching on and off
-		(add-hook 'tree-sitter-after-on-hook 'tree-sitter-hl-mode))
-
+		;; :config
+		;; ;; activate tree-sitter on any buffer containing code for which it has a parser available
+		;; (global-tree-sitter-mode)
+		;; ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
+		;; ;; by switching on and off
+		;; (add-hook 'tree-sitter-after-on-hook 'tree-sitter-hl-mode))
+)
+		
 	(use-package tree-sitter-langs
 		:ensure t
 		:after tree-sitter)
@@ -1616,17 +1634,17 @@ Make gc pauses faster by decreasing the threshold.
 	(setq inhibit-compacting-font-caches t)
 #+end_src
 
-
-
-
-dmenu
+* dmenu
 #+begin_src emacs-lisp
+	(use-package dmenu
+		:ensure t)
+
 	(global-set-key (kbd "s-d") 'dmenu)
 #+end_src
 
 * EXWM
 ** Multi-monitor setting
-#+begin_src emacs-lisp
+#+begin_src example
 	(require 'exwm-randr)
 	(setq exwm-randr-workspace-output-plist '(1 "eDP-1"))
 	(add-hook 'exwm-randr-screen-change-hook
@@ -1637,7 +1655,7 @@ dmenu
 #+end_src
 
 ** System tray
-#+begin_src emacs-lisp
+#+begin_src example
 	(require 'exwm-systemtray)
 	(exwm-systemtray-enable)
 #+end_src
@@ -1654,7 +1672,7 @@ are keyboard layout specific. The provided configuration is for an ascii keyboar
 To support a mode-line indicator for EXWM “line-mode”/”char-mode” a hook is set to force a redisplay of the current buffers mode line.
 Support for resizing windows, using the mouse. Position the mouse on the divider line between two windows, the mouse pointer should then change to a double arrow. Press the left mouse button, and move the mouse.
 
-#+begin_src emacs-lisp
+#+begin_src example
 	(require 'ido)
 	(use-package windower
 		:ensure t)

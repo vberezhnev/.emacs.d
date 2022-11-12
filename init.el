@@ -39,7 +39,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(blamer-face ((t :foreground "#E46876" :height 140 :italic t)))
+ '(blamer-face ((t :foreground "#E46876" :height 140 :italic t)) t)
  '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
  '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0))))
  '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))

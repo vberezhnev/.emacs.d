@@ -38,6 +38,9 @@ savehist.el
 history
 flycheck_init.el
 company-statistics-cache.el
+.org-id*
+org-roam.db
+notes.org
 
 #*
 README.el
