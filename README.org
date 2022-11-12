@@ -22,6 +22,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 │   └── company-go.el
 ├── README.org              <~ All settings with comments
 ├── init.el                 <~ Main init file
+├── example.org             <~ For Org preview testing
+├── sound.wav               <~ Bing sound for Org pomodoro
 #+END_SRC
 
 * Setting base of Emacs
@@ -188,7 +190,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
 	(set-face-attribute 'default nil
 											:font "JetBrains Mono"
-											:height 120
+											:height 110
 											:weight 'medium)
 	(set-face-attribute 'variable-pitch nil
 											:font "JetBrains Mono"
@@ -196,7 +198,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 											:weight 'medium)
 	(set-face-attribute 'fixed-pitch nil
 											:font "JetBrains Mono"
-											:height 120
+											:height 110
 											:weight 'medium)
 	;; Makes commented text and keywords italics.
 	;; This is working in emacsclient but not emacs.
@@ -250,7 +252,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		;; Corrects (and improves) org-mode's native fontification.
 		(doom-themes-org-config))
 
-						;; (load-theme 'gruvbox-dark-soft t)
+	(load-theme 'doom-gruvbox t)
 #+end_src
 
 * Setting Packages
@@ -985,8 +987,10 @@ BUG BUG BUG
 		;;               ("elisp" . "src example")
 		;;               ("swift" . "src swift"))
 		(add-to-list 'org-modules 'org-tempo t))
+#+end_src
 
-
+*** Org bullets
+#+begin_src emacs-lisp
 	(use-package org-superstar
 		:ensure t
 		:config
@@ -994,11 +998,11 @@ BUG BUG BUG
 	(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
 	;; (use-package org-bullets
+	;; 	:ensure t
 	;; 	:hook (org-mode . org-bullets-mode)
 	;; 	:custom
 	;; 	(org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 #+end_src
-
 *** Change TODO's states
 #+begin_src emacs-lisp
 	(with-eval-after-load 'org
@@ -1012,12 +1016,12 @@ BUG BUG BUG
 #+begin_src emacs-lisp
 	(with-eval-after-load 'org
 		(setq org-todo-keyword-faces
-					'(("todo" . "SlateGray")
-						("doing" . "DarkOrchid")
-						("blocked" . "Firebrick")
-						("review" . "Teal")
-						("done" . "ForestGreen")
-						("archived" .  "SlateBlue"))))
+					'(("TODO" . "SlateGray")
+						("DOING" . "DarkOrchid")
+						("BLOCKED" . "Firebrick")
+						("REVIEW" . "Teal")
+						("DONE" . "ForestGreen")
+						("ARCHIVED" .  "SlateBlue"))))
 #+end_src
 *** Org agenda
 ~C-c a t~ -- for entering in Org agenda
@@ -1166,9 +1170,9 @@ Show vertical lines to guide indentation
 		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
 		("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
 
-	;; (use-package general
-	;; 	:config
-	;; 	(general-evil-setup t))
+	(use-package general
+		:config
+		(general-evil-setup t))
 
 	(use-package format-all
 		:ensure t
@@ -1189,6 +1193,7 @@ Show vertical lines to guide indentation
 
 	;; Needed for `:after char-fold' to work
 	(use-package char-fold
+		:ensure t
 		:custom
 		(char-fold-symmetric t)
 		(search-default-mode 'char-fold-to-regexp))
@@ -1347,6 +1352,7 @@ Show vertical lines to guide indentation
 		(push '(company-semantic :with company-yasnippet) company-backends))
 
 	(use-package company-box
+		:ensure t
 		:after (company all-the-icons)
 		:hook (company-mode . company-box-mode)
 		:functions (all-the-icons-faicon
@@ -1541,6 +1547,7 @@ Show vertical lines to guide indentation
 ** Flycheck
 #+begin_src emacs-lisp
 	(use-package flycheck
+		:ensure t
 		:hook (prog-mode . flycheck-mode)
 		:diminish
 		:custom
@@ -1550,6 +1557,7 @@ Show vertical lines to guide indentation
 		(flycheck-idle-change-delay 2))
 
 	(use-package flycheck-inline
+		:ensure t
 		:hook (flycheck-mode . turn-on-flycheck-inline))
 #+end_src
 ** Tree Sitter
