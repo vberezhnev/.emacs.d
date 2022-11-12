@@ -187,34 +187,34 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 * Setting font face
 ** Setting fonts
-#+begin_src emacs-lisp
-	(set-face-attribute 'default nil
-											:font "JetBrains Mono"
-											:height 110
-											:weight 'medium)
-	(set-face-attribute 'variable-pitch nil
-											:font "JetBrains Mono"
-											:height 120
-											:weight 'medium)
-	(set-face-attribute 'fixed-pitch nil
-											:font "JetBrains Mono"
-											:height 110
-											:weight 'medium)
-	;; Makes commented text and keywords italics.
-	;; This is working in emacsclient but not emacs.
-	;; Your font must have an italic face available.
-	(set-face-attribute 'font-lock-comment-face nil
-											:slant 'italic)
-	(set-face-attribute 'font-lock-keyword-face nil
-											:slant 'italic)
+#+begin_src example
+  (set-face-attribute 'default nil
+		      :font "M PLUS 1"
+		      :height 110
+		      :weight 'bold)
+  (set-face-attribute 'variable-pitch nil
+		      :font "M PLUS 1"
+		      :height 120
+		      :weight 'bold)
+  (set-face-attribute 'fixed-pitch nil
+		      :font "M PLUS 1"
+		      :height 110
+		      :weight 'bold)
+  ;; Makes commented text and keywords italics.
+  ;; This is working in emacsclient but not emacs.
+  ;; Your font must have an italic face available.
+  (set-face-attribute 'font-lock-comment-face nil
+		      :slant 'italic)
+  (set-face-attribute 'font-lock-keyword-face nil
+		      :slant 'italic)
 
-	;; Uncomment the following line if line spacing needs adjusting.
-	(setq-default line-spacing 0.12)
+  ;; Uncomment the following line if line spacing needs adjusting.
+  (setq-default line-spacing 0.12)
 
-	;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-	;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
-	;; changes certain keywords to symbols, such as lamda!
-	(setq global-prettify-symbols-mode t)
+  ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
+  ;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
+  ;; changes certain keywords to symbols, such as lamda!
+  (setq global-prettify-symbols-mode t)
 #+end_src
 
 ** Setting and installing themes
@@ -222,7 +222,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	;; (use-package atom-one-dark)
 
 	;; (use-package 'gruvbox-theme
-	;;   :ensure t)
+	;; 	:ensure t)
 
 	;; (use-package 'modus-themes
 	;; 	:ensure t)
@@ -240,19 +240,19 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		:ensure t
 		:config
 		;; Global settings (defaults)
-		;; (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-		;;       doom-themes-enable-italic t) ; if nil, italics is universally disabled
+		(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+					doom-themes-enable-italic t) ; if nil, italics is universally disabled
 		;; Enable flashing mode-line on errors
-		;; (doom-themes-visual-bell-config)
+		(doom-themes-visual-bell-config)
 		;; Enable custom neotree theme (all-the-icons must be installed!)
-		;;(doom-themes-neotree-config)
+		;; (doom-themes-neotree-config)
 		;; or for treemacs users
-		;;(setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
+		(setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
 		(doom-themes-treemacs-config)
 		;; Corrects (and improves) org-mode's native fontification.
 		(doom-themes-org-config))
 
-	(load-theme 'doom-gruvbox t)
+	(load-theme 'gruvbox-dark-soft t)
 #+end_src
 
 * Setting Packages
