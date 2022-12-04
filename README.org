@@ -187,53 +187,47 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 * Setting font face
 ** Setting fonts
-#+begin_src example
-  (set-face-attribute 'default nil
-		      :font "M PLUS 1"
-		      :height 110
-		      :weight 'bold)
-  (set-face-attribute 'variable-pitch nil
-		      :font "M PLUS 1"
-		      :height 120
-		      :weight 'bold)
-  (set-face-attribute 'fixed-pitch nil
-		      :font "M PLUS 1"
-		      :height 110
-		      :weight 'bold)
-  ;; Makes commented text and keywords italics.
-  ;; This is working in emacsclient but not emacs.
-  ;; Your font must have an italic face available.
-  (set-face-attribute 'font-lock-comment-face nil
-		      :slant 'italic)
-  (set-face-attribute 'font-lock-keyword-face nil
-		      :slant 'italic)
+#+begin_src emacs-lisp
+	(set-face-attribute 'default nil
+											:font "Iosevka"
+											:height 110
+											:weight 'medium)
+	(set-face-attribute 'variable-pitch nil
+											:font "Iosevka"
+											:height 120
+											:weight 'medium)
+	(set-face-attribute 'fixed-pitch nil
+											:font "Iosevka"
+											:height 110
+											:weight 'medium)
+	;; Makes commented text and keywords italics.
+	;; This is working in emacsclient but not emacs.
+	;; Your font must have an italic face available.
+	(set-face-attribute 'font-lock-comment-face nil
+											:slant 'italic)
+	(set-face-attribute 'font-lock-keyword-face nil
+											:slant 'italic)
 
-  ;; Uncomment the following line if line spacing needs adjusting.
-  (setq-default line-spacing 0.12)
+	(add-to-list 'default-frame-alist '(font . "Iosevka"))
 
-  ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-  ;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
-  ;; changes certain keywords to symbols, such as lamda!
-  (setq global-prettify-symbols-mode t)
+	;; Uncomment the following line if line spacing needs adjusting.
+	(setq-default line-spacing 0.12)
+
+	;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
+	;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
+	;; changes certain keywords to symbols, such as lamda!
+	(setq global-prettify-symbols-mode t)
 #+end_src
 
 ** Setting and installing themes
+
 #+begin_src emacs-lisp
-	;; (use-package atom-one-dark)
+	(use-package atom-one-dark :ensure t)
 
 	;; (use-package 'gruvbox-theme
 	;; 	:ensure t)
 
 	;; (use-package 'modus-themes
-	;; 	:ensure t)
-
-	;; (use-package melancholy-theme
-	;; 	:ensure t)
-
-	;; (use-package solo-jazz-theme
-	;; 	:ensure t)
-
-	;; (use-package ef-themes
 	;; 	:ensure t)
 
 	(use-package doom-themes
@@ -252,8 +246,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		;; Corrects (and improves) org-mode's native fontification.
 		(doom-themes-org-config))
 
-	(load-theme 'gruvbox-dark-soft t)
-#+end_src
+	(load-theme 'gruvbox-light-soft t)
+	#+end_src
 
 * Setting Packages
 ** Evil
@@ -397,11 +391,11 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(setq-default elfeed-search-title-min-width 100)
 #+end_src
 ** Telega.el
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package telega
-		:ensure t
 		:config
-		(setq telega-server-libs-prefix "/nix/store/5g56izbswyf25r22yp70dqrmmv1lr8k5-tdlib-1.8.3.drv"))
+		(setq telega-server-libs-prefix "/nix/store/6xlbl23w1fzr3dv0fqdcjzavja7isy7k-tdlib-1.8.7/")
+		:ensure t) ;; cwbra4x825d0cifjbgl89ggvbb2ymz4v-tdlib-1.8.7.drv /nix/store/6xlbl23w1fzr3dv0fqdcjzavja7isy7k-tdlib-1.8.7
 #+end_src
 ** PDF Tools
 *** pdf-tools
@@ -667,7 +661,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(use-package doom-modeline
 		:ensure t
 		:hook (after-init . doom-modeline-mode)
-		:config
+		:custom
 		(setq doom-modeline-buffer-encoding nil
 					doom-modeline-buffer-file-name-style 'file-name
 					doom-modeline-checker-simple-format t
@@ -710,26 +704,35 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(provide 'modeline)
 #+end_src
 
-** Calendar sync (disabled)
-#+begin_src example
-(setup (:pkg org-caldav)
-  (:delay)
-  (setq org-caldav-url "https://caldav.fastmail.com/dav/calendars/user/daviwil@fastmail.fm/"
-        ;; org-caldav-files '("~/Notes/Calendar/Personal.org" "~/Notes/Calendar/Work.org")
-        ;; org-caldav-inbox '("~/Notes/Calendar/Personal.org" "~/Notes/Calendar/Work.org")
-        org-caldav-calendar-id "fe098bfb-0726-4e10-bff2-55f8278c8a56"
-        org-caldav-files '("~/Notes/Calendar/Personal.org")
-        org-caldav-inbox "~/Notes/Calendar/PersonalInbox.org"
-        org-caldav-calendars
-         '((:calendar-id "fe098bfb-0726-4e10-bff2-55f8278c8a56"
-            :files ("~/Notes/Calendar/Personal.org")
-            :inbox "~/Notes/Calendar/PersonalInbox.org"))
-           ;; (:calendar-id "8f150437-cc57-4ba0-9200-d1d98389e2e4"
-           ;;  :files ("~/Notes/Calendar/Work.org")
-           ;;  :inbox "~/Notes/Calendar/Work.org"))
-        org-caldav-delete-org-entries 'always
-        org-caldav-delete-calendar-entries 'never))
-#+end_src
+** Calendar sync
+#+begin_src emacs-lisp
+	;; (use-package org-caldav
+	;; 	:custom
+	;; 	(org-caldav-url "https://egoistcloud.ddns.net/remote.php/dav/calendars/ncp")
+	;; 	(org-caldav-calendar-id "caldav")
+	;; 	(org-caldav-inbox "~/Org/agenda.org")
+	;; 	(org-caldav-files '("~/Org/agenda.org"))
+	;; 	(org-icalendar-timezone "Asia/Vladivostok")
+	;; 	;; (org-caldav-delete-org-entries 'always)
+	;; 	;; (org-caldav-delete-calendar-entries 'never)
+	;; 	)
+
+	(use-package org-caldav :ensure t
+		:custom (setq org-caldav-url "https://egoistcloud.ddns.net/remote.php/dav/calendars/ncp"
+									org-caldav-calendar-id "caldav"
+									org-caldav-files '("~/Org/Calendar/Personal.org")
+									org-caldav-inbox "~/Org/Calendar/PersonalInbox.org"
+									org-caldav-calendars
+									'((:calendar-id "caldav"
+																	:files ("~/Org/Calendar/Personal.org")
+																	:inbox "~/Org/Calendar/PersonalInbox.org"))
+									org-caldav-delete-org-entries 'always
+									org-caldav-delete-calendar-entries 'never))
+							 #+end_src
+
+#+RESULTS:
+: t
+
 ** Dashboard
 #+begin_src emacs-lisp
 	;; Setting dashboard
@@ -750,8 +753,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 					;; dashboard-page-separator ""
 					dashboard-set-navigator t
 					dashboard-items '(
-														(recents . 5)
-														(agenda . 5 )
+														(recents . 4)
+														(agenda . 4 )
 														;;(registers . 3)
 														(bookmarks . 4)
 														(projects . 4))) ;; use standard emacs logo as banner
@@ -946,6 +949,10 @@ BUG BUG BUG
  (add-hook 'dired-after-readin-hook 'sof/dired-sort)
 #+end_src
 
+*** Auto hide details
+#+begin_src emacs-lisp
+	(setq dired-hide-details 1)
+#+end_src
 ** Org
 *** Setting Org
 #+begin_src emacs-lisp
@@ -1063,8 +1070,26 @@ BUG BUG BUG
 #+begin_src emacs-lisp
 	(setq org-clock-sound "~/.emacs.d/sound.wav")
 #+end_src
-** Org modern (disabled)
-#+begin_src example
+*** Org notifications
+#+begin_src emacs-lisp
+	(use-package org-alert
+		:ensure t)
+#+end_src
+*** Insert images from url
+#+BEGIN_SRC emacs-lisp
+(org-add-link-type
+ "image-url"
+ (lambda (path)
+   (let ((img (expand-file-name
+           (concat (md5 path) "." (file-name-extension path))
+           temporary-file-directory)))
+     (if (file-exists-p img)
+     (find-file img)
+       (url-copy-file path img)
+       (find-file img)))))
+#+END_SRC
+** Org modern
+#+begin_src emacs-lisp
 	(use-package org-modern
 		:ensure t
 		:config
@@ -1085,7 +1110,7 @@ BUG BUG BUG
 					magit-todos-depth 4
 					magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/"))
 		(custom-set-variables
-		 '(magit-todos-keywords (list "TODO" "FIXME" "HACK"))))
+		 '(magit-todos-keywords (list "TODO" "FIXME" "BUGFIX" "HACK"))))
 
 	(use-package blamer
 		:commands (blamer-mode)
@@ -1102,7 +1127,7 @@ BUG BUG BUG
 		(blamer-face ((t :foreground "#E46876"
 										 :height 140
 										 :italic t))))
-	
+
 	(use-package git-gutter
 		:ensure t
 		:hook (prog-mode . git-gutter-mode)
@@ -1157,6 +1182,10 @@ Show vertical lines to guide indentation
 #+begin_src emacs-lisp
 	(use-package emojify :ensure t)
 #+end_src
+** Which key
+#+begin_src emacs-lisp
+(use-package which-key :ensure t)
+#+end_src
 ** Other packages
 #+begin_src emacs-lisp
 	;; (use-package elcord :defer t)
@@ -1171,8 +1200,8 @@ Show vertical lines to guide indentation
 		("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
 
 	(use-package general
-		:config
-		(general-evil-setup t))
+		:ensure t)
+	(general-evil-setup t)
 
 	(use-package format-all
 		:ensure t
@@ -1243,7 +1272,9 @@ Show vertical lines to guide indentation
 	(global-set-key (kbd "C-c a") #'org-agenda)
 	(global-set-key (kbd "C-c c") #'org-capture)
 
-	(global-set-key (kbd "C-c t") #'org-timer-set-timer)
+	(global-set-key (kbd "C-c t s") #'org-timer-set-timer)
+	(global-set-key (kbd "C-c t SPC") #'org-timer-pause-or-continue)
+	(global-set-key (kbd "C-c t <deletechar>") #'org-timer-stop)
 
 	(global-set-key (kbd "\C-c w") 'evil-window-map)
 #+end_src
@@ -1347,48 +1378,51 @@ Show vertical lines to guide indentation
 					company-show-quick-access           'left
 					company-async-wait                  0.1
 					company-async-timeout               1
-					company-idle-delay                  0.1
-					company-frontends '(company-box-frontend))
+					;; company-frontends '(company-box-frontend)
+					company-idle-delay                  0.1)
 		(push '(company-semantic :with company-yasnippet) company-backends))
 
-	(use-package company-box
-		:ensure t
-		:after (company all-the-icons)
-		:hook (company-mode . company-box-mode)
-		:functions (all-the-icons-faicon
-								all-the-icons-material
-								all-the-icons-octicon
-								all-the-icons-alltheicon)
-		:config
-		(setq company-box-frame-behavior 'point
-					company-box-icons-alist 'company-box-icons-images
-					company-box-backends-colors t
-					company-box-icon-right-margin 0.5
-					company-box-backends-colors '((company-yasnippet
-																				 :all (:foreground "RosyBrown1" :background nil :italic t)
-																				 :selected (:foreground "black" :background "RosyBrown4")))
-					company-box-doc-delay 1))
+	;; (use-package company-box
+	;; 	:ensure t
+	;; 	:after (company all-the-icons)
+	;; 	:hook (company-mode . company-box-mode)
+	;; 	:functions (all-the-icons-faicon
+	;; 							all-the-icons-material
+	;; 							all-the-icons-octicon
+	;; 							all-the-icons-alltheicon)
+	;; 	:config
+	;; 	(setq company-box-frame-behavior 'point
+	;; 				company-box-icons-alist 'company-box-icons-images
+	;; 				company-box-backends-colors t
+	;; 				company-box-icon-right-margin 0.5
+	;; 				company-box-backends-colors '((company-yasnippet
+	;; 																			 :all (:foreground "RosyBrown1" :background nil :italic t)
+	;; 																			 :selected (:foreground "black" :background "RosyBrown4")))
+	;; 				company-box-doc-delay 1))
 
 	;; (defun setup-swift-mode-company ()
 	;; 	"Setup company with separate bakends merged into one."
 	;; 	(setq-local company-backends
 	;; 							'((company-capf :with company-dabbrev-code company-yasnippet ))))
 
-	;; (use-package company-quickhelp
-	;; 	:hook (company-mode . company-quickhelp-mode))
+	(use-package company-quickhelp
+		:ensure t
+		:hook (company-mode . company-quickhelp-mode))
 
-	;; (use-package company-statistics
-	;; 	:hook (company-mode . company-statistics-mode))
+	(use-package company-statistics
+		:ensure t
+		:hook (company-mode . company-statistics-mode))
 
 
-	;; (use-package company-anaconda
-	;; 	:defer
-	;; 	:after company
-	;; 	:config (add-to-list 'company-backends 'company-anaconda))
+	(use-package company-anaconda
+		:ensure t
+		:defer
+		:after company
+		:config (add-to-list 'company-backends 'company-anaconda))
 
 	;; Company mode Show
-	;; (setq company-idle-delay 0)
-	;; (setq company-minimum-prefix-length 1)
+	(setq company-idle-delay 0)
+	(setq company-minimum-prefix-length 1)
 #+end_src
 
 ** Setting LSP-Mode
@@ -1427,21 +1461,28 @@ Show vertical lines to guide indentation
 	;;		(which-key-mode))
 #+end_src
 
+*** LSP UI
+#+begin_src emacs-lisp
+	(use-package lsp-ui :ensure t)
+#+end_src
+
 *** JavaScript
 #+begin_src emacs-lisp
-	;; (use-package web-mode  :ensure t
-	;; 	:mode (("\\.js\\'" . web-mode)
-	;; 				 ("\\.jsx\\'" . web-mode)
-	;; 				 ("\\.ts\\'" . web-mode)
-	;; 				 ;;("\\.tsx\\'" . web-mode)
-	;; 				 ("\\.html\\'" . web-mode)
-	;; 				 ("\\.vue\\'" . web-mode)
-	;; 				 ("\\.json\\'" . web-mode))
-	;; 	:commands web-mode
-	;; 	;; :config
-	;; 	;; (setq web-mode-content-types-alist
-	;; 	;; 			'(("jsx" . "\\.js[x]?\\'")))
-	;; 	)
+	(use-package web-mode  :ensure t
+		:mode (("\\.js\\'" . web-mode)
+					 ("\\.jsx\\'" . web-mode)
+					 ("\\.ts\\'" . web-mode)
+					 ("\\.tsx\\'" . typescript-mode)
+					 ("\\.html\\'" . web-mode)
+					 ("\\.vue\\'" . web-mode)
+					 ("\\.json\\'" . web-mode))
+		:commands web-mode
+		:config
+		(setq web-mode-content-types-alist
+					'(("jsx" . "\\.js[x]?\\'")))
+		)
+
+	(use-package import-js :ensure t)
 
 	;; JSX syntax highlighting
 	(add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
@@ -1465,7 +1506,6 @@ Show vertical lines to guide indentation
 								:after-until
 								(lambda (c) (eq c ?#))))
 
-	(use-package import-js :ensure t)
 
 	(add-hook 'web-mode-hook #'(lambda ()
 															 (enable-minor-mode
@@ -1474,6 +1514,71 @@ Show vertical lines to guide indentation
 	(add-hook 'web-mode-hook 'prettier-js-mode)
 #+end_src
 
+*** TypeScript
+#+begin_src emacs-lisp
+	(use-package typescript-mode
+		:ensure t
+		:after tree-sitter
+		:config
+		;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
+		;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
+		(define-derived-mode typescriptreact-mode typescript-mode
+			"TypeScript TSX")
+
+		;; use our derived mode for tsx files
+		(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
+		;; by default, typescript-mode is mapped to the treesitter typescript parser
+		;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
+		(add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
+#+end_src
+
+*** TypeScript Tide
+#+begin_src emacs-lisp
+	(use-package tide
+		:ensure t
+		:after (typescript-mode company flycheck)
+		:hook ((typescript-mode . tide-setup)
+					 (typescript-mode . tide-hl-identifier-mode)
+					 (before-save . tide-format-before-save)))
+	(defun setup-tide-mode ()
+		(interactive)
+		(tide-setup)
+		(flycheck-mode +1)
+		(setq flycheck-check-syntax-automatically '(save mode-enabled))
+		(eldoc-mode +1)
+		(tide-hl-identifier-mode +1)
+		;; company is an optional dependency. You have to
+		;; install it separately via package-install
+		;; `M-x package-install [ret] company`
+		(company-mode +1))
+
+	;; aligns annotation to the right hand side
+	(setq company-tooltip-align-annotations t)
+
+	;; formats the buffer before saving
+	(add-hook 'before-save-hook 'tide-format-before-save)
+
+	(add-hook 'typescript-mode-hook #'setup-tide-mode)
+
+
+	(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+	(add-hook 'web-mode-hook
+						(lambda ()
+							(when (string-equal "tsx" (file-name-extension buffer-file-name))
+								(setup-tide-mode))))
+	;; enable typescript-tslint checker
+	(flycheck-add-mode 'typescript-tslint 'web-mode)
+
+	(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+	(add-hook 'web-mode-hook
+						(lambda ()
+							(when (string-equal "jsx" (file-name-extension buffer-file-name))
+								(setup-tide-mode))))
+	;; configure jsx-tide checker to run after your default jsx checker
+	(flycheck-add-mode 'javascript-eslint 'web-mode)
+	;; (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
+
+#+end_src
 *** JSON
 #+begin_src emacs-lisp
 	(use-package json-mode :ensure t :defer 20
@@ -1501,24 +1606,6 @@ Show vertical lines to guide indentation
 (defun vue-mode/init-vue-mode ()
 		"Initialize my package"
 		(use-package vue-mode))
-#+end_src
-
-*** TypeScript
-#+begin_src emacs-lisp
-	(use-package typescript-mode
-		:ensure t
-		:after tree-sitter
-		:config
-		;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
-		;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
-		(define-derived-mode typescriptreact-mode typescript-mode
-			"TypeScript TSX")
-
-		;; use our derived mode for tsx files
-		(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
-		;; by default, typescript-mode is mapped to the treesitter typescript parser
-		;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
-		(add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
 #+end_src
 
 *** Golang
@@ -1570,8 +1657,8 @@ Show vertical lines to guide indentation
 		;; ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
 		;; ;; by switching on and off
 		;; (add-hook 'tree-sitter-after-on-hook 'tree-sitter-hl-mode))
-)
-		
+		)
+
 	(use-package tree-sitter-langs
 		:ensure t
 		:after tree-sitter)
