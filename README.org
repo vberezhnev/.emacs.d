@@ -66,7 +66,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(set-default-coding-systems 'utf-8)
 	(set-terminal-coding-system 'utf-8)
 	(set-keyboard-coding-system 'utf-8)
-	(setq-default shell-file-name "/nix/store/bdx6s73gwc22m0psyfmc62kz77hnv33a-system-path/bin/fish")
+	(setq-default shell-file-name "/usr/bin/fish")
 
 	(setq ad-redefinition-action            'accept
 				default-buffer-file-coding-system 'utf-8
@@ -90,12 +90,33 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 				word-wrap                         nil
 				visible-bell                      nil
 				bidi-display-reordering           nil
+				large-file-warning-threshold nil      ;; Disable "File is large. Really open?"
 				x-stretch-cursor                  t   ;; stretch cursor on tabs
 				scroll-margin                     4   ;; scroll N to screen edge
 				undo-limit                        6710886400 ;; 64mb
 				undo-strong-limit                 100663296 ;; x 1.5 (96mb)
 				undo-outer-limit                  1006632960) ;; x 10 (960mb), (Emacs uses x100), but this seems too high.
-#+end_src 
+#+end_src
+** Emacs blur (toggle)
+#+begin_src example
+	;; (defun toggle-transparency ()
+	;; 	(interactive)
+	;; 	(let ((alpha (frame-parameter nil 'alpha)))
+	;; 		(set-frame-parameter
+	;; 		 nil 'alpha
+	;; 		 (if (eql (cond ((numberp alpha) alpha)
+	;; 										((numberp (cdr alpha)) (cdr alpha))
+	;; 										;; Also handle undocumented (<active> <inactive>) form.
+	;; 										((numberp (cadr alpha)) (cadr alpha)))
+	;; 							100)
+	;; 				 '(85 . 50) '(100 . 100)))))
+	;; (global-set-key (kbd "C-c t") 'toggle-transparency)
+
+	 ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
+ ;;(set-frame-parameter (selected-frame) 'alpha <both>)
+ (set-frame-parameter (selected-frame) 'alpha '(85 . 50))
+ (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+#+end_src
 ** Import local files
 #+begin_src emacs-lisp
 	(use-package go-mode :ensure t)
@@ -132,6 +153,11 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(use-package xclip
 		:ensure t)
 	(xclip-mode 1)
+#+end_src
+** Share clipoard with OS
+#+begin_src emacs-lisp
+(use-package pbcopy
+  :ensure t)
 #+end_src
 ** Disable backup and auto save
 #+begin_src emacs-lisp
@@ -220,10 +246,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 ** Setting and installing themes
-
 #+begin_src emacs-lisp
-	(use-package atom-one-dark :ensure t)
-
 	;; (use-package 'gruvbox-theme
 	;; 	:ensure t)
 
@@ -238,15 +261,13 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 					doom-themes-enable-italic t) ; if nil, italics is universally disabled
 		;; Enable flashing mode-line on errors
 		(doom-themes-visual-bell-config)
-		;; Enable custom neotree theme (all-the-icons must be installed!)
-		;; (doom-themes-neotree-config)
 		;; or for treemacs users
 		(setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
 		(doom-themes-treemacs-config)
 		;; Corrects (and improves) org-mode's native fontification.
 		(doom-themes-org-config))
 
-	(load-theme 'gruvbox-light-soft t)
+	(load-theme 'gruvbox-dark-soft t)
 	#+end_src
 
 * Setting Packages
@@ -344,6 +365,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
 	(evil-set-initial-state 'ibuffer-mode 'normal)
 	(evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+	(evil-set-initial-state 'vterm-mode 'normal)
 	;; (evil-set-initial-state 'dired-mode 'emacs)
 	(evil-set-initial-state 'sunrise-mode 'emacs)
 #+end_src
@@ -391,11 +413,11 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(setq-default elfeed-search-title-min-width 100)
 #+end_src
 ** Telega.el
-#+begin_src example
+#+begin_src emacs-lisp
 	(use-package telega
-		:config
-		(setq telega-server-libs-prefix "/nix/store/6xlbl23w1fzr3dv0fqdcjzavja7isy7k-tdlib-1.8.7/")
-		:ensure t) ;; cwbra4x825d0cifjbgl89ggvbb2ymz4v-tdlib-1.8.7.drv /nix/store/6xlbl23w1fzr3dv0fqdcjzavja7isy7k-tdlib-1.8.7
+		:ensure t
+		:config 
+		(setq telega-use-docker t))
 #+end_src
 ** PDF Tools
 *** pdf-tools
@@ -428,134 +450,59 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 								("b"  . pdf-view-set-slice-from-bounding-box)
 								("r"  . pdf-view-reset-slice)))
 
-	;; (defhydra hydra-pdftools (:color blue :hint nil)
-	;; 	"
-	;; 																																		 ╭───────────┐
-	;; 			Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-	;; 	╭──────────────────────────────────────────────────────────────────┴───────────╯
-	;; 				^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-	;; 				^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-	;; 				^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-	;; 				^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-	;; 	 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-	;; 				^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-	;; 				^^_n_^^      ^ ^  _r_eset slice box
-	;; 				^^^↓^^^
-	;; 				^^_G_^^
-	;; 	--------------------------------------------------------------------------------
-	;; 			 "
-	;; 	("\\" hydra-master/body "back")
-	;; 	("<ESC>" nil "quit")
-	;; 	("al" pdf-annot-list-annotations)
-	;; 	("ad" pdf-annot-delete)
-	;; 	("aa" pdf-annot-attachment-dired)
-	;; 	("am" pdf-annot-add-markup-annotation)
-	;; 	("at" pdf-annot-add-text-annotation)
-	;; 	("y"  pdf-view-kill-ring-save)
-	;; 	("+" pdf-view-enlarge :color red)
-	;; 	("-" pdf-view-shrink :color red)
-	;; 	("0" pdf-view-scale-reset)
-	;; 	("H" pdf-view-fit-height-to-window)
-	;; 	("W" pdf-view-fit-width-to-window)
-	;; 	("P" pdf-view-fit-page-to-window)
-	;; 	("n" pdf-view-next-page-command :color red)
-	;; 	("p" pdf-view-previous-page-command :color red)
-	;; 	("d" pdf-view-dark-minor-mode)
-	;; 	("b" pdf-view-set-slice-from-bounding-box)
-	;; 	("r" pdf-view-reset-slice)
-	;; 	("g" pdf-view-first-page)
-	;; 	("G" pdf-view-last-page)
-	;; 	("e" pdf-view-goto-page)
-	;; 	("o" pdf-outline)
-	;; 	("s" pdf-occur)
-	;; 	("i" pdf-misc-display-metadata)
-	;; 	("u" pdf-view-revert-buffer)
-	;; 	("F" pdf-links-action-perfom)
-	;; 	("f" pdf-links-isearch-link)
-	;; 	("B" pdf-history-backward :color red)
-	;; 	("N" pdf-history-forward :color red)
-	;; 	("l" image-forward-hscroll :color red)
-	;; 	("h" image-backward-hscroll :color red))
+	(defhydra hydra-pdftools (:color blue :hint nil)
+		"
+																																			 ╭───────────┐
+				Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+		╭──────────────────────────────────────────────────────────────────┴───────────╯
+					^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+					^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+					^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+					^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+		 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+					^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+					^^_n_^^      ^ ^  _r_eset slice box
+					^^^↓^^^
+					^^_G_^^
+		--------------------------------------------------------------------------------
+				 "
+		("\\" hydra-master/body "back")
+		("<ESC>" nil "quit")
+		("al" pdf-annot-list-annotations)
+		("ad" pdf-annot-delete)
+		("aa" pdf-annot-attachment-dired)
+		("am" pdf-annot-add-markup-annotation)
+		("at" pdf-annot-add-text-annotation)
+		("y"  pdf-view-kill-ring-save)
+		("+" pdf-view-enlarge :color red)
+		("-" pdf-view-shrink :color red)
+		("0" pdf-view-scale-reset)
+		("H" pdf-view-fit-height-to-window)
+		("W" pdf-view-fit-width-to-window)
+		("P" pdf-view-fit-page-to-window)
+		("n" pdf-view-next-page-command :color red)
+		("p" pdf-view-previous-page-command :color red)
+		("d" pdf-view-dark-minor-mode)
+		("b" pdf-view-set-slice-from-bounding-box)
+		("r" pdf-view-reset-slice)
+		("g" pdf-view-first-page)
+		("G" pdf-view-last-page)
+		("e" pdf-view-goto-page)
+		("o" pdf-outline)
+		("s" pdf-occur)
+		("i" pdf-misc-display-metadata)
+		("u" pdf-view-revert-buffer)
+		("F" pdf-links-action-perfom)
+		("f" pdf-links-isearch-link)
+		("B" pdf-history-backward :color red)
+		("N" pdf-history-forward :color red)
+		("l" image-forward-hscroll :color red)
+		("h" image-backward-hscroll :color red))
 #+end_src
-*** pdf-view-restore
+*** saveplace-pdf-view
 #+begin_src emacs-lisp
-	(use-package pdf-view-restore
-		:ensure t)
-#+end_src
-** Centaur Tabs (disabled)
-#+begin_src example
-	(use-package centaur-tabs
-		:config
-		(setq centaur-tabs-style "bar"
-					centaur-tabs-height 32
-					centaur-tabs-set-icons t
-					centaur-tabs-set-modified-marker t
-					;; centaur-tabs-show-navigation-buttons t
-					centaur-tabs-set-bar 'over
-					;; x-underline-at-descent-line t
-					)
-		(centaur-tabs-headline-match)
-		;; (setq centaur-tabs-gray-out-icons 'buffer)
-		;; (centaur-tabs-enable-buffer-reordering)
-		;; (setq centaur-tabs-adjust-buffer-order t)
-		(centaur-tabs-mode t)
-		(setq uniquify-separator "/")
-		(setq uniquify-buffer-name-style 'forward)
-		(defun centaur-tabs-buffer-groups ()
-			"`centaur-tabs-buffer-groups' control buffers' group rules.
-
-					 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `example-mode' `dired-mode' `org-mode' `magit-mode'.
-					 All buffer name start with * will group to \"Emacs\".
-					 Other buffer group by `centaur-tabs-get-group-name' with project name."
-			(list
-			 (cond
-				;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-				;; "Remote")
-				((or (string-equal "*" (substring (buffer-name) 0 1))
-						 (memq major-mode '(magit-process-mode
-																magit-status-mode
-																magit-diff-mode
-																magit-log-mode
-																magit-file-mode
-																magit-blob-mode
-																magit-blame-mode
-																)))
-				 "Emacs")
-				((derived-mode-p 'prog-mode)
-				 "Editing")
-				((derived-mode-p 'dired-mode)
-				 "Dired")
-				((memq major-mode '(helpful-mode
-														help-mode))
-				 "Help")
-				((memq major-mode '(org-mode
-														org-agenda-clockreport-mode
-														org-src-mode
-														org-agenda-mode
-														org-beamer-mode
-														org-indent-mode
-														org-bullets-mode
-														org-cdlatex-mode
-														org-agenda-log-mode
-														diary-mode))
-				 "OrgMode")
-				(t
-				 (centaur-tabs-get-group-name (current-buffer))))))
-		:hook
-		(dashboard-mode . centaur-tabs-local-mode)
-		(term-mode . centaur-tabs-local-mode)
-		(calendar-mode . centaur-tabs-local-mode)
-		(org-agenda-mode . centaur-tabs-local-mode)
-		(helpful-mode . centaur-tabs-local-mode)
-		:bind
-		("C-<prior>" . centaur-tabs-backward)
-		("C-<next>" . centaur-tabs-forward)
-		("C-c t s" . centaur-tabs-counsel-switch-group)
-		("C-c t p" . centaur-tabs-group-by-projectile-project)
-		("C-c t g" . centaur-tabs-group-buffer-groups)
-		(:map evil-normal-state-map
-					("g t" . centaur-tabs-forward)
-					("g T" . centaur-tabs-backward)))
+	(use-package saveplace-pdf-view :ensure t)
+	(save-place-mode 1)
 #+end_src
 ** Treemacs
 #+begin_src emacs-lisp
@@ -660,7 +607,9 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
 	(use-package doom-modeline
 		:ensure t
-		:hook (after-init . doom-modeline-mode)
+		:hook
+		(after-init . doom-modeline-mode)
+		(doom-modeline-mode . display-battery-mode)
 		:custom
 		(setq doom-modeline-buffer-encoding nil
 					doom-modeline-buffer-file-name-style 'file-name
@@ -669,70 +618,27 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 					doom-modeline-major-mode-icon nil
 					doom-modeline-icon t
 					doom-modeline-modal-icon t
-					doom-modeline-lsp nil
+					;; doom-modeline-lsp nil
 					doom-modeline-major-mode-color-icon nil
 					doom-modeline-buffer-state-icon nil
 					doom-modeline-time-icon nil)
 		(custom-set-faces
 		 '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
 		 '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
-		 '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95))))))
-#+end_src
-** Modeline (simple variant) (disabled)
-#+begin_src example
-	(defun mode-line-render (left right)
-		"Return a string of `window-width' length.
-	Containing LEFT, and RIGHT aligned respectively."
-		(let ((available-width
-					 (- (window-width)
-							(+ (length (format-mode-line left))
-								 (length (format-mode-line right))))))
-			(append left
-							(list (format (format "%%%ds" available-width) ""))
-							right)))
+		 '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))
+		(doom-modeline-buffer-file-name-style 'relative-from-project))
 
-	(setq-default mode-line-format
-								'((:eval (mode-line-render
-													'((:eval (propertize " %b" 'face `(:slant italic)))
-														(:eval (if (and buffer-file-name (buffer-modified-p))
-																			 (propertize "*" 'face `(:inherit face-faded))))
-														(:eval (if (buffer-narrowed-p)
-																			 (propertize "-" 'face `(:inherit face-faded)))))
-													'("%p %l:%c "
-														(:eval (propertize " %m" 'face 'font-lock-string-face)))))))
-
-	(provide 'modeline)
-#+end_src
-
-** Calendar sync
-#+begin_src emacs-lisp
-	;; (use-package org-caldav
+	;; (use-package doom-modeline
+	;; 	:ensure t
+	;; 	:defer t
 	;; 	:custom
-	;; 	(org-caldav-url "https://egoistcloud.ddns.net/remote.php/dav/calendars/ncp")
-	;; 	(org-caldav-calendar-id "caldav")
-	;; 	(org-caldav-inbox "~/Org/agenda.org")
-	;; 	(org-caldav-files '("~/Org/agenda.org"))
-	;; 	(org-icalendar-timezone "Asia/Vladivostok")
-	;; 	;; (org-caldav-delete-org-entries 'always)
-	;; 	;; (org-caldav-delete-calendar-entries 'never)
-	;; 	)
+	;; 	(doom-modeline-modal-icon nil)
+	;; 	(doom-modeline-buffer-file-name-style 'relative-from-project)
+	;; 	:hook
+	;; 	(after-init . doom-modeline-mode)
+	;; 	(doom-modeline-mode . display-battery-mode))
 
-	(use-package org-caldav :ensure t
-		:custom (setq org-caldav-url "https://egoistcloud.ddns.net/remote.php/dav/calendars/ncp"
-									org-caldav-calendar-id "caldav"
-									org-caldav-files '("~/Org/Calendar/Personal.org")
-									org-caldav-inbox "~/Org/Calendar/PersonalInbox.org"
-									org-caldav-calendars
-									'((:calendar-id "caldav"
-																	:files ("~/Org/Calendar/Personal.org")
-																	:inbox "~/Org/Calendar/PersonalInbox.org"))
-									org-caldav-delete-org-entries 'always
-									org-caldav-delete-calendar-entries 'never))
-							 #+end_src
-
-#+RESULTS:
-: t
-
+#+end_src
 ** Dashboard
 #+begin_src emacs-lisp
 	;; Setting dashboard
@@ -796,6 +702,11 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(switch-to-buffer dashboard-buffer-name))
 #+end_src
 
+** Zygospore (to easy fullscreaning split screens)
+#+begin_src emacs-lisp
+(use-package zygospore :ensure t)
+(global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
+#+end_src
 ** Dired
 *** Dired Basics
 **** Invocation
@@ -833,7 +744,15 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 			 "l" 'dired-find-file))
 
  #+end_src
- 
+
+*** Dired subtree
+#+begin_src emacs-lisp
+(use-package dired-subtree
+  :ensure t
+  :after dired
+  :config
+  (define-key dired-mode-map (kbd "<tab>") 'dired-subtree-toggle))
+#+end_src
 *** File Operations
 **** Marking files
 
@@ -951,9 +870,16 @@ BUG BUG BUG
 
 *** Auto hide details
 #+begin_src emacs-lisp
-	(setq dired-hide-details 1)
+	(setq dired-hide-details-mode 1)
 #+end_src
 ** Org
+*** Org modern
+#+begin_src emacs-lisp
+	(use-package org-modern
+		:ensure t
+		:config
+		(global-org-modern-mode))
+#+end_src
 *** Setting Org
 #+begin_src emacs-lisp
 	(use-package org
@@ -1088,13 +1014,6 @@ BUG BUG BUG
        (url-copy-file path img)
        (find-file img)))))
 #+END_SRC
-** Org modern
-#+begin_src emacs-lisp
-	(use-package org-modern
-		:ensure t
-		:config
-		(global-org-modern-mode))
-#+end_src
 ** Git
 #+begin_src emacs-lisp
 	(use-package magit
@@ -1108,8 +1027,8 @@ BUG BUG BUG
 		:config
 		(setq magit-todos-recursive t
 					magit-todos-depth 4
-					magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/"))
-		(custom-set-variables
+					magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/" "target/"))
+		(custom-set-variable
 		 '(magit-todos-keywords (list "TODO" "FIXME" "BUGFIX" "HACK"))))
 
 	(use-package blamer
@@ -1145,13 +1064,6 @@ BUG BUG BUG
 
 	(git-gutter-mode)
 #+end_src
-** Smooth scroll (good-scroll) (disabled)
-#+begin_src example
-	(use-package good-scroll
-		:ensure t
-		:config
-		(good-scroll-mode 1))
-#+end_src
 ** Indent mode
 Show vertical lines to guide indentation
 #+begin_src emacs-lisp
@@ -1182,22 +1094,210 @@ Show vertical lines to guide indentation
 #+begin_src emacs-lisp
 	(use-package emojify :ensure t)
 #+end_src
+** Parrot
+#+begin_src emacs-lisp
+	(defun my/parrot-animate-when-compile-success (buffer result)
+		(if (string-match "^finished" result)
+				(parrot-start-animation)))
+
+	(use-package parrot
+		:ensure t
+		:config
+		(parrot-mode)
+		(parrot-set-parrot-type 'science)
+		(add-hook 'before-save-hook 'parrot-start-animation)
+		(add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
+#+end_src
+** Rainbow delimiters
+#+begin_src emacs-lisp
+	(use-package rainbow-delimiters
+		:ensure t
+		:hook
+		(prog-mode . rainbow-delimiters-mode))
+#+end_src
 ** Which key
 #+begin_src emacs-lisp
-(use-package which-key :ensure t)
+	(use-package which-key :ensure t)
+	
 #+end_src
+** Wakatime
+#+begin_src example
+
+	(use-package wakatime-mode :ensure t)
+
+	(global-wakatime-mode)
+
+#+end_src
+** Calendar sync (disabled)
+#+begin_src example
+	(use-package org-caldav
+		:custom
+		(org-caldav-url "https://lunarcloud.ddns.net/remote.php/dav/calendars/ncp")
+		(org-caldav-calendar-id "1")
+		(org-caldav-inbox "~/Org/agenda.org")
+		(org-caldav-files '("~/Org/agenda.org"))
+		(org-icalendar-timezone "Asia/Vladivostok")
+		(org-caldav-delete-org-entries 'never)
+		)
+							 #+end_src
+
+#+RESULTS:
+: t
+
+** Modeline (simple variant) (disabled)
+#+begin_src example
+	(defun mode-line-render (left right)
+		"Return a string of `window-width' length.
+	Containing LEFT, and RIGHT aligned respectively."
+		(let ((available-width
+					 (- (window-width)
+							(+ (length (format-mode-line left))
+								 (length (format-mode-line right))))))
+			(append left
+							(list (format (format "%%%ds" available-width) ""))
+							right)))
+
+	(setq-default mode-line-format
+								'((:eval (mode-line-render
+													'((:eval (propertize " %b" 'face `(:slant italic)))
+														(:eval (if (and buffer-file-name (buffer-modified-p))
+																			 (propertize "*" 'face `(:inherit face-faded))))
+														(:eval (if (buffer-narrowed-p)
+																			 (propertize "-" 'face `(:inherit face-faded)))))
+													'("%p %l:%c "
+														(:eval (propertize " %m" 'face 'font-lock-string-face)))))))
+
+	(provide 'modeline)
+#+end_src
+
+** Centaur Tabs (disabled)
+#+begin_src example
+	(use-package centaur-tabs
+		:config
+		(setq centaur-tabs-style "bar"
+					centaur-tabs-height 32
+					centaur-tabs-set-icons t
+					centaur-tabs-set-modified-marker t
+					;; centaur-tabs-show-navigation-buttons t
+					centaur-tabs-set-bar 'over
+					;; x-underline-at-descent-line t
+					)
+		(centaur-tabs-headline-match)
+		;; (setq centaur-tabs-gray-out-icons 'buffer)
+		;; (centaur-tabs-enable-buffer-reordering)
+		;; (setq centaur-tabs-adjust-buffer-order t)
+		(centaur-tabs-mode t)
+		(setq uniquify-separator "/")
+		(setq uniquify-buffer-name-style 'forward)
+		(defun centaur-tabs-buffer-groups ()
+			"`centaur-tabs-buffer-groups' control buffers' group rules.
+
+					 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `example-mode' `dired-mode' `org-mode' `magit-mode'.
+					 All buffer name start with * will group to \"Emacs\".
+					 Other buffer group by `centaur-tabs-get-group-name' with project name."
+			(list
+			 (cond
+				;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+				;; "Remote")
+				((or (string-equal "*" (substring (buffer-name) 0 1))
+						 (memq major-mode '(magit-process-mode
+																magit-status-mode
+																magit-diff-mode
+																magit-log-mode
+																magit-file-mode
+																magit-blob-mode
+																magit-blame-mode
+																)))
+				 "Emacs")
+				((derived-mode-p 'prog-mode)
+				 "Editing")
+				((derived-mode-p 'dired-mode)
+				 "Dired")
+				((memq major-mode '(helpful-mode
+														help-mode))
+				 "Help")
+				((memq major-mode '(org-mode
+														org-agenda-clockreport-mode
+														org-src-mode
+														org-agenda-mode
+														org-beamer-mode
+														org-indent-mode
+														org-bullets-mode
+														org-cdlatex-mode
+														org-agenda-log-mode
+														diary-mode))
+				 "OrgMode")
+				(t
+				 (centaur-tabs-get-group-name (current-buffer))))))
+		:hook
+		(dashboard-mode . centaur-tabs-local-mode)
+		(term-mode . centaur-tabs-local-mode)
+		(calendar-mode . centaur-tabs-local-mode)
+		(org-agenda-mode . centaur-tabs-local-mode)
+		(helpful-mode . centaur-tabs-local-mode)
+		:bind
+		("C-<prior>" . centaur-tabs-backward)
+		("C-<next>" . centaur-tabs-forward)
+		("C-c t s" . centaur-tabs-counsel-switch-group)
+		("C-c t p" . centaur-tabs-group-by-projectile-project)
+		("C-c t g" . centaur-tabs-group-buffer-groups)
+		(:map evil-normal-state-map
+					("g t" . centaur-tabs-forward)
+					("g T" . centaur-tabs-backward)))
+#+end_src
+** Smooth scroll (good-scroll) (disabled)
+#+begin_src example
+	(use-package good-scroll
+		:ensure t
+		:config
+		(good-scroll-mode 1))
+#+end_src
+** Terminals (vterm, multi-vterm, term, multi-term)
+*** vterm + multi-vterm
+#+begin_src emacs-lisp
+	(use-package vterm
+		:ensure t)
+
+	(use-package multi-vterm
+		:ensure t
+		:bind
+		("C-x q" . vterm-clear)
+		("C-x w" . multi-vterm))
+#+end_src
+*** term + multi-term (disabled)
+#+begin_src example
+	(use-package multi-term
+		:ensure t
+		:bind
+		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
+		("C-x v" . multi-term)) ;; Open default multi-term without automate spliting
+	)
+#+end_src
+
+
 ** Other packages
 #+begin_src emacs-lisp
 	;; (use-package elcord :defer t)
 
 	(use-package helm
-		:ensure t)
-
-	(use-package multi-term
 		:ensure t
-		:bind
-		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
-		("C-x w" . multi-term)) ;; Open default multi-term without automate spliting
+		:defer t
+		:custom
+		(helm-M-x-use-completion-styles nil)
+		(helm-split-window-inside-p t)
+		(helm-follow-mode-persistent t)
+		(helm-buffers-show-icons t)
+		:bind (:map helm-map
+								("<tab>" . 'helm-execute-persistent-action))
+		:config
+		(helm-mode 1))
+
+	(with-eval-after-load 'helm
+		(add-to-list 'display-buffer-alist
+								 '("\\`\\*helm.*\\*\\'"
+									 (display-buffer-in-side-window)
+									 (inhibit-same-window . t)
+									 (window-height . 0.4))))
 
 	(use-package general
 		:ensure t)
@@ -1215,10 +1315,6 @@ Show vertical lines to guide indentation
 		:config
 		(global-set-key (kbd "M-F") 'ian/format-code)
 		(add-hook 'prog-mode-hook 'format-all-ensure-formatter))
-
-	(use-package parrot
-		:ensure t
-		:defer t)
 
 	;; Needed for `:after char-fold' to work
 	(use-package char-fold
@@ -1248,10 +1344,12 @@ Show vertical lines to guide indentation
 								("s-p" . projectile-command-map)
 								("C-c p" . projectile-command-map)))
 
-	;; Highlight TODO, FIXME, ... in any programming mode
-	;; (use-package 'fic-mode
-	;; 	:ensure t
-	;; 	:hook 'prog-mode-hook 'fic-mode)
+	(defun my/highlight-todo-like-words ()
+		(font-lock-add-keywords
+		 nil `(("\\<\\(FIXME\\|TODO\\)"
+						1 font-lock-warning-face t))))
+
+	(add-hook 'prog-mode-hook 'my/highlight-todo-like-words)
 #+end_src
 
 * Setting keymap
@@ -1287,6 +1385,7 @@ Show vertical lines to guide indentation
 
 	(dolist (mode '(org-mode-hook ; Disable line numbers for some modes
 									term-mode-hook
+									vterm-mode-hook
 									shell-mode-hook
 									treemacs-mode-hook
 									eshell-mode-hook
@@ -1436,12 +1535,20 @@ Show vertical lines to guide indentation
 					 (go-mode . lsp)
 					 (javascript-mode . lsp)
 					 (typescript-mode . lsp)
+					 (rust-mode . lsp)
 					 ;; if you want which-key integration
 					 (lsp-mode . lsp-enable-which-key-integration))
 		:commands lsp)
 
 	;; optionally
-	(use-package lsp-ui :commands lsp-ui-mode)
+	(use-package lsp-ui
+		:ensure t
+		:commands lsp-ui-mode
+		:config
+		(setq lsp-ui-doc-enable t)
+		(setq lsp-ui-sideline-show-diagnostics t)
+		(setq lsp-ui-sideline-show-hover t))
+
 	;; if you are helm user
 	(use-package helm-lsp :commands helm-lsp-workspace-symbol)
 	;; if you are ivy user
@@ -1466,6 +1573,10 @@ Show vertical lines to guide indentation
 	(use-package lsp-ui :ensure t)
 #+end_src
 
+*** LSP Doc
+#+begin_src emacs-lisp
+
+#+end_src
 *** JavaScript
 #+begin_src emacs-lisp
 	(use-package web-mode  :ensure t
@@ -1510,6 +1621,10 @@ Show vertical lines to guide indentation
 	(add-hook 'web-mode-hook #'(lambda ()
 															 (enable-minor-mode
 																'("\\.jsx?\\'" . prettier-js-mode))))
+
+	(add-hook 'web-mode-hook #'(lambda ()
+															 (enable-minor-mode
+																'("\\.tsx?\\'" . prettier-js-mode))))
 
 	(add-hook 'web-mode-hook 'prettier-js-mode)
 #+end_src
@@ -1626,9 +1741,40 @@ Show vertical lines to guide indentation
 *** Rust
 [[https://rust-analyzer.github.io/manual.html#installation#Emacs][*Quick start with rust-analyzer*]]
 
+#+begin_src example
+cargo install rustfmt
+cargo install racer
+#+end_src
+
 #+begin_src emacs-lisp
-	(use-package rust-mode :ensure t)
 	(use-package rust-playground :ensure t)
+
+	(use-package rust-mode
+		:ensure t
+		:if (executable-find "rustc"))
+
+	(use-package cargo
+		:ensure t
+		:if (executable-find "cargo")
+		:after rust-mode
+		:bind (:map cargo-minor-mode-map
+								("C-c C-t" . cargo-process-test)
+								("C-c C-b" . cargo-process-build)
+								("C-c C-c" . cargo-process-run))
+		:config
+		(add-hook 'rust-mode-hook 'cargo-minor-mode))
+
+	(use-package racer
+		:ensure t
+		:if (executable-find "racer")
+		:after rust-mode
+		:custom
+		(racer-rust-src-path "~/Code/rust/src/src")
+		:hook ((rust-mode . racer-mode)
+					 (racer-mode . eldoc-mode)
+					 (racer-mode . company-mode))
+		:config
+		(evil-leader/set-key-for-mode 'rust-mode "d" 'racer-find-definition))
 #+end_src
 
 ** Flycheck
