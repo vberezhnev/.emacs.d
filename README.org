@@ -271,6 +271,280 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	#+end_src
 
 * Setting Packages
+** Alert.el
+#+begin_src example
+	(use-package alert :ensure t)
+
+	(telega-alert-mode 1)
+#+end_src
+
+** Dashboard
+#+begin_src emacs-lisp
+  ;; Setting dashboard
+  (use-package dashboard
+    :ensure t
+    :hook (dashboard-mode . (lambda ()
+			      ;; No title
+			      (setq-local frame-title-format nil)
+			      ;; Enable `page-break-lines-mode'
+			      (when (fboundp 'page-break-lines-mode)
+				(page-break-lines-mode 1))))
+    :init      ;; tweak dashboard config before loading it
+    (setq dashboard-set-heading-icons t
+	  dashboard-set-file-icons t
+	  dashboard-center-content t
+	  dashboard-banner-logo-title "Welcome back, Darling!"
+	  dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
+	  ;; dashboard-page-separator ""
+	  dashboard-set-navigator t
+	  dashboard-items '(
+			    (recents . 6)
+			    (agenda . 4 )
+			    ;;(registers . 3)
+			    (bookmarks . 4)
+			    (projects . 4))) ;; use standard emacs logo as banner
+
+    ;; Format: "(icon title help action face prefix suffix)"
+    ;; (setq dashboard-navigator-buttons
+    ;; 			`(;; line1
+    ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
+    ;; 					"Main site"
+    ;; 					"Browse homepage"
+    ;; 					(lambda (&rest _) (browse-url "homepage")))
+    ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+    ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
+    ;; 				;; line 2
+    ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+    ;; 					"Github"
+    ;; 					""
+    ;; 					(lambda (&rest _) (browse-url "homepage")))
+    ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+    (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
+    ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+    ;; 																									 :height 1.1
+    ;; 																									 :v-adjust -0.05
+    ;; 																									 :face 'font-lock-keyword-face))
+    :config
+    (dashboard-modify-heading-icons '((recents . "file-text")
+				      (bookmarks . "book")))
+    (dashboard-setup-startup-hook)
+    )
+
+  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+
+  (defun dashboard-refresh-buffer ()
+    (interactive)
+    (when (get-buffer dashboard-buffer-name)
+      (kill-buffer dashboard-buffer-name))
+    (dashboard-insert-startupify-lists)
+    (switch-to-buffer dashboard-buffer-name))
+#+end_src
+
+** Dired
+*** Dired Basics
+**** Invocation
+
+- =C-x d= or =C-x C-f= - =dired=
+- =dired-jump= - open Dired buffer, select the current file
+- =projectile-dired=
+
+**** Navigation
+
+*Emacs* / *Evil*
+- =n= / =j= - next line
+- =p= / =k= - previous line
+- =j= / =J= - jump to file in buffer
+- =RET= - select file or directory
+- =^= - go to parent directory
+- =S-RET= / =g O= - Open file in "other" window
+- =M-RET= - Show file in other window without focusing (previewing files)
+- =g o= (=dired-view-file=) - Open file but in a "preview" mode, close with =q=
+
+**** Configuration
+
+- =dired-listing-switches:= Try =-agho --group-directories-first=
+- =g= / =g r= Refresh the buffer with =revert-buffer= after changing configuration (and after filesystem changes!)
+
+ #+begin_src example
+
+	 (use-package dired
+		 :ensure nil
+		 :commands (dired dired-jump)
+		 :bind (("C-x C-j" . dired-jump))
+		 :config
+		 (evil-collection-define-key 'normal 'dired-mode-map
+			 "h" 'dired-up-directory
+			 "l" 'dired-find-file))
+
+ #+end_src
+
+*** Dired subtree
+#+begin_src example
+  (use-package dired-subtree
+    :ensure t
+    :after dired
+    :config
+    (define-key dired-mode-map (kbd "<tab>") 'dired-subtree-toggle))
+#+end_src
+*** File Operations
+**** Marking files
+
+- =m= - Marks a file
+- =u= - Unmarks a file
+- =U= - Unmarks all files in buffer
+- =* t= / =t= - Inverts marked files in buffer
+- =% m= - Mark files in buffer using regular expression
+- =*= - Lots of other auto-marking functions
+- =k= / =K= - "Kill" marked items (refresh buffer with =g= / =g r= to get them back)
+- Many operations can be done on a single file if there are no active marks!
+
+**** Copying and Renaming files
+
+- =C= - Copy marked files (or if no files are marked, the current file)
+- Copying single and multiple files
+- =U= - Unmark all files in buffer
+- =R= - Rename marked files, renaming multiple is a move!
+- =% R= - Rename based on regular expression: =^test= , =old-\&=
+
+**** Deleting files
+
+- =D= - Delete marked file
+- =d= - Mark file for deletion
+- =x= - Execute deletion for marks
+- =delete-by-moving-to-trash= - Move to trash instead of deleting permanently
+
+**** Creating and extracting archives
+
+- =Z= - Compress or uncompress a file or folder to (=.tar.gz=)
+- =c= - Compress selection to a specific file
+- =dired-compress-files-alist= - Bind compression commands to file extension
+
+**** Other common operations
+
+- =T= - Touch (change timestamp)
+- =M= - Change file mode
+- =O= - Change file owner
+- =G= - Change file group
+- =S= - Create a symbolic link to this file
+- =L= - Load an Emacs Lisp file into Emacs
+	
+*** Single Dired buffer
+
+Closed Dired buffers are just buried!  They need to be refreshed if you go back to them.
+
+Use =dired-single= to help with this: https://github.com/crocket/dired-single
+
+#+begin_src example
+
+	;; Inside `use-package dired`
+	(use-package dired-single)
+
+	(evil-collection-define-key 'normal 'dired-mode-map
+		"h" 'dired-single-up-directory
+		"l" 'dired-single-buffer)
+
+#+end_src
+
+*** File icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :ensure t
+    :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
+*** Open external files
+
+- =!= or =&= to launch an external program on a file
+
+BUG BUG BUG
+#+begin_src example
+
+	(use-package dired-open
+		:config
+		;; Doesn't work as expected!
+		(add-to-list 'dired-open-functions 'dired-open-xdg t)
+		;; -- OR! --
+		(setq dired-open-extensions '(("png" . "feh")
+																	("mkv" . "mpv"))))
+
+#+end_src
+
+*** Hide / show dotfiles
+#+begin_src example
+	(use-package dired-hide-dotfiles
+		:hook (dired-mode . dired-hide-dotfiles-mode)
+		:config
+		(evil-collection-define-key 'normal 'dired-mode-map
+			"H" 'dired-hide-dotfiles-mode))
+#+end_src
+
+*** Make dired open in the same window
+#+begin_src example
+  ;; (setf dired-kill-when-;; Make dired open in the same window when using RET or ^
+  (put 'dired-find-alternate-file 'disabled nil) ; disables warning
+  (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
+  (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directoryopening-new-dired-buffer t)
+#+end_src
+*** Dired sort directories first
+#+begin_src emacs-lisp
+(defun sof/dired-sort ()
+  "Dired sort hook to list directories first."
+  (save-excursion
+   (let (buffer-read-only)
+     (forward-line 2) ;; beyond dir. header  
+     (sort-regexp-fields t "^.*$" "[ ]*." (point) (point-max))))
+  (and (featurep 'xemacs)
+       (fboundp 'dired-insert-set-properties)
+       (dired-insert-set-properties (point-min) (point-max)))
+  (set-buffer-modified-p nil))
+
+ (add-hook 'dired-after-readin-hook 'sof/dired-sort)
+#+end_src
+
+*** Auto hide details
+#+begin_src emacs-lisp
+	(setq dired-hide-details-mode 1)
+#+end_src
+** Doom modeline
+#+begin_src emacs-lisp
+	(use-package doom-modeline
+		:ensure t
+		:hook
+		(after-init . doom-modeline-mode)
+		(doom-modeline-mode . display-battery-mode)
+		:custom
+		(setq doom-modeline-buffer-encoding nil
+					doom-modeline-buffer-file-name-style 'file-name
+					doom-modeline-checker-simple-format t
+					doom-modeline-vcs-max-length 50
+					doom-modeline-major-mode-icon nil
+					doom-modeline-icon t
+					doom-modeline-modal-icon t
+					;; doom-modeline-lsp nil
+					doom-modeline-major-mode-color-icon nil
+					doom-modeline-buffer-state-icon nil
+					doom-modeline-time-icon nil)
+		(custom-set-faces
+		 '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
+		 '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
+		 '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))
+		(doom-modeline-buffer-file-name-style 'relative-from-project))
+
+	;; (use-package doom-modeline
+	;; 	:ensure t
+	;; 	:defer t
+	;; 	:custom
+	;; 	(doom-modeline-modal-icon nil)
+	;; 	(doom-modeline-buffer-file-name-style 'relative-from-project)
+	;; 	:hook
+	;; 	(after-init . doom-modeline-mode)
+	;; 	(doom-modeline-mode . display-battery-mode))
+
+#+end_src
+** Emojify
+#+begin_src emacs-lisp
+	(use-package emojify :ensure t)
+#+end_src
 ** Evil
 *** Set initial Evil
 #+begin_src emacs-lisp
@@ -370,507 +644,91 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(evil-set-initial-state 'sunrise-mode 'emacs)
 #+end_src
 
-** RSS
+** FZF
 #+begin_src emacs-lisp
-	(use-package elfeed
-		:ensure t)
-
-	;; data is stored in ~/.elfeed
-	(setq elfeed-feeds
-				'(
-					;; programming
-					;;("https://news.ycombinator.com/rss" hacker)
-					;;("https://www.reddit.com/r/programming.rss" programming)
-					("https://www.reddit.com/r/emacs.rss" emacs)
-					("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
-					("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
-					("https://habr.com/ru/rss/news/?fl=ru" habr-news)
-					("https://nuancesprog.ru/feed" nop)
-					("https://dev.to/feed" dev-to)
-
-					;; hobby
-					("https://www.reddit.com/r/nasa.rss" nasa)
-					("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
-					("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
-					("https://dev.to/feed/tell396" tell396)
-
-					;; programming languages
-					("https://www.reddit.com/r/javascript.rss" javascript)
-					("https://www.reddit.com/r/typescript.rss" typescript)
-					("https://www.reddit.com/r/golang.rss" golang)
-					("https://www.reddit.com/r/rust.rss" rust)
-
-					;; cloud
-					;;("https://www.reddit.com/r/aws.rss" aws)
-					;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
-					;;("https://www.reddit.com/r/azure.rss" azure)
-					;;("https://www.reddit.com/r/devops.rss" devops)
-					;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
-					))
-
-	(setq-default elfeed-search-filter "@7-days-ago +unread")
-	(setq-default elfeed-search-title-max-width 100)
-	(setq-default elfeed-search-title-min-width 100)
-#+end_src
-** Telega.el
-#+begin_src emacs-lisp
-	(use-package telega
+	(use-package fzf
 		:ensure t
-		:config 
-		(setq telega-use-docker t))
-#+end_src
-** PDF Tools
-*** pdf-tools
-#+begin_src emacs-lisp
-	(use-package pdf-tools
-		:defer t
-		:mode (("\\.pdf\\'" . pdf-view-mode))
-		:config
-		(pdf-tools-install)
-		(setq-default pdf-view-display-size 'fit-page)
-		:bind (:map pdf-view-mode-map
-								("\\" . hydra-pdftools/body)
-								("<s-spc>" .  pdf-view-scroll-down-or-next-page)
-								("g"  . pdf-view-first-page)
-								("G"  . pdf-view-last-page)
-								("l"  . image-forward-hscroll)
-								("h"  . image-backward-hscroll)
-								("j"  . pdf-view-next-page)
-								("k"  . pdf-view-previous-page)
-								("e"  . pdf-view-goto-page)
-								("u"  . pdf-view-revert-buffer)
-								("al" . pdf-annot-list-annotations)
-								("ad" . pdf-annot-delete)
-								;; ("aa" . pdf-annot-attachment-dired)
-								("am" . pdf-annot-add-markup-annotation)
-								("at" . pdf-annot-add-text-annotation)
-								("y"  . pdf-view-kill-ring-save)
-								("i"  . pdf-misc-display-metadata)
-								("s"  . pdf-occur)
-								("b"  . pdf-view-set-slice-from-bounding-box)
-								("r"  . pdf-view-reset-slice)))
-
-	(defhydra hydra-pdftools (:color blue :hint nil)
-		"
-																																			 ╭───────────┐
-				Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-		╭──────────────────────────────────────────────────────────────────┴───────────╯
-					^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-					^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-					^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-					^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-		 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-					^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-					^^_n_^^      ^ ^  _r_eset slice box
-					^^^↓^^^
-					^^_G_^^
-		--------------------------------------------------------------------------------
-				 "
-		("\\" hydra-master/body "back")
-		("<ESC>" nil "quit")
-		("al" pdf-annot-list-annotations)
-		("ad" pdf-annot-delete)
-		("aa" pdf-annot-attachment-dired)
-		("am" pdf-annot-add-markup-annotation)
-		("at" pdf-annot-add-text-annotation)
-		("y"  pdf-view-kill-ring-save)
-		("+" pdf-view-enlarge :color red)
-		("-" pdf-view-shrink :color red)
-		("0" pdf-view-scale-reset)
-		("H" pdf-view-fit-height-to-window)
-		("W" pdf-view-fit-width-to-window)
-		("P" pdf-view-fit-page-to-window)
-		("n" pdf-view-next-page-command :color red)
-		("p" pdf-view-previous-page-command :color red)
-		("d" pdf-view-dark-minor-mode)
-		("b" pdf-view-set-slice-from-bounding-box)
-		("r" pdf-view-reset-slice)
-		("g" pdf-view-first-page)
-		("G" pdf-view-last-page)
-		("e" pdf-view-goto-page)
-		("o" pdf-outline)
-		("s" pdf-occur)
-		("i" pdf-misc-display-metadata)
-		("u" pdf-view-revert-buffer)
-		("F" pdf-links-action-perfom)
-		("f" pdf-links-isearch-link)
-		("B" pdf-history-backward :color red)
-		("N" pdf-history-forward :color red)
-		("l" image-forward-hscroll :color red)
-		("h" image-backward-hscroll :color red))
-#+end_src
-*** saveplace-pdf-view
-#+begin_src emacs-lisp
-	(use-package saveplace-pdf-view :ensure t)
-	(save-place-mode 1)
-#+end_src
-** Treemacs
-#+begin_src emacs-lisp
-	(use-package treemacs
-		:ensure t
-		:defer t
-		:init
-		(with-eval-after-load 'winum
-			(define-key winum-keymap (kbd "M-0") 'treemacs-select-window))
-		:config
-		(progn
-			(setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
-						treemacs-deferred-git-apply-delay        0.5
-						treemacs-directory-name-transformer      #'identity
-						treemacs-display-in-side-window          t
-						treemacs-eldoc-display                   'simple
-						treemacs-file-event-delay                2000
-						treemacs-file-extension-regex            treemacs-last-period-regex-value
-						treemacs-file-follow-delay               0.2
-						treemacs-file-name-transformer           #'identity
-						treemacs-follow-after-init               t
-						treemacs-expand-after-init               t
-						treemacs-find-workspace-method           'find-for-file-or-pick-first
-						treemacs-git-command-pipe                ""
-						treemacs-goto-tag-strategy               'refetch-index
-						treemacs-header-scroll-indicators        '(nil . "^^^^^^")
-						treemacs-hide-dot-git-directory          t
-						treemacs-indentation                     2
-						treemacs-indentation-string              " "
-						treemacs-is-never-other-window           nil
-						treemacs-max-git-entries                 5000
-						treemacs-missing-project-action          'ask
-						treemacs-move-forward-on-expand          nil
-						treemacs-no-png-images                   nil
-						treemacs-no-delete-other-windows         t
-						treemacs-project-follow-cleanup          nil
-						treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-						treemacs-position                        'left
-						treemacs-read-string-input               'from-child-frame
-						treemacs-recenter-distance               0.1
-						treemacs-recenter-after-file-follow      nil
-						treemacs-recenter-after-tag-follow       nil
-						treemacs-recenter-after-project-jump     'always
-						treemacs-recenter-after-project-expand   'on-distance
-						treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
-						treemacs-show-cursor                     nil
-						treemacs-show-hidden-files               t
-						treemacs-silent-filewatch                nil
-						treemacs-silent-refresh                  nil
-						treemacs-sorting                         'alphabetic-asc
-						treemacs-select-when-already-in-treemacs 'move-back
-						treemacs-space-between-root-nodes        t
-						treemacs-tag-follow-cleanup              t
-						treemacs-tag-follow-delay                1.5
-						treemacs-text-scale                      nil
-						treemacs-user-mode-line-format           nil
-						treemacs-user-header-line-format         nil
-						treemacs-wide-toggle-width               70
-						treemacs-width                           35
-						treemacs-width-increment                 1
-						treemacs-width-is-initially-locked       t
-						treemacs-workspace-switch-cleanup        nil)
-
-			;; The default width and height of the icons is 22 pixels. If you are
-			;; using a Hi-DPI display, uncomment this to double the icon size.
-			;; (treemacs-resize-icons 48)
-
-			(treemacs-follow-mode t)
-			(treemacs-filewatch-mode t)
-			(treemacs-fringe-indicator-mode 'always)
-			(when treemacs-python-executable
-				(treemacs-git-commit-diff-mode t))
-
-			(pcase (cons (not (null (executable-find "git")))
-									 (not (null treemacs-python-executable)))
-				(`(t . t)
-				 (treemacs-git-mode 'deferred))
-				(`(t . _)
-				 (treemacs-git-mode 'simple)))
-
-			(treemacs-hide-gitignored-files-mode nil))
 		:bind
-		(:map global-map
-					("M-0"       . treemacs-select-window)
-					("C-x t 1"   . treemacs-delete-other-windows)
-					("C-x t t"   . treemacs)
-					("C-x t d"   . treemacs-select-directory)
-					("C-x t B"   . treemacs-bookmark)
-					("C-x t C-t" . treemacs-find-file)
-					("C-x t M-t" . treemacs-find-tag)))
-
-	(use-package treemacs-all-the-icons
-		:ensure t)
-	(treemacs-load-theme "all-the-icons")
-
-	(use-package treemacs-evil
-		:after (treemacs evil)
-		:ensure t)
+		;; Don't forget to set keybinds!
+		:config
+		(setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
+					fzf/executable "fzf"
+					fzf/git-grep-args "-i --line-number %s"
+					;; command used for `fzf-grep-*` functions
+					;; example usage for ripgrep:
+					;; fzf/grep-command "rg --no-heading -nH"
+					fzf/grep-command "grep -nrH"
+					;; If nil, the fzf buffer will appear at the top of the window
+					fzf/position-bottom t
+					fzf/window-height 15))
+#+end_src
+** Git
+*** Magit
+**** Magit
+#+begin_src emacs-lisp
+	(use-package magit
+		:commands (magit-status magit-ediff-show-working-tree)
+		:bind ("C-c C-d" . magit-ediff-show-working-tree)
+		:custom (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
 
-** Doom modeline
+**** Magit todos
 #+begin_src emacs-lisp
-	(use-package doom-modeline
-		:ensure t
-		:hook
-		(after-init . doom-modeline-mode)
-		(doom-modeline-mode . display-battery-mode)
+	(use-package magit-todos
+		:commands (magit-todos-mode)
+		:hook (magit-mode . magit-todos-mode)
+		:config
+		(setq magit-todos-recursive t
+					magit-todos-depth 4
+					magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/" "target/"))
+		(custom-set-variable
+		 '(magit-todos-keywords (list "TODO" "FIXME" "BUGFIX" "HACK"))))
+	#+end_src
+*** Blamer
+#+begin_src emacs-lisp
+	(use-package blamer
+		:commands (blamer-mode)
+		:config
+		(setq blamer-view 'overlay
+					blamer-type 'posframe-popup
+					blamer-max-commit-message-length 70
+					blamer-force-truncate-long-line nil
+					blamer-author-formatter " ✎ [%s] - "
+					blamer-commit-formatter "● %s ● ")
 		:custom
-		(setq doom-modeline-buffer-encoding nil
-					doom-modeline-buffer-file-name-style 'file-name
-					doom-modeline-checker-simple-format t
-					doom-modeline-vcs-max-length 50
-					doom-modeline-major-mode-icon nil
-					doom-modeline-icon t
-					doom-modeline-modal-icon t
-					;; doom-modeline-lsp nil
-					doom-modeline-major-mode-color-icon nil
-					doom-modeline-buffer-state-icon nil
-					doom-modeline-time-icon nil)
-		(custom-set-faces
-		 '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
-		 '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
-		 '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))
-		(doom-modeline-buffer-file-name-style 'relative-from-project))
-
-	;; (use-package doom-modeline
-	;; 	:ensure t
-	;; 	:defer t
-	;; 	:custom
-	;; 	(doom-modeline-modal-icon nil)
-	;; 	(doom-modeline-buffer-file-name-style 'relative-from-project)
-	;; 	:hook
-	;; 	(after-init . doom-modeline-mode)
-	;; 	(doom-modeline-mode . display-battery-mode))
-
+		(blamer-idle-time 1.0)
+		:custom-face
+		(blamer-face ((t :foreground "#E46876"
+										 :height 140
+										 :italic t))))
 #+end_src
-** Dashboard
+*** Git gutter
 #+begin_src emacs-lisp
-	;; Setting dashboard
-	(use-package dashboard
+	(use-package git-gutter
 		:ensure t
-		:hook (dashboard-mode . (lambda ()
-															;; No title
-															(setq-local frame-title-format nil)
-															;; Enable `page-break-lines-mode'
-															(when (fboundp 'page-break-lines-mode)
-																(page-break-lines-mode 1))))
-		:init      ;; tweak dashboard config before loading it
-		(setq dashboard-set-heading-icons t
-					dashboard-set-file-icons t
-					dashboard-center-content t
-					dashboard-banner-logo-title "Welcome back, Darling!"
-					;; dashboard-startup-banner "~/.emacs.d/images/black-hole.png"
-					;; dashboard-page-separator ""
-					dashboard-set-navigator t
-					dashboard-items '(
-														(recents . 4)
-														(agenda . 4 )
-														;;(registers . 3)
-														(bookmarks . 4)
-														(projects . 4))) ;; use standard emacs logo as banner
-
-		;; Format: "(icon title help action face prefix suffix)"
-		(setq dashboard-navigator-buttons
-					`(;; line1
-						((,(all-the-icons-octicon "code" :height 1.1 :v-adjust 0.0)
-							"Main site"
-							"Browse homepage"
-							(lambda (&rest _) (browse-url "homepage")))
-						 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-						 ("?" "" "?/h" #'show-help nil "<" ">"))
-						;; line 2
-						((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-							"Github"
-							""
-							(lambda (&rest _) (browse-url "homepage")))
-						 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
-		(setq dashboard-footer-messages '("Richard Stallman is proud of you."))
-		(setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-																											 :height 1.1
-																											 :v-adjust -0.05
-																											 :face 'font-lock-keyword-face))
-
+		:hook (prog-mode . git-gutter-mode)
+		:diminish git-gutter-mode
 		:config
-		(dashboard-modify-heading-icons '((recents . "file-text")
-																			(bookmarks . "book")))
-		(dashboard-setup-startup-hook)
-		)
+		(setq git-gutter:update-interval 0.5))
 
-	(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-
-	(defun dashboard-refresh-buffer ()
-		(interactive)
-		(when (get-buffer dashboard-buffer-name)
-			(kill-buffer dashboard-buffer-name))
-		(dashboard-insert-startupify-lists)
-		(switch-to-buffer dashboard-buffer-name))
-#+end_src
-
-** Zygospore (to easy fullscreaning split screens)
-#+begin_src emacs-lisp
-(use-package zygospore :ensure t)
-(global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
-#+end_src
-** Dired
-*** Dired Basics
-**** Invocation
-
-- =C-x d= or =C-x C-f= - =dired=
-- =dired-jump= - open Dired buffer, select the current file
-- =projectile-dired=
-
-**** Navigation
-
-*Emacs* / *Evil*
-- =n= / =j= - next line
-- =p= / =k= - previous line
-- =j= / =J= - jump to file in buffer
-- =RET= - select file or directory
-- =^= - go to parent directory
-- =S-RET= / =g O= - Open file in "other" window
-- =M-RET= - Show file in other window without focusing (previewing files)
-- =g o= (=dired-view-file=) - Open file but in a "preview" mode, close with =q=
-
-**** Configuration
-
-- =dired-listing-switches:= Try =-agho --group-directories-first=
-- =g= / =g r= Refresh the buffer with =revert-buffer= after changing configuration (and after filesystem changes!)
-
- #+begin_src example
-
-	 (use-package dired
-		 :ensure nil
-		 :commands (dired dired-jump)
-		 :bind (("C-x C-j" . dired-jump))
-		 :config
-		 (evil-collection-define-key 'normal 'dired-mode-map
-			 "h" 'dired-up-directory
-			 "l" 'dired-find-file))
-
- #+end_src
-
-*** Dired subtree
-#+begin_src emacs-lisp
-(use-package dired-subtree
-  :ensure t
-  :after dired
-  :config
-  (define-key dired-mode-map (kbd "<tab>") 'dired-subtree-toggle))
-#+end_src
-*** File Operations
-**** Marking files
-
-- =m= - Marks a file
-- =u= - Unmarks a file
-- =U= - Unmarks all files in buffer
-- =* t= / =t= - Inverts marked files in buffer
-- =% m= - Mark files in buffer using regular expression
-- =*= - Lots of other auto-marking functions
-- =k= / =K= - "Kill" marked items (refresh buffer with =g= / =g r= to get them back)
-- Many operations can be done on a single file if there are no active marks!
-
-**** Copying and Renaming files
-
-- =C= - Copy marked files (or if no files are marked, the current file)
-- Copying single and multiple files
-- =U= - Unmark all files in buffer
-- =R= - Rename marked files, renaming multiple is a move!
-- =% R= - Rename based on regular expression: =^test= , =old-\&=
-
-**** Deleting files
-
-- =D= - Delete marked file
-- =d= - Mark file for deletion
-- =x= - Execute deletion for marks
-- =delete-by-moving-to-trash= - Move to trash instead of deleting permanently
-
-**** Creating and extracting archives
-
-- =Z= - Compress or uncompress a file or folder to (=.tar.gz=)
-- =c= - Compress selection to a specific file
-- =dired-compress-files-alist= - Bind compression commands to file extension
-
-**** Other common operations
-
-- =T= - Touch (change timestamp)
-- =M= - Change file mode
-- =O= - Change file owner
-- =G= - Change file group
-- =S= - Create a symbolic link to this file
-- =L= - Load an Emacs Lisp file into Emacs
-	
-*** Single Dired buffer
-
-Closed Dired buffers are just buried!  They need to be refreshed if you go back to them.
-
-Use =dired-single= to help with this: https://github.com/crocket/dired-single
-
-#+begin_src example
-
-	;; Inside `use-package dired`
-	(use-package dired-single)
-
-	(evil-collection-define-key 'normal 'dired-mode-map
-		"h" 'dired-single-up-directory
-		"l" 'dired-single-buffer)
-
-#+end_src
-
-*** File icons
-#+begin_src emacs-lisp
-	(use-package all-the-icons-dired
+	(use-package git-gutter-fringe
 		:ensure t
-		:hook (dired-mode . all-the-icons-dired-mode))
-#+end_src
-
-*** Open external files
-
-- =!= or =&= to launch an external program on a file
-
-BUG BUG BUG
-#+begin_src example
-
-	(use-package dired-open
+		:after git-gutter
 		:config
-		;; Doesn't work as expected!
-		(add-to-list 'dired-open-functions 'dired-open-xdg t)
-		;; -- OR! --
-		(setq dired-open-extensions '(("png" . "feh")
-																	("mkv" . "mpv"))))
+		(define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+		(define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+		(define-fringe-bitmap 'git-gutter-fr:deleted [224] nil nil '(center repeated)))
 
+	(git-gutter-mode)
 #+end_src
 
-*** Hide / show dotfiles
-#+begin_src example
-	(use-package dired-hide-dotfiles
-		:hook (dired-mode . dired-hide-dotfiles-mode)
+** Indent mode
+Show vertical lines to guide indentation
+#+begin_src emacs-lisp
+	(use-package indent-guide
+		:ensure t
 		:config
-		(evil-collection-define-key 'normal 'dired-mode-map
-			"H" 'dired-hide-dotfiles-mode))
-#+end_src
-
-*** Make dired open in the same window
-#+begin_src emacs-lisp
-	;; (setf dired-kill-when-;; Make dired open in the same window when using RET or ^
-	(put 'dired-find-alternate-file 'disabled nil) ; disables warning
-	(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
-	(define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directoryopening-new-dired-buffer t)
-#+end_src
-*** Dired sort directories first
-#+begin_src emacs-lisp
-(defun sof/dired-sort ()
-  "Dired sort hook to list directories first."
-  (save-excursion
-   (let (buffer-read-only)
-     (forward-line 2) ;; beyond dir. header  
-     (sort-regexp-fields t "^.*$" "[ ]*." (point) (point-max))))
-  (and (featurep 'xemacs)
-       (fboundp 'dired-insert-set-properties)
-       (dired-insert-set-properties (point-min) (point-max)))
-  (set-buffer-modified-p nil))
-
- (add-hook 'dired-after-readin-hook 'sof/dired-sort)
-#+end_src
-
-*** Auto hide details
-#+begin_src emacs-lisp
-	(setq dired-hide-details-mode 1)
+		(indent-guide-global-mode))
 #+end_src
 ** Org
 *** Org modern
@@ -1003,97 +861,17 @@ BUG BUG BUG
 #+end_src
 *** Insert images from url
 #+BEGIN_SRC emacs-lisp
-(org-add-link-type
- "image-url"
- (lambda (path)
-   (let ((img (expand-file-name
-           (concat (md5 path) "." (file-name-extension path))
-           temporary-file-directory)))
-     (if (file-exists-p img)
-     (find-file img)
-       (url-copy-file path img)
-       (find-file img)))))
+	(org-add-link-type
+	 "image-url"
+	 (lambda (path)
+		 (let ((img (expand-file-name
+								 (concat (md5 path) "." (file-name-extension path))
+								 temporary-file-directory)))
+			 (if (file-exists-p img)
+					 (find-file img)
+				 (url-copy-file path img)
+				 (find-file img)))))
 #+END_SRC
-** Git
-#+begin_src emacs-lisp
-	(use-package magit
-		:commands (magit-status magit-ediff-show-working-tree)
-		:bind ("C-c C-d" . magit-ediff-show-working-tree)
-		:custom (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
-
-	(use-package magit-todos
-		:commands (magit-todos-mode)
-		:hook (magit-mode . magit-todos-mode)
-		:config
-		(setq magit-todos-recursive t
-					magit-todos-depth 4
-					magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/" "target/"))
-		(custom-set-variable
-		 '(magit-todos-keywords (list "TODO" "FIXME" "BUGFIX" "HACK"))))
-
-	(use-package blamer
-		:commands (blamer-mode)
-		:config
-		(setq blamer-view 'overlay
-					blamer-type 'posframe-popup
-					blamer-max-commit-message-length 70
-					blamer-force-truncate-long-line nil
-					blamer-author-formatter " ✎ [%s] - "
-					blamer-commit-formatter "● %s ● ")
-		:custom
-		(blamer-idle-time 1.0)
-		:custom-face
-		(blamer-face ((t :foreground "#E46876"
-										 :height 140
-										 :italic t))))
-
-	(use-package git-gutter
-		:ensure t
-		:hook (prog-mode . git-gutter-mode)
-		:diminish git-gutter-mode
-		:config
-		(setq git-gutter:update-interval 0.5))
-
-	(use-package git-gutter-fringe
-		:ensure t
-		:after git-gutter
-		:config
-		(define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
-		(define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
-		(define-fringe-bitmap 'git-gutter-fr:deleted [224] nil nil '(center repeated)))
-
-	(git-gutter-mode)
-#+end_src
-** Indent mode
-Show vertical lines to guide indentation
-#+begin_src emacs-lisp
-	(use-package indent-guide
-		:ensure t
-		:config
-		(indent-guide-global-mode))
-#+end_src
-** FZF
-#+begin_src emacs-lisp
-	(use-package fzf
-		:ensure t
-		:bind
-		;; Don't forget to set keybinds!
-		:config
-		(setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
-					fzf/executable "fzf"
-					fzf/git-grep-args "-i --line-number %s"
-					;; command used for `fzf-grep-*` functions
-					;; example usage for ripgrep:
-					;; fzf/grep-command "rg --no-heading -nH"
-					fzf/grep-command "grep -nrH"
-					;; If nil, the fzf buffer will appear at the top of the window
-					fzf/position-bottom t
-					fzf/window-height 15))
-#+end_src
-** Emojify
-#+begin_src emacs-lisp
-	(use-package emojify :ensure t)
-#+end_src
 ** Parrot
 #+begin_src emacs-lisp
 	(defun my/parrot-animate-when-compile-success (buffer result)
@@ -1104,10 +882,125 @@ Show vertical lines to guide indentation
 		:ensure t
 		:config
 		(parrot-mode)
-		(parrot-set-parrot-type 'science)
+		(parrot-set-parrot-type 'thumbsup)
 		(add-hook 'before-save-hook 'parrot-start-animation)
 		(add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
 #+end_src
+** PDF Tools
+*** pdf-tools
+#+begin_src emacs-lisp
+	(use-package pdf-tools
+		:defer t
+		:mode (("\\.pdf\\'" . pdf-view-mode))
+		:config
+		(pdf-tools-install)
+		(setq-default pdf-view-display-size 'fit-page)
+		:bind (:map pdf-view-mode-map
+								("\\" . hydra-pdftools/body)
+								("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+								("g"  . pdf-view-first-page)
+								("G"  . pdf-view-last-page)
+								("l"  . image-forward-hscroll)
+								("h"  . image-backward-hscroll)
+								("j"  . pdf-view-next-page)
+								("k"  . pdf-view-previous-page)
+								("e"  . pdf-view-goto-page)
+								("u"  . pdf-view-revert-buffer)
+								("al" . pdf-annot-list-annotations)
+								("ad" . pdf-annot-delete)
+								;; ("aa" . pdf-annot-attachment-dired)
+								("am" . pdf-annot-add-markup-annotation)
+								("at" . pdf-annot-add-text-annotation)
+								("y"  . pdf-view-kill-ring-save)
+								("i"  . pdf-misc-display-metadata)
+								("s"  . pdf-occur)
+								("b"  . pdf-view-set-slice-from-bounding-box)
+								("r"  . pdf-view-reset-slice)))
+
+	(defhydra hydra-pdftools (:color blue :hint nil)
+		"
+																																			 ╭───────────┐
+				Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+		╭──────────────────────────────────────────────────────────────────┴───────────╯
+					^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+					^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+					^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+					^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+		 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+					^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+					^^_n_^^      ^ ^  _r_eset slice box
+					^^^↓^^^
+					^^_G_^^
+		--------------------------------------------------------------------------------
+				 "
+		("\\" hydra-master/body "back")
+		("<ESC>" nil "quit")
+		("al" pdf-annot-list-annotations)
+		("ad" pdf-annot-delete)
+		("aa" pdf-annot-attachment-dired)
+		("am" pdf-annot-add-markup-annotation)
+		("at" pdf-annot-add-text-annotation)
+		("y"  pdf-view-kill-ring-save)
+		("+" pdf-view-enlarge :color red)
+		("-" pdf-view-shrink :color red)
+		("0" pdf-view-scale-reset)
+		("H" pdf-view-fit-height-to-window)
+		("W" pdf-view-fit-width-to-window)
+		("P" pdf-view-fit-page-to-window)
+		("n" pdf-view-next-page-command :color red)
+		("p" pdf-view-previous-page-command :color red)
+		("d" pdf-view-dark-minor-mode)
+		("b" pdf-view-set-slice-from-bounding-box)
+		("r" pdf-view-reset-slice)
+		("g" pdf-view-first-page)
+		("G" pdf-view-last-page)
+		("e" pdf-view-goto-page)
+		("o" pdf-outline)
+		("s" pdf-occur)
+		("i" pdf-misc-display-metadata)
+		("u" pdf-view-revert-buffer)
+		("F" pdf-links-action-perfom)
+		("f" pdf-links-isearch-link)
+		("B" pdf-history-backward :color red)
+		("N" pdf-history-forward :color red)
+		("l" image-forward-hscroll :color red)
+		("h" image-backward-hscroll :color red))
+#+end_src
+*** org-pdftools
+#+begin_src example
+	(use-package org-noter
+		:ensure t)
+
+	(use-package org-pdftools
+		:ensure t
+		:hook (org-mode . org-pdftools-setup-link))
+
+	(use-package org-noter-pdftools
+		:ensure t)
+#+end_src
+*** saveplace-pdf-view
+#+begin_src emacs-lisp
+	(use-package saveplace-pdf-view :ensure t)
+	(save-place-mode 1)
+#+end_src
+** Projectile
+#+begin_src emacs-lisp
+	(use-package projectile
+		:ensure t
+		:init
+		(projectile-mode +1)
+		:bind (:map projectile-mode-map
+								("s-p" . projectile-command-map)
+								("C-c p" . projectile-command-map)))
+
+	(defun my/highlight-todo-like-words ()
+		(font-lock-add-keywords
+		 nil `(("\\<\\(FIXME\\|TODO\\)"
+						1 font-lock-warning-face t))))
+
+	(add-hook 'prog-mode-hook 'my/highlight-todo-like-words)
+#+end_src
+
 ** Rainbow delimiters
 #+begin_src emacs-lisp
 	(use-package rainbow-delimiters
@@ -1115,19 +1008,191 @@ Show vertical lines to guide indentation
 		:hook
 		(prog-mode . rainbow-delimiters-mode))
 #+end_src
+** RSS
+#+begin_src emacs-lisp
+	(use-package elfeed
+		:ensure t
+		:config
+		;; data is stored in ~/.elfeed
+		(setq elfeed-feeds
+					'(
+						;; programming
+						;;("https://news.ycombinator.com/rss" hacker)
+						;;("https://www.reddit.com/r/programming.rss" programming)
+						("https://www.reddit.com/r/emacs.rss" emacs)
+						("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
+						("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
+						("https://habr.com/ru/rss/news/?fl=ru" habr-news)
+						("https://nuancesprog.ru/feed" nop)
+						("https://dev.to/feed" dev-to)
+
+						;; hobby
+						("https://www.reddit.com/r/nasa.rss" nasa)
+						("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
+						("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
+						("https://dev.to/feed/tell396" tell396)
+
+						;; programming languages
+						("https://www.reddit.com/r/javascript.rss" javascript)
+						("https://www.reddit.com/r/typescript.rss" typescript)
+						("https://www.reddit.com/r/golang.rss" golang)
+						("https://www.reddit.com/r/rust.rss" rust)
+
+						;; cloud
+						;;("https://www.reddit.com/r/aws.rss" aws)
+						;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
+						;;("https://www.reddit.com/r/azure.rss" azure)
+						;;("https://www.reddit.com/r/devops.rss" devops)
+						;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
+						))
+
+		(setq-default elfeed-search-filter "@7-days-ago +unread")
+		(setq-default elfeed-search-title-max-width 100)
+		(setq-default elfeed-search-title-min-width 100))
+#+end_src
+** Telega.el
+#+begin_src emacs-lisp
+	(use-package telega
+		:ensure t
+		:config 
+		(setq telega-use-docker t)
+		(add-hook 'telega-load-hook 'telega-notifications-mode)
+		(add-hook 'telega-load-hook 'telega-appindicator-mode)
+		(add-hook 'telega-load-hook 'global-telega-url-shorten-mode))
+#+end_src
+** Terminals (vterm, multi-vterm, term, multi-term)
+*** vterm + multi-vterm
+#+begin_src emacs-lisp
+	(use-package vterm
+		:ensure t)
+
+	(use-package multi-vterm
+		:ensure t
+		:bind
+		("C-x q" . vterm-clear)
+		("C-x w" . multi-vterm))
+#+end_src
+*** term + multi-term (disabled)
+#+begin_src example
+	(use-package multi-term
+		:ensure t
+		:bind
+		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
+		("C-x v" . multi-term)) ;; Open default multi-term without automate spliting
+	)
+#+end_src
+
+** Treemacs
+#+begin_src emacs-lisp
+	(use-package treemacs
+		:ensure t
+		:defer t
+		:init
+		(with-eval-after-load 'winum
+			(define-key winum-keymap (kbd "M-0") 'treemacs-select-window))
+		:config
+		(progn
+			(setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+						treemacs-deferred-git-apply-delay        0.5
+						treemacs-directory-name-transformer      #'identity
+						treemacs-display-in-side-window          t
+						treemacs-eldoc-display                   'simple
+						treemacs-file-event-delay                2000
+						treemacs-file-extension-regex            treemacs-last-period-regex-value
+						treemacs-file-follow-delay               0.2
+						treemacs-file-name-transformer           #'identity
+						treemacs-follow-after-init               t
+						treemacs-expand-after-init               t
+						treemacs-find-workspace-method           'find-for-file-or-pick-first
+						treemacs-git-command-pipe                ""
+						treemacs-goto-tag-strategy               'refetch-index
+						treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+						treemacs-hide-dot-git-directory          t
+						treemacs-indentation                     2
+						treemacs-indentation-string              " "
+						treemacs-is-never-other-window           nil
+						treemacs-max-git-entries                 5000
+						treemacs-missing-project-action          'ask
+						treemacs-move-forward-on-expand          nil
+						treemacs-no-png-images                   nil
+						treemacs-no-delete-other-windows         t
+						treemacs-project-follow-cleanup          nil
+						treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+						treemacs-position                        'left
+						treemacs-read-string-input               'from-child-frame
+						treemacs-recenter-distance               0.1
+						treemacs-recenter-after-file-follow      nil
+						treemacs-recenter-after-tag-follow       nil
+						treemacs-recenter-after-project-jump     'always
+						treemacs-recenter-after-project-expand   'on-distance
+						treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+						treemacs-show-cursor                     nil
+						treemacs-show-hidden-files               t
+						treemacs-silent-filewatch                nil
+						treemacs-silent-refresh                  nil
+						treemacs-sorting                         'alphabetic-asc
+						treemacs-select-when-already-in-treemacs 'move-back
+						treemacs-space-between-root-nodes        t
+						treemacs-tag-follow-cleanup              t
+						treemacs-tag-follow-delay                1.5
+						treemacs-text-scale                      nil
+						treemacs-user-mode-line-format           nil
+						treemacs-user-header-line-format         nil
+						treemacs-wide-toggle-width               70
+						treemacs-width                           35
+						treemacs-width-increment                 1
+						treemacs-width-is-initially-locked       t
+						treemacs-workspace-switch-cleanup        nil)
+
+			;; The default width and height of the icons is 22 pixels. If you are
+			;; using a Hi-DPI display, uncomment this to double the icon size.
+			;; (treemacs-resize-icons 48)
+
+			(treemacs-follow-mode t)
+			(treemacs-filewatch-mode t)
+			(treemacs-fringe-indicator-mode 'always)
+			(when treemacs-python-executable
+				(treemacs-git-commit-diff-mode t))
+
+			(pcase (cons (not (null (executable-find "git")))
+									 (not (null treemacs-python-executable)))
+				(`(t . t)
+				 (treemacs-git-mode 'deferred))
+				(`(t . _)
+				 (treemacs-git-mode 'simple)))
+
+			(treemacs-hide-gitignored-files-mode nil))
+		:bind
+		(:map global-map
+					("M-0"       . treemacs-select-window)
+					("C-x t 1"   . treemacs-delete-other-windows)
+					("C-x t t"   . treemacs)
+					("C-x t d"   . treemacs-select-directory)
+					("C-x t B"   . treemacs-bookmark)
+					("C-x t C-t" . treemacs-find-file)
+					("C-x t M-t" . treemacs-find-tag)))
+
+	(use-package treemacs-all-the-icons
+		:ensure t)
+	(treemacs-load-theme "all-the-icons")
+
+	(use-package treemacs-evil
+		:after (treemacs evil)
+		:ensure t)
+#+end_src
+
 ** Which key
 #+begin_src emacs-lisp
 	(use-package which-key :ensure t)
 	
 #+end_src
-** Wakatime
-#+begin_src example
-
-	(use-package wakatime-mode :ensure t)
-
-	(global-wakatime-mode)
-
+** Zygospore (to easy fullscreening split screens)
+#+begin_src emacs-lisp
+(use-package zygospore :ensure t)
+(global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
 #+end_src
+
+
 ** Calendar sync (disabled)
 #+begin_src example
 	(use-package org-caldav
@@ -1140,36 +1205,6 @@ Show vertical lines to guide indentation
 		(org-caldav-delete-org-entries 'never)
 		)
 							 #+end_src
-
-#+RESULTS:
-: t
-
-** Modeline (simple variant) (disabled)
-#+begin_src example
-	(defun mode-line-render (left right)
-		"Return a string of `window-width' length.
-	Containing LEFT, and RIGHT aligned respectively."
-		(let ((available-width
-					 (- (window-width)
-							(+ (length (format-mode-line left))
-								 (length (format-mode-line right))))))
-			(append left
-							(list (format (format "%%%ds" available-width) ""))
-							right)))
-
-	(setq-default mode-line-format
-								'((:eval (mode-line-render
-													'((:eval (propertize " %b" 'face `(:slant italic)))
-														(:eval (if (and buffer-file-name (buffer-modified-p))
-																			 (propertize "*" 'face `(:inherit face-faded))))
-														(:eval (if (buffer-narrowed-p)
-																			 (propertize "-" 'face `(:inherit face-faded)))))
-													'("%p %l:%c "
-														(:eval (propertize " %m" 'face 'font-lock-string-face)))))))
-
-	(provide 'modeline)
-#+end_src
-
 ** Centaur Tabs (disabled)
 #+begin_src example
 	(use-package centaur-tabs
@@ -1245,6 +1280,32 @@ Show vertical lines to guide indentation
 					("g t" . centaur-tabs-forward)
 					("g T" . centaur-tabs-backward)))
 #+end_src
+** Modeline (simple variant) (disabled)
+#+begin_src example
+	(defun mode-line-render (left right)
+		"Return a string of `window-width' length.
+	Containing LEFT, and RIGHT aligned respectively."
+		(let ((available-width
+					 (- (window-width)
+							(+ (length (format-mode-line left))
+								 (length (format-mode-line right))))))
+			(append left
+							(list (format (format "%%%ds" available-width) ""))
+							right)))
+
+	(setq-default mode-line-format
+								'((:eval (mode-line-render
+													'((:eval (propertize " %b" 'face `(:slant italic)))
+														(:eval (if (and buffer-file-name (buffer-modified-p))
+																			 (propertize "*" 'face `(:inherit face-faded))))
+														(:eval (if (buffer-narrowed-p)
+																			 (propertize "-" 'face `(:inherit face-faded)))))
+													'("%p %l:%c "
+														(:eval (propertize " %m" 'face 'font-lock-string-face)))))))
+
+	(provide 'modeline)
+#+end_src
+
 ** Smooth scroll (good-scroll) (disabled)
 #+begin_src example
 	(use-package good-scroll
@@ -1252,28 +1313,12 @@ Show vertical lines to guide indentation
 		:config
 		(good-scroll-mode 1))
 #+end_src
-** Terminals (vterm, multi-vterm, term, multi-term)
-*** vterm + multi-vterm
-#+begin_src emacs-lisp
-	(use-package vterm
-		:ensure t)
 
-	(use-package multi-vterm
-		:ensure t
-		:bind
-		("C-x q" . vterm-clear)
-		("C-x w" . multi-vterm))
-#+end_src
-*** term + multi-term (disabled)
+** Wakatime (disabled)
 #+begin_src example
-	(use-package multi-term
-		:ensure t
-		:bind
-		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
-		("C-x v" . multi-term)) ;; Open default multi-term without automate spliting
-	)
+	(use-package wakatime-mode :ensure t)
+	(global-wakatime-mode)
 #+end_src
-
 
 ** Other packages
 #+begin_src emacs-lisp
@@ -1335,21 +1380,6 @@ Show vertical lines to guide indentation
 		(reverse-im-input-methods '("ukrainian-computer")) ; translate these methods
 		:config
 		(reverse-im-mode t)) ; turn the mode on
-
-	(use-package projectile
-		:ensure t
-		:init
-		(projectile-mode +1)
-		:bind (:map projectile-mode-map
-								("s-p" . projectile-command-map)
-								("C-c p" . projectile-command-map)))
-
-	(defun my/highlight-todo-like-words ()
-		(font-lock-add-keywords
-		 nil `(("\\<\\(FIXME\\|TODO\\)"
-						1 font-lock-warning-face t))))
-
-	(add-hook 'prog-mode-hook 'my/highlight-todo-like-words)
 #+end_src
 
 * Setting keymap
