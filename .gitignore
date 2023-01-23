@@ -12,6 +12,7 @@ places/
 var/
 emojis/
 eln-cache/
+eaf/
 dmenu-items
 
 org-caldav*
@@ -28,7 +29,7 @@ url/
 bookmarks
 tramp
 recentf
-projectile-bookmarks.eld
+projectile*
 
 .dap-breakpoints
 .lsp-session*

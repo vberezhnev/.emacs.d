@@ -122,8 +122,11 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	(use-package go-mode :ensure t)
 	(use-package company :ensure t)
 
-	(load "~/.emacs.d/local-packages/company-go")
-	(require 'company-go)
+	;; (load "~/.emacs.d/local-packages/epubmode")
+	;; (require 'epubmode)
+
+	;; (load "~/.emacs.d/local-packages/company-go")
+	;; (require 'company-go)
 
 	;; (load "~/.emacs.d/local-packages/chep-video")
 	;; (require 'chep-video)
@@ -134,16 +137,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	;; (load "~/.emacs.d/local-packages/nov")
 	;; (require 'nov)
 
-	;; (load "~/.emacs.d/local-packages/novXvidget")
-	;; (require 'novXvidget)
+	;; (use-package nov :ensure t)
 
-	;; Best .epub reader
-	;; (use-package nov-xwidget
-	;; 	:demand t
-	;; 	:after nov
-	;; 	:config
-	;; 	(define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
-	;; 	(add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
 
 	;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
 #+end_src
@@ -282,62 +277,62 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
   ;; Setting dashboard
   (use-package dashboard
-    :ensure t
-    :hook (dashboard-mode . (lambda ()
-			      ;; No title
-			      (setq-local frame-title-format nil)
-			      ;; Enable `page-break-lines-mode'
-			      (when (fboundp 'page-break-lines-mode)
-				(page-break-lines-mode 1))))
-    :init      ;; tweak dashboard config before loading it
-    (setq dashboard-set-heading-icons t
-	  dashboard-set-file-icons t
-	  dashboard-center-content t
-	  dashboard-banner-logo-title "Welcome back, Darling!"
-	  dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
-	  ;; dashboard-page-separator ""
-	  dashboard-set-navigator t
-	  dashboard-items '(
-			    (recents . 6)
-			    (agenda . 4 )
-			    ;;(registers . 3)
-			    (bookmarks . 4)
-			    (projects . 4))) ;; use standard emacs logo as banner
+	  :ensure t
+	  :hook (dashboard-mode . (lambda ()
+														  ;; No title
+														  (setq-local frame-title-format nil)
+														  ;; Enable `page-break-lines-mode'
+														  (when (fboundp 'page-break-lines-mode)
+															  (page-break-lines-mode 1))))
+	  :init      ;; tweak dashboard config before loading it
+	  (setq dashboard-set-heading-icons t
+				  dashboard-set-file-icons t
+				  dashboard-center-content t
+				  dashboard-banner-logo-title "Welcome back, Darling!"
+				  dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
+				  ;; dashboard-page-separator ""
+				  dashboard-set-navigator t
+				  dashboard-items '(
+													  (recents . 6)
+													  (agenda . 4 )
+													  ;;(registers . 3)
+													  (bookmarks . 4)
+													  (projects . 4))) ;; use standard emacs logo as banner
 
-    ;; Format: "(icon title help action face prefix suffix)"
-    ;; (setq dashboard-navigator-buttons
-    ;; 			`(;; line1
-    ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
-    ;; 					"Main site"
-    ;; 					"Browse homepage"
-    ;; 					(lambda (&rest _) (browse-url "homepage")))
-    ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-    ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
-    ;; 				;; line 2
-    ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-    ;; 					"Github"
-    ;; 					""
-    ;; 					(lambda (&rest _) (browse-url "homepage")))
-    ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
-    (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
-    ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-    ;; 																									 :height 1.1
-    ;; 																									 :v-adjust -0.05
-    ;; 																									 :face 'font-lock-keyword-face))
-    :config
-    (dashboard-modify-heading-icons '((recents . "file-text")
-				      (bookmarks . "book")))
-    (dashboard-setup-startup-hook)
-    )
+	  ;; Format: "(icon title help action face prefix suffix)"
+	  ;; (setq dashboard-navigator-buttons
+	  ;; 			`(;; line1
+	  ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
+	  ;; 					"Main site"
+	  ;; 					"Browse homepage"
+	  ;; 					(lambda (&rest _) (browse-url "homepage")))
+	  ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+	  ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
+	  ;; 				;; line 2
+	  ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+	  ;; 					"Github"
+	  ;; 					""
+	  ;; 					(lambda (&rest _) (browse-url "homepage")))
+	  ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+	  (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
+	  ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+	  ;; 																									 :height 1.1
+	  ;; 																									 :v-adjust -0.05
+	  ;; 																									 :face 'font-lock-keyword-face))
+	  :config
+	  (dashboard-modify-heading-icons '((recents . "file-text")
+																		  (bookmarks . "book")))
+	  (dashboard-setup-startup-hook)
+	  )
 
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
   (defun dashboard-refresh-buffer ()
-    (interactive)
-    (when (get-buffer dashboard-buffer-name)
-      (kill-buffer dashboard-buffer-name))
-    (dashboard-insert-startupify-lists)
-    (switch-to-buffer dashboard-buffer-name))
+	  (interactive)
+	  (when (get-buffer dashboard-buffer-name)
+		  (kill-buffer dashboard-buffer-name))
+	  (dashboard-insert-startupify-lists)
+	  (switch-to-buffer dashboard-buffer-name))
 #+end_src
 
 ** Dired
@@ -640,6 +635,7 @@ BUG BUG BUG
 	(evil-set-initial-state 'ibuffer-mode 'normal)
 	(evil-set-initial-state 'bookmark-bmenu-mode 'normal)
 	(evil-set-initial-state 'vterm-mode 'normal)
+	(evil-set-initial-state 'calibredb-mode 'normal)
 	;; (evil-set-initial-state 'dired-mode 'emacs)
 	(evil-set-initial-state 'sunrise-mode 'emacs)
 #+end_src
@@ -817,7 +813,7 @@ Show vertical lines to guide indentation
 *** Org agenda
 ~C-c a t~ -- for entering in Org agenda
 #+begin_src emacs-lisp
-	(setq org-agenda-files   (list "~/Org/")
+	(setq org-agenda-files   (list "~/Org")
 				org-log-done 'time)
 #+end_src
 
@@ -886,15 +882,17 @@ Show vertical lines to guide indentation
 		(add-hook 'before-save-hook 'parrot-start-animation)
 		(add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
 #+end_src
-** PDF Tools
-*** pdf-tools
+** Pdf, epub, Djvu readers
+*** PDF Tools (pdf)
+**** pdf-tools
 #+begin_src emacs-lisp
 	(use-package pdf-tools
 		:defer t
 		:mode (("\\.pdf\\'" . pdf-view-mode))
 		:config
-		(pdf-tools-install)
+(add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
 		(setq-default pdf-view-display-size 'fit-page)
+		;; (pdf-tools-install)
 		:bind (:map pdf-view-mode-map
 								("\\" . hydra-pdftools/body)
 								("<s-spc>" .  pdf-view-scroll-down-or-next-page)
@@ -908,7 +906,7 @@ Show vertical lines to guide indentation
 								("u"  . pdf-view-revert-buffer)
 								("al" . pdf-annot-list-annotations)
 								("ad" . pdf-annot-delete)
-								;; ("aa" . pdf-annot-attachment-dired)
+								("aa" . pdf-annot-attachment-dired)
 								("am" . pdf-annot-add-markup-annotation)
 								("at" . pdf-annot-add-text-annotation)
 								("y"  . pdf-view-kill-ring-save)
@@ -966,42 +964,111 @@ Show vertical lines to guide indentation
 		("l" image-forward-hscroll :color red)
 		("h" image-backward-hscroll :color red))
 #+end_src
-*** org-pdftools
-#+begin_src example
-	(use-package org-noter
-		:ensure t)
-
-	(use-package org-pdftools
-		:ensure t
-		:hook (org-mode . org-pdftools-setup-link))
-
-	(use-package org-noter-pdftools
-		:ensure t)
-#+end_src
-*** saveplace-pdf-view
+**** saveplace-pdf-view
 #+begin_src emacs-lisp
-	(use-package saveplace-pdf-view :ensure t)
-	(save-place-mode 1)
+  (use-package saveplace-pdf-view :ensure t)
+  (save-place-mode 1)
 #+end_src
+*** nov.el (epub)
+For more information: https://depp.brause.cc/nov.el/
+#+begin_src emacs-lisp
+  use-package nov
+  :ensure t
+  :config
+  ;; (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  (setq nov-text-width 80)
+  (setq nov-text-width t)
+  (setq visual-fill-column-center-text t)
+  (add-hook 'nov-mode-hook 'visual-line-mode)
+  (add-hook 'nov-mode-hook 'visual-fill-column-mode)
+  )
+#+end_src
+*** nov-xwidget (epub)
+#+begin_src emacs-lisp
+  (load "~/.emacs.d/local-packages/nov-xwidget")
+  (require 'nov-xwidget)
+
+
+  (use-package cl-lib :ensure t)
+
+  ;; Best .epub reader
+  (use-package nov-xwidget
+    :demand t
+    :after nov
+    :config
+    (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
+    (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
+#+end_src
+*** justify-kp (for epub)
+#+begin_src example
+	;; Here's an advanced example of text justification with the justify-kp package
+	(use-package justify-kp
+		:ensure nil
+		:load-path "~/.emacs.d/local-packages/justify-kp.el"
+		:config
+		(setq nov-text-width t)
+		(defun my-nov-window-configuration-change-hook ()
+			(my-nov-post-html-render-hook)
+			(remove-hook 'window-configuration-change-hook
+									 'my-nov-window-configuration-change-hook
+									 t))
+		(defun my-nov-post-html-render-hook ()
+			(if (get-buffer-window)
+					(let ((max-width (pj-line-width))
+								buffer-read-only)
+						(save-excursion
+							(goto-char (point-min))
+							(while (not (eobp))
+								(when (not (looking-at "^[[:space:]]*$"))
+									(goto-char (line-end-position))
+									(when (> (shr-pixel-column) max-width)
+										(goto-char (line-beginning-position))
+										(pj-justify)))
+								(forward-line 1))))
+				(add-hook 'window-configuration-change-hook
+									'my-nov-window-configuration-change-hook
+									nil t))))
+
+#+end_src
+*** Calibre (books management)
+#+begin_src emacs-lisp
+  (setq sql-sqlite-program "/usr/bin/sqlite3")
+  ;; (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
+
+  (use-package calibredb
+    :ensure t
+    :defer t
+    :config
+    (setq calibredb-root-dir "~/Calibre Library")
+    (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+    (setq calibredb-library-alist '(("~/Books")))
+    (setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
+					    ("2. Read it later" . "Readit epub")
+					    ("3. Development - rust" . "rust")))
+    (setq calibredb-format-all-the-icons t)
+    (setq calibredb-format-icons-in-terminal t))
+#+end_src
+
 ** Projectile
 #+begin_src emacs-lisp
-	(use-package projectile
-		:ensure t
-		:init
-		(projectile-mode +1)
-		:bind (:map projectile-mode-map
-								("s-p" . projectile-command-map)
-								("C-c p" . projectile-command-map)))
+  (use-package projectile
+    :ensure t
+    :init
+    (projectile-mode +1)
+    :bind (:map projectile-mode-map
+		("s-p" . projectile-command-map)
+		("C-c p" . projectile-command-map)))
 
-	(defun my/highlight-todo-like-words ()
-		(font-lock-add-keywords
-		 nil `(("\\<\\(FIXME\\|TODO\\)"
-						1 font-lock-warning-face t))))
+  (defun my/highlight-todo-like-words ()
+    (font-lock-add-keywords
+     nil `(("\\<\\(FIXME\\|TODO\\)"
+	    1 font-lock-warning-face t))))
 
-	(add-hook 'prog-mode-hook 'my/highlight-todo-like-words)
+  (add-hook 'prog-mode-hook 'my/highlight-todo-like-words)
+  (add-to-list 'projectile-globally-ignored-directories "node_modules")
 #+end_src
 
-** Rainbow delimiters
+** Rainbow delimiter
 #+begin_src emacs-lisp
 	(use-package rainbow-delimiters
 		:ensure t
@@ -1037,6 +1104,9 @@ Show vertical lines to guide indentation
 						("https://www.reddit.com/r/typescript.rss" typescript)
 						("https://www.reddit.com/r/golang.rss" golang)
 						("https://www.reddit.com/r/rust.rss" rust)
+
+						;; Books
+						("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
 
 						;; cloud
 						;;("https://www.reddit.com/r/aws.rss" aws)
@@ -1193,17 +1263,19 @@ Show vertical lines to guide indentation
 #+end_src
 
 
-** Calendar sync (disabled)
-#+begin_src example
+
+** Calendar sync
+#+begin_src emacs-lisp
 	(use-package org-caldav
 		:custom
 		(org-caldav-url "https://lunarcloud.ddns.net/remote.php/dav/calendars/ncp")
-		(org-caldav-calendar-id "1")
+		(org-caldav-calendar-id "cato")
 		(org-caldav-inbox "~/Org/agenda.org")
 		(org-caldav-files '("~/Org/agenda.org"))
 		(org-icalendar-timezone "Asia/Vladivostok")
 		(org-caldav-delete-org-entries 'never)
 		)
+	;; (org-caldav-sync)
 							 #+end_src
 ** Centaur Tabs (disabled)
 #+begin_src example
@@ -1320,6 +1392,7 @@ Show vertical lines to guide indentation
 	(global-wakatime-mode)
 #+end_src
 
+
 ** Other packages
 #+begin_src emacs-lisp
 	;; (use-package elcord :defer t)
@@ -1405,6 +1478,8 @@ Show vertical lines to guide indentation
 	(global-set-key (kbd "C-c t <deletechar>") #'org-timer-stop)
 
 	(global-set-key (kbd "\C-c w") 'evil-window-map)
+
+	(global-set-key (kbd "\C-c f") 'format-all-buffer)
 #+end_src
 
 #+begin_src emacs-lisp 
@@ -1419,6 +1494,7 @@ Show vertical lines to guide indentation
 									shell-mode-hook
 									treemacs-mode-hook
 									eshell-mode-hook
+	                nov-mode-hook
 									neotree-mode-hook))
 		(add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
@@ -1613,7 +1689,7 @@ Show vertical lines to guide indentation
 		:mode (("\\.js\\'" . web-mode)
 					 ("\\.jsx\\'" . web-mode)
 					 ("\\.ts\\'" . web-mode)
-					 ("\\.tsx\\'" . typescript-mode)
+					 ;; ("\\.tsx\\'" . typescript-mode)
 					 ("\\.html\\'" . web-mode)
 					 ("\\.vue\\'" . web-mode)
 					 ("\\.json\\'" . web-mode))
@@ -1664,17 +1740,10 @@ Show vertical lines to guide indentation
 	(use-package typescript-mode
 		:ensure t
 		:after tree-sitter
-		:config
-		;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
-		;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
-		(define-derived-mode typescriptreact-mode typescript-mode
-			"TypeScript TSX")
-
-		;; use our derived mode for tsx files
-		(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
-		;; by default, typescript-mode is mapped to the treesitter typescript parser
-		;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
-		(add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
+		:mode (rx ".ts" string-end)
+		:init
+		(define-derived-mode typescript-tsx-mode typescript-mode "typescript-tsx")
+		(add-to-list 'auto-mode-alist (cons (rx ".tsx" string-end) #'typescript-tsx-mode)))
 #+end_src
 
 *** TypeScript Tide
@@ -2143,4 +2212,31 @@ Support for resizing windows, using the mouse. Position the mouse on the divider
 	(defun ambrevar/exwm-rename-buffer-to-title () (exwm-workspace-rename-buffer exwm-title))
 
 	(my-exwm-config-setup) ;; Does not start X11 or EXWM. Start should be done from commandline.
+#+end_src
+
+
+* eaf
+#+begin_src emacs-lisp
+	(use-package eaf
+		:load-path "~/.emacs.d/site-lisp/emacs-application-framework"
+		:custom
+																					; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+		(eaf-browser-continue-where-left-off t)
+		(eaf-browser-enable-adblocker t)
+		(browse-url-browser-function 'eaf-open-browser)
+		:config
+	(eaf-setq eaf-browser-enable-adblocker "true")
+		;; :config
+		;; (defalias 'browse-web #'eaf-open-browser)
+		;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+		;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+		;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+		;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+		) ;; unbind, see more in the Wiki
+
+	(require 'eaf)
+	(require 'eaf-browser)
+	;; (require 'eaf-pdf-viewer)
+	;; (require 'eaf-org-previewer)
+	;; (require 'eaf-terminal)
 #+end_src

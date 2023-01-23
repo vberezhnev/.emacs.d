@@ -30,10 +30,14 @@
 
 ;;; Code:
 
+
 (require 'nov)
 (require 'shr)
 (require 'xwidget)
+
+(load "~/.emacs.d/local-packages/cl-lib")
 (require 'cl-lib)
+(require 'evil-core nil 'noerror)
 
 (defcustom nov-xwidget-script (format "
 console.log(\"Hello world\");
@@ -48,7 +52,6 @@ console.log(\"Hello world\");
         writing-mode: horizontal-tb;
         // background: %s !important;
         font-size: 18px !important;
-        max-width: 750px !important;
         text-align: left !important;
         width: 90%% !important;
         height: 50%% !important;
@@ -132,7 +135,6 @@ console.log(\"Hello world\");
         // background: %s !important;
         color: #eee !important;
         font-size: 18px !important;
-        max-width: 750px !important;
         text-align: left !important;
         width: 90%% !important;
         height: 50%% !important;
