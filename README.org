@@ -96,6 +96,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 				undo-limit                        6710886400 ;; 64mb
 				undo-strong-limit                 100663296 ;; x 1.5 (96mb)
 				undo-outer-limit                  1006632960) ;; x 10 (960mb), (Emacs uses x100), but this seems too high.
+
+	(setq org-default-notes-file (expand-file-name "~/Org/agenda.org"))
 #+end_src
 ** Emacs blur (toggle)
 #+begin_src example
@@ -209,60 +211,130 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting font face
 ** Setting fonts
 #+begin_src emacs-lisp
-	(set-face-attribute 'default nil
-											:font "Iosevka"
-											:height 110
-											:weight 'medium)
-	(set-face-attribute 'variable-pitch nil
-											:font "Iosevka"
-											:height 120
-											:weight 'medium)
-	(set-face-attribute 'fixed-pitch nil
-											:font "Iosevka"
-											:height 110
-											:weight 'medium)
+	(set-face-attribute 'default t
+											:font "JetBrains Mono" ;; Iosevka, Input, Hack
+											:height 70
+											:weight 'regular
+											)
+	;; (set-face-attribute 'variable-pitch nil
+	;; 										:font "JetBrains Mono"
+	;; 										:height 80
+	;; 										:weight 'medium
+	;; 										)
+	;; (set-face-attribute 'fixed-pitch nil
+	;; 										:font "JetBrains Mono"
+	;; 										:height 80
+	;; 										:weight 'medium
+	;; 										)
+
+	;; (set-frame-font "JetBrains Mono" nil t)
+
 	;; Makes commented text and keywords italics.
 	;; This is working in emacsclient but not emacs.
 	;; Your font must have an italic face available.
-	(set-face-attribute 'font-lock-comment-face nil
-											:slant 'italic)
-	(set-face-attribute 'font-lock-keyword-face nil
-											:slant 'italic)
+	;; (set-face-attribute 'font-lock-comment-face nil
+	;; 										:slant 'italic)
+	;; (set-face-attribute 'font-lock-keyword-face nil
+	;; 										:slant 'italic)
 
-	(add-to-list 'default-frame-alist '(font . "Iosevka"))
 
 	;; Uncomment the following line if line spacing needs adjusting.
-	(setq-default line-spacing 0.12)
+	;; (setq-default line-spacing 0.12)
 
 	;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
+	(add-to-list 'default-frame-alist '(font . "JetBrains Mono"))
 	;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
 	;; changes certain keywords to symbols, such as lamda!
 	(setq global-prettify-symbols-mode t)
 #+end_src
 
+** Prettify JetBrains Mono symbols
+#+begin_src emacs-lisp
+	(defun jetbrains-ligature-mode--make-alist (list)
+		"Generate prettify-symbols alist from LIST."
+		(let ((idx -1))
+			(mapcar
+			 (lambda (s)
+				 (setq idx (1+ idx))
+				 (if s
+						 (let* ((code (+ #X10001 idx))
+										(width (string-width s))
+										(prefix ())
+										(suffix '(?\s (Br . Br)))
+										(n 1))
+							 (while (< n width)
+								 (setq prefix (append prefix '(?\s (Br . Bl))))
+								 (setq n (1+ n)))
+							 (cons s (append prefix suffix (list (decode-char 'ucs code)))))))
+			 list)))
+
+	(defconst jetbrains-ligature-mode--ligatures
+		'("-->" "//" "/**" "/*" "*/" "<!--" ":=" "->>" "<<-" "->" "<-"
+			"<=>" "==" "!=" "<=" ">=" "=:=" "!==" "&&" "||" "..." ".."
+			nil nil nil nil nil nil nil nil nil nil nil nil nil nil
+			"|||" "///" "&&&" "===" "++" "--" "=>" "|>" "<|" "||>" "<||"
+			"|||>" "<|||" ">>" "<<" nil nil "::=" "|]" "[|" "{|" "|}"
+			"[<" ">]" ":?>" ":?" nil "/=" "[||]" "!!" "?:" "?." "::"
+			"+++" "??" "###" "##" ":::" "####" ".?" "?=" "=!=" "<|>"
+			"<:" ":<" ":>" ">:" "<>" "***" ";;" "/==" ".=" ".-" "__"
+			"=/=" "<-<" "<<<" ">>>" "<=<" "<<=" "<==" "<==>" "==>" "=>>"
+			">=>" ">>=" ">>-" ">-" "<~>" "-<" "-<<" "=<<" "---" "<-|"
+			"<=|" "/\\" "\\/" "|=>" "|~>" "<~~" "<~" "~~" "~~>" "~>"
+			"<$>" "<$" "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</>" "</" "/>"
+			"<->" "..<" "~=" "~-" "-~" "~@" "^=" "-|" "_|_" "|-" "||-"
+			"|=" "||=" "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#="
+			"&="))
+
+	(defvar jetbrains-ligature-mode--old-prettify-alist)
+
+	(defun jetbrains-ligature-mode--enable ()
+		"Enable JetBrains Mono ligatures in current buffer."
+		(setq-local jetbrains-ligature-mode--old-prettify-alist prettify-symbols-alist)
+		(setq-local prettify-symbols-alist (append (jetbrains-ligature-mode--make-alist jetbrains-ligature-mode--ligatures) jetbrains-ligature-mode--old-prettify-alist))
+		(prettify-symbols-mode t))
+
+	(defun jetbrains-ligature-mode--disable ()
+		"Disable JetBrains Mono ligatures in current buffer."
+		(setq-local prettify-symbols-alist jetbrains-ligature-mode--old-prettify-alist)
+		(prettify-symbols-mode -1))
+
+	(define-minor-mode jetbrains-ligature-mode
+		"JetBrains Mono ligatures minor mode"
+		:lighter " JetBrains Mono"
+		(setq-local prettify-symbols-unprettify-at-point 'right-edge)
+		(if jetbrains-ligature-mode
+				(jetbrains-ligature-mode--enable)
+			(jetbrains-ligature-mode--disable)))
+
+	(defun jetbrains-ligature-mode--setup ()
+		"Setup JetBrains Mono Symbols"
+		(set-fontset-font t '(#X10001 . #X1009c) "JetBrains Mono"))
+
+	(provide 'jetbrains-ligature-mode)
+#+end_src
 ** Setting and installing themes
 #+begin_src emacs-lisp
-	;; (use-package 'gruvbox-theme
-	;; 	:ensure t)
+  ;; (use-package 'gruvbox-theme
+  ;; 	:ensure t)
 
-	;; (use-package 'modus-themes
-	;; 	:ensure t)
+  ;; (use-package 'modus-themes
+  ;; 	:ensure t)
 
-	(use-package doom-themes
-		:ensure t
-		:config
-		;; Global settings (defaults)
-		(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-					doom-themes-enable-italic t) ; if nil, italics is universally disabled
-		;; Enable flashing mode-line on errors
-		(doom-themes-visual-bell-config)
-		;; or for treemacs users
-		(setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
-		(doom-themes-treemacs-config)
-		;; Corrects (and improves) org-mode's native fontification.
-		(doom-themes-org-config))
+  (use-package doom-themes
+    :ensure t
+    :config
+    ;; Global settings (defaults)
+    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+	  doom-themes-enable-italic t) ; if nil, italics is universally disabled
+    ;; Enable flashing mode-line on errors
+    (doom-themes-visual-bell-config)
+    ;; or for treemacs users
+    ;; (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
+    (doom-themes-treemacs-config)
+    ;; Corrects (and improves) org-mode's native fontification.
+    (doom-themes-org-config))
 
-	(load-theme 'gruvbox-dark-soft t)
+  (load-theme 'doom-one t)
 	#+end_src
 
 * Setting Packages
@@ -275,75 +347,156 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Dashboard
 #+begin_src emacs-lisp
-  ;; Setting dashboard
-  (use-package dashboard
-	  :ensure t
-	  :hook (dashboard-mode . (lambda ()
-														  ;; No title
-														  (setq-local frame-title-format nil)
-														  ;; Enable `page-break-lines-mode'
-														  (when (fboundp 'page-break-lines-mode)
-															  (page-break-lines-mode 1))))
-	  :init      ;; tweak dashboard config before loading it
-	  (setq dashboard-set-heading-icons t
-				  dashboard-set-file-icons t
-				  dashboard-center-content t
-				  dashboard-banner-logo-title "Welcome back, Darling!"
-				  dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
-				  ;; dashboard-page-separator ""
-				  dashboard-set-navigator t
-				  dashboard-items '(
-													  (recents . 6)
-													  (agenda . 4 )
-													  ;;(registers . 3)
-													  (bookmarks . 4)
-													  (projects . 4))) ;; use standard emacs logo as banner
+	;; Setting dashboard
+	(use-package dashboard
+		:ensure t
+		:hook (dashboard-mode . (lambda ()
+															;; No title
+															(setq-local frame-title-format nil)
+															;; Enable `page-break-lines-mode'
+															(when (fboundp 'page-break-lines-mode)
+																(page-break-lines-mode 1))))
+		:init      ;; tweak dashboard config before loading it
+		(setq dashboard-set-heading-icons t
+					dashboard-set-file-icons t
+					dashboard-center-content t
+					dashboard-banner-logo-title "Welcome back, Darling!"
+					dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
+					;; dashboard-page-separator ""
+					dashboard-set-navigator t
+					dashboard-items '(
+														(recents . 6)
+														(agenda . 4 )
+														;;(registers . 3)
+														(bookmarks . 4)
+														(projects . 4))) ;; use standard emacs logo as banner
 
-	  ;; Format: "(icon title help action face prefix suffix)"
-	  ;; (setq dashboard-navigator-buttons
-	  ;; 			`(;; line1
-	  ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
-	  ;; 					"Main site"
-	  ;; 					"Browse homepage"
-	  ;; 					(lambda (&rest _) (browse-url "homepage")))
-	  ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-	  ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
-	  ;; 				;; line 2
-	  ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-	  ;; 					"Github"
-	  ;; 					""
-	  ;; 					(lambda (&rest _) (browse-url "homepage")))
-	  ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
-	  (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
-	  ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-	  ;; 																									 :height 1.1
-	  ;; 																									 :v-adjust -0.05
-	  ;; 																									 :face 'font-lock-keyword-face))
-	  :config
-	  (dashboard-modify-heading-icons '((recents . "file-text")
-																		  (bookmarks . "book")))
-	  (dashboard-setup-startup-hook)
-	  )
+		;; Format: "(icon title help action face prefix suffix)"
+		;; (setq dashboard-navigator-buttons
+		;; 			`(;; line1
+		;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
+		;; 					"Main site"
+		;; 					"Browse homepage"
+		;; 					(lambda (&rest _) (browse-url "homepage")))
+		;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+		;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
+		;; 				;; line 2
+		;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+		;; 					"Github"
+		;; 					""
+		;; 					(lambda (&rest _) (browse-url "homepage")))
+		;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+		(setq dashboard-footer-messages '("Richard Stallman is proud of you."))
+		;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+		;; 																									 :height 1.1
+		;; 																									 :v-adjust -0.05
+		;; 																									 :face 'font-lock-keyword-face))
+		:config
+		(dashboard-modify-heading-icons '((recents . "file-text")
+																			(bookmarks . "book")))
+		(dashboard-setup-startup-hook)
+		)
 
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+	(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
-  (defun dashboard-refresh-buffer ()
-	  (interactive)
-	  (when (get-buffer dashboard-buffer-name)
-		  (kill-buffer dashboard-buffer-name))
-	  (dashboard-insert-startupify-lists)
-	  (switch-to-buffer dashboard-buffer-name))
+	(defun dashboard-refresh-buffer ()
+		(interactive)
+		(when (get-buffer dashboard-buffer-name)
+			(kill-buffer dashboard-buffer-name))
+		(dashboard-insert-startupify-lists)
+		(switch-to-buffer dashboard-buffer-name))
+#+end_src
+
+** Org-roam
+*** Org-roam setting
+#+begin_src emacs-lisp
+	(use-package org-roam
+		:ensure t
+		:custom
+		(org-roam-directory (file-truename "~/Org/2Brain"))
+		(org-roam-completion-everywhere t)
+		(org-roam-capture-templates
+		 '(
+			 ("d" "default" plain "%?"
+				:if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+				:unnarrowed t)
+			 ("b" "Books" plain
+				"\n* Source\n\nAuthor: %^{Author}\nTitle: ${title}\nYear: %^{Year}\n\n* Summary\n\n%?"
+				:if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+				:unnarrowed t)
+
+			 ))
+		:bind (("C-c n l" . org-roam-buffer-toggle)
+					 ("C-c n f" . org-roam-node-find)
+					 ("C-c n g" . org-roam-graph)
+					 ("C-c n i" . org-roam-node-insert)
+					 ("C-c n c" . org-roam-capture)
+					 ;; Dailies
+					 ("C-c n j" . org-roam-dailies-capture-today))
+		:config
+		;; If you're using a vertical completion framework, you might want a more informative completion interface
+		;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+		(setq org-roam-completion-everywhere t)
+		(org-roam-db-autosync-mode)
+		;; If using org-roam-protocol
+		(require 'org-roam-protocol))
+#+end_src
+
+*** Org-roam-ui
+#+begin_src emacs-lisp
+	(use-package org-roam-ui
+		:ensure t
+		:hook (after-init . org-roam-ui-mode)
+		:config
+		(setq org-roam-ui-sync-theme t
+					org-roam-ui-follow t
+					org-roam-ui-update-on-save t
+					org-roam-ui-open-on-start nil)
+		(setq org-roam-ui-custom-theme
+					'((bg . "#1E2029")
+						(bg-alt . "#282a36")
+						(fg . "#f8f8f2")
+						(fg-alt . "#6272a4")
+						(red . "#ff5555")
+						(orange . "#f1fa8c")
+						(yellow ."#ffb86c")
+						(green . "#50fa7b")
+						(cyan . "#8be9fd")
+						(blue . "#ff79c6")
+						(violet . "#8be9fd")
+						(magenta . "#bd93f9"))))
+#+end_src
+
+*** Configuring org-roam buffer display
+#+begin_src emacs-lisp
+(add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
+#+end_src
+*** Md-roam (add md for org-roam)
+#+begin_src emacs-lisp
+	(load "~/.emacs.d/local-packages/md-roam")
+	(use-package md-roam
+		:config
+		(md-roam-mode 1) ; md-roam-mode must be active before org-roam-db-sync
+		(setq md-roam-file-extension "md") ; default "md". Specify an extension such as "markdown"
+		(org-roam-db-autosync-mode 1) ; autosync-mode triggers db-sync. md-roam-mode must be already active
+		)
 #+end_src
 
 ** Dired
-*** Dired Basics
-**** Invocation
+*** Docs for dired
+**** Dired Basics
+***** Invocation
 
 - =C-x d= or =C-x C-f= - =dired=
 - =dired-jump= - open Dired buffer, select the current file
 - =projectile-dired=
 
-**** Navigation
+***** Navigation
 
 *Emacs* / *Evil*
 - =n= / =j= - next line
@@ -355,7 +508,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 - =M-RET= - Show file in other window without focusing (previewing files)
 - =g o= (=dired-view-file=) - Open file but in a "preview" mode, close with =q=
 
-**** Configuration
+***** Configuration
 
 - =dired-listing-switches:= Try =-agho --group-directories-first=
 - =g= / =g r= Refresh the buffer with =revert-buffer= after changing configuration (and after filesystem changes!)
@@ -373,6 +526,36 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
  #+end_src
 
+*** Other dired config
+#+begin_src emacs-lisp
+	(use-package dired
+		:defer t
+		:config
+		(setq dired-dwim-target t) ; Dired tries to guess the target directory
+		(setq dired-recursive-deletes 'always) ; Allow deleting directories recursively
+		(setq dired-listing-switches "-alh --group-directories-first") ; Use human-readable file sizes and group directories first
+		(setq dired-hide-details-mode t) ; Hide file and directory details by default
+		(setq dired-auto-revert-buffer t) ; Automatically refresh Dired buffers when changes are made
+		(setq diredp-hide-details-initially-flag nil)
+		(put 'dired-find-alternate-file 'disabled nil) ; Allow using Enter key to open files
+		(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; Bind Enter to open files
+		(define-key dired-mode-map (kbd "^")
+			(lambda () (interactive) (find-alternate-file ".."))) ; Bind ^ to go up a directory
+		(define-key dired-mode-map (kbd "(") 'dired-hide-details-mode) ; Bind ( to toggle file and directory details
+		(define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
+		(define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
+		(use-package all-the-icons-dired
+			:ensure t
+			:hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
+			:init
+			(setq all-the-icons-dired-mode-inline-electric-icons t)) ; Show electric icons for Dired mode
+		;; (use-package image-dired
+		;; 	:ensure t
+		;; 	:config
+		;; 	(image-dired-track-modified-flag t) ; Automatically track modifications in images
+		;; 	(image-dired-thumb-margin 5)) ; Set margin for image thumbnails in Image Dired mode
+		)
+#+end_src
 *** Dired subtree
 #+begin_src example
   (use-package dired-subtree
@@ -381,8 +564,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     :config
     (define-key dired-mode-map (kbd "<tab>") 'dired-subtree-toggle))
 #+end_src
-*** File Operations
-**** Marking files
+**** File Operations
+***** Marking files
 
 - =m= - Marks a file
 - =u= - Unmarks a file
@@ -393,7 +576,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 - =k= / =K= - "Kill" marked items (refresh buffer with =g= / =g r= to get them back)
 - Many operations can be done on a single file if there are no active marks!
 
-**** Copying and Renaming files
+***** Copying and Renaming files
 
 - =C= - Copy marked files (or if no files are marked, the current file)
 - Copying single and multiple files
@@ -401,20 +584,20 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 - =R= - Rename marked files, renaming multiple is a move!
 - =% R= - Rename based on regular expression: =^test= , =old-\&=
 
-**** Deleting files
+***** Deleting files
 
 - =D= - Delete marked file
 - =d= - Mark file for deletion
 - =x= - Execute deletion for marks
 - =delete-by-moving-to-trash= - Move to trash instead of deleting permanently
 
-**** Creating and extracting archives
+***** Creating and extracting archives
 
 - =Z= - Compress or uncompress a file or folder to (=.tar.gz=)
 - =c= - Compress selection to a specific file
 - =dired-compress-files-alist= - Bind compression commands to file extension
 
-**** Other common operations
+***** Other common operations
 
 - =T= - Touch (change timestamp)
 - =M= - Change file mode
@@ -441,7 +624,7 @@ Use =dired-single= to help with this: https://github.com/crocket/dired-single
 #+end_src
 
 *** File icons
-#+begin_src emacs-lisp
+#+begin_src example
   (use-package all-the-icons-dired
     :ensure t
     :hook (dired-mode . all-the-icons-dired-mode))
@@ -481,59 +664,55 @@ BUG BUG BUG
   (define-key dired-mode-map (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directoryopening-new-dired-buffer t)
 #+end_src
 *** Dired sort directories first
-#+begin_src emacs-lisp
-(defun sof/dired-sort ()
-  "Dired sort hook to list directories first."
-  (save-excursion
-   (let (buffer-read-only)
-     (forward-line 2) ;; beyond dir. header  
-     (sort-regexp-fields t "^.*$" "[ ]*." (point) (point-max))))
-  (and (featurep 'xemacs)
-       (fboundp 'dired-insert-set-properties)
-       (dired-insert-set-properties (point-min) (point-max)))
-  (set-buffer-modified-p nil))
+#+begin_src example
+	(defun sof/dired-sort ()
+		"Dired sort hook to list directories first."
+		(save-excursion
+			(let (buffer-read-only)
+				(forward-line 2) ;; beyond dir. header  
+				(sort-regexp-fields t "^.*$" "[ ]*." (point) (point-max))))
+		(and (featurep 'xemacs)
+				 (fboundp 'dired-insert-set-properties)
+				 (dired-insert-set-properties (point-min) (point-max)))
+		(set-buffer-modified-p nil))
 
- (add-hook 'dired-after-readin-hook 'sof/dired-sort)
+	(add-hook 'dired-after-readin-hook 'sof/dired-sort)
 #+end_src
 
-*** Auto hide details
-#+begin_src emacs-lisp
-	(setq dired-hide-details-mode 1)
-#+end_src
 ** Doom modeline
 #+begin_src emacs-lisp
-	(use-package doom-modeline
-		:ensure t
-		:hook
-		(after-init . doom-modeline-mode)
-		(doom-modeline-mode . display-battery-mode)
-		:custom
-		(setq doom-modeline-buffer-encoding nil
-					doom-modeline-buffer-file-name-style 'file-name
-					doom-modeline-checker-simple-format t
-					doom-modeline-vcs-max-length 50
-					doom-modeline-major-mode-icon nil
-					doom-modeline-icon t
-					doom-modeline-modal-icon t
-					;; doom-modeline-lsp nil
-					doom-modeline-major-mode-color-icon nil
-					doom-modeline-buffer-state-icon nil
-					doom-modeline-time-icon nil)
-		(custom-set-faces
-		 '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
-		 '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
-		 '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))
-		(doom-modeline-buffer-file-name-style 'relative-from-project))
+  (use-package doom-modeline
+    :ensure t
+    :hook
+    (after-init . doom-modeline-mode)
+    (doom-modeline-mode . display-battery-mode)
+    :custom
+    (setq doom-modeline-buffer-encoding nil
+	  doom-modeline-buffer-file-name-style 'file-name
+	  doom-modeline-checker-simple-format t
+	  doom-modeline-vcs-max-length 50
+	  doom-modeline-major-mode-icon nil
+	  doom-modeline-icon t
+	  doom-modeline-modal-icon t
+	  ;; doom-modeline-lsp nil
+	  doom-modeline-major-mode-color-icon nil
+	  doom-modeline-buffer-state-icon nil
+	  doom-modeline-time-icon nil)
+    (custom-set-faces
+     '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
+     '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
+     '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))
+    (doom-modeline-buffer-file-name-style 'relative-from-project))
 
-	;; (use-package doom-modeline
-	;; 	:ensure t
-	;; 	:defer t
-	;; 	:custom
-	;; 	(doom-modeline-modal-icon nil)
-	;; 	(doom-modeline-buffer-file-name-style 'relative-from-project)
-	;; 	:hook
-	;; 	(after-init . doom-modeline-mode)
-	;; 	(doom-modeline-mode . display-battery-mode))
+  ;; (use-package doom-modeline
+  ;; 	:ensure t
+  ;; 	:defer t
+  ;; 	:custom
+  ;; 	(doom-modeline-modal-icon nil)
+  ;; 	(doom-modeline-buffer-file-name-style 'relative-from-project)
+  ;; 	:hook
+  ;; 	(after-init . doom-modeline-mode)
+  ;; 	(doom-modeline-mode . display-battery-mode))
 
 #+end_src
 ** Emojify
@@ -732,12 +911,51 @@ Show vertical lines to guide indentation
 	(use-package org-modern
 		:ensure t
 		:config
+		;; Add frame borders and window dividers
+		;; (modify-all-frames-parameters
+		;;  '((right-divider-width . 40)
+		;; 	 (internal-border-width . 40)))
+		(dolist (face '(window-divider
+										window-divider-first-pixel
+										window-divider-last-pixel))
+			(face-spec-reset-face face)
+			(set-face-foreground face (face-attribute 'default :background)))
+		(set-face-background 'fringe (face-attribute 'default :background))
+
+		(setq
+		 ;; Edit settings
+		 org-auto-align-tags nil
+		 org-tags-column 0
+		 org-catch-invisible-edits 'show-and-error
+		 org-special-ctrl-a/e t
+		 org-insert-heading-respect-content t
+
+		 ;; Org styling, hide markup etc.
+		 org-hide-emphasis-markers t
+		 org-pretty-entities t
+		 org-ellipsis "…"
+
+		 ;; Agenda styling
+		 org-agenda-tags-column 0
+		 org-agenda-block-separator ?─
+		 org-agenda-time-grid
+		 '((daily today require-timed)
+			 (800 1000 1200 1400 1600 1800 2000)
+			 " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+		 org-agenda-current-time-string
+		 "⭠ now ─────────────────────────────────────────────────")
+		(setq org-enable-table-editor nil)
 		(global-org-modern-mode))
+
+	(add-hook 'org-mode-hook 'my-org-mode-hook)
+	(defun my-org-mode-hook ()
+		(add-hook 'hack-local-variables-hook
+							(lambda () (setq org-enable-table-editor nil)  )))
 #+end_src
 *** Setting Org
 #+begin_src emacs-lisp
 	(use-package org
-		:hook (org-mode . mk/org-mode-setup)
+		;; :hook (org-mode . mk/org-mode-setup)
 		:config
 		(set-face-attribute 'org-table nil :inherit 'fixed-pitch)
 		(setq org-ellipsis " ᗐ"
@@ -812,7 +1030,7 @@ Show vertical lines to guide indentation
 #+end_src
 *** Org agenda
 ~C-c a t~ -- for entering in Org agenda
-#+begin_src emacs-lisp
+#+begin_src example
 	(setq org-agenda-files   (list "~/Org")
 				org-log-done 'time)
 #+end_src
@@ -964,7 +1182,12 @@ Show vertical lines to guide indentation
 		("l" image-forward-hscroll :color red)
 		("h" image-backward-hscroll :color red))
 #+end_src
-**** saveplace-pdf-view
+**** org-pdftools (bookmarks for pdf-tools)
+#+begin_src example
+	(use-package org-pdftools
+		:ensure t)
+#+end_src
+**** saveplace-view
 #+begin_src emacs-lisp
   (use-package saveplace-pdf-view :ensure t)
   (save-place-mode 1)
@@ -972,16 +1195,16 @@ Show vertical lines to guide indentation
 *** nov.el (epub)
 For more information: https://depp.brause.cc/nov.el/
 #+begin_src emacs-lisp
-  use-package nov
-  :ensure t
-  :config
-  ;; (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-  (setq nov-text-width 80)
-  (setq nov-text-width t)
-  (setq visual-fill-column-center-text t)
-  (add-hook 'nov-mode-hook 'visual-line-mode)
-  (add-hook 'nov-mode-hook 'visual-fill-column-mode)
-  )
+  (use-package nov
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+    (setq nov-text-width 80)
+    (setq nov-text-width t)
+    (setq visual-fill-column-center-text t)
+    (add-hook 'nov-mode-hook 'visual-line-mode)
+    (add-hook 'nov-mode-hook 'visual-fill-column-mode)
+    )
 #+end_src
 *** nov-xwidget (epub)
 #+begin_src emacs-lisp
@@ -1065,17 +1288,17 @@ For more information: https://depp.brause.cc/nov.el/
 	    1 font-lock-warning-face t))))
 
   (add-hook 'prog-mode-hook 'my/highlight-todo-like-words)
-  (add-to-list 'projectile-globally-ignored-directories "node_modules")
+  (setq projectile-globally-ignored-files "node_modules")
 #+end_src
 
 ** Rainbow delimiter
 #+begin_src emacs-lisp
-	(use-package rainbow-delimiters
-		:ensure t
-		:hook
-		(prog-mode . rainbow-delimiters-mode))
+  (use-package rainbow-delimiters
+    :ensure t
+    :hook
+    (prog-mode . rainbow-delimiters-mode))
 #+end_src
-** RSS
+** Elfeed (RSS)
 #+begin_src emacs-lisp
 	(use-package elfeed
 		:ensure t
@@ -1083,6 +1306,9 @@ For more information: https://depp.brause.cc/nov.el/
 		;; data is stored in ~/.elfeed
 		(setq elfeed-feeds
 					'(
+						;;
+						("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
+
 						;; programming
 						;;("https://news.ycombinator.com/rss" hacker)
 						;;("https://www.reddit.com/r/programming.rss" programming)
@@ -1119,7 +1345,14 @@ For more information: https://depp.brause.cc/nov.el/
 		(setq-default elfeed-search-filter "@7-days-ago +unread")
 		(setq-default elfeed-search-title-max-width 100)
 		(setq-default elfeed-search-title-min-width 100))
-#+end_src
+
+	(use-package elfeed-dashboard
+		:ensure t
+		:config
+		(setq elfeed-dashboard-file "~/elfeed-dashboard.org")
+		;; update feed counts on elfeed-quit
+		(advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
+		#+end_src
 ** Telega.el
 #+begin_src emacs-lisp
 	(use-package telega
@@ -1253,8 +1486,10 @@ For more information: https://depp.brause.cc/nov.el/
 
 ** Which key
 #+begin_src emacs-lisp
-	(use-package which-key :ensure t)
-	
+	(use-package which-key
+		:ensure t
+		:config (which-key-mode))
+
 #+end_src
 ** Zygospore (to easy fullscreening split screens)
 #+begin_src emacs-lisp
@@ -1264,8 +1499,8 @@ For more information: https://depp.brause.cc/nov.el/
 
 
 
-** Calendar sync
-#+begin_src emacs-lisp
+** Calendar sync (disabled)
+#+begin_src example
 	(use-package org-caldav
 		:custom
 		(org-caldav-url "https://lunarcloud.ddns.net/remote.php/dav/calendars/ncp")
@@ -1743,7 +1978,8 @@ For more information: https://depp.brause.cc/nov.el/
 		:mode (rx ".ts" string-end)
 		:init
 		(define-derived-mode typescript-tsx-mode typescript-mode "typescript-tsx")
-		(add-to-list 'auto-mode-alist (cons (rx ".tsx" string-end) #'typescript-tsx-mode)))
+		(add-to-list 'auto-mode-alist (cons (rx ".tsx" string-end) #'typescript-tsx-mode))
+	(add-to-list 'auto-mode-alist (cons (rx ".ts" string-end) #'typescript-tsx-mode)))
 #+end_src
 
 *** TypeScript Tide

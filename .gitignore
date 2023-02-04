@@ -30,6 +30,7 @@ bookmarks
 tramp
 recentf
 projectile*
+projects*
 
 .dap-breakpoints
 .lsp-session*
