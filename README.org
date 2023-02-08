@@ -101,23 +101,28 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 ** Emacs blur (toggle)
 #+begin_src example
-	;; (defun toggle-transparency ()
-	;; 	(interactive)
-	;; 	(let ((alpha (frame-parameter nil 'alpha)))
-	;; 		(set-frame-parameter
-	;; 		 nil 'alpha
-	;; 		 (if (eql (cond ((numberp alpha) alpha)
-	;; 										((numberp (cdr alpha)) (cdr alpha))
-	;; 										;; Also handle undocumented (<active> <inactive>) form.
-	;; 										((numberp (cadr alpha)) (cadr alpha)))
-	;; 							100)
-	;; 				 '(85 . 50) '(100 . 100)))))
-	;; (global-set-key (kbd "C-c t") 'toggle-transparency)
+	;;________________________________________________________________
+	;;    Transparent Emacs
+	;;________________________________________________________________
+	(set-frame-parameter (selected-frame) 'alpha '(85 . 50))
+	(add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+	;; (set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
+	;; (set-frame-parameter (selected-frame) 'alpha <both>)
 
-	 ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
- ;;(set-frame-parameter (selected-frame) 'alpha <both>)
- (set-frame-parameter (selected-frame) 'alpha '(85 . 50))
- (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+	;; Use the following snippet after you’ve set the alpha as above to assign a toggle to “C-c t”:
+	(defun toggle-transparency ()
+		"Crave for transparency!"
+		(interactive)
+		(let ((alpha (frame-parameter nil 'alpha)))
+			(set-frame-parameter
+			 nil 'alpha
+			 (if (eql (cond ((numberp alpha) alpha)
+											((numberp (cdr alpha)) (cdr alpha))
+											;; Also handle undocumented (<active> <inactive>) form.
+											((numberp (cadr alpha)) (cadr alpha)))
+								100)
+					 '(85 . 50) '(100 . 100)))))
+	(global-set-key (kbd "C-c t b") 'toggle-transparency)
 #+end_src
 ** Import local files
 #+begin_src emacs-lisp
@@ -213,36 +218,36 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
 	(set-face-attribute 'default t
 											:font "JetBrains Mono" ;; Iosevka, Input, Hack
-											:height 70
+											:height 10
 											:weight 'regular
 											)
-	;; (set-face-attribute 'variable-pitch nil
-	;; 										:font "JetBrains Mono"
-	;; 										:height 80
-	;; 										:weight 'medium
-	;; 										)
-	;; (set-face-attribute 'fixed-pitch nil
-	;; 										:font "JetBrains Mono"
-	;; 										:height 80
-	;; 										:weight 'medium
-	;; 										)
+	(set-face-attribute 'variable-pitch nil
+											:font "JetBrains Mono"
+											:height 80
+											:weight 'medium
+											)
+	(set-face-attribute 'fixed-pitch nil
+											:font "JetBrains Mono"
+											:height 80
+											:weight 'medium
+											)
 
 	;; (set-frame-font "JetBrains Mono" nil t)
 
 	;; Makes commented text and keywords italics.
 	;; This is working in emacsclient but not emacs.
 	;; Your font must have an italic face available.
-	;; (set-face-attribute 'font-lock-comment-face nil
-	;; 										:slant 'italic)
-	;; (set-face-attribute 'font-lock-keyword-face nil
-	;; 										:slant 'italic)
+	(set-face-attribute 'font-lock-comment-face nil
+											:slant 'italic)
+	(set-face-attribute 'font-lock-keyword-face nil
+											:slant 'italic)
 
 
 	;; Uncomment the following line if line spacing needs adjusting.
 	;; (setq-default line-spacing 0.12)
 
 	;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-	(add-to-list 'default-frame-alist '(font . "JetBrains Mono"))
+	(add-to-list 'default-frame-alist '(font . "JetBrains Mono 10"))
 	;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
 	;; changes certain keywords to symbols, such as lamda!
 	(setq global-prettify-symbols-mode t)
@@ -405,86 +410,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 			(kill-buffer dashboard-buffer-name))
 		(dashboard-insert-startupify-lists)
 		(switch-to-buffer dashboard-buffer-name))
-#+end_src
-
-** Org-roam
-*** Org-roam setting
-#+begin_src emacs-lisp
-	(use-package org-roam
-		:ensure t
-		:custom
-		(org-roam-directory (file-truename "~/Org/2Brain"))
-		(org-roam-completion-everywhere t)
-		(org-roam-capture-templates
-		 '(
-			 ("d" "default" plain "%?"
-				:if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
-				:unnarrowed t)
-			 ("b" "Books" plain
-				"\n* Source\n\nAuthor: %^{Author}\nTitle: ${title}\nYear: %^{Year}\n\n* Summary\n\n%?"
-				:if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-				:unnarrowed t)
-
-			 ))
-		:bind (("C-c n l" . org-roam-buffer-toggle)
-					 ("C-c n f" . org-roam-node-find)
-					 ("C-c n g" . org-roam-graph)
-					 ("C-c n i" . org-roam-node-insert)
-					 ("C-c n c" . org-roam-capture)
-					 ;; Dailies
-					 ("C-c n j" . org-roam-dailies-capture-today))
-		:config
-		;; If you're using a vertical completion framework, you might want a more informative completion interface
-		;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-		(setq org-roam-completion-everywhere t)
-		(org-roam-db-autosync-mode)
-		;; If using org-roam-protocol
-		(require 'org-roam-protocol))
-#+end_src
-
-*** Org-roam-ui
-#+begin_src emacs-lisp
-	(use-package org-roam-ui
-		:ensure t
-		:hook (after-init . org-roam-ui-mode)
-		:config
-		(setq org-roam-ui-sync-theme t
-					org-roam-ui-follow t
-					org-roam-ui-update-on-save t
-					org-roam-ui-open-on-start nil)
-		(setq org-roam-ui-custom-theme
-					'((bg . "#1E2029")
-						(bg-alt . "#282a36")
-						(fg . "#f8f8f2")
-						(fg-alt . "#6272a4")
-						(red . "#ff5555")
-						(orange . "#f1fa8c")
-						(yellow ."#ffb86c")
-						(green . "#50fa7b")
-						(cyan . "#8be9fd")
-						(blue . "#ff79c6")
-						(violet . "#8be9fd")
-						(magenta . "#bd93f9"))))
-#+end_src
-
-*** Configuring org-roam buffer display
-#+begin_src emacs-lisp
-(add-to-list 'display-buffer-alist
-             '("\\*org-roam\\*"
-               (display-buffer-in-direction)
-               (direction . right)
-               (window-width . 0.33)
-               (window-height . fit-window-to-buffer)))
-#+end_src
-*** Md-roam (add md for org-roam)
-#+begin_src emacs-lisp
-	(load "~/.emacs.d/local-packages/md-roam")
-	(use-package md-roam
-		:config
-		(md-roam-mode 1) ; md-roam-mode must be active before org-roam-db-sync
-		(setq md-roam-file-extension "md") ; default "md". Specify an extension such as "markdown"
-		(org-roam-db-autosync-mode 1) ; autosync-mode triggers db-sync. md-roam-mode must be already active
-		)
 #+end_src
 
 ** Dired
@@ -678,7 +603,6 @@ BUG BUG BUG
 
 	(add-hook 'dired-after-readin-hook 'sof/dired-sort)
 #+end_src
-
 ** Doom modeline
 #+begin_src emacs-lisp
   (use-package doom-modeline
@@ -715,6 +639,61 @@ BUG BUG BUG
   ;; 	(doom-modeline-mode . display-battery-mode))
 
 #+end_src
+** Elfeed (RSS)
+#+begin_src emacs-lisp
+	(use-package elfeed
+		:ensure t
+		:config
+		;; data is stored in ~/.elfeed
+		(setq elfeed-feeds
+					'(
+						;;
+						("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
+
+						;; programming
+						;;("https://news.ycombinator.com/rss" hacker)
+						;;("https://www.reddit.com/r/programming.rss" programming)
+						("https://www.reddit.com/r/emacs.rss" emacs)
+						("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
+						("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
+						("https://habr.com/ru/rss/news/?fl=ru" habr-news)
+						("https://nuancesprog.ru/feed" nop)
+						("https://dev.to/feed" dev-to)
+
+						;; hobby
+						("https://www.reddit.com/r/nasa.rss" nasa)
+						("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
+						("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
+						("https://dev.to/feed/tell396" tell396)
+
+						;; programming languages
+						("https://www.reddit.com/r/javascript.rss" javascript)
+						("https://www.reddit.com/r/typescript.rss" typescript)
+						("https://www.reddit.com/r/golang.rss" golang)
+						("https://www.reddit.com/r/rust.rss" rust)
+
+						;; Books
+						("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
+
+						;; cloud
+						;;("https://www.reddit.com/r/aws.rss" aws)
+						;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
+						;;("https://www.reddit.com/r/azure.rss" azure)
+						;;("https://www.reddit.com/r/devops.rss" devops)
+						;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
+						))
+
+		(setq-default elfeed-search-filter "@7-days-ago +unread")
+		(setq-default elfeed-search-title-max-width 100)
+		(setq-default elfeed-search-title-min-width 100))
+
+	(use-package elfeed-dashboard
+		:ensure t
+		:config
+		(setq elfeed-dashboard-file "~/elfeed-dashboard.org")
+		;; update feed counts on elfeed-quit
+		(advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
+		#+end_src
 ** Emojify
 #+begin_src emacs-lisp
 	(use-package emojify :ensure t)
@@ -842,6 +821,7 @@ BUG BUG BUG
 **** Magit
 #+begin_src emacs-lisp
 	(use-package magit
+		:ensure t
 		:commands (magit-status magit-ediff-show-working-tree)
 		:bind ("C-c C-d" . magit-ediff-show-working-tree)
 		:custom (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
@@ -850,6 +830,7 @@ BUG BUG BUG
 **** Magit todos
 #+begin_src emacs-lisp
 	(use-package magit-todos
+	:ensure t
 		:commands (magit-todos-mode)
 		:hook (magit-mode . magit-todos-mode)
 		:config
@@ -862,6 +843,7 @@ BUG BUG BUG
 *** Blamer
 #+begin_src emacs-lisp
 	(use-package blamer
+		:ensure t
 		:commands (blamer-mode)
 		:config
 		(setq blamer-view 'overlay
@@ -904,6 +886,41 @@ Show vertical lines to guide indentation
 		:ensure t
 		:config
 		(indent-guide-global-mode))
+#+end_src
+** LaTeX
+*** Auctex
+#+begin_src emacs-lisp
+	(use-package auctex
+		:ensure t)
+
+	(use-package auctex-latexmk
+		:ensure t
+		:custom
+		(auctex-latexmk-setup)
+		(add-hook 'LaTeX-mode-hook 'linum-mode)
+		(add-hook 'TeX-mode-hook
+							(lambda () (TeX-fold-mode 1))); Automatically activate
+																					; TeX-fold-mode.
+		)
+
+
+
+	;; Use pdf-tools to open PDF files
+	(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+				TeX-source-correlate-start-server t)
+
+	;; Update PDF buffers after successful LaTeX runs
+	(add-hook 'TeX-after-compilation-finished-functions
+						#'TeX-revert-document-buffer)
+#+end_src
+*** Embed LaTeX in org-mode
+#+begin_src emacs-lisp
+	(require 'ox-latex)
+	(setq org-latex-create-formula-image-program 'dvipng)
+	(org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
+
+	;; Setting size of result of LaTeX compile in org-mode
+	(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 #+end_src
 ** Org
 *** Org modern
@@ -1086,6 +1103,110 @@ Show vertical lines to guide indentation
 				 (url-copy-file path img)
 				 (find-file img)))))
 #+END_SRC
+** Org-roam
+*** Org-roam setting
+#+begin_src emacs-lisp
+	(use-package org-roam
+		:ensure t
+		:custom
+		(org-roam-directory (file-truename "~/Org/2Brain"))
+		(org-roam-completion-everywhere t)
+		(org-roam-capture-templates
+		 '(
+			 ("d" "default" plain "%?"
+				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+				:unnarrowed t)
+
+			 ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n* Summary\n\n"
+				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
+				:unnarrowed t)
+			 ))
+		:bind (("C-c n l" . org-roam-buffer-toggle)
+					 ("C-c n f" . org-roam-node-find)
+					 ;; ("C-c n g" . org-roam-graph) ;; Need graphviz package
+					 ("C-c n i" . org-roam-node-insert)
+					 ("C-c n c" . org-roam-capture)
+
+					 ("C-c g" . org-id-get-create)
+					 ;; Dailies
+					 ("C-c n j" . org-roam-dailies-capture-today))
+		:config
+		;; If you're using a vertical completion framework, you might want a more informative completion interface
+		;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+		(setq org-roam-completion-everywhere t)
+		(org-roam-db-autosync-mode 1)
+		;; If using org-roam-protocol
+		(require 'org-roam-protocol))
+#+end_src
+
+*** Org-roam-ui
+#+begin_src emacs-lisp
+	(use-package org-roam-ui
+		:ensure t
+		:hook (after-init . org-roam-ui-mode)
+		:config
+		(setq org-roam-ui-sync-theme t
+					org-roam-ui-follow t
+					org-roam-ui-update-on-save t
+					org-roam-ui-open-on-start nil)
+		(setq org-roam-ui-custom-theme
+					'((bg . "#1E2029")
+						(bg-alt . "#282a36")
+						(fg . "#f8f8f2")
+						(fg-alt . "#6272a4")
+						(red . "#ff5555")
+						(orange . "#f1fa8c")
+						(yellow ."#ffb86c")
+						(green . "#50fa7b")
+						(cyan . "#8be9fd")
+						(blue . "#ff79c6")
+						(violet . "#8be9fd")
+						(magenta . "#bd93f9"))))
+#+end_src
+
+*** Configuring org-roam buffer display
+#+begin_src emacs-lisp
+(add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
+#+end_src
+*** Md-roam (add md for org-roam)
+#+begin_src example
+	(load "~/.emacs.d/local-packages/md-roam")
+	(use-package md-roam
+		:config
+		(md-roam-mode 1) ; md-roam-mode must be active before org-roam-db-sync
+		(setq org-roam-file-extensions '("org" "md"))
+		(setq md-roam-file-extension "md") ; default "md". Specify an extension such as "markdown"
+		)
+	(with-eval-after-load 'markdown-mode
+  (advice-add #'markdown-indent-line :before-until #'completion-at-point))
+#+end_src
+
+*** delve.el
+#+begin_src emacs-lisp
+	(use-package delve
+		:straight (:repo "publicimageltd/delve"
+										 :host github
+										 :type git)
+		:after (org-roam)
+		;; this is necessary if use-package-always-defer is true
+		:demand t
+		:bind
+		;; the main entry point, offering a list of all stored collections
+		;; and of all open Delve buffers:
+		(("<f12>" . delve))
+		:config
+		;; set meaningful tag names for the dashboard query
+		(setq delve-dashboard-tags '("Tag1" "Tag2"))
+		;; optionally turn on compact view as default
+		(add-hook #'delve-mode-hook #'delve-compact-view-mode)
+		;; turn on delve-minor-mode when Org Roam file is opened:
+		(delve-global-minor-mode))
+#+end_src
 ** Parrot
 #+begin_src emacs-lisp
 	(defun my/parrot-animate-when-compile-success (buffer result)
@@ -1298,61 +1419,6 @@ For more information: https://depp.brause.cc/nov.el/
     :hook
     (prog-mode . rainbow-delimiters-mode))
 #+end_src
-** Elfeed (RSS)
-#+begin_src emacs-lisp
-	(use-package elfeed
-		:ensure t
-		:config
-		;; data is stored in ~/.elfeed
-		(setq elfeed-feeds
-					'(
-						;;
-						("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
-
-						;; programming
-						;;("https://news.ycombinator.com/rss" hacker)
-						;;("https://www.reddit.com/r/programming.rss" programming)
-						("https://www.reddit.com/r/emacs.rss" emacs)
-						("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
-						("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
-						("https://habr.com/ru/rss/news/?fl=ru" habr-news)
-						("https://nuancesprog.ru/feed" nop)
-						("https://dev.to/feed" dev-to)
-
-						;; hobby
-						("https://www.reddit.com/r/nasa.rss" nasa)
-						("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
-						("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
-						("https://dev.to/feed/tell396" tell396)
-
-						;; programming languages
-						("https://www.reddit.com/r/javascript.rss" javascript)
-						("https://www.reddit.com/r/typescript.rss" typescript)
-						("https://www.reddit.com/r/golang.rss" golang)
-						("https://www.reddit.com/r/rust.rss" rust)
-
-						;; Books
-						("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
-
-						;; cloud
-						;;("https://www.reddit.com/r/aws.rss" aws)
-						;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
-						;;("https://www.reddit.com/r/azure.rss" azure)
-						;;("https://www.reddit.com/r/devops.rss" devops)
-						;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
-						))
-
-		(setq-default elfeed-search-filter "@7-days-ago +unread")
-		(setq-default elfeed-search-title-max-width 100)
-		(setq-default elfeed-search-title-min-width 100))
-
-	(use-package elfeed-dashboard
-		:ensure t
-		:config
-		(setq elfeed-dashboard-file "~/elfeed-dashboard.org")
-		;; update feed counts on elfeed-quit
-		(advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
-		#+end_src
 ** Telega.el
 #+begin_src emacs-lisp
 	(use-package telega
@@ -1496,6 +1562,7 @@ For more information: https://depp.brause.cc/nov.el/
 (use-package zygospore :ensure t)
 (global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
 #+end_src
+
 
 
 
@@ -1704,10 +1771,13 @@ For more information: https://depp.brause.cc/nov.el/
 	(global-set-key (kbd "C-x C-b") 'ibuffer)
 	(global-set-key (kbd "M-x") 'helm-M-x)
 
+	;;Org
+	(global-set-key (kbd "M-q") #'toggle-truncate-lines)
+	;; Org agenda
 	(global-set-key (kbd "C-c l") #'org-store-link)
 	(global-set-key (kbd "C-c a") #'org-agenda)
 	(global-set-key (kbd "C-c c") #'org-capture)
-
+	;; Org timer
 	(global-set-key (kbd "C-c t s") #'org-timer-set-timer)
 	(global-set-key (kbd "C-c t SPC") #'org-timer-pause-or-continue)
 	(global-set-key (kbd "C-c t <deletechar>") #'org-timer-stop)
@@ -1865,6 +1935,11 @@ For more information: https://depp.brause.cc/nov.el/
 	(setq company-minimum-prefix-length 1)
 #+end_src
 
+** Setting yasnippet
+#+begin_src emacs-lisp
+	(use-package yasnippet :ensure t)
+
+#+end_src
 ** Setting LSP-Mode
 *** LSP-Mode
 #+begin_src emacs-lisp
@@ -1920,11 +1995,11 @@ For more information: https://depp.brause.cc/nov.el/
 #+end_src
 *** JavaScript
 #+begin_src emacs-lisp
-	(use-package web-mode  :ensure t
+	(use-package web-mode :ensure t
 		:mode (("\\.js\\'" . web-mode)
 					 ("\\.jsx\\'" . web-mode)
 					 ("\\.ts\\'" . web-mode)
-					 ;; ("\\.tsx\\'" . typescript-mode)
+					 ("\\.tsx\\'" . typescript-mode)
 					 ("\\.html\\'" . web-mode)
 					 ("\\.vue\\'" . web-mode)
 					 ("\\.json\\'" . web-mode))
@@ -2461,7 +2536,7 @@ Support for resizing windows, using the mouse. Position the mouse on the divider
 		(eaf-browser-enable-adblocker t)
 		(browse-url-browser-function 'eaf-open-browser)
 		:config
-	(eaf-setq eaf-browser-enable-adblocker "true")
+		(eaf-setq eaf-browser-enable-adblocker "true")
 		;; :config
 		;; (defalias 'browse-web #'eaf-open-browser)
 		;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
@@ -2475,4 +2550,8 @@ Support for resizing windows, using the mouse. Position the mouse on the divider
 	;; (require 'eaf-pdf-viewer)
 	;; (require 'eaf-org-previewer)
 	;; (require 'eaf-terminal)
+#+end_src
+
+
+#+begin_src emacs-lisp
 #+end_src
