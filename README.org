@@ -218,17 +218,17 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+begin_src emacs-lisp
 	(set-face-attribute 'default t
 											:font "JetBrains Mono" ;; Iosevka, Input, Hack
-											:height 10
+											:height 90
 											:weight 'regular
 											)
 	(set-face-attribute 'variable-pitch nil
 											:font "JetBrains Mono"
-											:height 80
+											:height 90
 											:weight 'medium
 											)
 	(set-face-attribute 'fixed-pitch nil
 											:font "JetBrains Mono"
-											:height 80
+											:height 90
 											:weight 'medium
 											)
 
@@ -247,7 +247,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	;; (setq-default line-spacing 0.12)
 
 	;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-	(add-to-list 'default-frame-alist '(font . "JetBrains Mono 10"))
+	(add-to-list 'default-frame-alist '(font . "JetBrains Mono 11"))
 	;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
 	;; changes certain keywords to symbols, such as lamda!
 	(setq global-prettify-symbols-mode t)
@@ -921,7 +921,14 @@ Show vertical lines to guide indentation
 
 	;; Setting size of result of LaTeX compile in org-mode
 	(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
+
+	(add-hook 'LaTeX-mode-hook 'turn-on-reftex) 
+	(org-babel-do-load-languages
+	 'org-babel-load-languages
+	 '((latex . t)))
 #+end_src
+
 ** Org
 *** Org modern
 #+begin_src emacs-lisp
@@ -1139,6 +1146,26 @@ Show vertical lines to guide indentation
 		(require 'org-roam-protocol))
 #+end_src
 
+
+
+
+
+*** Org-download
+#+begin_src emacs-lisp
+	(use-package org-download
+		:ensure t)
+
+	;; Drag-and-drop to `dired`
+(add-hook 'dired-mode-hook 'org-download-enable)
+#+end_src
+
+*** company-org-roam
+#+begin_src emacs-lisp
+(use-package company-org-roam
+  :straight (:host github :repo "org-roam/company-org-roam")
+  :config
+  (push 'company-org-roam company-backends))
+#+end_src
 *** Org-roam-ui
 #+begin_src emacs-lisp
 	(use-package org-roam-ui
