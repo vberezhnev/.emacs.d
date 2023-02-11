@@ -1,10 +1,6 @@
 #+TITLE: Berezhnev's GNU Emacs config
 #+AUTHOR: Berezhnev Vladimir (Tell396)
 #+DESCRIPTION: Berezhnev's personal Emacs config.
-#+STARTUP: showeverything
-#+EXPORT_FILE_NAME: ~/Org/html/config.html
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
-#+OPTIONS: num:nil ^:{}
 
 I don't want to use init.el to config Emacs.  I want to use an org file to config Emacs because I like literate configs with lots of comments.  The following code block should be your init.el.  This tells init.el to use the source code blocks from this file (README.org).
 
@@ -29,76 +25,75 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting base of Emacs
 ** Functions
 #+begin_src emacs-lisp
-	(defun indent-org-block-automatically ()
-		(when (org-in-src-block-p)
-			(org-edit-special)
-			(indent-region (point-min) (point-max))
-			(org-edit-src-exit)))
+  (defun indent-org-block-automatically ()
+    (when (org-in-src-block-p)
+      (org-edit-special)
+      (indent-region (point-min) (point-max))
+      (org-edit-src-exit)))
 
-	(run-at-time 1 10 'indent-org-block-automatically)
+  (run-at-time 1 10 'indent-org-block-automatically)
 #+end_src
 
 ** Window
 #+begin_src emacs-lisp
-	(eval-when-compile (defvar display-time-24hr-format t))
-	(eval-when-compile (defvar display-time-default-load-average nil))
+  ц(eval-when-compile (defvar display-time-24hr-format t))
+  (eval-when-compile (defvar display-time-default-load-average nil))
 
-	(display-battery-mode t)		  ;; Show battery.
-	(display-time-mode t)			  ;; Show time.
-	(set-fringe-mode 1)               ;; Give us some space.
-	(delete-selection-mode nil)		  ;; Use a more sane delete mode than evil.
-	(fset 'yes-or-no-p 'y-or-n-p)     ;; Set yes or no to y/n
-	(global-font-lock-mode 1)         ;; always highlight code
-	(global-auto-revert-mode 1)       ;; refresh a buffer if changed on disk
-	;; (global-hl-line-mode 1)           ;; Highlight current line
-	;; (semantic-mode 1)								;; help out with semantics
-	(savehist-mode 1)                 ;; Save history
-	(save-place-mode 1)               ;; when buffer is closed, save the cursor position
-	(blink-cursor-mode 1)
+  (display-battery-mode t)		  ;; Show battery.
+  (display-time-mode t)			  ;; Show time.
+  (set-fringe-mode 1)               ;; Give us some space.
+  (delete-selection-mode nil)		  ;; Use a more sane delete mode than evil.
+  (fset 'yes-or-no-p 'y-or-n-p)     ;; Set yes or no to y/n
+  (global-font-lock-mode 1)         ;; always highlight code
+  (global-auto-revert-mode 1)       ;; refresh a buffer if changed on disk
+  ;; (global-hl-line-mode 1)           ;; Highlight current line
+  ;; (semantic-mode 1)								;; help out with semantics
+  (savehist-mode 1)                 ;; Save history
+  (save-place-mode 1)               ;; when buffer is closed, save the cursor position
+  (blink-cursor-mode 1)
 
-	;; Setup fonts
-	;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 160)
-	;; (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
-	;; (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
-	(variable-pitch-mode t)
+  ;; Setup fonts
+  ;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 160)
+  ;; (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
+  ;; (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
+  (variable-pitch-mode t)
 
-	(prefer-coding-system 'utf-8)
-	(set-default-coding-systems 'utf-8)
-	(set-terminal-coding-system 'utf-8)
-	(set-keyboard-coding-system 'utf-8)
-	(setq-default shell-file-name "/usr/bin/fish")
+  (prefer-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (setq-default shell-file-name "/usr/bin/fish")
 
-	(setq ad-redefinition-action            'accept
-				default-buffer-file-coding-system 'utf-8
-				blink-cursor-interval             0.6       ;; Little slower cursor blinking . default is 0.5
-				create-lockfiles                  nil
-				idle-update-delay                 1.2    ;; Speed things up by not updating so often
-				read-process-output-max           (* 8 1024 1024)
-				ediff-split-window-function       'split-window-horizontally
-				highlight-nonselected-windows     t
-				auto-mode-case-fold               nil
-				backup-by-copying                 t
-				byte-compile-warnings             '(ck-functions)
-				confirm-kill-processes            nil
-				fast-but-imprecise-scrolling      t
-				jit-lock-defer-time               0.0
-				echo-keystrokes                   0.2
-				kill-buffer-query-functions       nil    ;; Dont ask for closing spawned processes
-				line-number-mode                  nil
-				use-dialog-box                    nil
-				load-prefer-newer                 t
-				word-wrap                         nil
-				visible-bell                      nil
-				bidi-display-reordering           nil
-				large-file-warning-threshold nil      ;; Disable "File is large. Really open?"
-				x-stretch-cursor                  t   ;; stretch cursor on tabs
-				scroll-margin                     4   ;; scroll N to screen edge
-				undo-limit                        6710886400 ;; 64mb
-				undo-strong-limit                 100663296 ;; x 1.5 (96mb)
-				undo-outer-limit                  1006632960) ;; x 10 (960mb), (Emacs uses x100), but this seems too high.
-
-	(setq org-default-notes-file (expand-file-name "~/Org/agenda.org"))
+  (setq ad-redefinition-action            'accept
+	default-buffer-file-coding-system 'utf-8
+	blink-cursor-interval             0.6       ;; Little slower cursor blinking . default is 0.5
+	create-lockfiles                  nil
+	idle-update-delay                 1.2    ;; Speed things up by not updating so often
+	read-process-output-max           (* 8 1024 1024)
+	ediff-split-window-function       'split-window-horizontally
+	highlight-nonselected-windows     t
+	auto-mode-case-fold               nil
+	backup-by-copying                 t
+	byte-compile-warnings             '(ck-functions)
+	confirm-kill-processes            nil
+	fast-but-imprecise-scrolling      t
+	jit-lock-defer-time               0.0
+	echo-keystrokes                   0.2
+	kill-buffer-query-functions       nil    ;; Dont ask for closing spawned processes
+	line-number-mode                  nil
+	use-dialog-box                    nil
+	load-prefer-newer                 t
+	word-wrap                         nil
+	visible-bell                      nil
+	bidi-display-reordering           nil
+	large-file-warning-threshold nil      ;; Disable "File is large. Really open?"
+	x-stretch-cursor                  t   ;; stretch cursor on tabs
+	scroll-margin                     4   ;; scroll N to screen edge
+	undo-limit                        6710886400 ;; 64mb
+	undo-strong-limit                 100663296 ;; x 1.5 (96mb)
+	undo-outer-limit                  1006632960) ;; x 10 (960mb), (Emacs uses x100), but this seems too high.
 #+end_src
+
 ** Emacs blur (toggle)
 #+begin_src example
 	;;________________________________________________________________
@@ -126,36 +121,37 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 ** Import local files
 #+begin_src emacs-lisp
-	(use-package go-mode :ensure t)
-	(use-package company :ensure t)
+  (use-package go-mode :ensure t)
+  (use-package company :ensure t)
 
-	;; (load "~/.emacs.d/local-packages/epubmode")
-	;; (require 'epubmode)
+  ;; (load "~/.emacs.d/local-packages/epubmode")
+  ;; (require 'epubmode)
 
-	;; (load "~/.emacs.d/local-packages/company-go")
-	;; (require 'company-go)
+  ;; (load "~/.emacs.d/local-packages/company-go")
+  ;; (require 'company-go)
 
-	;; (load "~/.emacs.d/local-packages/chep-video")
-	;; (require 'chep-video)
+  ;; (load "~/.emacs.d/local-packages/chep-video")
+  ;; (require 'chep-video)
 
-	;; (load "~/.emacs.d/local-packages/dired+")
-	;; (require 'dired+)
+  ;; (load "~/.emacs.d/local-packages/dired+")
+  ;; (require 'dired+)
 
-	;; (load "~/.emacs.d/local-packages/nov")
-	;; (require 'nov)
+  ;; (load "~/.emacs.d/local-packages/nov")
+  ;; (require 'nov)
 
-	;; (use-package nov :ensure t)
+  ;; (use-package nov :ensure t)
 
 
-	;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
+  ;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
 #+end_src
 
 ** Integrate clipboard with X11 (Need for Emacs TTY)
 #+begin_src emacs-lisp
-	(use-package xclip
-		:ensure t)
-	(xclip-mode 1)
+  (use-package xclip
+    :ensure t)
+  (xclip-mode 1)
 #+end_src
+
 ** Share clipoard with OS
 #+begin_src emacs-lisp
 (use-package pbcopy
@@ -176,18 +172,20 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 		(toggle-frame-maximized))
 #+end_src
 
+#+RESULTS:
+
 ** Disable *Messages* and *Completions* buffers
 #+begin_src emacs-lisp
-	(setq-default message-log-max nil)
-	(kill-buffer "*Messages*")
+  (setq-default message-log-max nil)
+  (kill-buffer "*Messages*")
 
-	(add-hook 'minibuffer-exit-hook
-						'(lambda ()
-							 (let ((buffer "*Completions*"))
-								 (and (get-buffer buffer)
-											(kill-buffer buffer)))))
+  (add-hook 'minibuffer-exit-hook
+	    '(lambda ()
+	       (let ((buffer "*Completions*"))
+		 (and (get-buffer buffer)
+		      (kill-buffer buffer)))))
 
-	(setq initial-major-mode (quote fundamental-mode))
+  (setq initial-major-mode (quote fundamental-mode))
 
 #+end_src
 
@@ -216,107 +214,116 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting font face
 ** Setting fonts
 #+begin_src emacs-lisp
-	(set-face-attribute 'default t
-											:font "JetBrains Mono" ;; Iosevka, Input, Hack
-											:height 90
-											:weight 'regular
-											)
-	(set-face-attribute 'variable-pitch nil
-											:font "JetBrains Mono"
-											:height 90
-											:weight 'medium
-											)
-	(set-face-attribute 'fixed-pitch nil
-											:font "JetBrains Mono"
-											:height 90
-											:weight 'medium
-											)
+  (set-face-attribute 'default t
+										  :font "JetBrains Mono" ;; Iosevka, Input, Hack
+										  :height 90
+										  :weight 'regular
+										  )
+  (set-face-attribute 'variable-pitch nil
+										  :font "JetBrains Mono"
+										  :height 90
+										  :weight 'medium
+										  )
+  (set-face-attribute 'fixed-pitch nil
+										  :font "JetBrains Mono"
+										  :height 90
+										  :weight 'medium
+										  )
 
-	;; (set-frame-font "JetBrains Mono" nil t)
+  ;; (set-frame-font "JetBrains Mono" nil t)
 
-	;; Makes commented text and keywords italics.
-	;; This is working in emacsclient but not emacs.
-	;; Your font must have an italic face available.
-	(set-face-attribute 'font-lock-comment-face nil
-											:slant 'italic)
-	(set-face-attribute 'font-lock-keyword-face nil
-											:slant 'italic)
+  ;; Makes commented text and keywords italics.
+  ;; This is working in emacsclient but not emacs.
+  ;; Your font must have an italic face available.
+  (set-face-attribute 'font-lock-comment-face nil
+										  :slant 'italic)
+  (set-face-attribute 'font-lock-keyword-face nil
+										  :slant 'italic)
 
 
-	;; Uncomment the following line if line spacing needs adjusting.
-	;; (setq-default line-spacing 0.12)
+  ;; Uncomment the following line if line spacing needs adjusting.
+  ;; (setq-default line-spacing 0.12)
 
-	;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-	(add-to-list 'default-frame-alist '(font . "JetBrains Mono 11"))
-	;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
-	;; changes certain keywords to symbols, such as lamda!
-	(setq global-prettify-symbols-mode t)
+  ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
+  (add-to-list 'default-frame-alist '(font . "JetBrains Mono 11"))
+  ;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
+  ;; changes certain keywords to symbols, such as lamda!
+  (setq global-prettify-symbols-mode t)
+
+
+  ;; (add-hook 'org-mode-hook (lambda ()
+  ;; 													 "Beautify Org Checkbox Symbol"
+  ;; 													 (push '("[ ]" .  "☐") prettify-symbols-alist)
+  ;; 													 (push '("[X]" . "☑" ) prettify-symbols-alist)
+  ;; 													 (push '("[-]" . "❍" ) prettify-symbols-alist)
+  ;; 													 (prettify-symbols-mode)))
 #+end_src
 
 ** Prettify JetBrains Mono symbols
 #+begin_src emacs-lisp
-	(defun jetbrains-ligature-mode--make-alist (list)
-		"Generate prettify-symbols alist from LIST."
-		(let ((idx -1))
-			(mapcar
-			 (lambda (s)
-				 (setq idx (1+ idx))
-				 (if s
-						 (let* ((code (+ #X10001 idx))
-										(width (string-width s))
-										(prefix ())
-										(suffix '(?\s (Br . Br)))
-										(n 1))
-							 (while (< n width)
-								 (setq prefix (append prefix '(?\s (Br . Bl))))
-								 (setq n (1+ n)))
-							 (cons s (append prefix suffix (list (decode-char 'ucs code)))))))
-			 list)))
+  (defun jetbrains-ligature-mode--make-alist (list)
+    "Generate prettify-symbols alist from LIST."
+    (let ((idx -1))
+      (mapcar
+       (lambda (s)
+	 (setq idx (1+ idx))
+	 (if s
+	     (let* ((code (+ #X10001 idx))
+		    (width (string-width s))
+		    (prefix ())
+		    (suffix '(?\s (Br . Br)))
+		    (n 1))
+	       (while (< n width)
+		 (setq prefix (append prefix '(?\s (Br . Bl))))
+		 (setq n (1+ n)))
+	       (cons s (append prefix suffix (list (decode-char 'ucs code)))))))
+       list)))
 
-	(defconst jetbrains-ligature-mode--ligatures
-		'("-->" "//" "/**" "/*" "*/" "<!--" ":=" "->>" "<<-" "->" "<-"
-			"<=>" "==" "!=" "<=" ">=" "=:=" "!==" "&&" "||" "..." ".."
-			nil nil nil nil nil nil nil nil nil nil nil nil nil nil
-			"|||" "///" "&&&" "===" "++" "--" "=>" "|>" "<|" "||>" "<||"
-			"|||>" "<|||" ">>" "<<" nil nil "::=" "|]" "[|" "{|" "|}"
-			"[<" ">]" ":?>" ":?" nil "/=" "[||]" "!!" "?:" "?." "::"
-			"+++" "??" "###" "##" ":::" "####" ".?" "?=" "=!=" "<|>"
-			"<:" ":<" ":>" ">:" "<>" "***" ";;" "/==" ".=" ".-" "__"
-			"=/=" "<-<" "<<<" ">>>" "<=<" "<<=" "<==" "<==>" "==>" "=>>"
-			">=>" ">>=" ">>-" ">-" "<~>" "-<" "-<<" "=<<" "---" "<-|"
-			"<=|" "/\\" "\\/" "|=>" "|~>" "<~~" "<~" "~~" "~~>" "~>"
-			"<$>" "<$" "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</>" "</" "/>"
-			"<->" "..<" "~=" "~-" "-~" "~@" "^=" "-|" "_|_" "|-" "||-"
-			"|=" "||=" "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#="
-			"&="))
+  (defconst jetbrains-ligature-mode--ligatures
+    '("-->" "//" "/**" "/*" "*/" "<!--" ":=" "->>" "<<-" "->" "<-"
+      "<=>" "==" "!=" "<=" ">=" "=:=" "!==" "&&" "||" "..." ".."
+      nil nil nil nil nil nil nil nil nil nil nil nil nil nil
+      "|||" "///" "&&&" "===" "++" "--" "=>" "|>" "<|" "||>" "<||"
+      "|||>" "<|||" ">>" "<<" nil nil "::=" "|]" "[|" "{|" "|}"
+      "[<" ">]" ":?>" ":?" nil "/=" "[||]" "!!" "?:" "?." "::"
+      "+++" "??" "###" "##" ":::" "####" ".?" "?=" "=!=" "<|>"
+      "<:" ":<" ":>" ">:" "<>" "***" ";;" "/==" ".=" ".-" "__"
+      "=/=" "<-<" "<<<" ">>>" "<=<" "<<=" "<==" "<==>" "==>" "=>>"
+      ">=>" ">>=" ">>-" ">-" "<~>" "-<" "-<<" "=<<" "---" "<-|"
+      "<=|" "/\\" "\\/" "|=>" "|~>" "<~~" "<~" "~~" "~~>" "~>"
+      "<$>" "<$" "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</>" "</" "/>"
+      "<->" "..<" "~=" "~-" "-~" "~@" "^=" "-|" "_|_" "|-" "||-"
+      "|=" "||=" "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#="
+      "&="))
 
-	(defvar jetbrains-ligature-mode--old-prettify-alist)
+  (defvar jetbrains-ligature-mode--old-prettify-alist)
 
-	(defun jetbrains-ligature-mode--enable ()
-		"Enable JetBrains Mono ligatures in current buffer."
-		(setq-local jetbrains-ligature-mode--old-prettify-alist prettify-symbols-alist)
-		(setq-local prettify-symbols-alist (append (jetbrains-ligature-mode--make-alist jetbrains-ligature-mode--ligatures) jetbrains-ligature-mode--old-prettify-alist))
-		(prettify-symbols-mode t))
+  (defun jetbrains-ligature-mode--enable ()
+    "Enable JetBrains Mono ligatures in current buffer."
+    (setq-local jetbrains-ligature-mode--old-prettify-alist prettify-symbols-alist)
+    (setq-local prettify-symbols-alist (append (jetbrains-ligature-mode--make-alist jetbrains-ligature-mode--ligatures) jetbrains-ligature-mode--old-prettify-alist))
+    (prettify-symbols-mode t))
 
-	(defun jetbrains-ligature-mode--disable ()
-		"Disable JetBrains Mono ligatures in current buffer."
-		(setq-local prettify-symbols-alist jetbrains-ligature-mode--old-prettify-alist)
-		(prettify-symbols-mode -1))
+  (defun jetbrains-ligature-mode--disable ()
+    "Disable JetBrains Mono ligatures in current buffer."
+    (setq-local prettify-symbols-alist jetbrains-ligature-mode--old-prettify-alist)
+    (prettify-symbols-mode -1))
 
-	(define-minor-mode jetbrains-ligature-mode
-		"JetBrains Mono ligatures minor mode"
-		:lighter " JetBrains Mono"
-		(setq-local prettify-symbols-unprettify-at-point 'right-edge)
-		(if jetbrains-ligature-mode
-				(jetbrains-ligature-mode--enable)
-			(jetbrains-ligature-mode--disable)))
+  (define-minor-mode jetbrains-ligature-mode
+    "JetBrains Mono ligatures minor mode"
+    :lighter " JetBrains Mono"
+    (setq-local prettify-symbols-unprettify-at-point 'right-edge)
+    (if jetbrains-ligature-mode
+	(jetbrains-ligature-mode--enable)
+      (jetbrains-ligature-mode--disable)))
 
-	(defun jetbrains-ligature-mode--setup ()
-		"Setup JetBrains Mono Symbols"
-		(set-fontset-font t '(#X10001 . #X1009c) "JetBrains Mono"))
+  (defun jetbrains-ligature-mode--setup ()
+    "Setup JetBrains Mono Symbols"
+    (set-fontset-font t '(#X10001 . #X1009c) "JetBrains Mono"))
 
-	(provide 'jetbrains-ligature-mode)
+  (provide 'jetbrains-ligature-mode)
 #+end_src
+
 ** Setting and installing themes
 #+begin_src emacs-lisp
   ;; (use-package 'gruvbox-theme
@@ -342,8 +349,111 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   (load-theme 'doom-one t)
 	#+end_src
 
+	#+RESULTS:
+	: t
+
 * Setting Packages
-** Alert.el
+** Evil
+*** Set initial Evil
+#+begin_src emacs-lisp
+  (use-package evil
+    :ensure t
+    :init      ;; tweak evil's configuration before loading it
+    (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+    (setq evil-want-keybinding nil)
+    (setq evil-vsplit-window-right t)
+    (setq evil-split-window-below t))
+  (evil-mode 1)
+#+end_src
+
+*** Evil collection 
+#+begin_src emacs-lisp
+  (use-package evil-collection
+    :after evil
+    :ensure t
+    :config
+    (setq evil-emacs-state-cursor '("#FF5D62" box))
+    (setq evil-normal-state-cursor '("#FF5D62" box))
+    (setq evil-visual-state-cursor '("#98BB6C" box))
+    (setq evil-insert-state-cursor '("#E82424" bar))
+    (setq evil-replace-state-cursor '("#FF9E3B" hbar))
+    (setq evil-operator-state-cursor '("#7E9CD8" hollow))
+    (evil-collection-init))
+#+end_src
+
+*** Evil leader (disabled)
+#+begin_src example
+	(use-package evil-leader
+		:init
+		(global-evil-leader-mode)
+		(evil-leader/set-leader "<SPC>")
+		(evil-leader/set-key
+		 ;; General
+		 ".f" 'consult-isearch
+		 ".q" 'delete-frame
+		 ".e" 'eval-region
+		 ;; Files
+		 "fr" 'consult-recent-file
+		 "fb" 'consult-bookmark
+		 "ff" 'find-file
+		 "fd" 'dired
+		 ;; Org
+		 "oa" 'org-agenda
+		 "fh" 'consult-org-heading
+		 ;; Open
+		 "om" 'mu4e
+		 "os" 'eshell
+		 ;; Notes
+		 "no" 'deft
+		 "nf" 'deft-find-file
+		 "nn" 'deft-new-file-named
+		 ;; Bufffers
+		 "bd" 'kill-current-buffer
+		 "bb" 'consult-buffer
+		 "bx" 'switch-to-scratch
+		 "bi" 'ibuffer
+		 ;; Windows
+		 "wv" 'split-window-right
+		 "wh" 'split-window-below
+		 "wt" 'window-split-toggle
+		 "ws" 'ace-window
+		 ;; Help
+		 "hh" 'help
+		 "hk" 'describe-key
+		 "hv" 'describe-variable
+		 "hF" 'describe-function
+		 "hf" 'describe-face
+		 "hs" 'describe-symbol
+		 "hm" 'describe-mode))
+
+#+end_src
+
+*** Evil multiple cursors (disabled)
+#+begin_src example
+	(use-package evil-multiedit
+		:after evil
+		:bind
+		(:map evil-normal-state-map
+					("M-d". evil-multiedit-match-symbol-and-next)
+					("M-D". evil-multiedit-match-symbol-and-prev)
+					("C-M-d". evil-multiedit-match-all)
+					:map evil-visual-state-map
+					("M-d". evil-multiedit-match-and-next)
+					("M-D". evil-multiedit-match-and-prev)
+					("C-M-d". evil-multiedit-match-all)))
+#+end_src
+
+*** Set evil states
+#+begin_src emacs-lisp
+  (evil-set-initial-state 'ibuffer-mode 'normal)
+  (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+  (evil-set-initial-state 'vterm-mode 'normal)
+  (evil-set-initial-state 'calibredb-mode 'normal)
+  ;; (evil-set-initial-state 'dired-mode 'emacs)
+  (evil-set-initial-state 'sunrise-mode 'emacs)
+#+end_src
+
+** Alert.el (disabled)
 #+begin_src example
 	(use-package alert :ensure t)
 
@@ -352,64 +462,64 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Dashboard
 #+begin_src emacs-lisp
-	;; Setting dashboard
-	(use-package dashboard
-		:ensure t
-		:hook (dashboard-mode . (lambda ()
-															;; No title
-															(setq-local frame-title-format nil)
-															;; Enable `page-break-lines-mode'
-															(when (fboundp 'page-break-lines-mode)
-																(page-break-lines-mode 1))))
-		:init      ;; tweak dashboard config before loading it
-		(setq dashboard-set-heading-icons t
-					dashboard-set-file-icons t
-					dashboard-center-content t
-					dashboard-banner-logo-title "Welcome back, Darling!"
-					dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
-					;; dashboard-page-separator ""
-					dashboard-set-navigator t
-					dashboard-items '(
-														(recents . 6)
-														(agenda . 4 )
-														;;(registers . 3)
-														(bookmarks . 4)
-														(projects . 4))) ;; use standard emacs logo as banner
+  ;; Setting dashboard
+  (use-package dashboard
+    :ensure t
+    :hook (dashboard-mode . (lambda ()
+			      ;; No title
+			      (setq-local frame-title-format nil)
+			      ;; Enable `page-break-lines-mode'
+			      (when (fboundp 'page-break-lines-mode)
+				(page-break-lines-mode 1))))
+    :init      ;; tweak dashboard config before loading it
+    (setq dashboard-set-heading-icons t
+	  dashboard-set-file-icons t
+	  dashboard-center-content t
+	  dashboard-banner-logo-title "Welcome back, Darling!"
+	  dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
+	  ;; dashboard-page-separator ""
+	  dashboard-set-navigator t
+	  dashboard-items '(
+			    (recents . 6)
+			    ;; (agenda . 4 )
+			    ;;(registers . 3)
+			    (bookmarks . 4)
+			    (projects . 4))) ;; use standard emacs logo as banner
 
-		;; Format: "(icon title help action face prefix suffix)"
-		;; (setq dashboard-navigator-buttons
-		;; 			`(;; line1
-		;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
-		;; 					"Main site"
-		;; 					"Browse homepage"
-		;; 					(lambda (&rest _) (browse-url "homepage")))
-		;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-		;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
-		;; 				;; line 2
-		;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-		;; 					"Github"
-		;; 					""
-		;; 					(lambda (&rest _) (browse-url "homepage")))
-		;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
-		(setq dashboard-footer-messages '("Richard Stallman is proud of you."))
-		;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-		;; 																									 :height 1.1
-		;; 																									 :v-adjust -0.05
-		;; 																									 :face 'font-lock-keyword-face))
-		:config
-		(dashboard-modify-heading-icons '((recents . "file-text")
-																			(bookmarks . "book")))
-		(dashboard-setup-startup-hook)
-		)
+    ;; Format: "(icon title help action face prefix suffix)"
+    ;; (setq dashboard-navigator-buttons
+    ;; 			`(;; line1
+    ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
+    ;; 					"Main site"
+    ;; 					"Browse homepage"
+    ;; 					(lambda (&rest _) (browse-url "homepage")))
+    ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+    ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
+    ;; 				;; line 2
+    ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+    ;; 					"Github"
+    ;; 					""
+    ;; 					(lambda (&rest _) (browse-url "homepage")))
+    ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+    (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
+    ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+    ;; 																									 :height 1.1
+    ;; 																									 :v-adjust -0.05
+    ;; 																									 :face 'font-lock-keyword-face))
+    :config
+    (dashboard-modify-heading-icons '((recents . "file-text")
+				      (bookmarks . "book")))
+    (dashboard-setup-startup-hook)
+    )
 
-	(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
-	(defun dashboard-refresh-buffer ()
-		(interactive)
-		(when (get-buffer dashboard-buffer-name)
-			(kill-buffer dashboard-buffer-name))
-		(dashboard-insert-startupify-lists)
-		(switch-to-buffer dashboard-buffer-name))
+  (defun dashboard-refresh-buffer ()
+    (interactive)
+    (when (get-buffer dashboard-buffer-name)
+      (kill-buffer dashboard-buffer-name))
+    (dashboard-insert-startupify-lists)
+    (switch-to-buffer dashboard-buffer-name))
 #+end_src
 
 ** Dired
@@ -639,164 +749,75 @@ BUG BUG BUG
   ;; 	(doom-modeline-mode . display-battery-mode))
 
 #+end_src
+
+#+RESULTS:
+| display-battery-mode | doom-modeline-override-time | doom-modeline-override-battery | doom-modeline-override-rcirc | doom-modeline-override-mu4e-alert | doom-modeline-override-eglot |
+
 ** Elfeed (RSS)
 #+begin_src emacs-lisp
-	(use-package elfeed
-		:ensure t
-		:config
-		;; data is stored in ~/.elfeed
-		(setq elfeed-feeds
-					'(
-						;;
-						("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
+  (use-package elfeed
+    :ensure t
+    :config
+    ;; data is stored in ~/.elfeed
+    (setq elfeed-feeds
+	  '(
+	    ;;
+	    ("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
 
-						;; programming
-						;;("https://news.ycombinator.com/rss" hacker)
-						;;("https://www.reddit.com/r/programming.rss" programming)
-						("https://www.reddit.com/r/emacs.rss" emacs)
-						("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
-						("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
-						("https://habr.com/ru/rss/news/?fl=ru" habr-news)
-						("https://nuancesprog.ru/feed" nop)
-						("https://dev.to/feed" dev-to)
+	    ;; programming
+	    ;;("https://news.ycombinator.com/rss" hacker)
+	    ;;("https://www.reddit.com/r/programming.rss" programming)
+	    ("https://www.reddit.com/r/emacs.rss" emacs)
+	    ("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
+	    ("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
+	    ("https://habr.com/ru/rss/news/?fl=ru" habr-news)
+	    ("https://nuancesprog.ru/feed" nop)
+	    ("https://dev.to/feed" dev-to)
 
-						;; hobby
-						("https://www.reddit.com/r/nasa.rss" nasa)
-						("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
-						("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
-						("https://dev.to/feed/tell396" tell396)
+	    ;; hobby
+	    ("https://www.reddit.com/r/nasa.rss" nasa)
+	    ("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
+	    ("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
+	    ("https://dev.to/feed/tell396" tell396)
 
-						;; programming languages
-						("https://www.reddit.com/r/javascript.rss" javascript)
-						("https://www.reddit.com/r/typescript.rss" typescript)
-						("https://www.reddit.com/r/golang.rss" golang)
-						("https://www.reddit.com/r/rust.rss" rust)
+	    ;; programming languages
+	    ("https://www.reddit.com/r/javascript.rss" javascript)
+	    ("https://www.reddit.com/r/typescript.rss" typescript)
+	    ("https://www.reddit.com/r/golang.rss" golang)
+	    ("https://www.reddit.com/r/rust.rss" rust)
 
-						;; Books
-						("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
+	    ;; Books
+	    ("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
 
-						;; cloud
-						;;("https://www.reddit.com/r/aws.rss" aws)
-						;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
-						;;("https://www.reddit.com/r/azure.rss" azure)
-						;;("https://www.reddit.com/r/devops.rss" devops)
-						;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
-						))
+	    ;; cloud
+	    ;;("https://www.reddit.com/r/aws.rss" aws)
+	    ;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
+	    ;;("https://www.reddit.com/r/azure.rss" azure)
+	    ;;("https://www.reddit.com/r/devops.rss" devops)
+	    ;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
+	    ))
 
-		(setq-default elfeed-search-filter "@7-days-ago +unread")
-		(setq-default elfeed-search-title-max-width 100)
-		(setq-default elfeed-search-title-min-width 100))
+    (setq-default elfeed-search-filter "@7-days-ago +unread")
+    (setq-default elfeed-search-title-max-width 100)
+    (setq-default elfeed-search-title-min-width 100))
 
-	(use-package elfeed-dashboard
-		:ensure t
-		:config
-		(setq elfeed-dashboard-file "~/elfeed-dashboard.org")
-		;; update feed counts on elfeed-quit
-		(advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
+  (use-package elfeed-dashboard
+    :ensure t
+    :config
+    (setq elfeed-dashboard-file "~/elfeed-dashboard.org")
+    ;; update feed counts on elfeed-quit
+    (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
 		#+end_src
+
+		#+RESULTS:
+		: t
+
 ** Emojify
 #+begin_src emacs-lisp
-	(use-package emojify :ensure t)
-#+end_src
-** Evil
-*** Set initial Evil
-#+begin_src emacs-lisp
-	(use-package evil
-		:ensure t
-		:init      ;; tweak evil's configuration before loading it
-		(setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-		(setq evil-want-keybinding nil)
-		(setq evil-vsplit-window-right t)
-		(setq evil-split-window-below t))
-	(evil-mode 1)
+  (use-package emojify :ensure t)
 #+end_src
 
-*** Evil collection 
-#+begin_src emacs-lisp
-	(use-package evil-collection
-		:after evil
-		:ensure t
-		:config
-		(setq evil-emacs-state-cursor '("#FF5D62" box))
-		(setq evil-normal-state-cursor '("#FF5D62" box))
-		(setq evil-visual-state-cursor '("#98BB6C" box))
-		(setq evil-insert-state-cursor '("#E82424" bar))
-		(setq evil-replace-state-cursor '("#FF9E3B" hbar))
-		(setq evil-operator-state-cursor '("#7E9CD8" hollow))
-		(evil-collection-init))
-#+end_src
-
-*** Evil leader (disabled)
-#+begin_src example
-	(use-package evil-leader
-		:init
-		(global-evil-leader-mode)
-		(evil-leader/set-leader "<SPC>")
-		(evil-leader/set-key
-		 ;; General
-		 ".f" 'consult-isearch
-		 ".q" 'delete-frame
-		 ".e" 'eval-region
-		 ;; Files
-		 "fr" 'consult-recent-file
-		 "fb" 'consult-bookmark
-		 "ff" 'find-file
-		 "fd" 'dired
-		 ;; Org
-		 "oa" 'org-agenda
-		 "fh" 'consult-org-heading
-		 ;; Open
-		 "om" 'mu4e
-		 "os" 'eshell
-		 ;; Notes
-		 "no" 'deft
-		 "nf" 'deft-find-file
-		 "nn" 'deft-new-file-named
-		 ;; Bufffers
-		 "bd" 'kill-current-buffer
-		 "bb" 'consult-buffer
-		 "bx" 'switch-to-scratch
-		 "bi" 'ibuffer
-		 ;; Windows
-		 "wv" 'split-window-right
-		 "wh" 'split-window-below
-		 "wt" 'window-split-toggle
-		 "ws" 'ace-window
-		 ;; Help
-		 "hh" 'help
-		 "hk" 'describe-key
-		 "hv" 'describe-variable
-		 "hF" 'describe-function
-		 "hf" 'describe-face
-		 "hs" 'describe-symbol
-		 "hm" 'describe-mode))
-
-#+end_src
-
-*** Evil multiple cursors (disabled)
-#+begin_src example
-	(use-package evil-multiedit
-		:after evil
-		:bind
-		(:map evil-normal-state-map
-					("M-d". evil-multiedit-match-symbol-and-next)
-					("M-D". evil-multiedit-match-symbol-and-prev)
-					("C-M-d". evil-multiedit-match-all)
-					:map evil-visual-state-map
-					("M-d". evil-multiedit-match-and-next)
-					("M-D". evil-multiedit-match-and-prev)
-					("C-M-d". evil-multiedit-match-all)))
-#+end_src
-
-*** Set evil states
-#+begin_src emacs-lisp
-	(evil-set-initial-state 'ibuffer-mode 'normal)
-	(evil-set-initial-state 'bookmark-bmenu-mode 'normal)
-	(evil-set-initial-state 'vterm-mode 'normal)
-	(evil-set-initial-state 'calibredb-mode 'normal)
-	;; (evil-set-initial-state 'dired-mode 'emacs)
-	(evil-set-initial-state 'sunrise-mode 'emacs)
-#+end_src
+#+RESULTS:
 
 ** FZF
 #+begin_src emacs-lisp
@@ -816,16 +837,23 @@ BUG BUG BUG
 					fzf/position-bottom t
 					fzf/window-height 15))
 #+end_src
+
+#+RESULTS:
+: t
+
 ** Git
 *** Magit
 **** Magit
 #+begin_src emacs-lisp
-	(use-package magit
-		:ensure t
-		:commands (magit-status magit-ediff-show-working-tree)
-		:bind ("C-c C-d" . magit-ediff-show-working-tree)
-		:custom (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
+  (use-package magit
+    :ensure t
+    :commands (magit-status magit-ediff-show-working-tree)
+    :bind ("C-c C-d" . magit-ediff-show-working-tree)
+    :custom (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
+
+#+RESULTS:
+: magit-ediff-show-working-tree
 
 **** Magit todos
 #+begin_src emacs-lisp
@@ -887,48 +915,6 @@ Show vertical lines to guide indentation
 		:config
 		(indent-guide-global-mode))
 #+end_src
-** LaTeX
-*** Auctex
-#+begin_src emacs-lisp
-	(use-package auctex
-		:ensure t)
-
-	(use-package auctex-latexmk
-		:ensure t
-		:custom
-		(auctex-latexmk-setup)
-		(add-hook 'LaTeX-mode-hook 'linum-mode)
-		(add-hook 'TeX-mode-hook
-							(lambda () (TeX-fold-mode 1))); Automatically activate
-																					; TeX-fold-mode.
-		)
-
-
-
-	;; Use pdf-tools to open PDF files
-	(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-				TeX-source-correlate-start-server t)
-
-	;; Update PDF buffers after successful LaTeX runs
-	(add-hook 'TeX-after-compilation-finished-functions
-						#'TeX-revert-document-buffer)
-#+end_src
-*** Embed LaTeX in org-mode
-#+begin_src emacs-lisp
-	(require 'ox-latex)
-	(setq org-latex-create-formula-image-program 'dvipng)
-	(org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
-
-	;; Setting size of result of LaTeX compile in org-mode
-	(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
-
-
-	(add-hook 'LaTeX-mode-hook 'turn-on-reftex) 
-	(org-babel-do-load-languages
-	 'org-babel-load-languages
-	 '((latex . t)))
-#+end_src
-
 ** Org
 *** Org modern
 #+begin_src emacs-lisp
@@ -1113,42 +1099,42 @@ Show vertical lines to guide indentation
 ** Org-roam
 *** Org-roam setting
 #+begin_src emacs-lisp
-	(use-package org-roam
-		:ensure t
-		:custom
-		(org-roam-directory (file-truename "~/Org/2Brain"))
-		(org-roam-completion-everywhere t)
-		(org-roam-capture-templates
-		 '(
-			 ("d" "default" plain "%?"
-				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
-				:unnarrowed t)
+  (use-package org-roam
+	  :ensure t
+	  :custom
+	  (org-roam-directory (file-truename "~/Org/2Brain"))
+	  (org-roam-completion-everywhere t)
+	  (org-roam-capture-templates
+	   '(
+		   ("d" "default" plain "%?"
+			  :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+			  :unnarrowed t)
 
-			 ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n* Summary\n\n"
-				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
-				:unnarrowed t)
-			 ))
-		:bind (("C-c n l" . org-roam-buffer-toggle)
-					 ("C-c n f" . org-roam-node-find)
-					 ;; ("C-c n g" . org-roam-graph) ;; Need graphviz package
-					 ("C-c n i" . org-roam-node-insert)
-					 ("C-c n c" . org-roam-capture)
+		   ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n* Summary\n\n"
+			  :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
+			  :unnarrowed t)
 
-					 ("C-c g" . org-id-get-create)
-					 ;; Dailies
-					 ("C-c n j" . org-roam-dailies-capture-today))
-		:config
-		;; If you're using a vertical completion framework, you might want a more informative completion interface
-		;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-		(setq org-roam-completion-everywhere t)
-		(org-roam-db-autosync-mode 1)
-		;; If using org-roam-protocol
-		(require 'org-roam-protocol))
+		   ;; ("n" "New Thought" plain "\n\nSource: %^{Source}\nTitle: ${title}\n\n* Summary\n\n"
+		   ;; 	:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
+		   ;; 	:unnarrowed t)
+		   ))
+	  :bind (("C-c n l" . org-roam-buffer-toggle)
+				   ("C-c n f" . org-roam-node-find)
+				   ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
+				   ("C-c n i" . org-roam-node-insert)
+				   ("C-c n c" . org-roam-capture)
+
+				   ("C-c g" . org-id-get-create)
+				   ;; Dailies
+				   ("C-c n j" . org-roam-dailies-capture-today))
+	  :config
+	  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+	  ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+	  (setq org-roam-completion-everywhere t)
+	  (org-roam-db-autosync-mode 1)
+	  ;; If using org-roam-protocol
+	  (require 'org-roam-protocol))
 #+end_src
-
-
-
-
 
 *** Org-download
 #+begin_src emacs-lisp
@@ -1592,6 +1578,48 @@ For more information: https://depp.brause.cc/nov.el/
 
 
 
+** LaTeX
+*** Auctex
+#+begin_src emacs-lisp
+	(use-package auctex
+		:ensure t)
+
+	(use-package auctex-latexmk
+		:ensure t
+		:custom
+		(auctex-latexmk-setup)
+		(add-hook 'LaTeX-mode-hook 'linum-mode)
+		(add-hook 'TeX-mode-hook
+							(lambda () (TeX-fold-mode 1))); Automatically activate
+																					; TeX-fold-mode.
+		)
+
+
+
+	;; Use pdf-tools to open PDF files
+	(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+				TeX-source-correlate-start-server t)
+
+	;; Update PDF buffers after successful LaTeX runs
+	(add-hook 'TeX-after-compilation-finished-functions
+						#'TeX-revert-document-buffer)
+#+end_src
+*** Embed LaTeX in org-mode
+#+begin_src emacs-lisp
+  (require 'ox-latex)
+  (setq org-latex-create-formula-image-program 'dvipng)
+  (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
+
+  ;; Setting size of result of LaTeX compile in org-mode
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
+
+  ;; (add-hook 'LaTeX-mode-hook 'turn-on-reftex) 
+  ;; (org-babel-do-load-languages
+  ;;  'org-babel-load-languages
+  ;;  '((latex . t)))
+#+end_src
+
 
 ** Calendar sync (disabled)
 #+begin_src example
@@ -1961,6 +1989,16 @@ For more information: https://depp.brause.cc/nov.el/
 	(setq company-idle-delay 0)
 	(setq company-minimum-prefix-length 1)
 #+end_src
+** Setting company-org-block
+#+begin_src emacs-lisp
+	(use-package company-org-block
+		:ensure t
+		:custom
+		(company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
+		:hook ((org-mode . (lambda ()
+												 (setq-local company-backends '(company-org-block))
+												 (company-mode +1)))))
+											 #+end_src
 
 ** Setting yasnippet
 #+begin_src emacs-lisp
@@ -2313,7 +2351,7 @@ Make gc pauses faster by decreasing the threshold.
 #+end_src
 
 * dmenu
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package dmenu
 		:ensure t)
 
@@ -2550,11 +2588,10 @@ Support for resizing windows, using the mouse. Position the mouse on the divider
 	(defun ambrevar/exwm-rename-buffer-to-title () (exwm-workspace-rename-buffer exwm-title))
 
 	(my-exwm-config-setup) ;; Does not start X11 or EXWM. Start should be done from commandline.
-#+end_src
-
+#+
 
 * eaf
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package eaf
 		:load-path "~/.emacs.d/site-lisp/emacs-application-framework"
 		:custom
@@ -2579,6 +2616,3 @@ Support for resizing windows, using the mouse. Position the mouse on the divider
 	;; (require 'eaf-terminal)
 #+end_src
 
-
-#+begin_src emacs-lisp
-#+end_src
