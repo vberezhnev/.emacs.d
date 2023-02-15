@@ -36,7 +36,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Window
 #+begin_src emacs-lisp
-  ц(eval-when-compile (defvar display-time-24hr-format t))
+  (eval-when-compile (defvar display-time-24hr-format t))
   (eval-when-compile (defvar display-time-default-load-average nil))
 
   (display-battery-mode t)		  ;; Show battery.
@@ -215,20 +215,20 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 ** Setting fonts
 #+begin_src emacs-lisp
   (set-face-attribute 'default t
-										  :font "JetBrains Mono" ;; Iosevka, Input, Hack
-										  :height 90
-										  :weight 'regular
-										  )
+                      :font "JetBrains Mono" ;; Iosevka, Input, Hack
+                      :height 90
+                      :weight 'regular
+                      )
   (set-face-attribute 'variable-pitch nil
-										  :font "JetBrains Mono"
-										  :height 90
-										  :weight 'medium
-										  )
+                      :font "JetBrains Mono"
+                      :height 90
+                      :weight 'medium
+                      )
   (set-face-attribute 'fixed-pitch nil
-										  :font "JetBrains Mono"
-										  :height 90
-										  :weight 'medium
-										  )
+                      :font "JetBrains Mono"
+                      :height 90
+                      :weight 'medium
+                      )
 
   ;; (set-frame-font "JetBrains Mono" nil t)
 
@@ -236,16 +236,16 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   ;; This is working in emacsclient but not emacs.
   ;; Your font must have an italic face available.
   (set-face-attribute 'font-lock-comment-face nil
-										  :slant 'italic)
+                      :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil
-										  :slant 'italic)
+                      :slant 'italic)
 
 
   ;; Uncomment the following line if line spacing needs adjusting.
   ;; (setq-default line-spacing 0.12)
 
   ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-  (add-to-list 'default-frame-alist '(font . "JetBrains Mono 11"))
+  (add-to-list 'default-frame-alist '(font . "JetBrains Mono 10"))
   ;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
   ;; changes certain keywords to symbols, such as lamda!
   (setq global-prettify-symbols-mode t)
@@ -326,139 +326,80 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting and installing themes
 #+begin_src emacs-lisp
-  ;; (use-package 'gruvbox-theme
-  ;; 	:ensure t)
+	;; (use-package 'gruvbox-theme
+	;; 	:ensure t)
 
-  ;; (use-package 'modus-themes
-  ;; 	:ensure t)
+	;; (use-package 'modus-themes
+	;; 	:ensure t)
 
-  (use-package doom-themes
-    :ensure t
-    :config
-    ;; Global settings (defaults)
-    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-	  doom-themes-enable-italic t) ; if nil, italics is universally disabled
-    ;; Enable flashing mode-line on errors
-    (doom-themes-visual-bell-config)
-    ;; or for treemacs users
-    ;; (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
-    (doom-themes-treemacs-config)
-    ;; Corrects (and improves) org-mode's native fontification.
-    (doom-themes-org-config))
+	(use-package doom-themes
+		:ensure t
+		:config
+		;; Global settings (defaults)
+		(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+					doom-themes-enable-italic t) ; if nil, italics is universally disabled
+		;; Enable flashing mode-line on errors
+		(doom-themes-visual-bell-config)
+		;; or for treemacs users
+		;; (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
+		(doom-themes-treemacs-config)
+		;; Corrects (and improves) org-mode's native fontification.
+		(doom-themes-org-config))
 
-  (load-theme 'doom-one t)
+	;; (load-theme 'gruvbox-dark-soft t)
 	#+end_src
 
-	#+RESULTS:
-	: t
+** Change theme by time
+#+begin_src emacs-lisp :lexical no
+	(use-package theme-changer
+		:ensure t
+		:config
+		(setq calendar-location-name "Vladivostok, RU") 
+		(setq calendar-latitude 43.11)
+		(setq calendar-longitude 131.88))
+
+	(change-theme 'gruvbox-light-medium 'gruvbox-dark-soft)
+#+end_src
+
+#+begin_src example
+	(defvar install-theme-loading-times nil
+		"An association list of time strings and theme names.
+	The themes will be loaded at the specified time every day.")
+	(defvar install-theme-timers nil)
+	(defun install-theme-loading-at-times ()
+		"Set up theme loading according to `install-theme-loading-at-times`"
+		(interactive)
+		(dolist (timer install-theme-timers)
+			(cancel-timer timer))
+		(setq install-theme-timers nil)
+		(dolist (time-theme install-theme-loading-times)
+			(add-to-list 'install-theme-timers
+									 (run-at-time (car time-theme) (* 60 60 24) 'load-theme (cdr time-theme)))))
+
+	(setq install-theme-loading-times '(("9:00am" . gruvbox-light-soft)
+																			("7:30pm" . gruvbox-dark-soft)))
+#+end_src
 
 * Setting Packages
-** Evil
-*** Set initial Evil
-#+begin_src emacs-lisp
-  (use-package evil
-    :ensure t
-    :init      ;; tweak evil's configuration before loading it
-    (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-    (setq evil-want-keybinding nil)
-    (setq evil-vsplit-window-right t)
-    (setq evil-split-window-below t))
-  (evil-mode 1)
-#+end_src
-
-*** Evil collection 
-#+begin_src emacs-lisp
-  (use-package evil-collection
-    :after evil
-    :ensure t
-    :config
-    (setq evil-emacs-state-cursor '("#FF5D62" box))
-    (setq evil-normal-state-cursor '("#FF5D62" box))
-    (setq evil-visual-state-cursor '("#98BB6C" box))
-    (setq evil-insert-state-cursor '("#E82424" bar))
-    (setq evil-replace-state-cursor '("#FF9E3B" hbar))
-    (setq evil-operator-state-cursor '("#7E9CD8" hollow))
-    (evil-collection-init))
-#+end_src
-
-*** Evil leader (disabled)
-#+begin_src example
-	(use-package evil-leader
-		:init
-		(global-evil-leader-mode)
-		(evil-leader/set-leader "<SPC>")
-		(evil-leader/set-key
-		 ;; General
-		 ".f" 'consult-isearch
-		 ".q" 'delete-frame
-		 ".e" 'eval-region
-		 ;; Files
-		 "fr" 'consult-recent-file
-		 "fb" 'consult-bookmark
-		 "ff" 'find-file
-		 "fd" 'dired
-		 ;; Org
-		 "oa" 'org-agenda
-		 "fh" 'consult-org-heading
-		 ;; Open
-		 "om" 'mu4e
-		 "os" 'eshell
-		 ;; Notes
-		 "no" 'deft
-		 "nf" 'deft-find-file
-		 "nn" 'deft-new-file-named
-		 ;; Bufffers
-		 "bd" 'kill-current-buffer
-		 "bb" 'consult-buffer
-		 "bx" 'switch-to-scratch
-		 "bi" 'ibuffer
-		 ;; Windows
-		 "wv" 'split-window-right
-		 "wh" 'split-window-below
-		 "wt" 'window-split-toggle
-		 "ws" 'ace-window
-		 ;; Help
-		 "hh" 'help
-		 "hk" 'describe-key
-		 "hv" 'describe-variable
-		 "hF" 'describe-function
-		 "hf" 'describe-face
-		 "hs" 'describe-symbol
-		 "hm" 'describe-mode))
-
-#+end_src
-
-*** Evil multiple cursors (disabled)
-#+begin_src example
-	(use-package evil-multiedit
-		:after evil
-		:bind
-		(:map evil-normal-state-map
-					("M-d". evil-multiedit-match-symbol-and-next)
-					("M-D". evil-multiedit-match-symbol-and-prev)
-					("C-M-d". evil-multiedit-match-all)
-					:map evil-visual-state-map
-					("M-d". evil-multiedit-match-and-next)
-					("M-D". evil-multiedit-match-and-prev)
-					("C-M-d". evil-multiedit-match-all)))
-#+end_src
-
-*** Set evil states
-#+begin_src emacs-lisp
-  (evil-set-initial-state 'ibuffer-mode 'normal)
-  (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
-  (evil-set-initial-state 'vterm-mode 'normal)
-  (evil-set-initial-state 'calibredb-mode 'normal)
-  ;; (evil-set-initial-state 'dired-mode 'emacs)
-  (evil-set-initial-state 'sunrise-mode 'emacs)
-#+end_src
-
 ** Alert.el (disabled)
 #+begin_src example
 	(use-package alert :ensure t)
 
 	(telega-alert-mode 1)
 #+end_src
+** Auto-dark (change theme by system)
+#+begin_src example
+	(use-package auto-dark
+		:ensure t
+		:init (auto-dark-mode t)
+		:config
+		)
+	(setq auto-dark-dark-theme 'gruvbox-dark-soft)
+	(setq auto-dark-light-theme 'gruvbox-light-soft)
+	(setq auto-dark-detection-method 'dbus)
+#+end_src
+
+#+RESULTS:
 
 ** Dashboard
 #+begin_src emacs-lisp
@@ -819,6 +760,106 @@ BUG BUG BUG
 
 #+RESULTS:
 
+** Evil
+*** Set initial Evil
+#+begin_src emacs-lisp
+  (use-package evil
+    :ensure t
+    :init      ;; tweak evil's configuration before loading it
+    (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+    (setq evil-want-keybinding nil)
+    (setq evil-vsplit-window-right t)
+    (setq evil-split-window-below t))
+  (evil-mode 1)
+#+end_src
+
+*** Evil collection 
+#+begin_src emacs-lisp
+  (use-package evil-collection
+    :after evil
+    :ensure t
+    :config
+    (setq evil-emacs-state-cursor '("#FF5D62" box))
+    (setq evil-normal-state-cursor '("#FF5D62" box))
+    (setq evil-visual-state-cursor '("#98BB6C" box))
+    (setq evil-insert-state-cursor '("#E82424" bar))
+    (setq evil-replace-state-cursor '("#FF9E3B" hbar))
+    (setq evil-operator-state-cursor '("#7E9CD8" hollow))
+    (evil-collection-init))
+#+end_src
+
+*** Evil leader (disabled)
+#+begin_src example
+	(use-package evil-leader
+		:init
+		(global-evil-leader-mode)
+		(evil-leader/set-leader "<SPC>")
+		(evil-leader/set-key
+		 ;; General
+		 ".f" 'consult-isearch
+		 ".q" 'delete-frame
+		 ".e" 'eval-region
+		 ;; Files
+		 "fr" 'consult-recent-file
+		 "fb" 'consult-bookmark
+		 "ff" 'find-file
+		 "fd" 'dired
+		 ;; Org
+		 "oa" 'org-agenda
+		 "fh" 'consult-org-heading
+		 ;; Open
+		 "om" 'mu4e
+		 "os" 'eshell
+		 ;; Notes
+		 "no" 'deft
+		 "nf" 'deft-find-file
+		 "nn" 'deft-new-file-named
+		 ;; Bufffers
+		 "bd" 'kill-current-buffer
+		 "bb" 'consult-buffer
+		 "bx" 'switch-to-scratch
+		 "bi" 'ibuffer
+		 ;; Windows
+		 "wv" 'split-window-right
+		 "wh" 'split-window-below
+		 "wt" 'window-split-toggle
+		 "ws" 'ace-window
+		 ;; Help
+		 "hh" 'help
+		 "hk" 'describe-key
+		 "hv" 'describe-variable
+		 "hF" 'describe-function
+		 "hf" 'describe-face
+		 "hs" 'describe-symbol
+		 "hm" 'describe-mode))
+
+#+end_src
+
+*** Evil multiple cursors (disabled)
+#+begin_src example
+	(use-package evil-multiedit
+		:after evil
+		:bind
+		(:map evil-normal-state-map
+					("M-d". evil-multiedit-match-symbol-and-next)
+					("M-D". evil-multiedit-match-symbol-and-prev)
+					("C-M-d". evil-multiedit-match-all)
+					:map evil-visual-state-map
+					("M-d". evil-multiedit-match-and-next)
+					("M-D". evil-multiedit-match-and-prev)
+					("C-M-d". evil-multiedit-match-all)))
+#+end_src
+
+*** Set evil states
+#+begin_src emacs-lisp
+  (evil-set-initial-state 'ibuffer-mode 'normal)
+  (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+  (evil-set-initial-state 'vterm-mode 'normal)
+  (evil-set-initial-state 'calibredb-mode 'normal)
+  ;; (evil-set-initial-state 'dired-mode 'emacs)
+  (evil-set-initial-state 'sunrise-mode 'emacs)
+#+end_src
+
 ** FZF
 #+begin_src emacs-lisp
 	(use-package fzf
@@ -915,7 +956,101 @@ Show vertical lines to guide indentation
 		:config
 		(indent-guide-global-mode))
 #+end_src
+** LaTeX
+*** Auctex
+#+begin_src example
+  (use-package auctex
+	  :ensure t)
+
+  (use-package auctex-latexmk
+	  :ensure t
+	  :custom
+	  (auctex-latexmk-setup)
+	  (add-hook 'LaTeX-mode-hook 'linum-mode)
+	  (add-hook 'TeX-mode-hook
+						  (lambda () (TeX-fold-mode 1))); Automatically activate
+																				  ; TeX-fold-mode.
+	  )
+
+
+
+  ;; Use pdf-tools to open PDF files
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+			  TeX-source-correlate-start-server t)
+
+  ;; Update PDF buffers after successful LaTeX runs
+  (add-hook 'TeX-after-compilation-finished-functions
+					  #'TeX-revert-document-buffer)
+#+end_src
+*** Embed LaTeX in org-mode
+#+begin_src emacs-lisp
+  (require 'ox-latex)
+  (setq org-latex-create-formula-image-program 'dvipng)
+  (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
+
+  ;; Setting size of result of LaTeX compile in org-mode
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
+
+  ;; (add-hook 'LaTeX-mode-hook 'turn-on-reftex) 
+  ;; (org-babel-do-load-languages
+  ;;  'org-babel-load-languages
+  ;;  '((latex . t)))
+#+end_src
+
 ** Org
+*** Improve org-mode looks
+#+begin_src emacs-lisp :lexical no
+  (setq
+   org-ellipsis " ▾"                 ; ↴, ▼, ▶, ⤵, ▾
+   org-roam-v2-ack t                 ; anonying startup message
+   org-log-done 'time                ; I need to know when a task is done
+   org-startup-folded t
+   ;; org-odd-levels-only t
+   org-pretty-entities t
+   org-startup-indented t
+   org-adapt-indentation t
+   org-hide-leading-stars t
+   org-hide-macro-markers t
+   org-hide-block-startup nil
+   org-src-fontify-natively t
+   org-src-tab-acts-natively t
+   org-hide-emphasis-markers t
+   org-cycle-separator-lines 2
+   org-startup-folded 'content
+   org-startup-with-inline-images t
+   org-src-preserve-indentation nil
+   org-edit-src-content-indentation 2
+   org-fontify-quote-and-verse-blocks t
+   org-image-actual-width '(300))
+#+end_src
+*** Some replaces
+#+begin_src emacs-lisp :lexical no
+	;;; replace-org-char
+	;; Replace list hyphen with dot
+	(font-lock-add-keywords 'org-mode
+													'(("^ *\\([-]\\) "
+														 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+	;; Replace list plus with arrow
+	(font-lock-add-keywords 'org-mode
+													'(("^ *\\([+]\\) "
+														 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "➤"))))))
+	
+#+end_src
+*** Increase the size of various headings
+#+begin_src emacs-lisp :lexical no
+  (set-face-attribute 'org-document-title nil :font "JetBrains Mono" ) ;; :weight 'bold :height 1.5
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "JetBrains Mono")) ;;  :weight 'medium :height (cdr face)
+#+end_src
 *** Org modern
 #+begin_src emacs-lisp
 	(use-package org-modern
@@ -962,61 +1097,69 @@ Show vertical lines to guide indentation
 		(add-hook 'hack-local-variables-hook
 							(lambda () (setq org-enable-table-editor nil)  )))
 #+end_src
+
 *** Setting Org
 #+begin_src emacs-lisp
-	(use-package org
-		;; :hook (org-mode . mk/org-mode-setup)
-		:config
-		(set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-		(setq org-ellipsis " ᗐ"
-					org-hide-emphasis-markers t
-					org-hide-leading-stars t
-					org-log-into-drawer t
-					org-log-done 'time))
+  (use-package org
+    ;; :hook (org-mode . mk/org-mode-setup)
+    :config
+    (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+    (setq org-ellipsis " ᗐ" ;; ⤵ ᗐ
+          org-hide-emphasis-markers t
+          org-hide-leading-stars t
+          org-log-into-drawer t
+          org-log-done 'time))
 
-	(with-eval-after-load 'org
-		(setq org-confirm-babel-evaluate nil)
-		(require 'org-tempo)
+  (with-eval-after-load 'org
+    (setq org-confirm-babel-evaluate nil)
+    (require 'org-tempo)
 
-		;; Setup fonts for org-mode
-		(set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
-		(set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-		(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-		(set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-		(set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-		(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-		(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-		(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-		(set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-		(set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-		(set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
+    ;; Setup fonts for org-mode
+    (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
+    (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+    (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+    (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+    (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
 
-		(add-hook 'org-babel-after-execute-hook (lambda ()
-																							(when org-inline-image-overlays
-																								(org-redisplay-inline-images))))
-		;; (org-babel-do-load-languages 'org-babel-load-languages
-		;;                               '((example t))
+    (add-hook 'org-babel-after-execute-hook (lambda ()
+                                              (when org-inline-image-overlays
+                                                (org-redisplay-inline-images))))
+    ;; (org-babel-do-load-languages 'org-babel-load-languages
+    ;;                               '((example t))
 
-		;; (add-to-list 'org-structure-template-alist
-		;;              '("sh" . "src shell")
-		;;               ("elisp" . "src example")
-		;;               ("swift" . "src swift"))
-		(add-to-list 'org-modules 'org-tempo t))
+    ;; (add-to-list 'org-structure-template-alist
+    ;;              '("sh" . "src shell")
+    ;;               ("elisp" . "src example")
+    ;;               ("swift" . "src swift"))
+    (add-to-list 'org-modules 'org-tempo t))
 #+end_src
 
 *** Org bullets
 #+begin_src emacs-lisp
-	(use-package org-superstar
-		:ensure t
-		:config
-		(setq org-superstar-headline-bullets-list '("◉" "⬢" "○" "✸" "✿")))
-	(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+	;; (use-package org-superstar
+	;; 	:ensure t
+	;; 	:config
+	;; 	(setq org-superstar-headline-bullets-list '("◉" "⬢" "○" "✸" "✿")))
+	;; (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
 	;; (use-package org-bullets
 	;; 	:ensure t
 	;; 	:hook (org-mode . org-bullets-mode)
 	;; 	:custom
 	;; 	(org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+	(use-package org-bullets
+		:ensure t
+		:after org
+		:hook (org-mode . org-bullets-mode)
+		:custom
+		(org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○"))) ; "●" "▷" "🞛" "◈" "✖"
 #+end_src
 *** Change TODO's states
 #+begin_src emacs-lisp
@@ -1096,61 +1239,225 @@ Show vertical lines to guide indentation
 				 (url-copy-file path img)
 				 (find-file img)))))
 #+END_SRC
+*** Org babel
+#+begin_src emacs-lisp
+	  ;; Execute org src block
+	  (org-babel-do-load-languages
+	   'org-babel-load-languages
+	   '((emacs-lisp . t)
+		   (js . t)
+		   (shell . t)
+		   (python . t)
+		   ;; (rust . t)
+  ))
+#+end_src
+*** Prettify symbols
+#+begin_src emacs-lisp :lexical no
+  ;; Beautify Org Checkbox Symbol
+  (defun ma/org-buffer-setup ()
+    "Something for like document, i guess 😕."
+    (push '("[ ]" . "☐" ) prettify-symbols-alist)
+    (push '("[X]" . "☑" ) prettify-symbols-alist)
+    (push '("[-]" . "❍" ) prettify-symbols-alist)
+    )
+  (add-hook 'org-mode-hook #'ma/org-buffer-setup)
+
+  (defun my/org-mode/load-prettify-symbols ()
+    "Looking pretty good, so i adopted it."
+    (interactive)
+    (setq prettify-symbols-alist
+          (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
+                  '(("#+begin_src" . ?)
+                    ("#+end_src" . ?)
+                    ("#+begin_example" . ?)
+                    ("#+end_example" . ?)
+                    ("#+begin_quote" . ?❝)
+                    ("#+end_quote" . ?❠) ; ❟ ―  
+                    ("#+begin_center" . "ϰ")
+                    ("#+end_center" . "ϰ")
+                    ("#+header:" . ?)
+                    ("#+name:" . ?﮸)
+                    ;; ("#+title:" . ?◈)
+                    ;; ("#+author:" . ?✒)
+                    ("#+results:" . ?)
+                    ("#+call:" . ?)
+                    (":properties:" . ?)
+                    (":logbook:" . ?)))))
+  (add-hook 'org-mode-hook #'my/org-mode/load-prettify-symbols)
+
+  ;;;; toggle-emphasis
+  (defun org-toggle-emphasis ()
+    "Toggle hiding/showing of org emphasis markers."
+    (interactive)
+    (if org-hide-emphasis-markers
+        (set-variable 'org-hide-emphasis-markers nil)
+      (set-variable 'org-hide-emphasis-markers t))
+    (org-mode-restart))
+  (define-key org-mode-map (kbd "C-c x") 'org-toggle-emphasis)
+#+end_src
+
 ** Org-roam
-*** Org-roam setting
+*** Org-roam
 #+begin_src emacs-lisp
-  (use-package org-roam
-	  :ensure t
-	  :custom
-	  (org-roam-directory (file-truename "~/Org/2Brain"))
-	  (org-roam-completion-everywhere t)
-	  (org-roam-capture-templates
-	   '(
-		   ("d" "default" plain "%?"
-			  :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
-			  :unnarrowed t)
+	(use-package org-roam
+		:ensure t
+		:custom
+		(org-roam-directory (file-truename "~/Org/2Brain"))
+		(org-roam-completion-everywhere t)
+		(org-roam-capture-templates
+		 '(
+			 ("d" "default" plain "%?"
+				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+				:unnarrowed t)
 
-		   ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n* Summary\n\n"
-			  :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
-			  :unnarrowed t)
+			 ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n"
+				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
+				:unnarrowed t)
 
-		   ;; ("n" "New Thought" plain "\n\nSource: %^{Source}\nTitle: ${title}\n\n* Summary\n\n"
-		   ;; 	:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
-		   ;; 	:unnarrowed t)
-		   ))
-	  :bind (("C-c n l" . org-roam-buffer-toggle)
-				   ("C-c n f" . org-roam-node-find)
-				   ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
-				   ("C-c n i" . org-roam-node-insert)
-				   ("C-c n c" . org-roam-capture)
+			 ("n" "New Thought" plain "\n\nSource: %^{Source}\nTitle: ${title}\n\n"
+				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
+				:unnarrowed t)
+			 ("e" "Encrypt note" plain "%?"
+				:target (file+head "<%Y-%m-%d-%H:%M:%S>.org.gpg"
+													 "#+title: ${title}\n#+date: %U")
+				:unnarrowed t)
+			 ))
+		:bind (("C-c n l" . org-roam-buffer-toggle)
+					 ("C-c n f" . org-roam-node-find)
+					 ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
+					 ("C-c n i" . org-roam-node-insert)
+					 ("C-c n c" . org-roam-capture)
+					 ("C-c n t" . org-roam-tag-add)
+					 ("C-c n r" . org-roam-ref-add)
 
-				   ("C-c g" . org-id-get-create)
-				   ;; Dailies
-				   ("C-c n j" . org-roam-dailies-capture-today))
-	  :config
-	  ;; If you're using a vertical completion framework, you might want a more informative completion interface
-	  ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-	  (setq org-roam-completion-everywhere t)
-	  (org-roam-db-autosync-mode 1)
-	  ;; If using org-roam-protocol
-	  (require 'org-roam-protocol))
+					 ("C-c g" . org-id-get-create)
+					 ;; Dailies
+					 ("C-c n j" . org-roam-dailies-capture-today))
+		:config
+		;; If you're using a vertical completion framework, you might want a more informative completion interface
+		;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+		(setq org-roam-completion-everywhere t)
+		(org-roam-db-autosync-mode 1)
+		;; If using org-roam-protocol
+		(require 'org-roam-protocol))
 #+end_src
 
-*** Org-download
-#+begin_src emacs-lisp
-	(use-package org-download
-		:ensure t)
+#+begin_example emacs-lisp
+(setq org-roam-directory (file-truename "~/org-roam"))
+(make-directory org-roam-directory 'parents)
+(setq org-roam-verbose t)
+(setq org-roam-db-location
+      (concat org-roam-directory "/.database/org-roam.db"))
+;; (setq +org-roam-open-buffer-on-find-file nil) ; deprecated for v2
+;; (setq org-roam-db-update-idle-seconds 30) ; deprecated for v2
+;; (setq org-roam-graph-viewer "qutebrowser") ; deprecated for v2
 
-	;; Drag-and-drop to `dired`
-(add-hook 'dired-mode-hook 'org-download-enable)
-#+end_src
+;; Redefining some part of the slug generator.
+(cl-defmethod org-roam-node-slug ((node org-roam-node))
+  "Return the slug of NODE."
+  (let ((title (org-roam-node-title node))
+        (slug-trim-chars '(;; Combining Diacritical Marks https://www.unicode.org/charts/PDF/U0300.pdf
+                           768    ; U+0300 COMBINING GRAVE ACCENT
+                           769    ; U+0301 COMBINING ACUTE ACCENT
+                           770 ; U+0302 COMBINING CIRCUMFLEX ACCENT
+                           771 ; U+0303 COMBINING TILDE
+                           772 ; U+0304 COMBINING MACRON
+                           774 ; U+0306 COMBINING BREVE
+                           775 ; U+0307 COMBINING DOT ABOVE
+                           776 ; U+0308 COMBINING DIAERESIS
+                           777 ; U+0309 COMBINING HOOK ABOVE
+                           778 ; U+030A COMBINING RING ABOVE
+                           780 ; U+030C COMBINING CARON
+                           795 ; U+031B COMBINING HORN
+                           803 ; U+0323 COMBINING DOT BELOW
+                           804 ; U+0324 COMBINING DIAERESIS BELOW
+                           805 ; U+0325 COMBINING RING BELOW
+                           807 ; U+0327 COMBINING CEDILLA
+                           813 ; U+032D COMBINING CIRCUMFLEX ACCENT BELOW
+                           814 ; U+032E COMBINING BREVE BELOW
+                           816 ; U+0330 COMBINING TILDE BELOW
+                           817 ; U+0331 COMBINING MACRON BELOW
+                           )))
+    (cl-flet* ((nonspacing-mark-p (char)
+                                  (memq char slug-trim-chars))
+               (strip-nonspacing-marks (s)
+                                       (ucs-normalize-NFC-string
+                                        (apply #'string (seq-remove #'nonspacing-mark-p
+                                                                    (ucs-normalize-NFD-string s)))))
+               (cl-replace (title pair)
+                           (replace-regexp-in-string (car pair) (cdr pair) title)))
+      (let* ((pairs `(("[^[:alnum:][:digit:]]" . "-") ;; convert anything not alphanumeric
+                      ;; ("__*" . "_") ;; remove sequential underscores
+                      ;; ("^_" . "")   ;; remove starting underscore
+                      ;; ("_$" . "")   ;; remove ending underscore
+                      ))
+             (slug (-reduce-from #'cl-replace (strip-nonspacing-marks title) pairs)))
+        (downcase slug)))))
 
-*** company-org-roam
+(setq org-roam-capture-templates
+      `(("p" "Permanent Note" plain "%?"
+         :if-new (file+head "${slug}.org"
+                            "#+title: ${title}\n")
+         :unnarrowed t)
+
+        ("f" "Fleeting Note" plain "%?"
+         :if-new (file+head "fleeting/%<%Y%m%d-%H%M%S>.org"
+                            "#+TITLE: %<%Y%m%d-%H%M%S>--${title}\n")
+         :unnarrowed t)
+
+        ("t" "Time Note" plain "%?"
+         :if-new (file+head "fleeting/%(my/initiate-org-roam-time-note).org"
+                            "#+TITLE: %(eval my/*time-note-last-time*)--${title}
+
+[[tsl:%(eval my/*time-note-last-time*)]]
+
+")
+         :unnarrowed t)
+
+        ("l" "Literature Note" plain "%?"
+         :if-new (file+head "literature/${slug}.org"
+                            "#+TITLE: ${title}
+#+ROAM_KEY: ${ref}")
+         :unnarrowed t)
+        ))
+
+(defun my/initiate-org-roam-time-note ()
+  (interactive)
+  (let ((ts (read-from-minibuffer "Timestamp (YYYYmmdd-HHMMSS): "
+                                  (ts-format "%Y%m%d-%H%M%S" (ts-now)))))
+    (if (string-match (rx (repeat 8 digit)
+                          "-"
+                          (repeat 6 digit))
+                      ts)
+        (setq my/*time-note-last-time* ts)
+      (error "Incorrect input format."))))
+
+;; (require 'org-roam-protocol) ; Deprecated for v2.
+
+;; TODO Have not got it integrated with org protocol. Find out how.
+;; 
+;; Recall that I used to use
+;;
+;;   `emacsclient "org-protocol://roam-ref?template=r&ref={INSERT-URL}&title={INSERT-TITLE}"`
+;;
+;; for quickly capturing a webpage.
+
+(setq org-roam-capture-ref-templates
+      '(("r" "ref" plain "%?"
+         :if-new (file+head "literature/${slug}.org"
+                            "#+title: ${title}
+#+roam_key: ${ref}")
+         :unnarrowed t)))
+#+end_example
+
+**** Configuring org-roam buffer display
 #+begin_src emacs-lisp
-(use-package company-org-roam
-  :straight (:host github :repo "org-roam/company-org-roam")
-  :config
-  (push 'company-org-roam company-backends))
+(add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
 #+end_src
 *** Org-roam-ui
 #+begin_src emacs-lisp
@@ -1176,30 +1483,14 @@ Show vertical lines to guide indentation
 						(violet . "#8be9fd")
 						(magenta . "#bd93f9"))))
 #+end_src
-
-*** Configuring org-roam buffer display
+*** Company-org-roam
 #+begin_src emacs-lisp
-(add-to-list 'display-buffer-alist
-             '("\\*org-roam\\*"
-               (display-buffer-in-direction)
-               (direction . right)
-               (window-width . 0.33)
-               (window-height . fit-window-to-buffer)))
+(use-package company-org-roam
+  :straight (:host github :repo "org-roam/company-org-roam")
+  :config
+  (push 'company-org-roam company-backends))
 #+end_src
-*** Md-roam (add md for org-roam)
-#+begin_src example
-	(load "~/.emacs.d/local-packages/md-roam")
-	(use-package md-roam
-		:config
-		(md-roam-mode 1) ; md-roam-mode must be active before org-roam-db-sync
-		(setq org-roam-file-extensions '("org" "md"))
-		(setq md-roam-file-extension "md") ; default "md". Specify an extension such as "markdown"
-		)
-	(with-eval-after-load 'markdown-mode
-  (advice-add #'markdown-indent-line :before-until #'completion-at-point))
-#+end_src
-
-*** delve.el
+*** Delve.el
 #+begin_src emacs-lisp
 	(use-package delve
 		:straight (:repo "publicimageltd/delve"
@@ -1220,6 +1511,65 @@ Show vertical lines to guide indentation
 		;; turn on delve-minor-mode when Org Roam file is opened:
 		(delve-global-minor-mode))
 #+end_src
+*** Md-roam (add md for org-roam)
+#+begin_src example
+	(load "~/.emacs.d/local-packages/md-roam")
+	(use-package md-roam
+		:config
+		(md-roam-mode 1) ; md-roam-mode must be active before org-roam-db-sync
+		(setq org-roam-file-extensions '("org" "md"))
+		(setq md-roam-file-extension "md") ; default "md". Specify an extension such as "markdown"
+		)
+	(with-eval-after-load 'markdown-mode
+  (advice-add #'markdown-indent-line :before-until #'completion-at-point))
+#+end_src
+
+*** Org-download
+#+begin_src emacs-lisp
+	(use-package org-download
+		:ensure t)
+
+	;; Drag-and-drop to `dired`
+(add-hook 'dired-mode-hook 'org-download-enable)
+#+end_src
+
+*** Org-roam-bibtex
+#+begin_src emacs-lisp
+  (use-package org-roam-bibtex
+    :ensure t
+    :after org-roam
+    :config
+    (require 'org-ref)) ; optional: if using Org-ref v2 or v3 citation links
+#+end_src
+
+Deps for org-roam-bibtex:
+**** Org ref
+#+begin_src emacs-lisp
+	(use-package org-ref :ensure t)
+#+end_src
+
+**** Helm bibtex
+#+begin_src emacs-lisp
+	(use-package helm-bibtex :ensure t)
+#+end_src
+
+**** Citar
+#+begin_src emacs-lisp :lexical no
+	(use-package citar-embark
+		:ensure t
+		:after citar embark
+		:no-require
+		:config (citar-embark-mode))
+#+end_src
+** Mathpix.el
+#+begin_src emacs-lisp :lexical no
+	(use-package mathpix.el
+		:straight (:host github :repo "jethrokuan/mathpix.el")
+		:custom ((mathpix-app-id "app-id")
+						 (mathpix-app-key "app-key"))
+		:bind
+		("C-x m" . mathpix-screenshot))
+#+end_src
 ** Parrot
 #+begin_src emacs-lisp
 	(defun my/parrot-animate-when-compile-success (buffer result)
@@ -1239,10 +1589,11 @@ Show vertical lines to guide indentation
 **** pdf-tools
 #+begin_src emacs-lisp
 	(use-package pdf-tools
+		:ensure t
 		:defer t
 		:mode (("\\.pdf\\'" . pdf-view-mode))
 		:config
-(add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+		;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
 		(setq-default pdf-view-display-size 'fit-page)
 		;; (pdf-tools-install)
 		:bind (:map pdf-view-mode-map
@@ -1267,55 +1618,59 @@ Show vertical lines to guide indentation
 								("b"  . pdf-view-set-slice-from-bounding-box)
 								("r"  . pdf-view-reset-slice)))
 
-	(defhydra hydra-pdftools (:color blue :hint nil)
-		"
-																																			 ╭───────────┐
-				Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-		╭──────────────────────────────────────────────────────────────────┴───────────╯
-					^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-					^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-					^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-					^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-		 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-					^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-					^^_n_^^      ^ ^  _r_eset slice box
-					^^^↓^^^
-					^^_G_^^
-		--------------------------------------------------------------------------------
-				 "
-		("\\" hydra-master/body "back")
-		("<ESC>" nil "quit")
-		("al" pdf-annot-list-annotations)
-		("ad" pdf-annot-delete)
-		("aa" pdf-annot-attachment-dired)
-		("am" pdf-annot-add-markup-annotation)
-		("at" pdf-annot-add-text-annotation)
-		("y"  pdf-view-kill-ring-save)
-		("+" pdf-view-enlarge :color red)
-		("-" pdf-view-shrink :color red)
-		("0" pdf-view-scale-reset)
-		("H" pdf-view-fit-height-to-window)
-		("W" pdf-view-fit-width-to-window)
-		("P" pdf-view-fit-page-to-window)
-		("n" pdf-view-next-page-command :color red)
-		("p" pdf-view-previous-page-command :color red)
-		("d" pdf-view-dark-minor-mode)
-		("b" pdf-view-set-slice-from-bounding-box)
-		("r" pdf-view-reset-slice)
-		("g" pdf-view-first-page)
-		("G" pdf-view-last-page)
-		("e" pdf-view-goto-page)
-		("o" pdf-outline)
-		("s" pdf-occur)
-		("i" pdf-misc-display-metadata)
-		("u" pdf-view-revert-buffer)
-		("F" pdf-links-action-perfom)
-		("f" pdf-links-isearch-link)
-		("B" pdf-history-backward :color red)
-		("N" pdf-history-forward :color red)
-		("l" image-forward-hscroll :color red)
-		("h" image-backward-hscroll :color red))
+	;; (defhydra hydra-pdftools (:color blue :hint nil)
+	;; 	"
+	;; 																																			 ╭───────────┐
+	;; 				Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+	;; 		╭──────────────────────────────────────────────────────────────────┴───────────╯
+	;; 					^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+	;; 					^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+	;; 					^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+	;; 					^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+	;; 		 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+	;; 					^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+	;; 					^^_n_^^      ^ ^  _r_eset slice box
+	;; 					^^^↓^^^
+	;; 					^^_G_^^
+	;; 		--------------------------------------------------------------------------------
+	;; 				 "
+	;; 	("\\" hydra-master/body "back")
+	;; 	("<ESC>" nil "quit")
+	;; 	("al" pdf-annot-list-annotations)
+	;; 	("ad" pdf-annot-delete)
+	;; 	("aa" pdf-annot-attachment-dired)
+	;; 	("am" pdf-annot-add-markup-annotation)
+	;; 	("at" pdf-annot-add-text-annotation)
+	;; 	("y"  pdf-view-kill-ring-save)
+	;; 	("+" pdf-view-enlarge :color red)
+	;; 	("-" pdf-view-shrink :color red)
+	;; 	("0" pdf-view-scale-reset)
+	;; 	("H" pdf-view-fit-height-to-window)
+	;; 	("W" pdf-view-fit-width-to-window)
+	;; 	("P" pdf-view-fit-page-to-window)
+	;; 	("n" pdf-view-next-page-command :color red)
+	;; 	("p" pdf-view-previous-page-command :color red)
+	;; 	("d" pdf-view-dark-minor-mode)
+	;; 	("b" pdf-view-set-slice-from-bounding-box)
+	;; 	("r" pdf-view-reset-slice)
+	;; 	("g" pdf-view-first-page)
+	;; 	("G" pdf-view-last-page)
+	;; 	("e" pdf-view-goto-page)
+	;; 	("o" pdf-outline)
+	;; 	("s" pdf-occur)
+	;; 	("i" pdf-misc-display-metadata)
+	;; 	("u" pdf-view-revert-buffer)
+	;; 	("F" pdf-links-action-perfom)
+	;; 	("f" pdf-links-isearch-link)
+	;; 	("B" pdf-history-backward :color red)
+	;; 	("N" pdf-history-forward :color red)
+	;; 	("l" image-forward-hscroll :color red)
+	;; 	("h" image-backward-hscroll :color red))
 #+end_src
+
+#+RESULTS:
+: hydra-pdftools/body
+
 **** org-pdftools (bookmarks for pdf-tools)
 #+begin_src example
 	(use-package org-pdftools
@@ -1556,7 +1911,7 @@ For more information: https://depp.brause.cc/nov.el/
 
 	(use-package treemacs-all-the-icons
 		:ensure t)
-	(treemacs-load-theme "all-the-icons")
+	;; (treemacs-load-theme "all-the-icons")
 
 	(use-package treemacs-evil
 		:after (treemacs evil)
@@ -1574,50 +1929,6 @@ For more information: https://depp.brause.cc/nov.el/
 #+begin_src emacs-lisp
 (use-package zygospore :ensure t)
 (global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
-#+end_src
-
-
-
-** LaTeX
-*** Auctex
-#+begin_src emacs-lisp
-	(use-package auctex
-		:ensure t)
-
-	(use-package auctex-latexmk
-		:ensure t
-		:custom
-		(auctex-latexmk-setup)
-		(add-hook 'LaTeX-mode-hook 'linum-mode)
-		(add-hook 'TeX-mode-hook
-							(lambda () (TeX-fold-mode 1))); Automatically activate
-																					; TeX-fold-mode.
-		)
-
-
-
-	;; Use pdf-tools to open PDF files
-	(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-				TeX-source-correlate-start-server t)
-
-	;; Update PDF buffers after successful LaTeX runs
-	(add-hook 'TeX-after-compilation-finished-functions
-						#'TeX-revert-document-buffer)
-#+end_src
-*** Embed LaTeX in org-mode
-#+begin_src emacs-lisp
-  (require 'ox-latex)
-  (setq org-latex-create-formula-image-program 'dvipng)
-  (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
-
-  ;; Setting size of result of LaTeX compile in org-mode
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
-
-
-  ;; (add-hook 'LaTeX-mode-hook 'turn-on-reftex) 
-  ;; (org-babel-do-load-languages
-  ;;  'org-babel-load-languages
-  ;;  '((latex . t)))
 #+end_src
 
 
@@ -1901,23 +2212,23 @@ For more information: https://depp.brause.cc/nov.el/
 	;; 				company-frontends '(company-box-frontend))
 
 
-	;; (defun my-company-visible-and-explicit-action-p ()
-	;; 	(and (company-tooltip-visible-p)
-	;; 			 (company-explicit-action-p)))
-	;; (defun company-ac-setup ()
-	;; 	"Sets up `company-mode' to behave similarly to `auto-complete-mode'."
-	;; 	(setq company-require-match nil)
-	;; 	(setq company-auto-complete 'my-company-visible-and-explicit-action-p)
-	;; 	(setq company-frontends '(company-echo-metadata-frontend
-	;; 														company-pseudo-tooltip-unless-just-one-frontend-with-delay
-	;; 														company-preview-frontend))
-	;; 	(define-key company-active-map [tab]
-	;; 		'company-select-next-if-tooltip-visible-or-complete-selection)
-	;; 	(define-key company-active-map (kbd "TAB")
-	;; 		'company-select-next-if-tooltip-visible-or-complete-selection))
+	(defun my-company-visible-and-explicit-action-p ()
+		(and (company-tooltip-visible-p)
+				 (company-explicit-action-p)))
+	(defun company-ac-setup ()
+		"Sets up `company-mode' to behave similarly to `auto-complete-mode'."
+		(setq company-require-match nil)
+		(setq company-auto-complete 'my-company-visible-and-explicit-action-p)
+		(setq company-frontends '(company-echo-metadata-frontend
+															company-pseudo-tooltip-unless-just-one-frontend-with-delay
+															company-preview-frontend))
+		(define-key company-active-map [tab]
+			'company-select-next-if-tooltip-visible-or-complete-selection)
+		(define-key company-active-map (kbd "TAB")
+			'company-select-next-if-tooltip-visible-or-complete-selection))
 
-	;; (company-ac-setup)
-	;; (add-hook 'js2-mode-hook (lambda () (company-mode)))
+	(company-ac-setup)
+	(add-hook 'js2-mode-hook (lambda () (company-mode)))
 
 	(use-package company
 		:defer t
@@ -1947,23 +2258,23 @@ For more information: https://depp.brause.cc/nov.el/
 					company-idle-delay                  0.1)
 		(push '(company-semantic :with company-yasnippet) company-backends))
 
-	;; (use-package company-box
-	;; 	:ensure t
-	;; 	:after (company all-the-icons)
-	;; 	:hook (company-mode . company-box-mode)
-	;; 	:functions (all-the-icons-faicon
-	;; 							all-the-icons-material
-	;; 							all-the-icons-octicon
-	;; 							all-the-icons-alltheicon)
-	;; 	:config
-	;; 	(setq company-box-frame-behavior 'point
-	;; 				company-box-icons-alist 'company-box-icons-images
-	;; 				company-box-backends-colors t
-	;; 				company-box-icon-right-margin 0.5
-	;; 				company-box-backends-colors '((company-yasnippet
-	;; 																			 :all (:foreground "RosyBrown1" :background nil :italic t)
-	;; 																			 :selected (:foreground "black" :background "RosyBrown4")))
-	;; 				company-box-doc-delay 1))
+	(use-package company-box
+		:ensure t
+		:after (company all-the-icons)
+		:hook (company-mode . company-box-mode)
+		:functions (all-the-icons-faicon
+								all-the-icons-material
+								all-the-icons-octicon
+								all-the-icons-alltheicon)
+		:config
+		(setq company-box-frame-behavior 'point
+					company-box-icons-alist 'company-box-icons-images
+					company-box-backends-colors t
+					company-box-icon-right-margin 0.5
+					company-box-backends-colors '((company-yasnippet
+																				 :all (:foreground "RosyBrown1" :background nil :italic t)
+																				 :selected (:foreground "black" :background "RosyBrown4")))
+					company-box-doc-delay 1))
 
 	;; (defun setup-swift-mode-company ()
 	;; 	"Setup company with separate bakends merged into one."
@@ -2060,54 +2371,54 @@ For more information: https://depp.brause.cc/nov.el/
 #+end_src
 *** JavaScript
 #+begin_src emacs-lisp
-	(use-package web-mode :ensure t
-		:mode (("\\.js\\'" . web-mode)
-					 ("\\.jsx\\'" . web-mode)
-					 ("\\.ts\\'" . web-mode)
-					 ("\\.tsx\\'" . typescript-mode)
-					 ("\\.html\\'" . web-mode)
-					 ("\\.vue\\'" . web-mode)
-					 ("\\.json\\'" . web-mode))
-		:commands web-mode
-		:config
-		(setq web-mode-content-types-alist
-					'(("jsx" . "\\.js[x]?\\'")))
-		)
+  (use-package web-mode :ensure t
+    :mode (("\\.js\\'" . web-mode)
+           ("\\.jsx\\'" . web-mode)
+           ("\\.ts\\'" . web-mode)
+           ("\\.tsx\\'" . typescript-mode)
+           ("\\.html\\'" . web-mode)
+           ("\\.vue\\'" . web-mode)
+           ("\\.json\\'" . web-mode))
+    :commands web-mode
+    :config
+    (setq web-mode-content-types-alist
+          '(("jsx" . "\\.js[x]?\\'")))
+    )
 
-	(use-package import-js :ensure t)
+  (use-package import-js :ensure t)
 
-	;; JSX syntax highlighting
-	(add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
-	(setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+  ;; JSX syntax highlighting
+  (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
+  (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
-	(use-package js2-mode :ensure t :defer 20
-		:mode
-		(("\\.js\\'" . js2-mode))
-		:custom
-		(js2-include-node-externs t)
-		;;(js2-global-externs '("customElements"))
-		(js2-highlight-level 3)
-		(js2r-prefer-let-over-var t)
-		(js2r-prefered-quote-type 2)
-		(js-indent-align-list-continuation t)
-		(global-auto-highlight-symbol-mode t)
-		:config
-		(setq js-indent-level 2)
-		;; patch in basic private field support
-		(advice-add #'js2-identifier-start-p
-								:after-until
-								(lambda (c) (eq c ?#))))
+  (use-package js2-mode :ensure t :defer 20
+    :mode
+    (("\\.js\\'" . js2-mode))
+    :custom
+    (js2-include-node-externs t)
+    ;;(js2-global-externs '("customElements"))
+    (js2-highlight-level 3)
+    (js2r-prefer-let-over-var t)
+    (js2r-prefered-quote-type 2)
+    (js-indent-align-list-continuation t)
+    (global-auto-highlight-symbol-mode t)
+    :config
+    (setq js-indent-level 2)
+    ;; patch in basic private field support
+    (advice-add #'js2-identifier-start-p
+                :after-until
+                (lambda (c) (eq c ?#))))
 
 
-	(add-hook 'web-mode-hook #'(lambda ()
-															 (enable-minor-mode
-																'("\\.jsx?\\'" . prettier-js-mode))))
+  (add-hook 'web-mode-hook #'(lambda ()
+                               (enable-minor-mode
+                                '("\\.jsx?\\'" . prettier-js-mode))))
 
-	(add-hook 'web-mode-hook #'(lambda ()
-															 (enable-minor-mode
-																'("\\.tsx?\\'" . prettier-js-mode))))
+  (add-hook 'web-mode-hook #'(lambda ()
+                               (enable-minor-mode
+                                '("\\.tsx?\\'" . prettier-js-mode))))
 
-	(add-hook 'web-mode-hook 'prettier-js-mode)
+  (add-hook 'web-mode-hook 'prettier-js-mode)
 #+end_src
 
 *** TypeScript
@@ -2216,9 +2527,9 @@ For more information: https://depp.brause.cc/nov.el/
 *** Rust
 [[https://rust-analyzer.github.io/manual.html#installation#Emacs][*Quick start with rust-analyzer*]]
 
-#+begin_src example
-cargo install rustfmt
-cargo install racer
+#+begin_src bash
+	cargo install rustfmt
+	cargo install racer
 #+end_src
 
 #+begin_src emacs-lisp
@@ -2306,7 +2617,7 @@ Make startup faster by reducing the frequency of garbage collection.  The defaul
 	(setq gc-cons-threshold (* 50 1000 1000))
 #+end_src
 
-** GC setting
+** [#C] GC setting
 Make gc pauses faster by decreasing the threshold.
 
 #+begin_src emacs-lisp
@@ -2588,7 +2899,7 @@ Support for resizing windows, using the mouse. Position the mouse on the divider
 	(defun ambrevar/exwm-rename-buffer-to-title () (exwm-workspace-rename-buffer exwm-title))
 
 	(my-exwm-config-setup) ;; Does not start X11 or EXWM. Start should be done from commandline.
-#+
+#+end_src
 
 * eaf
 #+begin_src example

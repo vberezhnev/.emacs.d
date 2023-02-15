@@ -1,26 +1,26 @@
 (require 'package)
-; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t) 
-(setq package-archives
-      '(("GNU ELPA"     . "https://elpa.gnu.org/packages/")
-	("ORG"		. "https://orgmode.org/elpa/")
-        ("MELPA Stable" . "https://stable.melpa.org/packages/")
-        ("MELPA"        . "https://melpa.org/packages/"))
-      package-archive-priorities
-      '(("ORG"		. 20)
-	("MELPA"        . 15)
-	("MELPA Stable" . 10)
-        ("GNU ELPA"     . 5)))
+																				; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; (setq package-archives
+;;       '(("GNU ELPA"     . "https://elpa.gnu.org/packages/")
+;; 	("ORG"		. "https://orgmode.org/elpa/")
+;;         ("MELPA Stable" . "https://stable.melpa.org/packages/")
+;;         ("MELPA"        . "https://melpa.org/packages/"))
+;;       package-archive-priorities
+;;       '(("ORG"		. 20)
+;; 	("MELPA"        . 15)
+;; 	("MELPA Stable" . 10)
+;;         ("GNU ELPA"     . 5)))
 
-;; (add-to-list 'package-archives '("melpa"  . "https://melpa.org/packages/"))
-;; (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
-;; (setq package-archive-priorities '(("melpa"  . 3)
-;;                                    ("gnu"    . 2)
-;;                                    ("nongnu" . 1)))
+(add-to-list 'package-archives '("melpa"  . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
+(setq package-archive-priorities '(("melpa"  . 3)
+                                   ("gnu"    . 2)
+                                   ("nongnu" . 1)))
 (package-initialize)
 
-(setq debug-on-error t)
+;; (setq debug-on-error t)
 
-;;(package-refresh-contents)
+;; ;;(package-refresh-contents)
 
 ;; (save-excursion
 ;;   (let ((tem eval-buffer-list))
@@ -127,6 +127,8 @@
   "README.org"
   user-emacs-directory))
 
+;; (load "README")
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -134,7 +136,7 @@
  ;; If there is more than one, they won't work right.
  '(before-save-hook '(parrot-start-animation format-all-buffer))
  '(custom-safe-themes
-	 '("afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "2ff9ac386eac4dffd77a33e93b0c8236bb376c5a5df62e36d4bfa821d56e4e20" "dc8285f7f4d86c0aebf1ea4b448842a6868553eded6f71d1de52f3dcbc960039" "171d1ae90e46978eb9c342be6658d937a83aaa45997b1d7af7657546cae5985b" "512ce140ea9c1521ccaceaa0e73e2487e2d3826cc9d287275550b47c04072bc4" "19a2c0b92a6aa1580f1be2deb7b8a8e3a4857b6c6ccf522d00547878837267e7" "3e374bb5eb46eb59dbd92578cae54b16de138bc2e8a31a2451bf6fdb0f3fd81b" "" default))
+	 '("83f4659ff482028561aed742320eaa491b1416c7c43181647f0c8ef256610dca" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "d80952c58cf1b06d936b1392c38230b74ae1a2a6729594770762dc0779ac66b7" "fa49766f2acb82e0097e7512ae4a1d6f4af4d6f4655a48170d0a00bcb7183970" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "2ff9ac386eac4dffd77a33e93b0c8236bb376c5a5df62e36d4bfa821d56e4e20" "dc8285f7f4d86c0aebf1ea4b448842a6868553eded6f71d1de52f3dcbc960039" "171d1ae90e46978eb9c342be6658d937a83aaa45997b1d7af7657546cae5985b" "512ce140ea9c1521ccaceaa0e73e2487e2d3826cc9d287275550b47c04072bc4" "19a2c0b92a6aa1580f1be2deb7b8a8e3a4857b6c6ccf522d00547878837267e7" "3e374bb5eb46eb59dbd92578cae54b16de138bc2e8a31a2451bf6fdb0f3fd81b" "" default))
  '(doom-modeline-bar-width 6)
  '(doom-modeline-buffer-file-name-style 'auto)
  '(doom-modeline-buffer-name nil)
