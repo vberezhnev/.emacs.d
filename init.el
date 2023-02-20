@@ -127,7 +127,7 @@
   "README.org"
   user-emacs-directory))
 
-;; (load "README")
+;; (load "~/.emacs.d/readme")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -149,9 +149,18 @@
  '(helm-minibuffer-history-key "M-p")
  '(magit-todos-keywords (list "TODO" "FIXME" "HACK"))
  '(org-safe-remote-resources
-	 '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'" "\\`https://fniessen\\.github\\.io\\(?:/\\|\\'\\)"))
+	 '("\\`https://cs7\\.pikabu\\.ru/post_img/2018/12/17/7/1545041477174040899\\.jpg\\'" "\\`https://cs11\\.pikabu\\.ru/post_img/2018/12/17/7/1545041626180870887\\.jpg\\'" "\\`https://upload\\.wikimedia\\.org/wikipedia/commons/thumb/0/00/Giovanni_Stanchi%2C_Watermelons%2C_Peaches%2C_Pears%2C_and_Other_Fruit_in_a_Landscape\\.jpg/2560px-Giovanni_Stanchi%2C_Watermelons%2C_Peaches%2C_Pears%2C_and_Other_Fruit_in_a_Landscape\\.jpg\\'" "\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'" "\\`https://fniessen\\.github\\.io\\(?:/\\|\\'\\)"))
  '(package-selected-packages
 	 '(latex-preview-pane auctex-latexmk auctex lorem-ipsum neotree zygospore xwwp xwidgets-reuse xwidgete xml+ xclip which-key web-mode use-package treemacs-evil treemacs-all-the-icons tree-sitter-langs tide telega saveplace-pdf-view rust-playground rust-auto-use reverse-im ranger rainbow-delimiters racer projectile pdf-view-restore pbcopy parrot org-superstar org-modern org-caldav org-alert nov names multi-vterm multi-term lsp-ui json-mode js2-mode indent-guide import-js helm gruvbox-theme graphql go-mode git-gutter-fringe general fzf format-all flycheck-rust flycheck-inline evil-collection emojify elfeed-dashboard doom-themes doom-modeline dmenu djvu dired-subtree dashboard dap-mode company-statistics company-quickhelp company-anaconda cl-libify cargo calibredb atom-one-dark-theme apheleia all-the-icons-dired))
+ '(telega-active-locations-mode t)
+ '(telega-appindicator-mode t)
+ '(telega-appindicator-show-mentions t)
+ '(telega-completing-read-function 'ido-completing-read)
+ '(telega-patrons-mode t)
+ '(telega-root-auto-fill-mode t)
+ '(telega-root-fill-column 232)
+ '(telega-sticker-animated-play nil)
+ '(telega-translate-to-language-by-default "en")
  '(warning-suppress-log-types '(((org-roam)) ((org-roam)) (comp)))
  '(warning-suppress-types '(((org-roam)) (comp))))
 (custom-set-faces
