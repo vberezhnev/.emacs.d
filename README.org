@@ -148,7 +148,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 ** Integrate clipboard with X11 (Need for Emacs TTY)
-#+begin_src emacs-lisp
+#+begin_src example
   (use-package xclip
     :ensure t)
   (xclip-mode 1)
@@ -247,7 +247,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   ;; (setq-default line-spacing 0.12)
 
   ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-  (add-to-list 'default-frame-alist '(font . "JetBrains Mono 10"))
+  (add-to-list 'default-frame-alist '(font . "JetBrains Mono 11"))
   ;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
   ;; changes certain keywords to symbols, such as lamda!
   (setq global-prettify-symbols-mode t)
@@ -353,14 +353,14 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Change theme by time
 #+begin_src emacs-lisp :lexical no
-	(use-package theme-changer
-		:ensure t
-		:config
-		(setq calendar-location-name "Vladivostok, RU") 
-		(setq calendar-latitude 43.11)
-		(setq calendar-longitude 131.88))
+  (use-package theme-changer
+    :ensure t
+    :config
+    (setq calendar-location-name "Vladivostok, RU") 
+    (setq calendar-latitude 43.11)
+    (setq calendar-longitude 131.88))
 
-	(change-theme 'gruvbox-light-medium 'gruvbox-dark-soft)
+  (change-theme 'gruvbox-light-medium 'gruvbox-dark-soft)
 #+end_src
 
 #+begin_src example
@@ -960,45 +960,69 @@ Show vertical lines to guide indentation
 #+end_src
 ** LaTeX
 *** Auctex
-#+begin_src example
+#+begin_src emacs-lisp
   (use-package auctex
-	  :ensure t)
+    :ensure t)
 
   (use-package auctex-latexmk
-	  :ensure t
-	  :custom
-	  (auctex-latexmk-setup)
-	  (add-hook 'LaTeX-mode-hook 'linum-mode)
-	  (add-hook 'TeX-mode-hook
-						  (lambda () (TeX-fold-mode 1))); Automatically activate
-																				  ; TeX-fold-mode.
-	  )
+    :ensure t
+    :custom
+    (auctex-latexmk-setup)
+    (add-hook 'LaTeX-mode-hook 'linum-mode)
+    (add-hook 'TeX-mode-hook
+              (lambda () (TeX-fold-mode 1))); Automatically activate
+                                          ; TeX-fold-mode.
+    )
 
 
 
   ;; Use pdf-tools to open PDF files
   (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-			  TeX-source-correlate-start-server t)
+        TeX-source-correlate-start-server t)
 
   ;; Update PDF buffers after successful LaTeX runs
   (add-hook 'TeX-after-compilation-finished-functions
-					  #'TeX-revert-document-buffer)
+            #'TeX-revert-document-buffer)
 #+end_src
+
 *** Embed LaTeX in org-mode
 #+begin_src emacs-lisp
-  (require 'ox-latex)
-  (setq org-latex-create-formula-image-program 'dvipng)
-  (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
+  ;; (require 'ox-latex)
+  ;; (setq org-latex-create-formula-image-program 'dvipng)
+  ;; (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
 
-  ;; Setting size of result of LaTeX compile in org-mode
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 
+  ;; Set up default LaTeX preview configuration
+  (setq org-latex-create-formula-image-program 'imagemagick)
+  (setq org-preview-latex-default-process 'imagemagick) ; or 'dvisvgm
+  (setq org-preview-latex-process-alist
+        '((imagemagick :programs ("latex" "convert")
+                       :description "imagemagick"
+                       :message "You need to install the programs: latex and imagemagick."
+                       :image-input-type "pdf"
+                       :image-output-type "png"
+                       :image-size-adjust (1.0 . 1.0)
+                       :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
+                       :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))
+          (dvisvgm :programs ("latex" "dvisvgm")
+                   :description "dvisvgm"
+                   :message "You need to install the programs: latex and dvisvgm."
+                   :image-input-type "xdv"
+                   :image-output-type "svg"
+                   :image-size-adjust (1.7 . 1.5)
+                   :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
+                   :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))))
 
-  ;; (add-hook 'LaTeX-mode-hook 'turn-on-reftex) 
-  ;; (org-babel-do-load-languages
-  ;;  'org-babel-load-languages
-  ;;  '((latex . t)))
+  ;; Enable inline LaTeX previews in org-mode
+  (add-hook 'org-mode-hook 'org-toggle-latex-fragment)
+
+  ;; Display images in org-mode buffers
+  (setq org-startup-with-inline-images t)
+  (setq org-image-actual-width nil) ; adjust to your liking
 #+end_src
+
+#+RESULTS:
 
 ** Org
 *** Improve org-mode looks
@@ -1054,52 +1078,86 @@ Show vertical lines to guide indentation
     (set-face-attribute (car face) nil :font "JetBrains Mono")) ;;  :weight 'medium :height (cdr face)
 #+end_src
 *** Org modern
-#+begin_src emacs-lisp
-	(use-package org-modern
-		:ensure t
-		:config
-		;; Add frame borders and window dividers
-		;; (modify-all-frames-parameters
-		;;  '((right-divider-width . 40)
-		;; 	 (internal-border-width . 40)))
-		(dolist (face '(window-divider
-										window-divider-first-pixel
-										window-divider-last-pixel))
-			(face-spec-reset-face face)
-			(set-face-foreground face (face-attribute 'default :background)))
-		(set-face-background 'fringe (face-attribute 'default :background))
+#+begin_src example
+  (use-package org-modern
+    :ensure t
+    :config
+    ;; Add frame borders and window dividers
+    ;; (modify-all-frames-parameters
+    ;;  '((right-divider-width . 40)
+    ;; 	 (internal-border-width . 40)))
+    (dolist (face '(window-divider
+                    window-divider-first-pixel
+                    window-divider-last-pixel))
+      (face-spec-reset-face face)
+      (set-face-foreground face (face-attribute 'default :background)))
+    (set-face-background 'fringe (face-attribute 'default :background))
 
-		(setq
-		 ;; Edit settings
-		 org-auto-align-tags nil
-		 org-tags-column 0
-		 org-catch-invisible-edits 'show-and-error
-		 org-special-ctrl-a/e t
-		 org-insert-heading-respect-content t
+    (setq
+     ;; Edit settings
+     org-auto-align-tags nil
+     org-tags-column 0
+     org-catch-invisible-edits 'show-and-error
+     org-special-ctrl-a/e t
+     org-insert-heading-respect-content t
 
-		 ;; Org styling, hide markup etc.
-		 org-hide-emphasis-markers t
-		 org-pretty-entities t
-		 org-ellipsis "…"
+     ;; Org styling, hide markup etc.
+     org-hide-emphasis-markers t
+     org-pretty-entities t
+     org-ellipsis "…"
 
-		 ;; Agenda styling
-		 org-agenda-tags-column 0
-		 org-agenda-block-separator ?─
-		 org-agenda-time-grid
-		 '((daily today require-timed)
-			 (800 1000 1200 1400 1600 1800 2000)
-			 " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-		 org-agenda-current-time-string
-		 "⭠ now ─────────────────────────────────────────────────")
-		(setq org-enable-table-editor nil)
-		(global-org-modern-mode))
+     ;; Agenda styling
+     org-agenda-tags-column 0
+     org-agenda-block-separator ?─
+     org-agenda-time-grid
+     '((daily today require-timed)
+       (800 1000 1200 1400 1600 1800 2000)
+       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+     org-agenda-current-time-string
+     "⭠ now ─────────────────────────────────────────────────")
+    (setq org-enable-table-editor nil)
+    (global-org-modern-mode))
 
-	(add-hook 'org-mode-hook 'my-org-mode-hook)
-	(defun my-org-mode-hook ()
-		(add-hook 'hack-local-variables-hook
-							(lambda () (setq org-enable-table-editor nil)  )))
+  (add-hook 'org-mode-hook 'my-org-mode-hook)
+  (defun my-org-mode-hook ()
+    (add-hook 'hack-local-variables-hook
+              (lambda () (setq org-enable-table-editor nil)  )))
 #+end_src
-
+*** HTML table from buffer to org-mode table
+#+begin_src emacs-lisp :lexical no
+  (defun chunyang-yank-html ()
+    "Yank HTML from clipboard as Org or Markdown code."
+    (interactive)
+    (let* ((result
+            (condition-case err
+                ;; hex-encoded string:
+                ;;           < m e t a ......>
+                ;; «data HTML3C6D657461......3E»
+                (do-applescript "the clipboard as «class HTML»")
+              (error
+               ;; assume it's user's fault
+               (user-error "Can't get HTML data from the clipboard: %s"
+                           (error-message-string err)))))
+           (data (substring result 10 -1))
+           (html (with-temp-buffer
+                   (set-buffer-multibyte nil)
+                   (let* ((i 0))
+                     (while (> (length data) (+ 2 i))
+                       (insert (string-to-number (substring data i (+ 2 i)) 16))
+                       (cl-incf i 2)))
+                   (decode-coding-region (point-min) (point-max) 'utf-8 t)))
+           (target (cond ((derived-mode-p 'org-mode) "org")
+                         ;; the official Markdown doesn't support table?
+                         (t "gfm"))))
+      (insert
+       (with-temp-buffer
+         (if (zerop (call-process-region html nil "pandoc" nil t nil
+                                         ;; https://stackoverflow.com/a/35812743/2999892
+                                         "-f" "html-native_divs-native_spans"
+                                         "-t" target))
+             (buffer-string)
+           (error "pandoc failed: %s" (buffer-string)))))))
+#+end_src
 *** Setting Org
 #+begin_src emacs-lisp
   (use-package org
@@ -1306,167 +1364,57 @@ Show vertical lines to guide indentation
     (org-mode-restart))
   (define-key org-mode-map (kbd "C-c x") 'org-toggle-emphasis)
 #+end_src
-** Presentations with reval.js
-#+begin_src emacs-lisp :lexical no
-  (use-package org-re-reveal :ensure t)
-  (use-package ox-reveal :ensure t)
-
-  (setq org-reveal-root "file:~/Org/Presentations/reveal.js/")
-#+end_src
-
 ** Org-roam
 *** Org-roam
 #+begin_src emacs-lisp
-	(use-package org-roam
-		:ensure t
-		:custom
-		(org-roam-directory (file-truename "~/Org/2Brain"))
-		(org-roam-completion-everywhere t)
-		(org-roam-capture-templates
-		 '(
-			 ("d" "default" plain "%?"
-				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
-				:unnarrowed t)
+  (use-package org-roam
+    :ensure t
+    :custom
+    (org-roam-directory (file-truename "~/Org/2Brain"))
+    (org-roam-completion-everywhere t)
+    (org-roam-capture-templates
+     '(
+       ("d" "default" plain "%?"
+        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+        :unnarrowed t)
 
-			 ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n"
-				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
-				:unnarrowed t)
+       ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n"
+        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
+        :unnarrowed t)
 
-			 ("n" "New Thought" plain "\n\nSource: %^{Source}\nTitle: ${title}\n\n"
-				:if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
-				:unnarrowed t)
-			 ("e" "Encrypt note" plain "%?"
-				:target (file+head "<%Y-%m-%d-%H:%M:%S>.org.gpg"
-													 "#+title: ${title}\n#+date: %U")
-				:unnarrowed t)
-			 ))
-		:bind (("C-c n l" . org-roam-buffer-toggle)
-					 ("C-c n f" . org-roam-node-find)
-					 ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
-					 ("C-c n i" . org-roam-node-insert)
-					 ("C-c n c" . org-roam-capture)
-					 ("C-c n t" . org-roam-tag-add)
-					 ("C-c n r" . org-roam-ref-add)
+       ("n" "New Thought" plain "\n\nSource: %^{Source}\n\nTitle: ${title}\n\n"
+        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
+        :unnarrowed t)
+       ("e" "Encrypt note" plain "%?"
+        :target (file+head "<%Y-%m-%d-%H:%M:%S>.org.gpg"
+                           "#+title: ${title}\n#+date: %U")
+        :unnarrowed t)
+       ))
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-roam-capture)
+           ("C-c n t" . org-roam-tag-add)
+           ("C-c n r" . org-roam-ref-add)
 
-					 ("C-c g" . org-id-get-create)
-					 ;; Dailies
-					 ("C-c n j" . org-roam-dailies-capture-today))
-		:config
-		;; If you're using a vertical completion framework, you might want a more informative completion interface
-		;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-		(setq org-roam-completion-everywhere t)
-		(org-roam-db-autosync-mode 1)
-		;; If using org-roam-protocol
-		(require 'org-roam-protocol))
+           ("C-c g" . org-id-get-create)
+           ;; Dailies
+           ("C-c n j" . org-roam-dailies-capture-today)
+           :map org-mode-map
+           ("C-M-i"    . completion-at-point))
+
+    :config
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (setq org-roam-completion-everywhere t)
+    (org-roam-db-autosync-mode 1)
+    ;; If using org-roam-protocol
+    (require 'org-roam-protocol))
 #+end_src
 
-#+begin_example emacs-lisp
-(setq org-roam-directory (file-truename "~/org-roam"))
-(make-directory org-roam-directory 'parents)
-(setq org-roam-verbose t)
-(setq org-roam-db-location
-      (concat org-roam-directory "/.database/org-roam.db"))
-;; (setq +org-roam-open-buffer-on-find-file nil) ; deprecated for v2
-;; (setq org-roam-db-update-idle-seconds 30) ; deprecated for v2
-;; (setq org-roam-graph-viewer "qutebrowser") ; deprecated for v2
-
-;; Redefining some part of the slug generator.
-(cl-defmethod org-roam-node-slug ((node org-roam-node))
-  "Return the slug of NODE."
-  (let ((title (org-roam-node-title node))
-        (slug-trim-chars '(;; Combining Diacritical Marks https://www.unicode.org/charts/PDF/U0300.pdf
-                           768    ; U+0300 COMBINING GRAVE ACCENT
-                           769    ; U+0301 COMBINING ACUTE ACCENT
-                           770 ; U+0302 COMBINING CIRCUMFLEX ACCENT
-                           771 ; U+0303 COMBINING TILDE
-                           772 ; U+0304 COMBINING MACRON
-                           774 ; U+0306 COMBINING BREVE
-                           775 ; U+0307 COMBINING DOT ABOVE
-                           776 ; U+0308 COMBINING DIAERESIS
-                           777 ; U+0309 COMBINING HOOK ABOVE
-                           778 ; U+030A COMBINING RING ABOVE
-                           780 ; U+030C COMBINING CARON
-                           795 ; U+031B COMBINING HORN
-                           803 ; U+0323 COMBINING DOT BELOW
-                           804 ; U+0324 COMBINING DIAERESIS BELOW
-                           805 ; U+0325 COMBINING RING BELOW
-                           807 ; U+0327 COMBINING CEDILLA
-                           813 ; U+032D COMBINING CIRCUMFLEX ACCENT BELOW
-                           814 ; U+032E COMBINING BREVE BELOW
-                           816 ; U+0330 COMBINING TILDE BELOW
-                           817 ; U+0331 COMBINING MACRON BELOW
-                           )))
-    (cl-flet* ((nonspacing-mark-p (char)
-                                  (memq char slug-trim-chars))
-               (strip-nonspacing-marks (s)
-                                       (ucs-normalize-NFC-string
-                                        (apply #'string (seq-remove #'nonspacing-mark-p
-                                                                    (ucs-normalize-NFD-string s)))))
-               (cl-replace (title pair)
-                           (replace-regexp-in-string (car pair) (cdr pair) title)))
-      (let* ((pairs `(("[^[:alnum:][:digit:]]" . "-") ;; convert anything not alphanumeric
-                      ;; ("__*" . "_") ;; remove sequential underscores
-                      ;; ("^_" . "")   ;; remove starting underscore
-                      ;; ("_$" . "")   ;; remove ending underscore
-                      ))
-             (slug (-reduce-from #'cl-replace (strip-nonspacing-marks title) pairs)))
-        (downcase slug)))))
-
-(setq org-roam-capture-templates
-      `(("p" "Permanent Note" plain "%?"
-         :if-new (file+head "${slug}.org"
-                            "#+title: ${title}\n")
-         :unnarrowed t)
-
-        ("f" "Fleeting Note" plain "%?"
-         :if-new (file+head "fleeting/%<%Y%m%d-%H%M%S>.org"
-                            "#+TITLE: %<%Y%m%d-%H%M%S>--${title}\n")
-         :unnarrowed t)
-
-        ("t" "Time Note" plain "%?"
-         :if-new (file+head "fleeting/%(my/initiate-org-roam-time-note).org"
-                            "#+TITLE: %(eval my/*time-note-last-time*)--${title}
-
-[[tsl:%(eval my/*time-note-last-time*)]]
-
-")
-         :unnarrowed t)
-
-        ("l" "Literature Note" plain "%?"
-         :if-new (file+head "literature/${slug}.org"
-                            "#+TITLE: ${title}
-#+ROAM_KEY: ${ref}")
-         :unnarrowed t)
-        ))
-
-(defun my/initiate-org-roam-time-note ()
-  (interactive)
-  (let ((ts (read-from-minibuffer "Timestamp (YYYYmmdd-HHMMSS): "
-                                  (ts-format "%Y%m%d-%H%M%S" (ts-now)))))
-    (if (string-match (rx (repeat 8 digit)
-                          "-"
-                          (repeat 6 digit))
-                      ts)
-        (setq my/*time-note-last-time* ts)
-      (error "Incorrect input format."))))
-
-;; (require 'org-roam-protocol) ; Deprecated for v2.
-
-;; TODO Have not got it integrated with org protocol. Find out how.
-;; 
-;; Recall that I used to use
-;;
-;;   `emacsclient "org-protocol://roam-ref?template=r&ref={INSERT-URL}&title={INSERT-TITLE}"`
-;;
-;; for quickly capturing a webpage.
-
-(setq org-roam-capture-ref-templates
-      '(("r" "ref" plain "%?"
-         :if-new (file+head "literature/${slug}.org"
-                            "#+title: ${title}
-#+roam_key: ${ref}")
-         :unnarrowed t)))
-#+end_example
+#+RESULTS:
+: completion-at-point
 
 **** Configuring org-roam buffer display
 #+begin_src emacs-lisp
@@ -1477,6 +1425,31 @@ Show vertical lines to guide indentation
                (window-width . 0.33)
                (window-height . fit-window-to-buffer)))
 #+end_src
+**** Build your Org agenda from Org Roam notes
+#+begin_src emacs-lisp :lexical no
+  ;; The buffer you put this code in must have lexical-binding set to t!
+  ;; See the final configuration at the end for more details.
+
+  (defun my/org-roam-filter-by-tag (tag-name)
+    (lambda (node)
+      (member tag-name (org-roam-node-tags node))))
+
+  (defun my/org-roam-list-notes-by-tag (tag-name)
+    (mapcar #'org-roam-node-file
+            (seq-filter
+             (my/org-roam-filter-by-tag tag-name)
+             (org-roam-node-list))))
+
+  (defun my/org-roam-refresh-agenda-list ()
+    (interactive)
+    (setq org-agenda-files (my/org-roam-list-notes-by-tag "Project")))
+
+  ;; Build the agenda list the first time for the session
+  (my/org-roam-refresh-agenda-list)
+#+end_src
+
+#+RESULTS:
+
 *** Org-roam-ui
 #+begin_src emacs-lisp
 	(use-package org-roam-ui
@@ -1544,11 +1517,13 @@ Show vertical lines to guide indentation
 
 *** Org-download
 #+begin_src emacs-lisp
-	(use-package org-download
-		:ensure t)
+  (use-package org-download
+    :ensure t)
 
-	;; Drag-and-drop to `dired`
-(add-hook 'dired-mode-hook 'org-download-enable)
+  (setq-default org-download-image-dir "./assets-org/")
+
+  ;; Drag-and-drop to `dired`
+  (add-hook 'dired-mode-hook 'org-download-enable)
 #+end_src
 
 *** Org-roam-bibtex
@@ -1563,13 +1538,17 @@ Show vertical lines to guide indentation
 Deps for org-roam-bibtex:
 **** Org ref
 #+begin_src emacs-lisp
-	(use-package org-ref :ensure t)
+  (use-package org-ref :ensure t)
 #+end_src
+
+#+RESULTS:
 
 **** Helm bibtex
 #+begin_src emacs-lisp
 	(use-package helm-bibtex :ensure t)
 #+end_src
+
+#+RESULTS:
 
 **** Citar
 #+begin_src emacs-lisp :lexical no
@@ -1579,15 +1558,27 @@ Deps for org-roam-bibtex:
 		:no-require
 		:config (citar-embark-mode))
 #+end_src
-** Mathpix.el
-#+begin_src example
-	(use-package mathpix.el
-		:straight (:host github :repo "jethrokuan/mathpix.el")
-		:custom ((mathpix-app-id "app-id")
-						 (mathpix-app-key "app-key"))
-		:bind
-		("C-x m" . mathpix-screenshot))
+
+#+RESULTS:
+
+** Ox-hugo
+#+begin_src emacs-lisp :lexical no
+  (use-package ox-hugo
+    :ensure t   ;Auto-install the package from Melpa
+    :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
+    :after ox)
 #+end_src
+
+#+RESULTS:
+
+** Presentations with org and reval.js
+#+begin_src emacs-lisp :lexical no
+  (use-package org-re-reveal :ensure t)
+  (use-package ox-reveal :ensure t)
+
+  (setq org-reveal-root "file:~/Org/Presentations/reveal.js/")
+#+end_src
+
 ** Parrot
 #+begin_src emacs-lisp
 	(defun my/parrot-animate-when-compile-success (buffer result)
@@ -1606,84 +1597,84 @@ Deps for org-roam-bibtex:
 *** PDF Tools (pdf)
 **** pdf-tools
 #+begin_src emacs-lisp
-	(use-package pdf-tools
-		:ensure t
-		:defer t
-		:mode (("\\.pdf\\'" . pdf-view-mode))
-		:config
-		;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
-		(setq-default pdf-view-display-size 'fit-page)
-		;; (pdf-tools-install)
-		:bind (:map pdf-view-mode-map
-								("\\" . hydra-pdftools/body)
-								("<s-spc>" .  pdf-view-scroll-down-or-next-page)
-								("g"  . pdf-view-first-page)
-								("G"  . pdf-view-last-page)
-								("l"  . image-forward-hscroll)
-								("h"  . image-backward-hscroll)
-								("j"  . pdf-view-next-page)
-								("k"  . pdf-view-previous-page)
-								("e"  . pdf-view-goto-page)
-								("u"  . pdf-view-revert-buffer)
-								("al" . pdf-annot-list-annotations)
-								("ad" . pdf-annot-delete)
-								("aa" . pdf-annot-attachment-dired)
-								("am" . pdf-annot-add-markup-annotation)
-								("at" . pdf-annot-add-text-annotation)
-								("y"  . pdf-view-kill-ring-save)
-								("i"  . pdf-misc-display-metadata)
-								("s"  . pdf-occur)
-								("b"  . pdf-view-set-slice-from-bounding-box)
-								("r"  . pdf-view-reset-slice)))
+  (use-package pdf-tools
+    :ensure t
+    :defer t
+    :mode (("\\.pdf\\'" . pdf-view-mode))
+    :config
+    ;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+    (setq-default pdf-view-display-size 'fit-page)
+    ;; (pdf-tools-install)
+    :bind (:map pdf-view-mode-map
+                ("\\" . hydra-pdftools/body)
+                ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+                ("g"  . pdf-view-first-page)
+                ("G"  . pdf-view-last-page)
+                ("l"  . image-forward-hscroll)
+                ("h"  . image-backward-hscroll)
+                ("j"  . pdf-view-next-page)
+                ("k"  . pdf-view-previous-page)
+                ("e"  . pdf-view-goto-page)
+                ("u"  . pdf-view-revert-buffer)
+                ("al" . pdf-annot-list-annotations)
+                ("ad" . pdf-annot-delete)
+                ("aa" . pdf-annot-attachment-dired)
+                ("am" . pdf-annot-add-markup-annotation)
+                ("at" . pdf-annot-add-text-annotation)
+                ("y"  . pdf-view-kill-ring-save)
+                ("i"  . pdf-misc-display-metadata)
+                ("s"  . pdf-occur)
+                ("b"  . pdf-view-set-slice-from-bounding-box)
+                ("r"  . pdf-view-reset-slice)))
 
-	;; (defhydra hydra-pdftools (:color blue :hint nil)
-	;; 	"
-	;; 																																			 ╭───────────┐
-	;; 				Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-	;; 		╭──────────────────────────────────────────────────────────────────┴───────────╯
-	;; 					^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-	;; 					^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-	;; 					^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-	;; 					^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-	;; 		 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-	;; 					^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-	;; 					^^_n_^^      ^ ^  _r_eset slice box
-	;; 					^^^↓^^^
-	;; 					^^_G_^^
-	;; 		--------------------------------------------------------------------------------
-	;; 				 "
-	;; 	("\\" hydra-master/body "back")
-	;; 	("<ESC>" nil "quit")
-	;; 	("al" pdf-annot-list-annotations)
-	;; 	("ad" pdf-annot-delete)
-	;; 	("aa" pdf-annot-attachment-dired)
-	;; 	("am" pdf-annot-add-markup-annotation)
-	;; 	("at" pdf-annot-add-text-annotation)
-	;; 	("y"  pdf-view-kill-ring-save)
-	;; 	("+" pdf-view-enlarge :color red)
-	;; 	("-" pdf-view-shrink :color red)
-	;; 	("0" pdf-view-scale-reset)
-	;; 	("H" pdf-view-fit-height-to-window)
-	;; 	("W" pdf-view-fit-width-to-window)
-	;; 	("P" pdf-view-fit-page-to-window)
-	;; 	("n" pdf-view-next-page-command :color red)
-	;; 	("p" pdf-view-previous-page-command :color red)
-	;; 	("d" pdf-view-dark-minor-mode)
-	;; 	("b" pdf-view-set-slice-from-bounding-box)
-	;; 	("r" pdf-view-reset-slice)
-	;; 	("g" pdf-view-first-page)
-	;; 	("G" pdf-view-last-page)
-	;; 	("e" pdf-view-goto-page)
-	;; 	("o" pdf-outline)
-	;; 	("s" pdf-occur)
-	;; 	("i" pdf-misc-display-metadata)
-	;; 	("u" pdf-view-revert-buffer)
-	;; 	("F" pdf-links-action-perfom)
-	;; 	("f" pdf-links-isearch-link)
-	;; 	("B" pdf-history-backward :color red)
-	;; 	("N" pdf-history-forward :color red)
-	;; 	("l" image-forward-hscroll :color red)
-	;; 	("h" image-backward-hscroll :color red))
+  ;; (defhydra hydra-pdftools (:color blue :hint nil)
+  ;; 	"
+  ;; 																																			 ╭───────────┐
+  ;; 				Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+  ;; 		╭──────────────────────────────────────────────────────────────────┴───────────╯
+  ;; 					^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+  ;; 					^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+  ;; 					^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+  ;; 					^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+  ;; 		 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+  ;; 					^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+  ;; 					^^_n_^^      ^ ^  _r_eset slice box
+  ;; 					^^^↓^^^
+  ;; 					^^_G_^^
+  ;; 		--------------------------------------------------------------------------------
+  ;; 				 "
+  ;; 	("\\" hydra-master/body "back")
+  ;; 	("<ESC>" nil "quit")
+  ;; 	("al" pdf-annot-list-annotations)
+  ;; 	("ad" pdf-annot-delete)
+  ;; 	("aa" pdf-annot-attachment-dired)
+  ;; 	("am" pdf-annot-add-markup-annotation)
+  ;; 	("at" pdf-annot-add-text-annotation)
+  ;; 	("y"  pdf-view-kill-ring-save)
+  ;; 	("+" pdf-view-enlarge :color red)
+  ;; 	("-" pdf-view-shrink :color red)
+  ;; 	("0" pdf-view-scale-reset)
+  ;; 	("H" pdf-view-fit-height-to-window)
+  ;; 	("W" pdf-view-fit-width-to-window)
+  ;; 	("P" pdf-view-fit-page-to-window)
+  ;; 	("n" pdf-view-next-page-command :color red)
+  ;; 	("p" pdf-view-previous-page-command :color red)
+  ;; 	("d" pdf-view-dark-minor-mode)
+  ;; 	("b" pdf-view-set-slice-from-bounding-box)
+  ;; 	("r" pdf-view-reset-slice)
+  ;; 	("g" pdf-view-first-page)
+  ;; 	("G" pdf-view-last-page)
+  ;; 	("e" pdf-view-goto-page)
+  ;; 	("o" pdf-outline)
+  ;; 	("s" pdf-occur)
+  ;; 	("i" pdf-misc-display-metadata)
+  ;; 	("u" pdf-view-revert-buffer)
+  ;; 	("F" pdf-links-action-perfom)
+  ;; 	("f" pdf-links-isearch-link)
+  ;; 	("B" pdf-history-backward :color red)
+  ;; 	("N" pdf-history-forward :color red)
+  ;; 	("l" image-forward-hscroll :color red)
+  ;; 	("h" image-backward-hscroll :color red))
 #+end_src
 
 #+RESULTS:
@@ -2394,6 +2385,12 @@ For more information: https://depp.brause.cc/nov.el/
 	(setq company-idle-delay 0)
 	(setq company-minimum-prefix-length 1)
 #+end_src
+** BibTeX company
+#+begin_src emacs-lisp :lexical no
+  (use-package company-bibtex
+    :ensure t)
+#+end_src
+
 ** Setting company-org-block
 #+begin_src emacs-lisp
 	(use-package company-org-block
