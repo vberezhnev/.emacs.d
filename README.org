@@ -1223,12 +1223,12 @@ Show vertical lines to guide indentation
 #+end_src
 *** Change TODO's states
 #+begin_src emacs-lisp
-	(with-eval-after-load 'org
-		(setq org-log-done 'time))
+  (with-eval-after-load 'org
+    (setq org-log-done 'time))
 
-	(with-eval-after-load 'org
-		(setq org-todo-keywords
-					'((sequence "TODO" "DOING" "BLOCKED" "REVIEW" "|" "DONE" "ARCHIVED"))))
+  (with-eval-after-load 'org
+    (setq org-todo-keywords
+          '((sequence "TODO" "DOING" "BLOCKED" "REVIEW" "|" "DONE" "ARCHIVED"))))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1243,10 +1243,30 @@ Show vertical lines to guide indentation
 #+end_src
 *** Org agenda
 ~C-c a t~ -- for entering in Org agenda
-#+begin_src example
-	(setq org-agenda-files   (list "~/Org")
-				org-log-done 'time)
+#+begin_src emacs-lisp
+  ;; (setq org-agenda-files   (list "~/Org")
+  ;; 			org-log-done 'time)
+
+  (setq who/org-agenda-directory "~/Org/agenda")
+
+  (require 'find-lisp)
+  (defun who/find-org-files (directory)
+    (find-lisp-find-files directory "\.org$"))
+
+  ;; "TODO" "DOING" "BLOCKED" "REVIEW" "|" "DONE" "ARCHIVED"
+
+  (defun who-org/agenda-files-update (&rest _)
+    (let ((todo-zettels (->> "rg --files-with-matches '(TODO)|(DOING)|(BLOCKED)|(REVIEW)' ~/Org/2Brain"
+                             (shell-command-to-string)
+                             (s-lines)
+                             (-filter (lambda (line) (not (s-blank? line)))))))
+      (setq org-agenda-files (append (who/find-org-files who/org-agenda-directory)
+                                     todo-zettels))))
+
+  (advice-add 'org-agenda :before #'who-org/agenda-files-update)
 #+end_src
+
+#+RESULTS:
 
 *** Colorize block
 #+begin_src emacs-lisp
@@ -1316,10 +1336,14 @@ Show vertical lines to guide indentation
      (shell . t)
      (python . t)
      (rust . t)
+     (latex . t)
      ))
 
 
 #+end_src
+
+#+RESULTS:
+
 *** Prettify symbols
 #+begin_src emacs-lisp :lexical no
   ;; Beautify Org Checkbox Symbol
@@ -1426,7 +1450,7 @@ Show vertical lines to guide indentation
                (window-height . fit-window-to-buffer)))
 #+end_src
 **** Build your Org agenda from Org Roam notes
-#+begin_src emacs-lisp :lexical no
+#+begin_example emacs-lisp :lexical no
   ;; The buffer you put this code in must have lexical-binding set to t!
   ;; See the final configuration at the end for more details.
 
@@ -2390,6 +2414,19 @@ For more information: https://depp.brause.cc/nov.el/
   (use-package company-bibtex
     :ensure t)
 #+end_src
+** AUCTeX company
+#+begin_src emacs-lisp :lexical no
+  (use-package ac-math
+    :ensure t)
+
+  (use-package company-auctex
+    :ensure t)
+
+  (company-auctex-init)
+#+end_src
+
+#+RESULTS:
+| (company-auctex-macros company-auctex-symbols company-auctex-environments) | company-auctex-bibs | company-auctex-labels | company-org-block |
 
 ** Setting company-org-block
 #+begin_src emacs-lisp
@@ -2410,46 +2447,50 @@ For more information: https://depp.brause.cc/nov.el/
 ** Setting LSP-Mode
 *** LSP-Mode
 #+begin_src emacs-lisp
-	(use-package lsp-mode
-		:init
-		;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-		(setq lsp-keymap-prefix "C-c l")
-		:hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-					 (go-mode . lsp)
-					 (javascript-mode . lsp)
-					 (typescript-mode . lsp)
-					 (rust-mode . lsp)
-					 ;; if you want which-key integration
-					 (lsp-mode . lsp-enable-which-key-integration))
-		:commands lsp)
+  (use-package lsp-mode
+    :init
+    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    (setq lsp-keymap-prefix "C-c l")
+    (setq lsp-tex-server 'digestif)
+    :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+           (go-mode . lsp)
+           (javascript-mode . lsp)
+           (typescript-mode . lsp)
+           (rust-mode . lsp)
+           ;; if you want which-key integration
+           (lsp-mode . lsp-enable-which-key-integration))
+    (LaTeX-mode . lsp)
+    :commands lsp)
 
-	;; optionally
-	(use-package lsp-ui
-		:ensure t
-		:commands lsp-ui-mode
-		:config
-		(setq lsp-ui-doc-enable t)
-		(setq lsp-ui-sideline-show-diagnostics t)
-		(setq lsp-ui-sideline-show-hover t))
+  ;; optionally
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode
+    :config
+    (setq lsp-ui-doc-enable t)
+    (setq lsp-ui-sideline-show-diagnostics t)
+    (setq lsp-ui-sideline-show-hover t))
 
-	;; if you are helm user
-	(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-	;; if you are ivy user
-	(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-	;; Symbol highlighting
-	(setq lsp-enable-symbol-highlighting nil)
+  ;; if you are helm user
+  (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+  ;; if you are ivy user
+  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+  ;; Symbol highlighting
+  (setq lsp-enable-symbol-highlighting nil)
 
-	(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+  (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
-	;; optionally if you want to use debugger
-	(use-package dap-mode :ensure t)
-	;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+  ;; optionally if you want to use debugger
+  (use-package dap-mode :ensure t)
+  ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
-	;; optional if you want which-key integration
-	;;(use-package which-key
-	;;		:config
-	;;		(which-key-mode))
+  ;; optional if you want which-key integration
+  ;;(use-package which-key
+  ;;		:config
+  ;;		(which-key-mode))
 #+end_src
+
+#+RESULTS:
 
 *** LSP UI
 #+begin_src emacs-lisp
