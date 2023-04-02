@@ -44,9 +44,9 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   (set-fringe-mode 1)               ;; Give us some space.
   (delete-selection-mode nil)		  ;; Use a more sane delete mode than evil.
   (fset 'yes-or-no-p 'y-or-n-p)     ;; Set yes or no to y/n
-  (global-font-lock-mode 1)         ;; always highlight code
+  ;; (global-font-lock-mode 1)         ;; always highlight code
   (global-auto-revert-mode 1)       ;; refresh a buffer if changed on disk
-  ;; (global-hl-line-mode 1)           ;; Highlight current line
+  (global-hl-line-mode 1)           ;; Highlight current line
   ;; (semantic-mode 1)								;; help out with semantics
   (savehist-mode 1)                 ;; Save history
   (save-place-mode 1)               ;; when buffer is closed, save the cursor position
@@ -205,16 +205,19 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 ** Setting line numbers
 #+begin_src emacs-lisp
-	(global-display-line-numbers-mode t)
-	(use-package display-line-numbers
-		;;:straight nil
-		:hook (prog-mode . display-line-numbers-mode)
-		:custom
-		;;(setq display-line-numbers-type 'relative)
-		(display-line-numbers-width 4)
-		(display-line-numbers-grow-only t)
-		(display-line-numbers-width-start t))
+  (global-display-line-numbers-mode t)
+  (use-package display-line-numbers
+    ;;:straight nil
+    :hook (prog-mode . display-line-numbers-mode)
+    :custom
+    (setq display-line-numbers-type 'relative)
+    (display-line-numbers-width 4)
+    (display-line-numbers-grow-only t)
+    (display-line-numbers-width-start t))
 #+end_src
+
+#+RESULTS:
+| hs-minor-mode | show-paren-mode | visual-line-mode | flycheck-mode | format-all-ensure-formatter | rainbow-delimiters-mode | my/highlight-todo-like-words | git-gutter-mode | display-line-numbers-mode |
 
 * Setting font face
 ** Setting fonts
@@ -359,7 +362,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 	#+end_src
 
 ** Change theme by time
-#+begin_src example :lexical no
+#+begin_src emacs-lisp :lexical no
   (use-package theme-changer
     :ensure t
     :config
@@ -657,10 +660,9 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
      (shell . t)
      (python . t)
      (rust . t)
+     (C . t)
      (latex . t)
      ))
-
-
 #+end_src
 
 #+RESULTS:
@@ -785,7 +787,13 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
                                      todo-zettels))))
 
   (advice-add 'org-agenda :before #'who-org/agenda-files-update)
+
+  ;; Set default column view headings: Task Total-Time Time-Stamp
+  (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
 #+end_src
+
+#+RESULTS:
+: %50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA
 
 *** Main settings
 #+begin_src emacs-lisp :lexical no
@@ -1014,17 +1022,18 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     (org-roam-completion-everywhere t)
     (org-roam-capture-templates
      '(
-       ("d" "default" plain "%?"
+       ("d" "Default abstract" plain "%?"
         :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+        :unnarrowed t)
+
+       ("s" "Abstract with source" plain "\n\nSource: %^{Source}\n\nTitle: ${title}\n\n"
+        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
         :unnarrowed t)
 
        ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n"
         :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
         :unnarrowed t)
 
-       ("n" "New Thought" plain "\n\nSource: %^{Source}\n\nTitle: ${title}\n\n"
-        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
-        :unnarrowed t)
        ("e" "Encrypt note" plain "%?"
         :target (file+head "${name-of-file}.org.gpg"
                            "#+title: ${title}\n#+date: %U")
@@ -1150,11 +1159,22 @@ Deps for org-roam-bibtex:
 
 **** Citar
 #+begin_src emacs-lisp :lexical no
-	(use-package citar-embark
-		:ensure t
-		:after citar embark
-		:no-require
-		:config (citar-embark-mode))
+  (use-package citar-embark
+    :ensure t
+    :after citar embark
+    :no-require
+    :config
+    (org-cite-global-bibliography
+     '("~/Org/2Brain/bibtex/ref.bib"))
+    (citar-embark-mode))
+
+  ;; Use `citar' with `org-cite'
+  (use-package citar-org
+    :after oc
+    :custom
+    (org-cite-insert-processor 'citar)
+    (org-cite-follow-processor 'citar)
+    (org-cite-activate-processor 'citar))
 #+end_src
 
 #+RESULTS:
@@ -1171,11 +1191,48 @@ Deps for org-roam-bibtex:
   (use-package org-noter
     :ensure t)
 
+  (use-package org-pdftools
+    :ensure t
+    :hook (org-mode . org-pdftools-setup-link)
+    )
+
   (use-package org-noter-pdftools
-    :ensure t )
+    :ensure t
+    :after org-noter
+    :config
+    ;; Add a function to ensure precise note is inserted
+    (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
+      (interactive "P")
+      (org-noter--with-valid-session
+       (let ((org-noter-insert-note-no-questions (if toggle-no-questions
+                                                     (not org-noter-insert-note-no-questions)
+                                                   org-noter-insert-note-no-questions))
+             (org-pdftools-use-isearch-link t)
+             (org-pdftools-use-freepointer-annot t))
+         (org-noter-insert-note (org-noter--get-precise-info)))))
+
+    ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
+    (defun org-noter-set-start-location (&optional arg)
+      "When opening a session with this document, go to the current location.
+       With a prefix ARG, remove start location."
+      (interactive "P")
+      (org-noter--with-valid-session
+       (let ((inhibit-read-only t)
+             (ast (org-noter--parse-root))
+             (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
+         (with-current-buffer (org-noter--session-notes-buffer session)
+           (org-with-wide-buffer
+            (goto-char (org-element-property :begin ast))
+            (if arg
+                (org-entry-delete nil org-noter-property-note-location)
+              (org-entry-put nil org-noter-property-note-location
+                             (org-noter--pretty-print-location location))))))))
+    (with-eval-after-load 'pdf-annot
+      (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 #+end_src
 
 #+RESULTS:
+: t
 
 
 *** Company-org-roam
@@ -1250,6 +1307,15 @@ Deps for org-roam-bibtex:
   (setq org-reveal-root "file:~/Org/Presentations/reveal.js/")
 #+end_src
 
+
+** Ement (matrix in emacs)
+#+begin_src emacs-lisp :lexical no
+  (use-package ement
+    :ensure t)
+#+end_src
+
+#+RESULTS:
+: t
 
 ** Spell checking
 #+begin_src example :lexical no
@@ -1937,6 +2003,9 @@ BUG BUG BUG
     ;; data is stored in ~/.elfeed
     (setq elfeed-feeds
           '(
+            ;; freelance
+            ("https://freelance.habr.com/user_rss_tasks/vsE2OtRKoyNeUnK7RGd+0w==" freelance)
+
             ;;
             ("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
 
@@ -1984,6 +2053,9 @@ BUG BUG BUG
     ;; update feed counts on elfeed-quit
     (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
 		#+end_src
+
+    #+RESULTS:
+    : t
 
 ** Emojify
 #+begin_src emacs-lisp
@@ -3007,34 +3079,34 @@ Show vertical lines to guide indentation
 #+end_src
 
 #+begin_src emacs-lisp
-	(use-package rust-playground :ensure t)
+  (use-package rust-playground :ensure t)
 
-	(use-package rust-mode
-		:ensure t
-		:if (executable-find "rustc"))
+  (use-package rust-mode
+    :ensure t
+    :if (executable-find "rustc"))
 
-	(use-package cargo
-		:ensure t
-		:if (executable-find "cargo")
-		:after rust-mode
-		:bind (:map cargo-minor-mode-map
-								("C-c C-t" . cargo-process-test)
-								("C-c C-b" . cargo-process-build)
-								("C-c C-c" . cargo-process-run))
-		:config
-		(add-hook 'rust-mode-hook 'cargo-minor-mode))
+  (use-package cargo
+    :ensure t
+    :if (executable-find "cargo")
+    :after rust-mode
+    :bind (:map cargo-minor-mode-map
+                ("C-c C-t" . cargo-process-test)
+                ("C-c C-b" . cargo-process-build)
+                ("C-c C-c" . cargo-process-run))
+    :config
+    (add-hook 'rust-mode-hook 'cargo-minor-mode))
 
-	(use-package racer
-		:ensure t
-		:if (executable-find "racer")
-		:after rust-mode
-		:custom
-		(racer-rust-src-path "~/Code/rust/src/src")
-		:hook ((rust-mode . racer-mode)
-					 (racer-mode . eldoc-mode)
-					 (racer-mode . company-mode))
-		:config
-		(evil-leader/set-key-for-mode 'rust-mode "d" 'racer-find-definition))
+  (use-package racer
+    :ensure t
+    :if (executable-find "racer")
+    :after rust-mode
+    :custom
+    (racer-rust-src-path "~/Code/rust/src/src")
+    :hook ((rust-mode . racer-mode)
+           (racer-mode . eldoc-mode)
+           (racer-mode . company-mode))
+    :config
+    (evil-leader/set-key-for-mode 'rust-mode "d" 'racer-find-definition))
 #+end_src
 
 ** Flycheck
@@ -3438,7 +3510,7 @@ Support for resizing windows, using the mouse. Position the mouse on the divider
 #+end_src
 
 * eaf
-#+begin_src example
+#+Begin_src example
 	(use-package eaf
 		:load-path "~/.emacs.d/site-lisp/emacs-application-framework"
 		:custom
