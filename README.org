@@ -378,7 +378,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 * Setting Packages
 ** Org
-*** Setting Org
+*** Org-mode 
+**** Setting Org
 #+begin_src emacs-lisp
   (use-package org
     ;; :hook (org-mode . mk/org-mode-setup)
@@ -424,8 +425,23 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 #+RESULTS:
 : t
+**** Custom emphasis list
+#+begin_src emacs-lisp :lexical no
+  (add-to-list 'org-emphasis-alist
+               '("\" (:foreground "red")
+                 ))
+#+end_src
 
-*** Some replaces
+#+RESULTS:
+|   |                     |          | (:foreground red) |
+| * | (:foreground red)   |          |                   |
+| * | bold                |          |                   |
+| _ | underline           |          |                   |
+| = | org-verbatim        | verbatim |                   |
+| ~ | org-code            | verbatim |                   |
+| + | (:strike-through t) |          |                   |
+
+**** Some replaces
 #+begin_src emacs-lisp :lexical no
 	;;; replace-org-char
 	;; Replace list hyphen with dot
@@ -439,7 +455,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 														 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "➤"))))))
 	
 #+end_src
-*** Improve org-mode looks
+**** Improve org-mode looks
 #+begin_src emacs-lisp :lexical no
   (setq
    org-ellipsis " ▾"                 ; ↴, ▼, ▶, ⤵, ▾
@@ -464,7 +480,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
    org-fontify-quote-and-verse-blocks t
    org-image-actual-width '(300))
 #+end_src
-*** Increase the size of various headings
+**** Increase the size of various headings
 #+begin_src emacs-lisp :lexical no
   (set-face-attribute 'org-document-title nil :font "JetBrains Mono" ) ;; :weight 'bold :height 1.5
   (dolist (face '((org-level-1 . 1.2)
@@ -477,7 +493,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
                   (org-level-8 . 1.1)))
     (set-face-attribute (car face) nil :font "JetBrains Mono")) ;;  :weight 'medium :height (cdr face)
 #+end_src
-*** Beautify quotes
+**** Beautify quotes
 #+begin_src emacs-lisp :lexical no
 (defun org-quote-beautify ()
   "Beautify quotes in org-mode."
@@ -505,7 +521,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+RESULTS:
 | org-quote-visual-fill | (lambda nil (set (make-local-variable 'company-backends) '(company-org-block)) (company-mode 1)) | (lambda nil (display-line-numbers-mode 0)) | org-toggle-latex-fragment | (closure (org-agenda-skip-regexp org-fold-core-style org-table1-hline-regexp org-table-tab-recognizes-table.el org-table-dataline-regexp org-table-any-border-regexp org-agenda-restriction-lock-overlay org-agenda-overriding-restriction org-agenda-diary-file org-complex-heading-regexp calendar-mode-map t) nil (setq imenu-create-index-function 'org-imenu-get-tree)) | org-pdftools-setup-link | org-ref-org-menu | (lambda nil Beautify Org Checkbox Symbol (setq prettify-symbols-alist (cons '([ ] . ☐) prettify-symbols-alist)) (setq prettify-symbols-alist (cons '([X] . ☑) prettify-symbols-alist)) (setq prettify-symbols-alist (cons '([-] . ❍) prettify-symbols-alist)) (prettify-symbols-mode)) | org-bullets-mode | (lambda nil (add-hook 'before-save-hook 'org-beautify-quote-blocks nil 'local)) | org-tempo-setup | (closure (org--rds reftex-docstruct-symbol org--single-lines-list-is-paragraph org-element-greater-elements visual-fill-column-width org-clock-history org-agenda-current-date org-with-time org-defdecode org-def org-read-date-inactive org-ans2 org-ans1 org-columns-current-fmt-compiled org-clock-current-task org-clock-effort org-agenda-skip-function org-agenda-skip-comment-trees org-agenda-archives-mode org-end-time-was-given org-time-was-given org-log-note-extra org-log-note-purpose org-log-post-message org-last-inserted-timestamp org-last-changed-timestamp org-entry-property-inherited-from org-blocked-by-checkboxes org-state org-agenda-headline-snapshot-before-repeat org-agenda-buffer-name org-agenda-start-on-weekday org-agenda-buffer-tmp-name org-priority-regexp org-mode-abbrev-table org-mode-syntax-table org-element-cache-persistent buffer-face-mode-face org-tbl-menu org-org-menu org-struct-menu org-entities org-last-state org-id-track-globally org-clock-start-time texmathp-why remember-data-file org-agenda-tags-todo-honor-ignore-options calc-embedded-open-mode calc-embedded-open-formula calc-embedded-close-formula align-mode-rules-list org-emphasis-alist org-emphasis-regexp-components org-export-registered-backends org-modules crm-separator org-babel-load-languages org-id-overriding-file-name org-indent-indentation-per-level org-element--timestamp-regexp org-element-cache-map-continue-from org-element-paragraph-separate org-agenda-buffer-name org-inlinetask-min-level t) nil (add-hook 'change-major-mode-hook 'org-fold-show-all 'append 'local)) | (closure (org-src-window-setup *this* org-babel-confirm-evaluate-answer-no org-babel-tangle-uncomment-comments org-src-preserve-indentation org-src-lang-modes org-edit-src-content-indentation org-babel-library-of-babel t) nil (add-hook 'change-major-mode-hook #'org-babel-show-result-all 'append 'local)) | org-babel-result-hide-spec | org-babel-hide-all-hashes |
 
-*** Org modern
+**** Org modern
 #+begin_src example
   (use-package org-modern
     :ensure t
@@ -551,7 +567,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     (add-hook 'hack-local-variables-hook
               (lambda () (setq org-enable-table-editor nil)  )))
 #+end_src
-*** HTML table from buffer to org-mode table
+**** HTML table from buffer to org-mode table
 #+begin_src emacs-lisp :lexical no
   (defun chunyang-yank-html ()
     "Yank HTML from clipboard as Org or Markdown code."
@@ -586,7 +602,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
              (buffer-string)
            (error "pandoc failed: %s" (buffer-string)))))))
 #+end_src
-*** Org bullets
+**** Org bullets
 #+begin_src emacs-lisp
   ;; (use-package org-superstar
   ;; 	:ensure t
@@ -608,7 +624,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○"))) ; "●" "▷" "🞛" "◈" "✖"
 #+end_src
 
-*** Change TODO's states
+**** Change TODO's states
 #+begin_src emacs-lisp
   (with-eval-after-load 'org
     (setq org-log-done 'time))
@@ -627,16 +643,16 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
             ("ARCHIVED" .  "SlateBlue"))))
           #+end_src
 
-*** Org timer (Pomodoro)
+**** Org timer (Pomodoro)
 #+begin_src emacs-lisp
 	(setq org-clock-sound "~/.emacs.d/sound.wav")
 #+end_src
-*** Org notifications
+**** Org notifications
 #+begin_src emacs-lisp
   (use-package org-alert
     :ensure t)
 #+end_src
-*** Insert images from url
+**** Insert images from url
 #+BEGIN_SRC emacs-lisp
 	(org-add-link-type
 	 "image-url"
@@ -649,7 +665,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 				 (url-copy-file path img)
 				 (find-file img)))))
 #+END_SRC
-*** Org babel
+**** Org babel
 #+begin_src emacs-lisp
   (use-package ob-typescript
     :ensure t)
@@ -673,7 +689,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 #+RESULTS:
 
-*** Prettify symbols
+**** Prettify symbols
 #+begin_src emacs-lisp
           ;; Beautiful Org Checkbox Symbol
   (add-hook 'org-mode-hook (lambda ()
@@ -713,7 +729,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
                                   (?I . "Important"))))
   #+end_src
 
-*** Inline images from URL
+**** Inline images from URL
 #+begin_src emacs-lisp :lexical no
   (org-add-link-type
    "image-url"
@@ -756,7 +772,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+RESULTS:
 : image-url-clear-overlays
 
-** Org agenda
+*** Org agenda
 ~C-c a~ -- for entering in Org agenda
 #+begin_src emacs-lisp
   (setq org-agenda-files   (list "~/Org")
@@ -787,7 +803,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+RESULTS:
 : %50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA
 
-*** Main settings
+**** Main settings
 #+begin_src emacs-lisp :lexical no
   (setq org-agenda-skip-scheduled-if-done t
         org-agenda-skip-deadline-if-done t
@@ -818,7 +834,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 #+RESULTS:
 
-*** Agenda reminders
+**** Agenda reminders
 #+begin_src emacs-lisp
   (alert-define-style 'who/alert-style-reminder
                       :title "Agenda reminders"
@@ -830,7 +846,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
                  who/alert-style-reminder))
 #+end_src
 
-*** Agenda style
+**** Agenda style
 #+begin_src emacs-lisp :lexical no
   (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
 
@@ -863,7 +879,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   ;;         ("Reading" ,(list (all-the-icons-faicon "book")) nil nil :ascent center)))
 #+end_src
 
-*** Colorize block
+**** Colorize block
 #+begin_src example
   ;; work with org-agenda dispatcher [c] "Today Clocked Tasks" to view today's clocked tasks.
   (defun org-agenda-log-mode-colorize-block ()
@@ -892,7 +908,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
   (add-hook 'org-agenda-finalize-hook #'org-agenda-log-mode-colorize-block)
 #+end_src
-*** Super agenda
+**** Super agenda
 #+begin_src emacs-lisp :lexical no
   (use-package org-super-agenda :ensure t)
 
@@ -937,7 +953,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
 #+end_src
 
-*** Capture
+**** Capture
 #+begin_src emacs-lisp
   (setq org-directory "~/Org")
   (setq org-default-notes-file "~/Org/agenda/notes.org")
@@ -983,7 +999,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 | t | TODO          | entry | (file ~/Org/agenda/inbox.org)        | * TODO %^{Title}    |
 | m | Meeting notes | entry | (file ~/Org/agenda/appointments.org) | * TODO %^{Title} %t |
 
-*** org-gcal
+**** org-gcal
 #+begin_src example
  (use-package org-gcal
    :after org
@@ -995,7 +1011,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
          org-gcal-client-secret (who/get-file-contents "~/.config/org-gcal/.org-gcal-client-secret")
          org-gcal-local-timezone "Canada/Pacific"))
 #+end_src
-*** org-caldav
+**** org-caldav
 #+begin_src emacs-lisp
  (use-package org-caldav
    :ensure t
@@ -1008,8 +1024,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
    (org-caldav-delete-org-entries 'never))
  ;; (org-caldav-sync)
 #+end_src
-** Org-roam
 *** Org-roam
+**** Org-roam
 #+begin_src emacs-lisp
   (use-package org-roam
     :ensure t
@@ -1061,7 +1077,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+RESULTS:
 : completion-at-point
 
-**** Configuring org-roam buffer display
+***** Configuring org-roam buffer display
 #+begin_src example
   (add-to-list 'display-buffer-alist
                '(;; Left side window
@@ -1072,7 +1088,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
                   (slot . 0))))
 #+end_src
 
-**** Build your Org agenda from Org Roam notes (disabled)
+***** Build your Org agenda from Org Roam notes (disabled)
 #+begin_src example :lexical no
   ;; The buffer you put this code in must have lexical-binding set to t!
   ;; See the final configuration at the end for more details.
@@ -1097,7 +1113,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 #+RESULTS:
 
-*** Org-roam-ui
+**** Org-roam-ui
 #+begin_src emacs-lisp
   (use-package org-roam-ui
     :ensure t
@@ -1108,7 +1124,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start nil))
 #+end_src
-*** Org-roam-bibtex
+**** Org-roam-bibtex
 #+begin_src emacs-lisp
   (use-package org-roam-bibtex
     :ensure t
@@ -1133,7 +1149,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 Deps for org-roam-bibtex:
-**** Org ref
+***** Org ref
 #+begin_src emacs-lisp
   (use-package org-ref :ensure t
     :config
@@ -1153,7 +1169,7 @@ Deps for org-roam-bibtex:
             (start-process "open" "*open*" "open" fpath))))
 #+end_src
 
-**** Citar
+***** Citar
 #+begin_src emacs-lisp :lexical no
   (use-package citar-embark
     :ensure t
@@ -1175,14 +1191,14 @@ Deps for org-roam-bibtex:
 
 #+RESULTS:
 
-**** Helm bibtex
+***** Helm bibtex
 #+begin_src emacs-lisp
 	(use-package helm-bibtex :ensure t)
 #+end_src
 
 #+RESULTS:
 
-**** Org noter
+***** Org noter
 #+begin_src emacs-lisp :lexical no
   (use-package org-noter
     :ensure t)
@@ -1231,14 +1247,14 @@ Deps for org-roam-bibtex:
 : t
 
 
-*** Company-org-roam
+**** Company-org-roam
 #+begin_src emacs-lisp
 (use-package company-org-roam
   :straight (:host github :repo "org-roam/company-org-roam")
   :config
   (push 'company-org-roam company-backends))
 #+end_src
-*** Delve.el
+**** Delve.el
 #+begin_src example
   (use-package delve
     :straight (:repo "publicimageltd/delve"
@@ -1263,7 +1279,7 @@ Deps for org-roam-bibtex:
 #+RESULTS:
 : t
 
-*** Md-roam (add md for org-roam)
+**** Md-roam (add md for org-roam)
 #+begin_src example
 	(load "~/.emacs.d/local-packages/md-roam")
 	(use-package md-roam
@@ -1276,7 +1292,7 @@ Deps for org-roam-bibtex:
   (advice-add #'markdown-indent-line :before-until #'completion-at-point))
 #+end_src
 
-*** Org-download
+**** Org-download
 #+begin_src emacs-lisp
   (use-package org-download
     :ensure t)
