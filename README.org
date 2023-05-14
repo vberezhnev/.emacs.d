@@ -24,7 +24,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 * Setting base of Emacs
 ** Functions
-#+begin_src emacs-lisp
+#+begin_src example
   (defun indent-org-block-automatically ()
     (when (org-in-src-block-p)
       (org-edit-special)
@@ -46,15 +46,15 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   (fset 'yes-or-no-p 'y-or-n-p)     ;; Set yes or no to y/n
   ;; (global-font-lock-mode 1)         ;; always highlight code
   (global-auto-revert-mode 1)       ;; refresh a buffer if changed on disk
-  (global-hl-line-mode 1)           ;; Highlight current line
-  ;; (semantic-mode 1)								;; help out with semantics
+  ;; (global-hl-line-mode 1)           ;; Highlight current line
+  (semantic-mode 1)								;; help out with semantics
   (savehist-mode 1)                 ;; Save history
   (save-place-mode 1)               ;; when buffer is closed, save the cursor position
-  (blink-cursor-mode 1)
+  ;; (blink-cursor-mode 1)
 
   ;; Setup fonts
-  (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 130)
-  (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
+  ;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 130)
+  ;; (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
   ;;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
   (variable-pitch-mode t)
 
@@ -66,7 +66,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
   (setq ad-redefinition-action            'accept
         default-buffer-file-coding-system 'utf-8
-        blink-cursor-interval             0.6       ;; Little slower cursor blinking . default is 0.5
+        ;; blink-cursor-interval             0.6       ;; Little slower cursor blinking . default is 0.5
         create-lockfiles                  nil
         idle-update-delay                 1.2    ;; Speed things up by not updating so often
         read-process-output-max           (* 8 1024 1024)
@@ -222,42 +222,42 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting font face
 ** Setting fonts
 #+begin_src emacs-lisp
-  (set-face-attribute 'default t
-                      :font "JetBrains Mono" ;; Iosevka, Input, Hack
-                      :height 90
-                      :weight 'regular
-                      )
-  (set-face-attribute 'variable-pitch nil
-                      :font "JetBrains Mono"
-                      :height 90
-                      :weight 'medium
-                      )
-  (set-face-attribute 'fixed-pitch nil
-                      :font "JetBrains Mono"
-                      :height 90
-                      :weight 'medium
-                      )
+  ;; (set-face-attribute 'default t
+  ;;                     :font "JetBrains Mono" ;; Iosevka, Input, Hack
+  ;;                     :height 90
+  ;;                     :weight 'regular
+  ;;                     )
+  ;; (set-face-attribute 'variable-pitch nil
+  ;;                     :font "JetBrains Mono"
+  ;;                     :height 90
+  ;;                     :weight 'medium
+  ;;                     )
+  ;; (set-face-attribute 'fixed-pitch nil
+  ;;                     :font "JetBrains Mono"
+  ;;                     :height 90
+  ;;                     :weight 'medium
+  ;;                     )
 
-  ;; (set-frame-font "JetBrains Mono" nil t)
+  ;; ;; (set-frame-font "JetBrains Mono" nil t)
 
-  ;; Makes commented text and keywords italics.
-  ;; This is working in emacsclient but not emacs.
-  ;; Your font must have an italic face available.
-  (set-face-attribute 'font-lock-comment-face nil
-                      :slant 'italic)
-  (set-face-attribute 'font-lock-keyword-face nil
-                      :slant 'italic)
+  ;; ;; Makes commented text and keywords italics.
+  ;; ;; This is working in emacsclient but not emacs.
+  ;; ;; Your font must have an italic face available.
+  ;; (set-face-attribute 'font-lock-comment-face nil
+  ;;                     :slant 'italic)
+  ;; (set-face-attribute 'font-lock-keyword-face nil
+  ;;                     :slant 'italic)
 
 
   ;; Uncomment the following line if line spacing needs adjusting.
   ;; (setq-default line-spacing 0.12)
 
   ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-  (add-to-list 'default-frame-alist '(font . "JetBrains Mono 11"))
+  ;; (add-to-list 'default-frame-alist '(font . "JetBrains Mono 12"))
   ;; (add-to-list 'default-frame-alist
   ;;              '(font . "DejaVu Sans Mono-11"))
 
-  ;; (add-to-list 'default-frame-alist '(font . "Fira Code"))
+  (add-to-list 'default-frame-alist '(font . "Fira Code"))
   ;; changes certain keywords to symbols, such as lamda!
   (setq global-prettify-symbols-mode t)
 
@@ -269,6 +269,9 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   ;; 													 (push '("[-]" . "❍" ) prettify-symbols-alist)
   ;; 													 (prettify-symbols-mode)))
 #+end_src
+
+#+RESULTS:
+: t
 
 ** Prettify JetBrains Mono symbols
 #+begin_src example
@@ -355,10 +358,10 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     ;; (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
     (doom-themes-treemacs-config)
     ;; Corrects (and improves) org-mode's native fontification.
-    (doom-themes-org-config))
+    (doom-themes-org-config)
+    )
 
   ;; (load-theme 'gruvbox-dark-soft t)
-  (load-theme 'doom-one t)
 	#+end_src
 
 ** Change theme by time
@@ -370,26 +373,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     (setq calendar-latitude 43.11)
     (setq calendar-longitude 131.88))
 
-  (change-theme 'doom-one-light 'doom-one)
-#+end_src
-
-#+begin_src example
-	(defvar install-theme-loading-times nil
-		"An association list of time strings and theme names.
-	The themes will be loaded at the specified time every day.")
-	(defvar install-theme-timers nil)
-	(defun install-theme-loading-at-times ()
-		"Set up theme loading according to `install-theme-loading-at-times`"
-		(interactive)
-		(dolist (timer install-theme-timers)
-			(cancel-timer timer))
-		(setq install-theme-timers nil)
-		(dolist (time-theme install-theme-loading-times)
-			(add-to-list 'install-theme-timers
-									 (run-at-time (car time-theme) (* 60 60 24) 'load-theme (cdr time-theme)))))
-
-	(setq install-theme-loading-times '(("9:00am" . gruvbox-light-soft)
-																			("7:30pm" . gruvbox-dark-soft)))
+  (change-theme 'gruvbox-light-medium 'gruvbox-dark-soft)
 #+end_src
 
 * Setting Packages
@@ -427,8 +411,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     (add-hook 'org-babel-after-execute-hook (lambda ()
                                               (when org-inline-image-overlays
                                                 (org-redisplay-inline-images))))
-    ;; (org-babel-do-load-languages 'org-babel-load-languages
-    ;;                               '((example t))
 
     ;; (add-to-list 'org-structure-template-alist
     ;;              '("sh" . "src shell")
@@ -495,6 +477,34 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
                   (org-level-8 . 1.1)))
     (set-face-attribute (car face) nil :font "JetBrains Mono")) ;;  :weight 'medium :height (cdr face)
 #+end_src
+*** Beautify quotes
+#+begin_src emacs-lisp :lexical no
+(defun org-quote-beautify ()
+  "Beautify quotes in org-mode."
+  (when (org-in-src-block-p)
+    (let ((begin-quote "#+begin_quote")
+          (end-quote "#+end_quote")
+          (quote-symbol "❝")
+          (close-quote-symbol "❞"))
+      (goto-char (point-min))
+      (while (search-forward-regexp begin-quote nil t)
+        (let ((beg (match-beginning 0))
+              (end (search-forward-regexp end-quote)))
+          (when end
+            (let ((buffer-undo-list t)
+                  (buffer-read-only nil))
+              (goto-char beg)
+              (insert quote-symbol)
+              (goto-char end)
+              (insert close-quote-symbol))))))))
+
+
+(add-hook 'org-mode-hook 'org-quote-beautify)
+#+end_src
+
+#+RESULTS:
+| org-quote-visual-fill | (lambda nil (set (make-local-variable 'company-backends) '(company-org-block)) (company-mode 1)) | (lambda nil (display-line-numbers-mode 0)) | org-toggle-latex-fragment | (closure (org-agenda-skip-regexp org-fold-core-style org-table1-hline-regexp org-table-tab-recognizes-table.el org-table-dataline-regexp org-table-any-border-regexp org-agenda-restriction-lock-overlay org-agenda-overriding-restriction org-agenda-diary-file org-complex-heading-regexp calendar-mode-map t) nil (setq imenu-create-index-function 'org-imenu-get-tree)) | org-pdftools-setup-link | org-ref-org-menu | (lambda nil Beautify Org Checkbox Symbol (setq prettify-symbols-alist (cons '([ ] . ☐) prettify-symbols-alist)) (setq prettify-symbols-alist (cons '([X] . ☑) prettify-symbols-alist)) (setq prettify-symbols-alist (cons '([-] . ❍) prettify-symbols-alist)) (prettify-symbols-mode)) | org-bullets-mode | (lambda nil (add-hook 'before-save-hook 'org-beautify-quote-blocks nil 'local)) | org-tempo-setup | (closure (org--rds reftex-docstruct-symbol org--single-lines-list-is-paragraph org-element-greater-elements visual-fill-column-width org-clock-history org-agenda-current-date org-with-time org-defdecode org-def org-read-date-inactive org-ans2 org-ans1 org-columns-current-fmt-compiled org-clock-current-task org-clock-effort org-agenda-skip-function org-agenda-skip-comment-trees org-agenda-archives-mode org-end-time-was-given org-time-was-given org-log-note-extra org-log-note-purpose org-log-post-message org-last-inserted-timestamp org-last-changed-timestamp org-entry-property-inherited-from org-blocked-by-checkboxes org-state org-agenda-headline-snapshot-before-repeat org-agenda-buffer-name org-agenda-start-on-weekday org-agenda-buffer-tmp-name org-priority-regexp org-mode-abbrev-table org-mode-syntax-table org-element-cache-persistent buffer-face-mode-face org-tbl-menu org-org-menu org-struct-menu org-entities org-last-state org-id-track-globally org-clock-start-time texmathp-why remember-data-file org-agenda-tags-todo-honor-ignore-options calc-embedded-open-mode calc-embedded-open-formula calc-embedded-close-formula align-mode-rules-list org-emphasis-alist org-emphasis-regexp-components org-export-registered-backends org-modules crm-separator org-babel-load-languages org-id-overriding-file-name org-indent-indentation-per-level org-element--timestamp-regexp org-element-cache-map-continue-from org-element-paragraph-separate org-agenda-buffer-name org-inlinetask-min-level t) nil (add-hook 'change-major-mode-hook 'org-fold-show-all 'append 'local)) | (closure (org-src-window-setup *this* org-babel-confirm-evaluate-answer-no org-babel-tangle-uncomment-comments org-src-preserve-indentation org-src-lang-modes org-edit-src-content-indentation org-babel-library-of-babel t) nil (add-hook 'change-major-mode-hook #'org-babel-show-result-all 'append 'local)) | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+
 *** Org modern
 #+begin_src example
   (use-package org-modern
@@ -598,9 +608,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○"))) ; "●" "▷" "🞛" "◈" "✖"
 #+end_src
 
-#+RESULTS:
-| (lambda nil (set (make-local-variable 'company-backends) '(company-org-block)) (company-mode 1)) | (lambda nil (display-line-numbers-mode 0)) | (closure (org-agenda-skip-regexp org-fold-core-style org-table1-hline-regexp org-table-tab-recognizes-table.el org-table-dataline-regexp org-table-any-border-regexp org-agenda-restriction-lock-overlay org-agenda-overriding-restriction org-agenda-diary-file org-complex-heading-regexp calendar-mode-map t) nil (setq imenu-create-index-function 'org-imenu-get-tree)) | org-toggle-latex-fragment | org-ref-org-menu | org-fancy-priorities-mode | org-bullets-mode | org-tempo-setup | (closure (org--rds reftex-docstruct-symbol org--single-lines-list-is-paragraph org-element-greater-elements visual-fill-column-width org-clock-history org-agenda-current-date org-with-time org-defdecode org-def org-read-date-inactive org-ans2 org-ans1 org-columns-current-fmt-compiled org-clock-current-task org-clock-effort org-agenda-skip-function org-agenda-skip-comment-trees org-agenda-archives-mode org-end-time-was-given org-time-was-given org-log-note-extra org-log-note-purpose org-log-post-message org-last-inserted-timestamp org-last-changed-timestamp org-entry-property-inherited-from org-blocked-by-checkboxes org-state org-agenda-headline-snapshot-before-repeat org-agenda-buffer-name org-agenda-start-on-weekday org-agenda-buffer-tmp-name org-priority-regexp org-mode-abbrev-table org-mode-syntax-table org-element-cache-persistent buffer-face-mode-face org-tbl-menu org-org-menu org-struct-menu org-entities org-last-state org-id-track-globally org-clock-start-time texmathp-why remember-data-file org-agenda-tags-todo-honor-ignore-options calc-embedded-open-mode calc-embedded-open-formula calc-embedded-close-formula align-mode-rules-list org-emphasis-alist org-emphasis-regexp-components org-export-registered-backends org-modules crm-separator org-babel-load-languages org-id-overriding-file-name org-indent-indentation-per-level org-element--timestamp-regexp org-element-cache-map-continue-from org-element-paragraph-separate org-agenda-buffer-name org-inlinetask-min-level t) nil (add-hook 'change-major-mode-hook 'org-fold-show-all 'append 'local)) | (closure (org-src-window-setup *this* org-babel-confirm-evaluate-answer-no org-babel-tangle-uncomment-comments org-src-preserve-indentation org-src-lang-modes org-edit-src-content-indentation org-babel-library-of-babel t) nil (add-hook 'change-major-mode-hook #'org-babel-show-result-all 'append 'local)) | org-babel-result-hide-spec | org-babel-hide-all-hashes |
-
 *** Change TODO's states
 #+begin_src emacs-lisp
   (with-eval-after-load 'org
@@ -609,9 +616,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   (with-eval-after-load 'org
     (setq org-todo-keywords
           '((sequence "TODO" "DOING" "BLOCKED" "REVIEW" "|" "DONE" "ARCHIVED"))))
-#+end_src
 
-#+begin_src emacs-lisp
   (with-eval-after-load 'org
     (setq org-todo-keyword-faces
           '(("TODO" . "SlateGray")
@@ -620,7 +625,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
             ("REVIEW" . "Teal")
             ("DONE" . "ForestGreen")
             ("ARCHIVED" .  "SlateBlue"))))
-#+end_src
+          #+end_src
+
 *** Org timer (Pomodoro)
 #+begin_src emacs-lisp
 	(setq org-clock-sound "~/.emacs.d/sound.wav")
@@ -668,57 +674,43 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+RESULTS:
 
 *** Prettify symbols
+#+begin_src emacs-lisp
+          ;; Beautiful Org Checkbox Symbol
+  (add-hook 'org-mode-hook (lambda ()
+     "Beautify Org Checkbox Symbol"
+     (push '("[ ]" .  "☐") prettify-symbols-alist)
+     (push '("[X]" . "☑" ) prettify-symbols-alist)
+     (push '("[-]" . "❍" ) prettify-symbols-alist)
+     (prettify-symbols-mode)))
+    
+        ;; (defface org-checkbox-done-text
+        ;;   '((t (:foreground "#71696A" :strike-through t)))
+        ;;   "Face for the text part of a checked org-mode checkbox.")
+
+        ;; (font-lock-add-keywords
+        ;;  'org-mode
+        ;;  `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?:X\\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)"
+        ;;     1 'org-checkbox-done-text prepend))
+        ;;  'append)
+  #+end_src
+
+  #+RESULTS:
+
 #+begin_src example :lexical no
-  ;; Beautify Org Checkbox Symbol
-  (defun ma/org-buffer-setup ()
-    "Something for like document, i guess 😕."
-    (push '("[ ]" . "☐" ) prettify-symbols-alist)
-    (push '("[X]" . "☑" ) prettify-symbols-alist)
-    (push '("[-]" . "❍" ) prettify-symbols-alist)
-    )
-  (add-hook 'org-mode-hook #'ma/org-buffer-setup)
-
-  (defun my/org-mode/load-prettify-symbols ()
-    "Looking pretty good, so i adopted it."
-    (interactive)
-    (setq prettify-symbols-alist
-          (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
-                  '(("#+begin_src" . ?)
-                    ("#+end_src" . ?)
-                    ("#+begin_example" . ?)
-                    ("#+end_example" . ?)
-                    ("#+begin_quote" . ?❝)
-                    ("#+end_quote" . ?❠) ; ❟ ―  
-                    ("#+begin_center" . "ϰ")
-                    ("#+end_center" . "ϰ")
-                    ("#+header:" . ?)
-                    ("#+name:" . ?﮸)
-                    ;; ("#+title:" . ?◈)
-                    ;; ("#+author:" . ?✒)
-                    ("#+results:" . ?)
-                    ("#+call:" . ?)
-                    (":properties:" . ?)
-                    (":logbook:" . ?)))))
-  (add-hook 'org-mode-hook #'my/org-mode/load-prettify-symbols)
-
-  ;;;; toggle-emphasis
-  (defun org-toggle-emphasis ()
-    "Toggle hiding/showing of org emphasis markers."
-    (interactive)
-    (if org-hide-emphasis-markers
-        (set-variable 'org-hide-emphasis-markers nil)
-      (set-variable 'org-hide-emphasis-markers t))
-    (org-mode-restart))
-  (define-key org-mode-map (kbd "C-c x") 'org-toggle-emphasis)
-#+end_src
-
-#+begin_src emacs-lisp :lexical no
   (use-package org-fancy-priorities
     :diminish
     :ensure t
     :hook (org-mode . org-fancy-priorities-mode)
     :config
-    (setq org-fancy-priorities-list '("🇦" "🅱" "🅲" "🅳" "🅴")))
+    (setq org-fancy-priorities-list '((?A . "❗")
+                                  (?B . "⬆")
+                                  (?C . "⬇")
+                                  (?D . "☕")
+                                  (?1 . "⚡")
+                                  (?2 . "⮬")
+                                  (?3 . "⮮")
+                                  (?4 . "☕")
+                                  (?I . "Important"))))
   #+end_src
 
 *** Inline images from URL
@@ -987,6 +979,10 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
           ))
 #+end_src
 
+#+RESULTS:
+| t | TODO          | entry | (file ~/Org/agenda/inbox.org)        | * TODO %^{Title}    |
+| m | Meeting notes | entry | (file ~/Org/agenda/appointments.org) | * TODO %^{Title} %t |
+
 *** org-gcal
 #+begin_src example
  (use-package org-gcal
@@ -1000,7 +996,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
          org-gcal-local-timezone "Canada/Pacific"))
 #+end_src
 *** org-caldav
-#+begin_src example
+#+begin_src emacs-lisp
  (use-package org-caldav
    :ensure t
    :custom
@@ -1066,7 +1062,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 : completion-at-point
 
 **** Configuring org-roam buffer display
-#+begin_src emacs-lisp
+#+begin_src example
   (add-to-list 'display-buffer-alist
                '(;; Left side window
                  (".org-roam.*"
@@ -1077,7 +1073,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 **** Build your Org agenda from Org Roam notes (disabled)
-#+begin_example emacs-lisp :lexical no
+#+begin_src example :lexical no
   ;; The buffer you put this code in must have lexical-binding set to t!
   ;; See the final configuration at the end for more details.
 
@@ -1318,12 +1314,7 @@ Deps for org-roam-bibtex:
 : t
 
 ** Spell checking
-#+begin_src example :lexical no
-  (dolist (hook '(text-mode-hook))
-    (add-hook hook (lambda () (flyspell-mode 1))))
-  (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
-    (add-hook hook (lambda () (flyspell-mode -1))))
-
+#+begin_src emacs-lisp :lexical no
   (add-hook 'LaTeX-mode-hook 'flyspell-mode)
   (add-hook 'org-mode-hook 'flyspell-mode)
 
@@ -1331,44 +1322,10 @@ Deps for org-roam-bibtex:
   (setq ispell-local-dictionary "ru_RU")
   (setq ispell-local-dictionary-alist
         '(("ru_RU" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8)))
-
-  ;; Add new word to dictionary
-  (defun my-save-word ()
-    (interactive)
-    (let ((current-location (point))
-          (word (flyspell-get-word)))
-      (when (consp word)    
-        (flyspell-do-correct 'save nil (car word) current-location (cadr word) (caddr word) current-location))))
-
-  (defun flyspell-on-for-buffer-type ()
-    "Enable Flyspell appropriately for the major mode of the current buffer.  Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings and comments get checked.  All other buffers get `flyspell-mode' to check all text.  If flyspell is already enabled, does nothing."
-    (interactive)
-    (if (not (symbol-value flyspell-mode)) ; if not already on
-        (progn
-          (if (derived-mode-p 'prog-mode)
-              (progn
-                (message "Flyspell on (code)")
-                (flyspell-prog-mode))
-            ;; else
-            (progn
-              (message "Flyspell on (text)")
-              (flyspell-mode 1)))
-          ;; I tried putting (flyspell-buffer) here but it didn't seem to work
-          )))
-
-  (defun flyspell-toggle ()
-    "Turn Flyspell on if it is off, or off if it is on.  When turning on, it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
-    (interactive)
-    (if (symbol-value flyspell-mode)
-        (progn ; flyspell is on, turn it off
-          (message "Flyspell off")
-          (flyspell-mode -1))
-                                          ; else - flyspell is off, turn it on
-      (flyspell-on-for-buffer-type)))
 #+end_src
 
 #+RESULTS:
-: flyspell-toggle
+| ru_RU | [[:alpha:]] | [^[:alpha:]] | ['] | nil | nil | nil | utf-8 |
 
 ** LaTeX
 *** Auctex
@@ -1956,44 +1913,47 @@ BUG BUG BUG
 #+end_src
 ** Doom modeline
 #+begin_src emacs-lisp
-  (use-package doom-modeline
-    :ensure t
-    :hook
-    (after-init . doom-modeline-mode)
-    (doom-modeline-mode . display-battery-mode)
-    :custom
-    (setq doom-modeline-buffer-encoding nil
-          ;; doom-modeline-buffer-file-name-style 'file-name
-          doom-modeline-checker-simple-format t
-          doom-modeline-vcs-max-length 50
-          doom-modeline-major-mode-icon nil
-          doom-modeline-icon t
-          doom-modeline-modal-icon t
-          doom-modeline-lsp nil
-          doom-modeline-major-mode-color-icon nil
-          doom-modeline-buffer-state-icon nil
-          doom-modeline-time-icon nil)
-    (custom-set-faces
-     '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
-     '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
-     '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))
-    (doom-modeline-buffer-file-name-style 'relative-from-project)
-    )
+          (use-package doom-modeline
+            :ensure t
+            :hook
+            (after-init . doom-modeline-mode)
+            :custom
+            (setq doom-modeline-buffer-encoding nil
+                  doom-modeline-buffer-file-name-style 'file-name
+                  doom-modeline-checker-simple-format t
+                  doom-modeline-vcs-max-length 50
+                  doom-modeline-major-mode-icon nil
+                  doom-modeline-icon t
+                  doom-modeline-modal-icon t
+                  doom-modeline-lsp nil
+                  doom-modeline-major-mode-color-icon nil
+                  doom-modeline-buffer-state-icon nil
+                  doom-modeline-time-icon nil
+        doom-modeline-battery t
+      doom-modeline-lsp t
+    doom-modeline-workspace-name t
+  doom-modeline-enable-word-count t)
+            (custom-set-faces
+             '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
+             '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
+             '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))
+            (doom-modeline-buffer-file-name-style 'relative-from-project)
+            )
 
-  ;; (use-package doom-modeline
-  ;; 	:ensure t
-  ;; 	:defer t
-  ;; 	:custom
-  ;; 	(doom-modeline-modal-icon nil)
-  ;; 	(doom-modeline-buffer-file-name-style 'relative-from-project)
-  ;; 	:hook
-  ;; 	(after-init . doom-modeline-mode)
-  ;; 	(doom-modeline-mode . display-battery-mode))
+          ;; (use-package doom-modeline
+          ;; 	:ensure t
+          ;; 	:defer t
+          ;; 	:custom
+          ;; 	(doom-modeline-modal-icon nil)
+          ;; 	(doom-modeline-buffer-file-name-style 'relative-from-project)
+          ;; 	:hook
+          ;; 	(after-init . doom-modeline-mode)
+          ;; 	(doom-modeline-mode . display-battery-mode))
 
 #+end_src
 
 #+RESULTS:
-| display-battery-mode | doom-modeline-override-time | doom-modeline-override-battery | doom-modeline-override-rcirc | doom-modeline-override-mu4e-alert | doom-modeline-override-eglot |
+| doom-modeline-mode | (closure (t) nil (dashboard-insert-startupify-lists)) | org-roam-ui-mode | org-persist-load-all | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
 
 ** Elfeed (RSS)
 #+begin_src emacs-lisp
@@ -2014,7 +1974,7 @@ BUG BUG BUG
             ;;("https://www.reddit.com/r/programming.rss" programming)
             ("https://www.reddit.com/r/emacs.rss" emacs)
             ("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
-            ("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
+            ;; ("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
             ("https://habr.com/ru/rss/news/?fl=ru" habr-news)
             ("https://nuancesprog.ru/feed" nop)
             ("https://dev.to/feed" dev-to)
@@ -2022,8 +1982,8 @@ BUG BUG BUG
             ;; hobby
             ("https://www.reddit.com/r/nasa.rss" nasa)
             ("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
-            ("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
-            ("https://dev.to/feed/tell396" tell396)
+            ;; ("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
+            ("https://nplus1.ru/rss" np1)
 
             ;; programming languages
             ("https://www.reddit.com/r/javascript.rss" javascript)
@@ -2032,7 +1992,7 @@ BUG BUG BUG
             ("https://www.reddit.com/r/rust.rss" rust)
 
             ;; Books
-            ("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
+            ;; ("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
 
             ;; cloud
             ;;("https://www.reddit.com/r/aws.rss" aws)
@@ -2339,101 +2299,101 @@ Show vertical lines to guide indentation
 
 ** Treemacs
 #+begin_src emacs-lisp
-	(use-package treemacs
-		:ensure t
-		:defer t
-		:init
-		(with-eval-after-load 'winum
-			(define-key winum-keymap (kbd "M-0") 'treemacs-select-window))
-		:config
-		(progn
-			(setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
-						treemacs-deferred-git-apply-delay        0.5
-						treemacs-directory-name-transformer      #'identity
-						treemacs-display-in-side-window          t
-						treemacs-eldoc-display                   'simple
-						treemacs-file-event-delay                2000
-						treemacs-file-extension-regex            treemacs-last-period-regex-value
-						treemacs-file-follow-delay               0.2
-						treemacs-file-name-transformer           #'identity
-						treemacs-follow-after-init               t
-						treemacs-expand-after-init               t
-						treemacs-find-workspace-method           'find-for-file-or-pick-first
-						treemacs-git-command-pipe                ""
-						treemacs-goto-tag-strategy               'refetch-index
-						treemacs-header-scroll-indicators        '(nil . "^^^^^^")
-						treemacs-hide-dot-git-directory          t
-						treemacs-indentation                     2
-						treemacs-indentation-string              " "
-						treemacs-is-never-other-window           nil
-						treemacs-max-git-entries                 5000
-						treemacs-missing-project-action          'ask
-						treemacs-move-forward-on-expand          nil
-						treemacs-no-png-images                   nil
-						treemacs-no-delete-other-windows         t
-						treemacs-project-follow-cleanup          nil
-						treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-						treemacs-position                        'left
-						treemacs-read-string-input               'from-child-frame
-						treemacs-recenter-distance               0.1
-						treemacs-recenter-after-file-follow      nil
-						treemacs-recenter-after-tag-follow       nil
-						treemacs-recenter-after-project-jump     'always
-						treemacs-recenter-after-project-expand   'on-distance
-						treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
-						treemacs-show-cursor                     nil
-						treemacs-show-hidden-files               t
-						treemacs-silent-filewatch                nil
-						treemacs-silent-refresh                  nil
-						treemacs-sorting                         'alphabetic-asc
-						treemacs-select-when-already-in-treemacs 'move-back
-						treemacs-space-between-root-nodes        t
-						treemacs-tag-follow-cleanup              t
-						treemacs-tag-follow-delay                1.5
-						treemacs-text-scale                      nil
-						treemacs-user-mode-line-format           nil
-						treemacs-user-header-line-format         nil
-						treemacs-wide-toggle-width               70
-						treemacs-width                           35
-						treemacs-width-increment                 1
-						treemacs-width-is-initially-locked       t
-						treemacs-workspace-switch-cleanup        nil)
+  (use-package treemacs
+    :ensure t
+    :defer t
+    :init
+    (with-eval-after-load 'winum
+      (define-key winum-keymap (kbd "M-0") 'treemacs-select-window))
+    :config
+    (progn
+      (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+            treemacs-deferred-git-apply-delay        0.5
+            treemacs-directory-name-transformer      #'identity
+            treemacs-display-in-side-window          t
+            treemacs-eldoc-display                   'simple
+            treemacs-file-event-delay                2000
+            treemacs-file-extension-regex            treemacs-last-period-regex-value
+            treemacs-file-follow-delay               0.2
+            treemacs-file-name-transformer           #'identity
+            treemacs-follow-after-init               t
+            treemacs-expand-after-init               t
+            treemacs-find-workspace-method           'find-for-file-or-pick-first
+            treemacs-git-command-pipe                ""
+            treemacs-goto-tag-strategy               'refetch-index
+            treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+            treemacs-hide-dot-git-directory          t
+            treemacs-indentation                     2
+            treemacs-indentation-string              " "
+            treemacs-is-never-other-window           nil
+            treemacs-max-git-entries                 5000
+            treemacs-missing-project-action          'ask
+            treemacs-move-forward-on-expand          nil
+            treemacs-no-png-images                   nil
+            treemacs-no-delete-other-windows         t
+            treemacs-project-follow-cleanup          nil
+            treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+            treemacs-position                        'left
+            treemacs-read-string-input               'from-child-frame
+            treemacs-recenter-distance               0.1
+            treemacs-recenter-after-file-follow      nil
+            treemacs-recenter-after-tag-follow       nil
+            treemacs-recenter-after-project-jump     'always
+            treemacs-recenter-after-project-expand   'on-distance
+            treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+            treemacs-show-cursor                     nil
+            treemacs-show-hidden-files               t
+            treemacs-silent-filewatch                nil
+            treemacs-silent-refresh                  nil
+            treemacs-sorting                         'alphabetic-asc
+            treemacs-select-when-already-in-treemacs 'move-back
+            treemacs-space-between-root-nodes        t
+            treemacs-tag-follow-cleanup              t
+            treemacs-tag-follow-delay                1.5
+            treemacs-text-scale                      nil
+            treemacs-user-mode-line-format           nil
+            treemacs-user-header-line-format         nil
+            treemacs-wide-toggle-width               70
+            treemacs-width                           35
+            treemacs-width-increment                 1
+            treemacs-width-is-initially-locked       t
+            treemacs-workspace-switch-cleanup        nil)
 
-			;; The default width and height of the icons is 22 pixels. If you are
-			;; using a Hi-DPI display, uncomment this to double the icon size.
-			;; (treemacs-resize-icons 48)
+      ;; The default width and height of the icons is 22 pixels. If you are
+      ;; using a Hi-DPI display, uncomment this to double the icon size.
+      ;; (treemacs-resize-icons 48)
 
-			(treemacs-follow-mode t)
-			(treemacs-filewatch-mode t)
-			(treemacs-fringe-indicator-mode 'always)
-			(when treemacs-python-executable
-				(treemacs-git-commit-diff-mode t))
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (treemacs-fringe-indicator-mode 'always)
+      (when treemacs-python-executable
+        (treemacs-git-commit-diff-mode t))
 
-			(pcase (cons (not (null (executable-find "git")))
-									 (not (null treemacs-python-executable)))
-				(`(t . t)
-				 (treemacs-git-mode 'deferred))
-				(`(t . _)
-				 (treemacs-git-mode 'simple)))
+      (pcase (cons (not (null (executable-find "git")))
+                   (not (null treemacs-python-executable)))
+        (`(t . t)
+         (treemacs-git-mode 'deferred))
+        (`(t . _)
+         (treemacs-git-mode 'simple)))
 
-			(treemacs-hide-gitignored-files-mode nil))
-		:bind
-		(:map global-map
-					("M-0"       . treemacs-select-window)
-					("C-x t 1"   . treemacs-delete-other-windows)
-					("C-x t t"   . treemacs)
-					("C-x t d"   . treemacs-select-directory)
-					("C-x t B"   . treemacs-bookmark)
-					("C-x t C-t" . treemacs-find-file)
-					("C-x t M-t" . treemacs-find-tag)))
+      (treemacs-hide-gitignored-files-mode nil))
+    :bind
+    (:map global-map
+          ("M-0"       . treemacs-select-window)
+          ("C-x t 1"   . treemacs-delete-other-windows)
+          ("C-x t t"   . treemacs)
+          ("C-x t d"   . treemacs-select-directory)
+          ("C-x t B"   . treemacs-bookmark)
+          ("C-x t C-t" . treemacs-find-file)
+          ("C-x t M-t" . treemacs-find-tag)))
 
-	(use-package treemacs-all-the-icons
-		:ensure t)
-	;; (treemacs-load-theme "all-the-icons")
+  (use-package treemacs-all-the-icons
+    :ensure t)
+  ;; (treemacs-load-theme "all-the-icons")
 
-	(use-package treemacs-evil
-		:after (treemacs evil)
-		:ensure t)
+  (use-package treemacs-evil
+    :after (treemacs evil)
+    :ensure t)
 #+end_src
 
 ** Which key
@@ -3073,6 +3033,12 @@ Show vertical lines to guide indentation
 *** Rust
 [[https://rust-analyzer.github.io/manual.html#installation#Emacs][*Quick start with rust-analyzer*]]
 
+#+begin_src rust
+  (add-hook 'rust-mode-hook 'lsp-deferred)
+#+end_src
+
+#+RESULTS:
+
 #+begin_src bash
 	cargo install rustfmt
 	cargo install racer
@@ -3111,20 +3077,30 @@ Show vertical lines to guide indentation
 
 ** Flycheck
 #+begin_src emacs-lisp
-	(use-package flycheck
-		:ensure t
-		:hook (prog-mode . flycheck-mode)
-		:diminish
-		:custom
-		(flycheck-indication-mode 'left-fringe)
-		(flycheck-display-errors-delay 0.2)
-		(flycheck-check-syntax-automatically '(save idle-change))
-		(flycheck-idle-change-delay 2))
+        (use-package flycheck
+          :ensure t
+          :hook (prog-mode . flycheck-mode)
+          :diminish
+          :custom
+          (flycheck-indication-mode 'left-fringe)
+          (flycheck-display-errors-delay 0.2)
+          (flycheck-check-syntax-automatically '(save idle-change))
+          (flycheck-idle-change-delay 2))
 
-	(use-package flycheck-inline
-		:ensure t
-		:hook (flycheck-mode . turn-on-flycheck-inline))
+        (use-package flycheck-inline
+          :ensure t
+          :hook (flycheck-mode . turn-on-flycheck-inline))
+
+        (use-package flycheck-rust
+      :ensure t
+    :config
+  (with-eval-after-load 'rust-mode
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 #+end_src
+
+#+RESULTS:
+: t
+
 ** Tree Sitter
 #+begin_src emacs-lisp
   (use-package tree-sitter
