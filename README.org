@@ -66,7 +66,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
   (setq ad-redefinition-action            'accept
         default-buffer-file-coding-system 'utf-8
-        ;; blink-cursor-interval             0.6       ;; Little slower cursor blinking . default is 0.5
+        blink-cursor-interval             0.7       ;; Little slower cursor blinking . default is 0.5
         create-lockfiles                  nil
         idle-update-delay                 1.2    ;; Speed things up by not updating so often
         read-process-output-max           (* 8 1024 1024)
@@ -222,21 +222,21 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting font face
 ** Setting fonts
 #+begin_src emacs-lisp
-  (set-face-attribute 'default t
-                      :font "Iosevka" ;; Iosevka, Input, Hack
-                      :height 90
-                      :weight 'regular
-                      )
-  (set-face-attribute 'variable-pitch nil
-                      :font "Iosevka"
-                      :height 90
-                      :weight 'medium
-                      )
-  (set-face-attribute 'fixed-pitch nil
-                      :font "Iosevka"
-                      :height 90
-                      :weight 'medium
-                      )
+  ;; (set-face-attribute 'default t
+  ;;                     :font "Hack" ;; Iosevka, Input, Hack
+  ;;                     :height 90
+  ;;                     :weight 'regular
+  ;;                     )
+  ;; (set-face-attribute 'variable-pitch nil
+  ;;                     :font "Hack"
+  ;;                     :height 90
+  ;;                     :weight 'medium
+  ;;                     )
+  ;; (set-face-attribute 'fixed-pitch nil
+  ;;                     :font "Hack"
+  ;;                     :height 90
+  ;;                     :weight 'medium
+  ;;                     )
 
   ;; (set-frame-font "JetBrains Mono" nil t)
 
@@ -244,20 +244,20 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   ;; This is working in emacsclient but not emacs.
   ;; Your font must have an italic face available.
   (set-face-attribute 'font-lock-comment-face nil
-                      :slant 'italic)
+		      :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil
-                      :slant 'italic)
+		      :slant 'italic)
 
 
   ;; Uncomment the following line if line spacing needs adjusting.
   (setq-default line-spacing 0.12)
 
   ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-  (add-to-list 'default-frame-alist '(font . "Iosevka 12"))
+  (add-to-list 'default-frame-alist '(font . "Hack 12"))
   (add-to-list 'default-frame-alist
-               '(font . "DejaVu Sans Mono-11"))
+	       '(font . "DejaVu Sans Mono-11"))
 
-  (add-to-list 'default-frame-alist '(font . "Iosevka"))
+  (add-to-list 'default-frame-alist '(font . "Hack"))
   ;; changes certain keywords to symbols, such as lamda!
   (setq global-prettify-symbols-mode t)
 #+end_src
@@ -266,7 +266,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 : t
 
 ** Setting and installing themes
-#+begin_src emacs-lisp
+#+begin_src example
   ;; (use-package 'gruvbox-theme
   ;; 	:ensure t)
 
@@ -287,10 +287,14 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     ;; Corrects (and improves) org-mode's native fontification.
     (doom-themes-org-config)
     )
+
+
+  ;; (load-theme 'atom-one-dark t)
+  (load-theme 'doom-monokai-classic t)
 	#+end_src
 
 ** Change theme by time
-#+begin_src emacs-lisp :lexical no
+#+begin_src example :lexical no
   (use-package theme-changer
     :ensure t
     :config
@@ -301,7 +305,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   (change-theme 'gruvbox-light-medium 'gruvbox-dark-soft)
 #+end_src
 
-* Setting Packages
+* Setting packages
 ** Org
 *** Org-mode 
 **** Setting Org
@@ -322,26 +326,22 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 
     ;; Setup fonts for org-mode
-    (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
-    (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-    (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-    (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-    (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
+    ;; (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
+    ;; (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+    ;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+    ;; (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+    ;; (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+    ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    ;; (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+    ;; (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+    ;; (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
 
     (add-hook 'org-babel-after-execute-hook (lambda ()
                                               (when org-inline-image-overlays
                                                 (org-redisplay-inline-images))))
 
-    ;; (add-to-list 'org-structure-template-alist
-    ;;              '("sh" . "src shell")
-    ;;               ("elisp" . "src example")
-    ;;               ("swift" . "src swift"))
     (add-to-list 'org-modules 'org-tempo t))
 
   (setq org-display-remote-inline-images t)
@@ -353,7 +353,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 **** Custom emphasis list
 #+begin_src emacs-lisp :lexical no
   (add-to-list 'org-emphasis-alist
-               '("^" (:foreground "red")
+               '("[" (:foreground "red")
                  ))
 #+end_src
 
@@ -366,7 +366,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 | + | (:strike-through t) |          |
 
 **** Some replaces
-#+begin_src example :lexical no
+#+begin_src emacs-lisp :lexical no
 	;;; replace-org-char
 	;; Replace list hyphen with dot
 	(font-lock-add-keywords 'org-mode
@@ -417,7 +417,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
                   (org-level-8 . 1.1)))
     (set-face-attribute (car face) nil :font "JetBrains Mono")) ;;  :weight 'medium :height (cdr face)
 #+end_src
-**** Beautify quotes
+**** Beautiful quotes
 #+begin_src emacs-lisp :lexical no
 (defun org-quote-beautify ()
   "Beautify quotes in org-mode."
@@ -491,41 +491,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     (add-hook 'hack-local-variables-hook
               (lambda () (setq org-enable-table-editor nil)  )))
 #+end_src
-**** HTML table from buffer to org-mode table
-#+begin_src emacs-lisp :lexical no
-  (defun chunyang-yank-html ()
-    "Yank HTML from clipboard as Org or Markdown code."
-    (interactive)
-    (let* ((result
-            (condition-case err
-                ;; hex-encoded string:
-                ;;           < m e t a ......>
-                ;; «data HTML3C6D657461......3E»
-                (do-applescript "the clipboard as «class HTML»")
-              (error
-               ;; assume it's user's fault
-               (user-error "Can't get HTML data from the clipboard: %s"
-                           (error-message-string err)))))
-           (data (substring result 10 -1))
-           (html (with-temp-buffer
-                   (set-buffer-multibyte nil)
-                   (let* ((i 0))
-                     (while (> (length data) (+ 2 i))
-                       (insert (string-to-number (substring data i (+ 2 i)) 16))
-                       (cl-incf i 2)))
-                   (decode-coding-region (point-min) (point-max) 'utf-8 t)))
-           (target (cond ((derived-mode-p 'org-mode) "org")
-                         ;; the official Markdown doesn't support table?
-                         (t "gfm"))))
-      (insert
-       (with-temp-buffer
-         (if (zerop (call-process-region html nil "pandoc" nil t nil
-                                         ;; https://stackoverflow.com/a/35812743/2999892
-                                         "-f" "html-native_divs-native_spans"
-                                         "-t" target))
-             (buffer-string)
-           (error "pandoc failed: %s" (buffer-string)))))))
-#+end_src
 **** Org bullets
 #+begin_src emacs-lisp
   ;; (use-package org-superstar
@@ -576,19 +541,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   (use-package org-alert
     :ensure t)
 #+end_src
-**** Insert images from url
-#+BEGIN_SRC emacs-lisp
-	(org-add-link-type
-	 "image-url"
-	 (lambda (path)
-		 (let ((img (expand-file-name
-								 (concat (md5 path) "." (file-name-extension path))
-								 temporary-file-directory)))
-			 (if (file-exists-p img)
-					 (find-file img)
-				 (url-copy-file path img)
-				 (find-file img)))))
-#+END_SRC
 **** Org babel
 #+begin_src emacs-lisp
   (use-package ob-typescript
@@ -613,19 +565,18 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 #+RESULTS:
 
-**** Prettify symbols
+**** Beautiful Org Checkbox Symbol
 #+begin_src emacs-lisp
-          ;; Beautiful Org Checkbox Symbol
   (add-hook 'org-mode-hook (lambda ()
      "Beautify Org Checkbox Symbol"
      (push '("[ ]" .  "☐") prettify-symbols-alist)
      (push '("[X]" . "☑" ) prettify-symbols-alist)
      (push '("[-]" . "❍" ) prettify-symbols-alist)
      (prettify-symbols-mode)))
-    
-        ;; (defface org-checkbox-done-text
-        ;;   '((t (:foreground "#71696A" :strike-through t)))
-        ;;   "Face for the text part of a checked org-mode checkbox.")
+
+        (defface org-checkbox-done-text
+          '((t (:foreground "#71696A" :strike-through t)))
+          "Face for the text part of a checked org-mode checkbox.")
 
         ;; (font-lock-add-keywords
         ;;  'org-mode
@@ -635,67 +586,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   #+end_src
 
   #+RESULTS:
-
-#+begin_src example :lexical no
-  (use-package org-fancy-priorities
-    :diminish
-    :ensure t
-    :hook (org-mode . org-fancy-priorities-mode)
-    :config
-    (setq org-fancy-priorities-list '((?A . "❗")
-                                  (?B . "⬆")
-                                  (?C . "⬇")
-                                  (?D . "☕")
-                                  (?1 . "⚡")
-                                  (?2 . "⮬")
-                                  (?3 . "⮮")
-                                  (?4 . "☕")
-                                  (?I . "Important"))))
-  #+end_src
-
-**** Inline images from URL
-#+begin_src emacs-lisp :lexical no
-  (org-add-link-type
-   "image-url"
-   (lambda (path)
-     (let ((img (expand-file-name
-                 (concat (md5 path) "." (file-name-extension path))
-                 temporary-file-directory)))
-       (if (file-exists-p img)
-           (find-file img)
-         (url-copy-file path img)
-         (find-file img)))))
-
-  ;; (defun image-url-overlays ()
-  ;;   "Put image overlays on remote image urls."
-  ;;   (interactive)
-  ;;   (loop for image-url in (org-element-map (org-element-parse-buffer) 'link
-  ;;                            (lambda (link)
-  ;;                              (when (string= "image-url" (org-element-property :type link))
-  ;;                                link)))
-  ;;         do
-  ;;         (let* ((path (org-element-property :path image-url))
-  ;;                (ov (make-overlay (org-element-property :begin image-url)
-  ;;                                  (org-element-property :end image-url)))
-  ;;                (img (create-image (expand-file-name
-  ;;                                    (concat (md5 path)
-  ;;                                            "."
-  ;;                                            (file-name-extension
-  ;;                                             path))
-  ;;                                    temporary-file-directory))))
-  ;;           (overlay-put ov 'display img)
-  ;;           (overlay-put ov 'image-url t))))
-
-  ;; (defun image-url-clear-overlays ()
-  ;;   "Reove overlays on image-urls."
-  ;;   (interactive)
-  ;;   (require 'ov)
-  ;;   (ov-clear 'image-url))
-#+end_src
-
-#+RESULTS:
-: image-url-clear-overlays
-
+  : org-checkbox-done-text
 *** Org-roam
 **** Org-roam
 #+begin_src emacs-lisp
@@ -748,17 +639,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 #+RESULTS:
 : completion-at-point
-
-***** Configuring org-roam buffer display
-#+begin_src example
-  (add-to-list 'display-buffer-alist
-               '(;; Left side window
-                 (".org-roam.*"
-                  (display-buffer-in-side-window)
-                  (window-width . 0.25)
-                  (side . left)
-                  (slot . 0))))
-#+end_src
 
 ***** Build your Org agenda from Org Roam notes (disabled)
 #+begin_src example :lexical no
@@ -1435,11 +1315,6 @@ Deps for org-roam-bibtex:
 #+RESULTS:
 : hydra-pdftools/body
 
-**** org-pdftools (bookmarks for pdf-tools)
-#+begin_src example
-	(use-package org-pdftools
-		:ensure t)
-#+end_src
 **** saveplace-view
 #+begin_src emacs-lisp
   (use-package saveplace-pdf-view :ensure t)
@@ -1474,37 +1349,6 @@ For more information: https://depp.brause.cc/nov.el/
     :config
     (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
     (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
-#+end_src
-*** justify-kp (for epub)
-#+begin_src example
-	;; Here's an advanced example of text justification with the justify-kp package
-	(use-package justify-kp
-		:ensure nil
-		:load-path "~/.emacs.d/local-packages/justify-kp.el"
-		:config
-		(setq nov-text-width t)
-		(defun my-nov-window-configuration-change-hook ()
-			(my-nov-post-html-render-hook)
-			(remove-hook 'window-configuration-change-hook
-									 'my-nov-window-configuration-change-hook
-									 t))
-		(defun my-nov-post-html-render-hook ()
-			(if (get-buffer-window)
-					(let ((max-width (pj-line-width))
-								buffer-read-only)
-						(save-excursion
-							(goto-char (point-min))
-							(while (not (eobp))
-								(when (not (looking-at "^[[:space:]]*$"))
-									(goto-char (line-end-position))
-									(when (> (shr-pixel-column) max-width)
-										(goto-char (line-beginning-position))
-										(pj-justify)))
-								(forward-line 1))))
-				(add-hook 'window-configuration-change-hook
-									'my-nov-window-configuration-change-hook
-									nil t))))
-
 #+end_src
 *** Calibre (books management)
 #+begin_src emacs-lisp
@@ -1731,56 +1575,6 @@ For more information: https://depp.brause.cc/nov.el/
 		;; 	(image-dired-thumb-margin 5)) ; Set margin for image thumbnails in Image Dired mode
 		)
 #+end_src
-*** Dired subtree
-#+begin_src example
-  (use-package dired-subtree
-    :ensure t
-    :after dired
-    :config
-    (define-key dired-mode-map (kbd "<tab>") 'dired-subtree-toggle))
-#+end_src
-**** File Operations
-***** Marking files
-
-- =m= - Marks a file
-- =u= - Unmarks a file
-- =U= - Unmarks all files in buffer
-- =* t= / =t= - Inverts marked files in buffer
-- =% m= - Mark files in buffer using regular expression
-- =*= - Lots of other auto-marking functions
-- =k= / =K= - "Kill" marked items (refresh buffer with =g= / =g r= to get them back)
-- Many operations can be done on a single file if there are no active marks!
-
-***** Copying and Renaming files
-
-- =C= - Copy marked files (or if no files are marked, the current file)
-- Copying single and multiple files
-- =U= - Unmark all files in buffer
-- =R= - Rename marked files, renaming multiple is a move!
-- =% R= - Rename based on regular expression: =^test= , =old-\&=
-
-***** Deleting files
-
-- =D= - Delete marked file
-- =d= - Mark file for deletion
-- =x= - Execute deletion for marks
-- =delete-by-moving-to-trash= - Move to trash instead of deleting permanently
-
-***** Creating and extracting archives
-
-- =Z= - Compress or uncompress a file or folder to (=.tar.gz=)
-- =c= - Compress selection to a specific file
-- =dired-compress-files-alist= - Bind compression commands to file extension
-
-***** Other common operations
-
-- =T= - Touch (change timestamp)
-- =M= - Change file mode
-- =O= - Change file owner
-- =G= - Change file group
-- =S= - Create a symbolic link to this file
-- =L= - Load an Emacs Lisp file into Emacs
-	
 *** Single Dired buffer
 
 Closed Dired buffers are just buried!  They need to be refreshed if you go back to them.
@@ -2326,7 +2120,7 @@ BUG BUG BUG
     :ensure t)
 #+end_src
 
-** Terminals (vterm, multi-vterm, term, multi-term)
+** Terminal (vterm, multi-vterm)
 *** vterm + multi-vterm
 #+begin_src emacs-lisp
 	(use-package vterm
@@ -2337,15 +2131,6 @@ BUG BUG BUG
 		:bind
 		("C-x q" . vterm-clear)
 		("C-x w" . multi-vterm))
-#+end_src
-*** term + multi-term (disabled)
-#+begin_src example
-	(use-package multi-term
-		:ensure t
-		:bind
-		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
-		("C-x v" . multi-term)) ;; Open default multi-term without automate spliting
-	)
 #+end_src
 
 
@@ -2528,10 +2313,44 @@ Show vertical lines to guide indentation
 
 ** Setting Company
 #+begin_src emacs-lisp
+  (use-package company
+  :ensure t
+  :hook (after-init . global-company-mode)
+  :config
+  (setq company-idle-delay 0
+        company-minimum-prefix-length 1
+        company-tooltip-limit 10
+        company-show-numbers t
+        company-dabbrev-downcase nil
+        company-dabbrev-ignore-case nil
+        company-require-match nil
+        company-global-modes '(not erc-mode message-mode help-mode)
+        company-transformers '(company-sort-by-occurrence))
+  
+  ;; Enable company mode in specific modes
+  (add-hook 'rust-mode-hook #'company-mode)
+  (add-hook 'go-mode-hook #'company-mode)
+  (add-hook 'typescript-mode-hook #'company-mode)
+  (add-hook 'js-mode-hook #'company-mode)
+  (add-hook 'rjsx-mode-hook #'company-mode)
+
+  ;; Set up company backends for each major mode
+  (setq company-backends-rust '((company-capf company-files)))
+  (setq company-backends-go '((company-capf company-files)))
+  (setq company-backends-typescript '((company-tide company-files)))
+  (setq company-backends-js '((company-tide company-files)))
+  (setq company-backends-react '((company-tide company-files)))
+  
+  ;; Set keybindings for company
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous)
+  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+  (define-key company-active-map (kbd "RET") 'company-complete-selection))
 #+end_src
 
 #+RESULTS:
-: 1
+| global-company-mode | doom-modeline-mode | (closure (t) nil (dashboard-insert-startupify-lists)) | org-roam-ui-mode | org-persist-load-all | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
 
 ** BibTeX company
 #+begin_src emacs-lisp :lexical no
@@ -2925,308 +2744,6 @@ Make gc pauses faster by decreasing the threshold.
 ** Don't compress the font cache
 #+begin_src emacs-lisp
 	(setq inhibit-compacting-font-caches t)
-#+end_src
-
-* dmenu
-#+begin_src example
-	(use-package dmenu
-		:ensure t)
-
-	(global-set-key (kbd "s-d") 'dmenu)
-#+end_src
-
-#+RESULTS:
-: dmenu
-
-* EXWM
-** EXWM complete config
-Code has been copied from https://github.com/ch11ng/exwm/blob/master/exwm-config.el, changing the names so they can not collide with exwm proper. The code has then been modified, mainly with settings from the ambrevar configuration.
-A hook function that executes xmodmap is defined and added to exwm-manage-finish-hook.
-browse-url-generic-program is redefined to use google-chrome, if not overridden by the “BROWSER” environment variable, or it is defined via xdg-mime.
-EXWM buffer names are changed to be much more human readable. For example, the buffer for a google-chrome window, will get its name from the title of the currently selected tab in that window.
-The EXWM keybindings are all defined as one element sequences. This is required, except for some special cases such as “C-c C-q”. To avoid collisions with other emacs keybindings the exwm-input-global-keys use the “Super” modifier key, and the simulation keys use the “Hyper” modifier key.
-
-The key bindings under
-;; ‘S-s-N’: Move window to, and switch to, a certain workspace.
-are keyboard layout specific. The provided configuration is for an ascii keyboard.
-To support a mode-line indicator for EXWM “line-mode”/”char-mode” a hook is set to force a redisplay of the current buffers mode line.
-Support for resizing windows, using the mouse. Position the mouse on the divider line between two windows, the mouse pointer should then change to a double arrow. Press the left mouse button, and move the mouse.
-
-#+begin_src example
-  (require 'ido)
-  (use-package windower
-    :ensure t)
-  (require 'browse-url)
-  ;; (require 'exwm-manage)
-
-  (defun ambrevar/call-process-to-string (program &rest args)
-    "Call PROGRAM with ARGS and return output.
-  See also `process-lines'."
-    ;; Or equivalently:
-    ;; (with-temp-buffer
-    ;;   (apply 'process-file program nil t nil args)
-    ;;   (buffer-string))
-    (with-output-to-string
-      (with-current-buffer standard-output
-        (apply 'process-file program nil t nil args))))
-
-  (defun jw/xmodmap ()
-    "Execute xmodmap"
-    (progn
-      ;; (remove-hook 'exwm-manage-finish-hook 'jw/xmodmap)
-      (ambrevar/call-process-to-string "/home/chopin/set_xmodmap.sh")))
-
-  (setq browse-url-generic-program
-        (or
-         (executable-find (or (getenv "BROWSER") ""))
-         (when (executable-find "xdg-mime")
-           (let ((desktop-browser (ambrevar/call-process-to-string "xdg-mime" "query" "default" "text/html")))
-             (substring desktop-browser 0 (string-match "\\.desktop" desktop-browser))))
-         (executable-find browse-url-chrome-program)))
-
-  (defun my-exwm-config-setup ()
-    "My modified configuration for EXWM. Based on exwm-config.el"
-    ;; Set the initial workspace number.
-    (unless (get 'exwm-workspace-number 'saved-value)
-      (setq exwm-workspace-number 4))
-    ;; Make class name the buffer name
-    (add-hook 'exwm-update-class-hook
-              (lambda ()
-                (exwm-workspace-rename-buffer exwm-class-name)))
-    ;; Global keybindings. 0-9 bcDfFgGhHijJkKlLmoOQrRwW !@#$%^&*() tab f2 backspace
-    (unless (get 'exwm-input-global-keys 'saved-value)
-      (setq exwm-input-global-keys
-            `(
-              ;; (,(kbd "s-b") . exwm-workspace-switch-to-buffer)
-              (,(kbd "s-b") . helm-mini) ;; list and select buffers
-              (,(kbd "s-c") . helm-resume) ;; Continue in latest helm selection buffer
-              (,(kbd "s-G") . helm-locate) ;; locate file, based in Linux locate command
-              ;; (,(kbd "s-g") . mu-helm-file-search) ;; Grep search in files, see https://www.manueluberti.eu/emacs/2020/02/22/ripgrepping-with-helm/
-              ;; (,(kbd "s-g") . ambrevar/helm-grep-git-or-ag) ;; Grep search in files, see https://gitlab.com/ambrevar/dotfiles/-/blob/master/.emacs.d/lisp/init-helm.el
-              (,(kbd "s-g") . helm-do-grep-ag) ;; Grep search in files
-              (,(kbd "s-r") . helm-run-external-command) ;; Start an application, such as google-chrome
-              (,(kbd "s-W") . helm-exwm-switch-browser) ;; Switch to some browser windows
-              (,(kbd "s-m") . (lambda () ;; Toggle display of mode-line and minibuffer, in an EXWM window
-                                (interactive)
-                                (exwm-layout-toggle-mode-line)
-                                (exwm-workspace-toggle-minibuffer)))
-              (,(kbd "s-i") . exwm-input-toggle-keyboard) ;; Toggle between "line-mode" and "char-mode" in an EXWM window
-              ;; 's-r': Reset (to line-mode).
-              (,(kbd "s-R") . exwm-reset) ;; Try to reset EXWM to a sane mode. Panic key
-              ;; Interactively select, and switch to, a workspace. Only works in non EXWM windows.
-              (,(kbd "s-w") . exwm-workspace-switch)
-              ;; 's-a': Launch application.
-              ;; (,(kbd "s-a") . (lambda (command)
-              ;;              (interactive (list (read-shell-command "$ ")))
-              ;;              (start-process-shell-command command nil command)))
-              ;; 's-N': Switch to a certain workspace.
-              ,@(mapcar (lambda (i)
-                          `(,(kbd (format "s-%d" i)) .
-                            (lambda ()
-                              (interactive)
-                              (exwm-workspace-switch-create ,i))))
-                        (number-sequence 0 9))
-              ;; 'S-s-N': Move window to, and switch to, a certain workspace.
-              ,@(cl-mapcar (lambda (c n)
-                             `(,(kbd (format "s-%c" c)) .
-                               (lambda ()
-                                 (interactive)
-                                 (exwm-workspace-move-window ,n)
-                                 (exwm-workspace-switch ,n))))
-                           '(?\) ?! ?@ ?# ?$ ?% ?^ ?& ?* ?\()
-                           ;; '(?\= ?! ?\" ?# ?¤ ?% ?& ?/ ?\( ?\))
-                           (number-sequence 0 9))
-
-              ;; Bind "s-<f2>" to "slock", a simple X display locker.
-              (,(kbd "s-<f2>") . (lambda ()
-                                   (interactive)
-                                   (start-process "" nil "/usr/bin/slock")))
-              (,(kbd "s-h") . windmove-left)  ;; Move to window to the left of current one. Uses universal arg
-              (,(kbd "s-j") . windmove-down)  ;; Move to window below current one. Uses universal arg
-              (,(kbd "s-k") . windmove-up)    ;; Move to window above current one. Uses universal arg
-              (,(kbd "s-l") . windmove-right) ;; Move to window to the right of current one. Uses universal arg
-              ;; (,(kbd "s-f") . find-file)
-              (,(kbd "s-f") . helm-find-files)
-              (,(kbd "s-<tab>") . windower-switch-to-last-buffer) ;; Switch to last open buffer in current window
-              (,(kbd "s-o") . windower-toggle-single) ;; Toggle between multiple windows, and a single window
-              (,(kbd "s-O") . windower-toggle-split)  ;; Toggle between vertical and horizontal split. Only works with exactly two windows.
-              (,(kbd "s-H") . windower-swap-left)  ;; Swap current window with the window to the left
-              (,(kbd "s-J") . windower-swap-below) ;; Swap current window with the window below
-              (,(kbd "s-K") . windower-swap-above) ;; Swap current window with the window above
-              (,(kbd "s-L") . windower-swap-right) ;; Swap current window with the window to the right
-              (,(kbd "s-F") . exwm-floating-toggle-floating) ;; Toggle the current window between floating and non-floating states
-              (,(kbd "s-Q") . exwm-layout-toggle-fullscreen) ;; Toggle fullscreen mode, when in an EXWM window.
-              (,(kbd "s-D") . kill-this-buffer)
-              (,(kbd "s-<backspace>") . kill-this-buffer)
-              )))
-    ;; Line-editing shortcuts: abBcdefFknpqsvwx
-    (unless (get 'exwm-input-simulation-keys 'saved-value)
-      (setq exwm-input-simulation-keys
-            `((,(kbd "H-b") . ,(kbd "<left>"))
-              (,(kbd "H-B") . ,(kbd "C-<left>"))
-              (,(kbd "H-f") . ,(kbd "<right>"))
-              (,(kbd "H-F") . ,(kbd "C-<right>"))
-              (,(kbd "H-p") . ,(kbd "<up>"))
-              (,(kbd "H-n") . ,(kbd "<down>"))
-              (,(kbd "H-a") . ,(kbd "<home>"))
-              (,(kbd "H-e") . ,(kbd "<end>"))
-              ;; q and w are convenient if Caps Lock key is Hyper key
-              (,(kbd "H-q") . ,(kbd "<prior>"))
-              (,(kbd "H-w") . ,(kbd "<next>"))
-              (,(kbd "H-d") . ,(kbd "<delete>"))
-              (,(kbd "H-k") . ,(kbd "S-<end> <delete>"))
-              ;; cut/paste.
-              (,(kbd "H-x") . ,(kbd "C-x"))
-              (,(kbd "H-c") . ,(kbd "C-c"))
-              (,(kbd "H-v") . ,(kbd "C-v"))
-              ;; search
-              (,(kbd "H-s") . ,(kbd "C-f"))
-              )))
-    ;; Default is save-buffers-kill-terminal, but that may kill daemon before its finished
-    (global-set-key (kbd "C-x C-c") 'save-buffers-kill-emacs)
-    (add-hook 'exwm-update-title-hook 'ambrevar/exwm-rename-buffer-to-title)
-    ;; Ensure that EXWM input mode is displayed in mode line
-    (add-hook 'exwm-input--input-mode-change-hook
-              'force-mode-line-update)
-    ;; Called once, to configure X11 keyboard layout
-    ;; (add-hook 'exwm-manage-finish-hook
-    ;;           'jw/xmodmap t)
-    ;; Allow resizing of non-floating windows, with mouse.
-    (setq window-divider-default-bottom-width 2
-          window-divider-default-right-width 2)
-    (window-divider-mode)
-    ;; Allow switching to EXWM buffers not belonging to current workspace.
-    ;; This behaviour takes some getting used to, I guess thats why its not default
-    (setq exwm-layout-show-all-buffers t)
-    ;; Configure Ido
-    (my-exwm-config-ido)
-    ;; Other configurations
-    (my-exwm-config-misc))
-
-  ;; This is copied from exwm-config.el
-  (defun my-exwm-config--fix/ido-buffer-window-other-frame ()
-    "Fix `ido-buffer-window-other-frame'."
-    (defalias 'exwm-config-ido-buffer-window-other-frame
-      (symbol-function #'ido-buffer-window-other-frame))
-    (defun ido-buffer-window-other-frame (buffer)
-      "This is a version redefined by EXWM.
-
-  You can find the original one at `exwm-config-ido-buffer-window-other-frame'."
-      (with-current-buffer (window-buffer (selected-window))
-        (if (and (derived-mode-p 'exwm-mode)
-                 exwm--floating-frame)
-            ;; Switch from a floating frame.
-            (with-current-buffer buffer
-              (if (and (derived-mode-p 'exwm-mode)
-                       exwm--floating-frame
-                       (eq exwm--frame exwm-workspace--current))
-                  ;; Switch to another floating frame.
-                  (frame-root-window exwm--floating-frame)
-                ;; Do not switch if the buffer is not on the current workspace.
-                (or (get-buffer-window buffer exwm-workspace--current)
-                    (selected-window))))
-          (with-current-buffer buffer
-            (when (derived-mode-p 'exwm-mode)
-              (if (eq exwm--frame exwm-workspace--current)
-                  (when exwm--floating-frame
-                    ;; Switch to a floating frame on the current workspace.
-                    (frame-selected-window exwm--floating-frame))
-                ;; Do not switch to exwm-mode buffers on other workspace (which
-                ;; won't work unless `exwm-layout-show-all-buffers' is set)
-                (unless exwm-layout-show-all-buffers
-                  (selected-window)))))))))
-
-  (defun my-exwm-config-ido ()
-    "Configure Ido to work with EXWM."
-    ;; (ido-mode 1)
-    (add-hook 'exwm-init-hook #'my-exwm-config--fix/ido-buffer-window-other-frame))
-
-  (defun my-exwm-config-misc ()
-    "Other configurations."
-    ;; Make more room
-    (menu-bar-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1))
-
-  ;; Rename buffer to window title.
-  (defun ambrevar/exwm-rename-buffer-to-title () (exwm-workspace-rename-buffer exwm-title))
-
-  (my-exwm-config-setup) ;; Does not start X11 or EXWM. Start should be done from commandline.
-#+end_src
-
-#+RESULTS:
-
-** other exwm config
-#+begin_src example
-(defun efs/exwm-update-class ()
-    (exwm-workspace-rename-buffer exwm-class-name))
-
-  (use-package exwm
-    :config
-    ;; Set the default number of workspaces
-    (setq exwm-workspace-number 5)
-
-    ;; When window "class" updates, use it to set the buffer name
-    (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
-
-    ;; Rebind CapsLock to Ctrl
-    (start-process-shell-command "xmodmap" nil "xmodmap ~/.emacs.d/exwm/Xmodmap")
-
-    ;; Set the screen resolution (update this to be the correct resolution for your screen!)
-    (require 'exwm-randr)
-    (exwm-randr-enable)
-    ;; (start-process-shell-command "xrandr" nil "xrandr --output Virtual-1 --primary --mode 2048x1152 --pos 0x0 --rotate normal")
-
-    ;; Load the system tray before exwm-init
-    (require 'exwm-systemtray)
-    (exwm-systemtray-enable)
-
-    ;; These keys should always pass through to Emacs
-    (setq exwm-input-prefix-keys
-          '(?\C-x
-            ?\C-u
-            ?\C-h
-            ?\M-x
-            ?\M-`
-            ?\M-&
-            ?\M-:
-            ?\C-\M-j  ;; Buffer list
-            ?\C-\ ))  ;; Ctrl+Space
-
-    ;; Ctrl+Q will enable the next key to be sent directly
-    (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-
-    ;; Set up global key bindings.  These always work, no matter the input state!
-    ;; Keep in mind that changing this list after EXWM initializes has no effect.
-    (setq exwm-input-global-keys
-          `(
-            ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-            ([?\s-r] . exwm-reset)
-
-            ;; Move between windows
-            ([s-left] . windmove-left)
-            ([s-right] . windmove-right)
-            ([s-up] . windmove-up)
-            ([s-down] . windmove-down)
-
-            ;; Launch applications via shell command
-            ([?\s-&] . (lambda (command)
-                         (interactive (list (read-shell-command "$ ")))
-                         (start-process-shell-command command nil command)))
-
-            ;; Switch workspace
-            ([?\s-w] . exwm-workspace-switch)
-            ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
-
-            ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
-            ,@(mapcar (lambda (i)
-                        `(,(kbd (format "s-%d" i)) .
-                          (lambda ()
-                            (interactive)
-                            (exwm-workspace-switch-create ,i))))
-                      (number-sequence 0 9))))
-
-    (exwm-enable))
 #+end_src
 
 * eaf
