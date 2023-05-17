@@ -222,52 +222,44 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting font face
 ** Setting fonts
 #+begin_src emacs-lisp
-  ;; (set-face-attribute 'default t
-  ;;                     :font "JetBrains Mono" ;; Iosevka, Input, Hack
-  ;;                     :height 90
-  ;;                     :weight 'regular
-  ;;                     )
-  ;; (set-face-attribute 'variable-pitch nil
-  ;;                     :font "JetBrains Mono"
-  ;;                     :height 90
-  ;;                     :weight 'medium
-  ;;                     )
-  ;; (set-face-attribute 'fixed-pitch nil
-  ;;                     :font "JetBrains Mono"
-  ;;                     :height 90
-  ;;                     :weight 'medium
-  ;;                     )
+  (set-face-attribute 'default t
+                      :font "Iosevka" ;; Iosevka, Input, Hack
+                      :height 90
+                      :weight 'regular
+                      )
+  (set-face-attribute 'variable-pitch nil
+                      :font "Iosevka"
+                      :height 90
+                      :weight 'medium
+                      )
+  (set-face-attribute 'fixed-pitch nil
+                      :font "Iosevka"
+                      :height 90
+                      :weight 'medium
+                      )
 
-  ;; ;; (set-frame-font "JetBrains Mono" nil t)
+  ;; (set-frame-font "JetBrains Mono" nil t)
 
-  ;; ;; Makes commented text and keywords italics.
-  ;; ;; This is working in emacsclient but not emacs.
-  ;; ;; Your font must have an italic face available.
-  ;; (set-face-attribute 'font-lock-comment-face nil
-  ;;                     :slant 'italic)
-  ;; (set-face-attribute 'font-lock-keyword-face nil
-  ;;                     :slant 'italic)
+  ;; Makes commented text and keywords italics.
+  ;; This is working in emacsclient but not emacs.
+  ;; Your font must have an italic face available.
+  (set-face-attribute 'font-lock-comment-face nil
+                      :slant 'italic)
+  (set-face-attribute 'font-lock-keyword-face nil
+                      :slant 'italic)
 
 
   ;; Uncomment the following line if line spacing needs adjusting.
-  ;; (setq-default line-spacing 0.12)
+  (setq-default line-spacing 0.12)
 
   ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-  ;; (add-to-list 'default-frame-alist '(font . "JetBrains Mono 12"))
-  ;; (add-to-list 'default-frame-alist
-  ;;              '(font . "DejaVu Sans Mono-11"))
+  (add-to-list 'default-frame-alist '(font . "Iosevka 12"))
+  (add-to-list 'default-frame-alist
+               '(font . "DejaVu Sans Mono-11"))
 
-  (add-to-list 'default-frame-alist '(font . "Fira Code"))
+  (add-to-list 'default-frame-alist '(font . "Iosevka"))
   ;; changes certain keywords to symbols, such as lamda!
   (setq global-prettify-symbols-mode t)
-
-
-  ;; (add-hook 'org-mode-hook (lambda ()
-  ;; 													 "Beautify Org Checkbox Symbol"
-  ;; 													 (push '("[ ]" .  "☐") prettify-symbols-alist)
-  ;; 													 (push '("[X]" . "☑" ) prettify-symbols-alist)
-  ;; 													 (push '("[-]" . "❍" ) prettify-symbols-alist)
-  ;; 													 (prettify-symbols-mode)))
 #+end_src
 
 #+RESULTS:
@@ -428,21 +420,20 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 **** Custom emphasis list
 #+begin_src emacs-lisp :lexical no
   (add-to-list 'org-emphasis-alist
-               '("\" (:foreground "red")
+               '("^" (:foreground "red")
                  ))
 #+end_src
 
 #+RESULTS:
-|   |                     |          | (:foreground red) |
-| * | (:foreground red)   |          |                   |
-| * | bold                |          |                   |
-| _ | underline           |          |                   |
-| = | org-verbatim        | verbatim |                   |
-| ~ | org-code            | verbatim |                   |
-| + | (:strike-through t) |          |                   |
+| ^ | (:foreground red)   |          |
+| * | bold                |          |
+| _ | underline           |          |
+| = | org-verbatim        | verbatim |
+| ~ | org-code            | verbatim |
+| + | (:strike-through t) |          |
 
 **** Some replaces
-#+begin_src emacs-lisp :lexical no
+#+begin_src example :lexical no
 	;;; replace-org-char
 	;; Replace list hyphen with dot
 	(font-lock-add-keywords 'org-mode
@@ -772,6 +763,294 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+RESULTS:
 : image-url-clear-overlays
 
+*** Org-roam
+**** Org-roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :custom
+    (org-roam-directory (file-truename "~/Org/2Brain"))
+    (org-roam-completion-everywhere t)
+    (org-roam-capture-templates
+     '(
+       ("d" "Default abstract" plain "%?"
+        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+        :unnarrowed t)
+
+       ("s" "Abstract with source" plain "\n\nSource: %^{Source}\n\nTitle: ${title}\n\n"
+        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
+        :unnarrowed t)
+
+       ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n"
+        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
+        :unnarrowed t)
+
+       ("e" "Encrypt note" plain "%?"
+        :target (file+head "${name-of-file}.org.gpg"
+                           "#+title: ${title}\n#+date: %U")
+        :unnarrowed t)
+       ))
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-roam-capture)
+           ;; ("C-c n t" . org-roam-tag-add)
+           ("C-c n r" . org-roam-ref-add)
+
+           ("C-c g" . org-id-get-create)
+           ;; Dailies
+           ("C-c n j" . org-roam-dailies-capture-today)
+           :map org-mode-map
+           ("C-M-i"    . completion-at-point))
+
+    :config
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (setq org-roam-completion-everywhere t)
+    (org-roam-db-autosync-mode)
+    ;; If using org-roam-protocol
+    (require 'org-roam-protocol))
+#+end_src
+
+#+RESULTS:
+: completion-at-point
+
+***** Configuring org-roam buffer display
+#+begin_src example
+  (add-to-list 'display-buffer-alist
+               '(;; Left side window
+                 (".org-roam.*"
+                  (display-buffer-in-side-window)
+                  (window-width . 0.25)
+                  (side . left)
+                  (slot . 0))))
+#+end_src
+
+***** Build your Org agenda from Org Roam notes (disabled)
+#+begin_src example :lexical no
+  ;; The buffer you put this code in must have lexical-binding set to t!
+  ;; See the final configuration at the end for more details.
+
+  (defun my/org-roam-filter-by-tag (tag-name)
+    (lambda (node)
+      (member tag-name (org-roam-node-tags node))))
+
+  (defun my/org-roam-list-notes-by-tag (tag-name)
+    (mapcar #'org-roam-node-file
+            (seq-filter
+             (my/org-roam-filter-by-tag tag-name)
+             (org-roam-node-list))))
+
+  (defun my/org-roam-refresh-agenda-list ()
+    (interactive)
+    (setq org-agenda-files (my/org-roam-list-notes-by-tag "Project")))
+
+  ;; Build the agenda list the first time for the session
+  (my/org-roam-refresh-agenda-list)
+#+end_src
+
+#+RESULTS:
+**** org-roam tag add with custom prompt
+#+begin_src emacs-lisp :lexical no
+  (defun my/org-roam-tag-add-with-custom-prompt ()
+    "Prompt for a custom tag and add it to the current buffer's ROAM_TAGS."
+    (interactive)
+    (let ((tag (read-string "Tag: ")))
+      (if (> (length tag) 0)
+          (org-roam-tag-add (concat "ROAM_TAGS: " tag)))))
+
+  (define-key org-mode-map (kbd "C-c n t") #'my/org-roam-tag-add-with-custom-prompt)
+#+end_src
+**** Org-roam-ui
+#+begin_src emacs-lisp
+  (use-package org-roam-ui
+    :ensure t
+    :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start nil))
+#+end_src
+**** Org-roam-bibtex
+#+begin_src emacs-lisp
+  (use-package org-roam-bibtex
+    :ensure t
+    :after org-roam
+    :hook (org-roam-mode . org-roam-bibtex-mode)
+    :config
+    (setq org-roam-bibtex-preformat-keywords
+          '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+    (setq orb-templates
+          '(("r" "ref" plain (function org-roam-capture--get-point)
+             ""
+             :file-name "${slug}"
+             :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+
+  - tags ::
+  - keywords :: ${keywords}
+
+  \n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
+
+             :unnarrowed t)))
+    (require 'org-ref)) ; optional: if using Org-ref v2 or v3 citation links
+#+end_src
+
+Deps for org-roam-bibtex:
+***** Org ref
+#+begin_src emacs-lisp
+  (use-package org-ref :ensure t
+    :config
+    (setq reftex-default-bibliography '("~/Org/2Brain/bibtex/ref.bib"))
+
+    (setq org-ref-bibliography-notes "~/Org/2Brain/bibtex/ref_notes.org"
+          org-ref-default-bibliography '("~/Org/2Brain/ref.bib")
+          org-ref-pdf-directory "~/Org/2Brain/bibtex/bibtex-pdfs/")
+
+    (setq bibtex-completion-bibliography "~/Org/2Brain/bibtex/ref.bib"
+          bibtex-completion-library-path "~/Org/2Brain/bibtex/bibtex-pdfs/"
+          bibtex-completion-notes-path "~/Org/2Brain/bibtex/bibtex-notes")
+
+                                          ; Optional. Open pdf in external viewer.
+    (setq bibtex-completion-pdf-open-function
+          (lambda (fpath)
+            (start-process "open" "*open*" "open" fpath))))
+#+end_src
+
+***** Citar
+#+begin_src emacs-lisp :lexical no
+  (use-package citar-embark
+    :ensure t
+    :after citar embark
+    :no-require
+    :config
+    (org-cite-global-bibliography
+     '("~/Org/2Brain/bibtex/ref.bib"))
+    (citar-embark-mode))
+
+  ;; Use `citar' with `org-cite'
+  (use-package citar-org
+    :after oc
+    :custom
+    (org-cite-insert-processor 'citar)
+    (org-cite-follow-processor 'citar)
+    (org-cite-activate-processor 'citar))
+#+end_src
+
+#+RESULTS:
+
+***** Helm bibtex
+#+begin_src emacs-lisp
+	(use-package helm-bibtex :ensure t)
+#+end_src
+
+#+RESULTS:
+
+***** Org noter
+#+begin_src emacs-lisp :lexical no
+  (use-package org-noter
+    :ensure t)
+
+  (use-package org-pdftools
+    :ensure t
+    :hook (org-mode . org-pdftools-setup-link)
+    )
+
+  (use-package org-noter-pdftools
+    :ensure t
+    :after org-noter
+    :config
+    ;; Add a function to ensure precise note is inserted
+    (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
+      (interactive "P")
+      (org-noter--with-valid-session
+       (let ((org-noter-insert-note-no-questions (if toggle-no-questions
+                                                     (not org-noter-insert-note-no-questions)
+                                                   org-noter-insert-note-no-questions))
+             (org-pdftools-use-isearch-link t)
+             (org-pdftools-use-freepointer-annot t))
+         (org-noter-insert-note (org-noter--get-precise-info)))))
+
+    ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
+    (defun org-noter-set-start-location (&optional arg)
+      "When opening a session with this document, go to the current location.
+       With a prefix ARG, remove start location."
+      (interactive "P")
+      (org-noter--with-valid-session
+       (let ((inhibit-read-only t)
+             (ast (org-noter--parse-root))
+             (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
+         (with-current-buffer (org-noter--session-notes-buffer session)
+           (org-with-wide-buffer
+            (goto-char (org-element-property :begin ast))
+            (if arg
+                (org-entry-delete nil org-noter-property-note-location)
+              (org-entry-put nil org-noter-property-note-location
+                             (org-noter--pretty-print-location location))))))))
+    (with-eval-after-load 'pdf-annot
+      (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+#+end_src
+
+#+RESULTS:
+: t
+
+**** Company-org-roam
+#+begin_src emacs-lisp
+(use-package company-org-roam
+  :straight (:host github :repo "org-roam/company-org-roam")
+  :config
+  (push 'company-org-roam company-backends))
+#+end_src
+**** Delve.el
+#+begin_src example
+  (use-package delve
+    :straight (:repo "publicimageltd/delve"
+                     :host github
+                     :type git)
+    :after (org-roam)
+    ;; this is necessary if use-package-always-defer is true
+    :demand t
+    :bind
+    ;; the main entry point, offering a list of all stored collections
+    ;; and of all open Delve buffers:
+    (("<f12>" . delve))
+    :config
+    ;; set meaningful tag names for the dashboard query
+    (setq delve-dashboard-tags '("Tag1" "Tag2"))
+    ;; optionally turn on compact view as default
+    (add-hook #'delve-mode-hook #'delve-compact-view-mode)
+    ;; turn on delve-minor-mode when Org Roam file is opened:
+    (delve-global-minor-mode))
+#+end_src
+
+#+RESULTS:
+: t
+
+**** Md-roam (add md for org-roam)
+#+begin_src example
+	(load "~/.emacs.d/local-packages/md-roam")
+	(use-package md-roam
+		:config
+		(md-roam-mode 1) ; md-roam-mode must be active before org-roam-db-sync
+		(setq org-roam-file-extensions '("org" "md"))
+		(setq md-roam-file-extension "md") ; default "md". Specify an extension such as "markdown"
+		)
+	(with-eval-after-load 'markdown-mode
+  (advice-add #'markdown-indent-line :before-until #'completion-at-point))
+#+end_src
+
+**** Org-download
+#+begin_src emacs-lisp
+  (use-package org-download
+    :ensure t)
+
+  (setq-default org-download-image-dir "./assets-org/")
+
+  ;; Drag-and-drop to `dired`
+  (add-hook 'dired-mode-hook 'org-download-enable)
+#+end_src
+
 *** Org agenda
 ~C-c a~ -- for entering in Org agenda
 #+begin_src emacs-lisp
@@ -1024,285 +1303,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
    (org-caldav-delete-org-entries 'never))
  ;; (org-caldav-sync)
 #+end_src
-*** Org-roam
-**** Org-roam
-#+begin_src emacs-lisp
-  (use-package org-roam
-    :ensure t
-    :custom
-    (org-roam-directory (file-truename "~/Org/2Brain"))
-    (org-roam-completion-everywhere t)
-    (org-roam-capture-templates
-     '(
-       ("d" "Default abstract" plain "%?"
-        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
-        :unnarrowed t)
-
-       ("s" "Abstract with source" plain "\n\nSource: %^{Source}\n\nTitle: ${title}\n\n"
-        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
-        :unnarrowed t)
-
-       ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n"
-        :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
-        :unnarrowed t)
-
-       ("e" "Encrypt note" plain "%?"
-        :target (file+head "${name-of-file}.org.gpg"
-                           "#+title: ${title}\n#+date: %U")
-        :unnarrowed t)
-       ))
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
-           ("C-c n i" . org-roam-node-insert)
-           ("C-c n c" . org-roam-capture)
-           ("C-c n t" . org-roam-tag-add)
-           ("C-c n r" . org-roam-ref-add)
-
-           ("C-c g" . org-id-get-create)
-           ;; Dailies
-           ("C-c n j" . org-roam-dailies-capture-today)
-           :map org-mode-map
-           ("C-M-i"    . completion-at-point))
-
-    :config
-    ;; If you're using a vertical completion framework, you might want a more informative completion interface
-    ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-    (setq org-roam-completion-everywhere t)
-    (org-roam-db-autosync-mode)
-    ;; If using org-roam-protocol
-    (require 'org-roam-protocol))
-#+end_src
-
-#+RESULTS:
-: completion-at-point
-
-***** Configuring org-roam buffer display
-#+begin_src example
-  (add-to-list 'display-buffer-alist
-               '(;; Left side window
-                 (".org-roam.*"
-                  (display-buffer-in-side-window)
-                  (window-width . 0.25)
-                  (side . left)
-                  (slot . 0))))
-#+end_src
-
-***** Build your Org agenda from Org Roam notes (disabled)
-#+begin_src example :lexical no
-  ;; The buffer you put this code in must have lexical-binding set to t!
-  ;; See the final configuration at the end for more details.
-
-  (defun my/org-roam-filter-by-tag (tag-name)
-    (lambda (node)
-      (member tag-name (org-roam-node-tags node))))
-
-  (defun my/org-roam-list-notes-by-tag (tag-name)
-    (mapcar #'org-roam-node-file
-            (seq-filter
-             (my/org-roam-filter-by-tag tag-name)
-             (org-roam-node-list))))
-
-  (defun my/org-roam-refresh-agenda-list ()
-    (interactive)
-    (setq org-agenda-files (my/org-roam-list-notes-by-tag "Project")))
-
-  ;; Build the agenda list the first time for the session
-  (my/org-roam-refresh-agenda-list)
-#+end_src
-
-#+RESULTS:
-
-**** Org-roam-ui
-#+begin_src emacs-lisp
-  (use-package org-roam-ui
-    :ensure t
-    :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start nil))
-#+end_src
-**** Org-roam-bibtex
-#+begin_src emacs-lisp
-  (use-package org-roam-bibtex
-    :ensure t
-    :after org-roam
-    :hook (org-roam-mode . org-roam-bibtex-mode)
-    :config
-    (setq org-roam-bibtex-preformat-keywords
-          '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
-    (setq orb-templates
-          '(("r" "ref" plain (function org-roam-capture--get-point)
-             ""
-             :file-name "${slug}"
-             :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
-
-  - tags ::
-  - keywords :: ${keywords}
-
-  \n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
-
-             :unnarrowed t)))
-    (require 'org-ref)) ; optional: if using Org-ref v2 or v3 citation links
-#+end_src
-
-Deps for org-roam-bibtex:
-***** Org ref
-#+begin_src emacs-lisp
-  (use-package org-ref :ensure t
-    :config
-    (setq reftex-default-bibliography '("~/Org/2Brain/bibtex/ref.bib"))
-
-    (setq org-ref-bibliography-notes "~/Org/2Brain/bibtex/ref_notes.org"
-          org-ref-default-bibliography '("~/Org/2Brain/ref.bib")
-          org-ref-pdf-directory "~/Org/2Brain/bibtex/bibtex-pdfs/")
-
-    (setq bibtex-completion-bibliography "~/Org/2Brain/bibtex/ref.bib"
-          bibtex-completion-library-path "~/Org/2Brain/bibtex/bibtex-pdfs/"
-          bibtex-completion-notes-path "~/Org/2Brain/bibtex/bibtex-notes")
-
-                                          ; Optional. Open pdf in external viewer.
-    (setq bibtex-completion-pdf-open-function
-          (lambda (fpath)
-            (start-process "open" "*open*" "open" fpath))))
-#+end_src
-
-***** Citar
-#+begin_src emacs-lisp :lexical no
-  (use-package citar-embark
-    :ensure t
-    :after citar embark
-    :no-require
-    :config
-    (org-cite-global-bibliography
-     '("~/Org/2Brain/bibtex/ref.bib"))
-    (citar-embark-mode))
-
-  ;; Use `citar' with `org-cite'
-  (use-package citar-org
-    :after oc
-    :custom
-    (org-cite-insert-processor 'citar)
-    (org-cite-follow-processor 'citar)
-    (org-cite-activate-processor 'citar))
-#+end_src
-
-#+RESULTS:
-
-***** Helm bibtex
-#+begin_src emacs-lisp
-	(use-package helm-bibtex :ensure t)
-#+end_src
-
-#+RESULTS:
-
-***** Org noter
-#+begin_src emacs-lisp :lexical no
-  (use-package org-noter
-    :ensure t)
-
-  (use-package org-pdftools
-    :ensure t
-    :hook (org-mode . org-pdftools-setup-link)
-    )
-
-  (use-package org-noter-pdftools
-    :ensure t
-    :after org-noter
-    :config
-    ;; Add a function to ensure precise note is inserted
-    (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
-      (interactive "P")
-      (org-noter--with-valid-session
-       (let ((org-noter-insert-note-no-questions (if toggle-no-questions
-                                                     (not org-noter-insert-note-no-questions)
-                                                   org-noter-insert-note-no-questions))
-             (org-pdftools-use-isearch-link t)
-             (org-pdftools-use-freepointer-annot t))
-         (org-noter-insert-note (org-noter--get-precise-info)))))
-
-    ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
-    (defun org-noter-set-start-location (&optional arg)
-      "When opening a session with this document, go to the current location.
-       With a prefix ARG, remove start location."
-      (interactive "P")
-      (org-noter--with-valid-session
-       (let ((inhibit-read-only t)
-             (ast (org-noter--parse-root))
-             (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
-         (with-current-buffer (org-noter--session-notes-buffer session)
-           (org-with-wide-buffer
-            (goto-char (org-element-property :begin ast))
-            (if arg
-                (org-entry-delete nil org-noter-property-note-location)
-              (org-entry-put nil org-noter-property-note-location
-                             (org-noter--pretty-print-location location))))))))
-    (with-eval-after-load 'pdf-annot
-      (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
-#+end_src
-
-#+RESULTS:
-: t
-
-
-**** Company-org-roam
-#+begin_src emacs-lisp
-(use-package company-org-roam
-  :straight (:host github :repo "org-roam/company-org-roam")
-  :config
-  (push 'company-org-roam company-backends))
-#+end_src
-**** Delve.el
-#+begin_src example
-  (use-package delve
-    :straight (:repo "publicimageltd/delve"
-                     :host github
-                     :type git)
-    :after (org-roam)
-    ;; this is necessary if use-package-always-defer is true
-    :demand t
-    :bind
-    ;; the main entry point, offering a list of all stored collections
-    ;; and of all open Delve buffers:
-    (("<f12>" . delve))
-    :config
-    ;; set meaningful tag names for the dashboard query
-    (setq delve-dashboard-tags '("Tag1" "Tag2"))
-    ;; optionally turn on compact view as default
-    (add-hook #'delve-mode-hook #'delve-compact-view-mode)
-    ;; turn on delve-minor-mode when Org Roam file is opened:
-    (delve-global-minor-mode))
-#+end_src
-
-#+RESULTS:
-: t
-
-**** Md-roam (add md for org-roam)
-#+begin_src example
-	(load "~/.emacs.d/local-packages/md-roam")
-	(use-package md-roam
-		:config
-		(md-roam-mode 1) ; md-roam-mode must be active before org-roam-db-sync
-		(setq org-roam-file-extensions '("org" "md"))
-		(setq md-roam-file-extension "md") ; default "md". Specify an extension such as "markdown"
-		)
-	(with-eval-after-load 'markdown-mode
-  (advice-add #'markdown-indent-line :before-until #'completion-at-point))
-#+end_src
-
-**** Org-download
-#+begin_src emacs-lisp
-  (use-package org-download
-    :ensure t)
-
-  (setq-default org-download-image-dir "./assets-org/")
-
-  ;; Drag-and-drop to `dired`
-  (add-hook 'dired-mode-hook 'org-download-enable)
-#+end_src
-
 ** Ox-hugo
 #+begin_src emacs-lisp :lexical no
   (use-package ox-hugo
@@ -1408,6 +1408,7 @@ Deps for org-roam-bibtex:
 #+end_src
 
 #+RESULTS:
+
 
 
 
@@ -1666,14 +1667,6 @@ For more information: https://depp.brause.cc/nov.el/
     "Keymap for `calibredb-search-mode'.")
 
     #+end_src
-** all-the-icons
-#+begin_src emacs-lisp
-  (use-package all-the-icons
-    :if (display-graphic-p))
-#+end_src
-
-#+RESULTS:
-
 ** Dashboard
 #+begin_src emacs-lisp
   ;; Setting dashboard
@@ -2033,18 +2026,6 @@ BUG BUG BUG
     #+RESULTS:
     : t
 
-** Emojify
-#+begin_src emacs-lisp
-  (use-package emojify
-    :config
-    (when (member "Segoe UI Emoji" (font-family-list))
-      (set-fontset-font
-       t 'symbol (font-spec :family "Segoe UI Emoji") nil 'prepend))
-    (setq emojify-display-style 'unicode)
-    (setq emojify-emoji-styles '(unicode))
-    (bind-key* (kbd "C-c e") #'emojify-insert-emoji)) ; override binding in any mode
-#+end_src
-
 ** Evil
 *** Set initial Evil
 #+begin_src emacs-lisp
@@ -2056,6 +2037,12 @@ BUG BUG BUG
     (setq evil-vsplit-window-right t)
     (setq evil-split-window-below t))
   (evil-mode 1)
+#+end_src
+*** General (more keymaps from vim)
+#+begin_src emacs-lisp :lexical no
+    (use-package general
+      :ensure t)
+    (general-evil-setup t)
 #+end_src
 
 *** Evil collection 
@@ -2196,65 +2183,88 @@ BUG BUG BUG
 	#+end_src
 *** Blamer
 #+begin_src emacs-lisp
-  (use-package blamer
-    :ensure t
-    :commands (blamer-mode)
-    :config
-    (setq blamer-view 'overlay
-          blamer-type 'posframe-popup
-          blamer-max-commit-message-length 70
-          blamer-force-truncate-long-line nil
-          blamer-author-formatter " ✎ [%s] - "
-          blamer-commit-formatter "● %s ● ")
-    :custom
-    (blamer-idle-time 1.0)
-    :custom-face
-    (blamer-face ((t :foreground "#E46876"
-                     :height 140
-                     :italic t))))
+    (use-package blamer
+      :ensure t
+      :bind (("s-i" . blamer-show-commit-info)
+             ("C-c i" . ("s-i" . blamer-show-posframe-commit-info)))
+      :defer 20
+      :custom
+      (blamer-idle-time 0.3)
+      (blamer-min-offset 70)
+      :custom-face
+      (blamer-face ((t :foreground "#7a88cf"
+                        :background nil
+                        :height 140
+                        :italic t)))
+      :config
+
+      (setq blamer-view 'overlay
+            blamer-type 'posframe-popup
+            blamer-max-commit-message-length 70
+            blamer-force-truncate-long-line nil
+            blamer-author-formatter " ✎ [%s] - "
+            blamer-commit-formatter "● %s ● ")
+      (global-blamer-mode 1))
+
+  (defun blamer-callback-show-commit-diff (commit-info)
+    (interactive)
+    (let ((commit-hash (plist-get commit-info :commit-hash)))
+      (when commit-hash
+        (magit-show-commit commit-hash))))
+
+  (defun blamer-callback-open-remote (commit-info)
+    (interactive)
+    (let ((commit-hash (plist-get commit-info :commit-hash)))
+      (when commit-hash
+        (message commit-hash)
+        (forge-browse-commit commit-hash))))
+
+  (setq blamer-bindings '(("<mouse-3>" . blamer-callback-open-remote)
+                          ("<mouse-1>" . blamer-callback-show-commit-diff)))
+
+      ;; (use-package blamer
+      ;;   :ensure t
+      ;;   :commands (blamer-mode)
+      ;;   :config
+      ;;   (setq blamer-view 'overlay
+      ;;         blamer-type 'posframe-popup
+      ;;         blamer-max-commit-message-length 70
+      ;;         blamer-force-truncate-long-line nil
+      ;;         blamer-author-formatter " ✎ [%s] - "
+      ;;         blamer-commit-formatter "● %s ● ")
+      ;;   :custom
+      ;;   (blamer-idle-time 1.0)
+      ;;   :custom-face
+      ;;   (blamer-face ((t :foreground "#E46876"
+      ;;                    :height 140
+      ;;                    :italic t))))
 #+end_src
+
+#+RESULTS:
+
 *** Git gutter
 #+begin_src emacs-lisp
-	(use-package git-gutter
-		:ensure t
-		:hook (prog-mode . git-gutter-mode)
-		:diminish git-gutter-mode
-		:config
-		(setq git-gutter:update-interval 0.5))
-
-	(use-package git-gutter-fringe
-		:ensure t
-		:after git-gutter
-		:config
-		(define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
-		(define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
-		(define-fringe-bitmap 'git-gutter-fr:deleted [224] nil nil '(center repeated)))
-
-	(git-gutter-mode)
-#+end_src
-
-** Indent mode
-Show vertical lines to guide indentation
-#+begin_src emacs-lisp
-  (use-package indent-guide
+  (use-package git-gutter
     :ensure t
+    :hook (prog-mode . git-gutter-mode)
+    :diminish git-gutter-mode
     :config
-    (indent-guide-global-mode))
-#+end_src
-** Parrot
-#+begin_src emacs-lisp
-	(defun my/parrot-animate-when-compile-success (buffer result)
-		(if (string-match "^finished" result)
-				(parrot-start-animation)))
+    (setq git-gutter:update-interval 0.5))
 
-	(use-package parrot
-		:ensure t
-		:config
-		(parrot-mode)
-		(parrot-set-parrot-type 'thumbsup)
-		(add-hook 'before-save-hook 'parrot-start-animation)
-		(add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
+  (use-package git-gutter-fringe
+    :ensure t
+    :after git-gutter
+    :config
+    (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'git-gutter-fr:deleted [224] nil nil '(center repeated)))
+
+  (global-git-gutter-mode +1)
 #+end_src
+
+#+RESULTS:
+: t
+
 ** Projectile
 #+begin_src emacs-lisp
   (use-package projectile
@@ -2274,13 +2284,6 @@ Show vertical lines to guide indentation
   (setq projectile-globally-ignored-files "node_modules")
 #+end_src
 
-** Rainbow delimiter
-#+begin_src emacs-lisp
-  (use-package rainbow-delimiters
-    :ensure t
-    :hook
-    (prog-mode . rainbow-delimiters-mode))
-#+end_src
 ** Telega.el
 #+begin_src emacs-lisp
 	(use-package telega
@@ -2291,28 +2294,6 @@ Show vertical lines to guide indentation
 		(add-hook 'telega-load-hook 'telega-appindicator-mode)
 		(add-hook 'telega-load-hook 'global-telega-url-shorten-mode))
 #+end_src
-** Terminals (vterm, multi-vterm, term, multi-term)
-*** vterm + multi-vterm
-#+begin_src emacs-lisp
-	(use-package vterm
-		:ensure t)
-
-	(use-package multi-vterm
-		:ensure t
-		:bind
-		("C-x q" . vterm-clear)
-		("C-x w" . multi-vterm))
-#+end_src
-*** term + multi-term (disabled)
-#+begin_src example
-	(use-package multi-term
-		:ensure t
-		:bind
-		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
-		("C-x v" . multi-term)) ;; Open default multi-term without automate spliting
-	)
-#+end_src
-
 ** Treemacs
 #+begin_src emacs-lisp
   (use-package treemacs
@@ -2412,218 +2393,153 @@ Show vertical lines to guide indentation
     :ensure t)
 #+end_src
 
-** Which key
+** Terminals (vterm, multi-vterm, term, multi-term)
+*** vterm + multi-vterm
+#+begin_src emacs-lisp
+	(use-package vterm
+		:ensure t)
+
+	(use-package multi-vterm
+		:ensure t
+		:bind
+		("C-x q" . vterm-clear)
+		("C-x w" . multi-vterm))
+#+end_src
+*** term + multi-term (disabled)
+#+begin_src example
+	(use-package multi-term
+		:ensure t
+		:bind
+		("C-x q" . multi-term-dedicated-toggle) ;; Open multi-term quickly
+		("C-x v" . multi-term)) ;; Open default multi-term without automate spliting
+	)
+#+end_src
+
+
+** Other packages
+*** Helm
+#+begin_src emacs-lisp :lexical no
+    (use-package helm
+      :ensure t
+      :defer t
+      :custom
+      (helm-M-x-use-completion-styles nil)
+      (helm-split-window-inside-p t)
+      (helm-follow-mode-persistent t)
+      (helm-buffers-show-icons t)
+      :bind (:map helm-map
+                  ("<tab>" . 'helm-execute-persistent-action))
+      :config
+      (helm-mode 1))
+
+    (with-eval-after-load 'helm
+      (add-to-list 'display-buffer-alist
+                   '("\\`\\*helm.*\\*\\'"
+                     (display-buffer-in-side-window)
+                     (inhibit-same-window . t)
+                     (window-height . 0.4))))
+#+end_src
+*** Reverse im
+#+begin_src emacs-lisp :lexical no
+    (use-package reverse-im
+      :ensure t ; install `reverse-im' using package.el
+      :demand t ; always load it
+      :after char-fold ; but only after `char-fold' is loaded
+      :bind
+      ("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
+      :custom
+      (reverse-im-char-fold t) ; use lax matching
+      (reverse-im-read-char-advice-function 'reverse-im-read-char-include)
+      (reverse-im-input-methods '("ukrainian-computer")) ; translate these methods
+      :config
+      (reverse-im-mode t)) ; turn the mode on
+#+end_src
+*** Format all
+#+begin_src emacs-lisp :lexical no
+    (use-package format-all
+      :ensure t
+      :preface
+      (defun ian/format-code ()
+        "Auto-format whole buffer."
+        (interactive)
+        (if (derived-mode-p 'prolog-mode)
+            (prolog-indent-buffer)
+          (format-all-buffer)))
+      :config
+      (global-set-key (kbd "M-F") 'ian/format-code)
+      (add-hook 'prog-mode-hook 'format-all-ensure-formatter))
+#+end_src
+*** Emojify
+#+begin_src emacs-lisp
+  (use-package emojify
+    :config
+    (when (member "Segoe UI Emoji" (font-family-list))
+      (set-fontset-font
+       t 'symbol (font-spec :family "Segoe UI Emoji") nil 'prepend))
+    (setq emojify-display-style 'unicode)
+    (setq emojify-emoji-styles '(unicode))
+    (bind-key* (kbd "C-c e") #'emojify-insert-emoji)) ; override binding in any mode
+#+end_src
+
+*** Rainbow delimiter
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :hook
+    (prog-mode . rainbow-delimiters-mode))
+#+end_src
+*** Which key
 #+begin_src emacs-lisp
 	(use-package which-key
 		:ensure t
 		:config (which-key-mode))
 
 #+end_src
-** Zygospore (to easy fullscreening split screens)
+*** Zygospore (to easy fullscreening split screens)
 #+begin_src emacs-lisp
 (use-package zygospore :ensure t)
 (global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
 #+end_src
 
-
-** Alert.el (disabled)
-#+begin_src example
-	(use-package alert :ensure t)
-
-	(telega-alert-mode 1)
-#+end_src
-** Auto-dark (change theme by system)
-#+begin_src example
-	(use-package auto-dark
-		:ensure t
-		:init (auto-dark-mode t)
-		:config
-		)
-	(setq auto-dark-dark-theme 'gruvbox-dark-soft)
-	(setq auto-dark-light-theme 'gruvbox-light-soft)
-	(setq auto-dark-detection-method 'dbus)
+*** all-the-icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :if (display-graphic-p))
 #+end_src
 
 #+RESULTS:
 
-** Centaur Tabs (disabled)
-#+begin_src example
-	(use-package centaur-tabs
-		:config
-		(setq centaur-tabs-style "bar"
-					centaur-tabs-height 32
-					centaur-tabs-set-icons t
-					centaur-tabs-set-modified-marker t
-					;; centaur-tabs-show-navigation-buttons t
-					centaur-tabs-set-bar 'over
-					;; x-underline-at-descent-line t
-					)
-		(centaur-tabs-headline-match)
-		;; (setq centaur-tabs-gray-out-icons 'buffer)
-		;; (centaur-tabs-enable-buffer-reordering)
-		;; (setq centaur-tabs-adjust-buffer-order t)
-		(centaur-tabs-mode t)
-		(setq uniquify-separator "/")
-		(setq uniquify-buffer-name-style 'forward)
-		(defun centaur-tabs-buffer-groups ()
-			"`centaur-tabs-buffer-groups' control buffers' group rules.
-
-					 Group centaur-tabs with mode if buffer is derived from `eshell-mode' `example-mode' `dired-mode' `org-mode' `magit-mode'.
-					 All buffer name start with * will group to \"Emacs\".
-					 Other buffer group by `centaur-tabs-get-group-name' with project name."
-			(list
-			 (cond
-				;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-				;; "Remote")
-				((or (string-equal "*" (substring (buffer-name) 0 1))
-						 (memq major-mode '(magit-process-mode
-																magit-status-mode
-																magit-diff-mode
-																magit-log-mode
-																magit-file-mode
-																magit-blob-mode
-																magit-blame-mode
-																)))
-				 "Emacs")
-				((derived-mode-p 'prog-mode)
-				 "Editing")
-				((derived-mode-p 'dired-mode)
-				 "Dired")
-				((memq major-mode '(helpful-mode
-														help-mode))
-				 "Help")
-				((memq major-mode '(org-mode
-														org-agenda-clockreport-mode
-														org-src-mode
-														org-agenda-mode
-														org-beamer-mode
-														org-indent-mode
-														org-bullets-mode
-														org-cdlatex-mode
-														org-agenda-log-mode
-														diary-mode))
-				 "OrgMode")
-				(t
-				 (centaur-tabs-get-group-name (current-buffer))))))
-		:hook
-		(dashboard-mode . centaur-tabs-local-mode)
-		(term-mode . centaur-tabs-local-mode)
-		(calendar-mode . centaur-tabs-local-mode)
-		(org-agenda-mode . centaur-tabs-local-mode)
-		(helpful-mode . centaur-tabs-local-mode)
-		:bind
-		("C-<prior>" . centaur-tabs-backward)
-		("C-<next>" . centaur-tabs-forward)
-		("C-c t s" . centaur-tabs-counsel-switch-group)
-		("C-c t p" . centaur-tabs-group-by-projectile-project)
-		("C-c t g" . centaur-tabs-group-buffer-groups)
-		(:map evil-normal-state-map
-					("g t" . centaur-tabs-forward)
-					("g T" . centaur-tabs-backward)))
-#+end_src
-** Modeline (simple variant) (disabled)
-#+begin_src example
-	(defun mode-line-render (left right)
-		"Return a string of `window-width' length.
-	Containing LEFT, and RIGHT aligned respectively."
-		(let ((available-width
-					 (- (window-width)
-							(+ (length (format-mode-line left))
-								 (length (format-mode-line right))))))
-			(append left
-							(list (format (format "%%%ds" available-width) ""))
-							right)))
-
-	(setq-default mode-line-format
-								'((:eval (mode-line-render
-													'((:eval (propertize " %b" 'face `(:slant italic)))
-														(:eval (if (and buffer-file-name (buffer-modified-p))
-																			 (propertize "*" 'face `(:inherit face-faded))))
-														(:eval (if (buffer-narrowed-p)
-																			 (propertize "-" 'face `(:inherit face-faded)))))
-													'("%p %l:%c "
-														(:eval (propertize " %m" 'face 'font-lock-string-face)))))))
-
-	(provide 'modeline)
-#+end_src
-
-** Smooth scroll (good-scroll) (disabled)
-#+begin_src example
-	(use-package good-scroll
-		:ensure t
-		:config
-		(good-scroll-mode 1))
-#+end_src
-
-** Wakatime (disabled)
-#+begin_src example
-	(use-package wakatime-mode :ensure t)
-	(global-wakatime-mode)
-#+end_src
-
-
-** Other packages
+*** Indent mode
+Show vertical lines to guide indentation
 #+begin_src emacs-lisp
-	;; (use-package elcord :defer t)
-
-	(use-package helm
-		:ensure t
-		:defer t
-		:custom
-		(helm-M-x-use-completion-styles nil)
-		(helm-split-window-inside-p t)
-		(helm-follow-mode-persistent t)
-		(helm-buffers-show-icons t)
-		:bind (:map helm-map
-								("<tab>" . 'helm-execute-persistent-action))
-		:config
-		(helm-mode 1))
-
-	(with-eval-after-load 'helm
-		(add-to-list 'display-buffer-alist
-								 '("\\`\\*helm.*\\*\\'"
-									 (display-buffer-in-side-window)
-									 (inhibit-same-window . t)
-									 (window-height . 0.4))))
-
-	(use-package general
-		:ensure t)
-	(general-evil-setup t)
-
-	(use-package format-all
-		:ensure t
-		:preface
-		(defun ian/format-code ()
-			"Auto-format whole buffer."
-			(interactive)
-			(if (derived-mode-p 'prolog-mode)
-					(prolog-indent-buffer)
-				(format-all-buffer)))
-		:config
-		(global-set-key (kbd "M-F") 'ian/format-code)
-		(add-hook 'prog-mode-hook 'format-all-ensure-formatter))
-
-	;; Needed for `:after char-fold' to work
-	(use-package char-fold
-		:ensure t
-		:custom
-		(char-fold-symmetric t)
-		(search-default-mode 'char-fold-to-regexp))
-
-	(use-package reverse-im
-		:ensure t ; install `reverse-im' using package.el
-		:demand t ; always load it
-		:after char-fold ; but only after `char-fold' is loaded
-		:bind
-		("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
-		:custom
-		(reverse-im-char-fold t) ; use lax matching
-		(reverse-im-read-char-advice-function 'reverse-im-read-char-include)
-		(reverse-im-input-methods '("ukrainian-computer")) ; translate these methods
-		:config
-		(reverse-im-mode t)) ; turn the mode on
+  (use-package indent-guide
+    :ensure t
+    :config
+    (indent-guide-global-mode))
 #+end_src
+*** Parrot
+#+begin_src emacs-lisp
+	(defun my/parrot-animate-when-compile-success (buffer result)
+		(if (string-match "^finished" result)
+				(parrot-start-animation)))
 
+	(use-package parrot
+		:ensure t
+		:config
+		(parrot-mode)
+		(parrot-set-parrot-type 'thumbsup)
+		(add-hook 'before-save-hook 'parrot-start-animation)
+		(add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
+#+end_src
+*** Char fold (*)
+#+begin_src example :lexical no
+    ;; Needed for `:after char-fold' to work
+    (use-package char-fold
+      :ensure t
+      :custom
+      (char-fold-symmetric t)
+      (search-default-mode 'char-fold-to-regexp))
+#+end_src
 * Setting keymap
 #+begin_src emacs-lisp
   ;; zoom in/out like we do everywhere else.
@@ -3526,4 +3442,3 @@ Support for resizing windows, using the mouse. Position the mouse on the divider
 	;; (require 'eaf-org-previewer)
 	;; (require 'eaf-terminal)
 #+end_src
-
