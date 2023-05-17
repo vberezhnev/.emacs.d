@@ -265,71 +265,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+RESULTS:
 : t
 
-** Prettify JetBrains Mono symbols
-#+begin_src example
-  (defun jetbrains-ligature-mode--make-alist (list)
-    "Generate prettify-symbols alist from LIST."
-    (let ((idx -1))
-      (mapcar
-       (lambda (s)
-	 (setq idx (1+ idx))
-	 (if s
-	     (let* ((code (+ #X10001 idx))
-		    (width (string-width s))
-		    (prefix ())
-		    (suffix '(?\s (Br . Br)))
-		    (n 1))
-	       (while (< n width)
-		 (setq prefix (append prefix '(?\s (Br . Bl))))
-		 (setq n (1+ n)))
-	       (cons s (append prefix suffix (list (decode-char 'ucs code)))))))
-       list)))
-
-  (defconst jetbrains-ligature-mode--ligatures
-    '("-->" "//" "/**" "/*" "*/" "<!--" ":=" "->>" "<<-" "->" "<-"
-      "<=>" "==" "!=" "<=" ">=" "=:=" "!==" "&&" "||" "..." ".."
-      nil nil nil nil nil nil nil nil nil nil nil nil nil nil
-      "|||" "///" "&&&" "===" "++" "--" "=>" "|>" "<|" "||>" "<||"
-      "|||>" "<|||" ">>" "<<" nil nil "::=" "|]" "[|" "{|" "|}"
-      "[<" ">]" ":?>" ":?" nil "/=" "[||]" "!!" "?:" "?." "::"
-      "+++" "??" "###" "##" ":::" "####" ".?" "?=" "=!=" "<|>"
-      "<:" ":<" ":>" ">:" "<>" "***" ";;" "/==" ".=" ".-" "__"
-      "=/=" "<-<" "<<<" ">>>" "<=<" "<<=" "<==" "<==>" "==>" "=>>"
-      ">=>" ">>=" ">>-" ">-" "<~>" "-<" "-<<" "=<<" "---" "<-|"
-      "<=|" "/\\" "\\/" "|=>" "|~>" "<~~" "<~" "~~" "~~>" "~>"
-      "<$>" "<$" "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</>" "</" "/>"
-      "<->" "..<" "~=" "~-" "-~" "~@" "^=" "-|" "_|_" "|-" "||-"
-      "|=" "||=" "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#="
-      "&="))
-
-  (defvar jetbrains-ligature-mode--old-prettify-alist)
-
-  (defun jetbrains-ligature-mode--enable ()
-    "Enable JetBrains Mono ligatures in current buffer."
-    (setq-local jetbrains-ligature-mode--old-prettify-alist prettify-symbols-alist)
-    (setq-local prettify-symbols-alist (append (jetbrains-ligature-mode--make-alist jetbrains-ligature-mode--ligatures) jetbrains-ligature-mode--old-prettify-alist))
-    (prettify-symbols-mode t))
-
-  (defun jetbrains-ligature-mode--disable ()
-    "Disable JetBrains Mono ligatures in current buffer."
-    (setq-local prettify-symbols-alist jetbrains-ligature-mode--old-prettify-alist)
-    (prettify-symbols-mode -1))
-
-  (define-minor-mode jetbrains-ligature-mode
-    "JetBrains Mono ligatures minor mode"
-    :lighter " JetBrains Mono"
-    (setq-local prettify-symbols-unprettify-at-point 'right-edge)
-    (if jetbrains-ligature-mode
-	(jetbrains-ligature-mode--enable)
-      (jetbrains-ligature-mode--disable)))
-
-  (defun jetbrains-ligature-mode--setup ()
-    "Setup JetBrains Mono Symbols"
-    (set-fontset-font t '(#X10001 . #X1009c) "JetBrains Mono"))
-
-  (provide 'jetbrains-ligature-mode)
-#+end_src
-
 ** Setting and installing themes
 #+begin_src emacs-lisp
   ;; (use-package 'gruvbox-theme
@@ -352,8 +287,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     ;; Corrects (and improves) org-mode's native fontification.
     (doom-themes-org-config)
     )
-
-  ;; (load-theme 'gruvbox-dark-soft t)
 	#+end_src
 
 ** Change theme by time
@@ -2589,133 +2522,12 @@ Show vertical lines to guide indentation
 
 * Setting LSP
 #+begin_src emacs-lisp
-  ;;(lsp-treemacs-sync-mode 1)
+  (lsp-treemacs-sync-mode 1)
   (helm-mode 1)
 #+end_src
 
 ** Setting Company
 #+begin_src emacs-lisp
-  ;; Install company
-  ;; (use-package company
-  ;; 	:ensure t
-  ;; 	:defer 20
-  ;; 	;; This is not perfect yet. It completes too quickly outside programming modes, but while programming it is just right.
-  ;; 	:custom
-  ;; 	(company-idle-delay 0.1)
-  ;; 	(global-company-mode t)
-  ;; 	(debug-on-error nil) ;; otherwise this throws lots of errors on completion errors
-  ;; 	:config
-  ;; 	(define-key company-active-map (kbd "TAB") 'company-complete-selection)
-  ;; 	(define-key company-active-map (kbd "<tab>") 'company-complete-selection)
-  ;; 	(define-key company-active-map [return] 'company-complete-selection)
-  ;; 	(define-key company-active-map (kbd "RET") 'company-complete-selection)
-
-  ;; 	(setq company-transformers '(company-sort-by-backend-importance)
-  ;; 				company-format-margin-function  'company-vscode-dark-icons-margin
-  ;; 				company-tooltip-margin              0
-  ;; 				company-dabbrev-downcase            nil
-  ;; 				company-dabbrev-ignore-case         t
-  ;; 				company-dabbrev-other-buffers       'all
-  ;; 				company-minimum-prefix-length       1
-  ;; 				company-tooltip-align-annotations   t
-  ;; 				company-require-match               nil
-  ;; 				company-tooltip-limit               25
-  ;; 				company-tooltip-width-grow-only     nil
-  ;; 				company-tooltip-flip-when-above     t
-  ;; 				company-show-quick-access           'left
-  ;; 				company-async-wait                  0.1
-  ;; 				company-async-timeout               1
-  ;; 				company-idle-delay                  0.1
-  ;; 				company-frontends '(company-box-frontend))
-
-
-  ;; (defun my-company-visible-and-explicit-action-p ()
-  ;;   (and (company-tooltip-visible-p)
-  ;;        (company-explicit-action-p)))
-  ;; (defun company-ac-setup ()
-  ;;   "Sets up `company-mode' to behave similarly to `auto-complete-mode'."
-  ;;   (setq company-require-match nil)
-  ;;   (setq company-auto-complete 'my-company-visible-and-explicit-action-p)
-  ;;   (setq company-frontends '(company-echo-metadata-frontend
-  ;;                             company-pseudo-tooltip-unless-just-one-frontend-with-delay
-  ;;                             company-preview-frontend))
-  ;;   (define-key company-active-map [tab]
-  ;;     'company-select-next-if-tooltip-visible-or-complete-selection)
-  ;;   (define-key company-active-map (kbd "TAB")
-  ;;     'company-select-next-if-tooltip-visible-or-complete-selection))
-
-  ;; (company-ac-setup)
-  ;; (add-hook 'js2-mode-hook (lambda () (company-mode)))
-
-  ;; (use-package company
-  ;;   :defer t
-  ;;   :hook (prog-mode . company-mode)
-  ;;   :bind
-  ;;   (:map company-active-map
-  ;;         ("RET" . company-complete-selection)
-  ;;         ("<return>" . company-complete-selection)
-  ;;         ("<tab>" . company-complete-selection))
-  ;;   :config
-  ;;   (setq company-transformers '(company-sort-by-backend-importance)
-  ;;         company-format-margin-function  'company-vscode-dark-icons-margin
-  ;;         company-tooltip-margin              0
-  ;;         company-dabbrev-downcase            nil
-  ;;         company-dabbrev-ignore-case         t
-  ;;         company-dabbrev-other-buffers       'all
-  ;;         company-minimum-prefix-length       1
-  ;;         company-tooltip-align-annotations   t
-  ;;         company-require-match               nil
-  ;;         company-tooltip-limit               25
-  ;;         company-tooltip-width-grow-only     nil
-  ;;         company-tooltip-flip-when-above     t
-  ;;         company-show-quick-access           'left
-  ;;         company-async-wait                  0.1
-  ;;         company-async-timeout               1
-  ;;         ;; company-frontends '(company-box-frontend)
-  ;;         company-idle-delay                  0.1)
-  ;;   (push '(company-semantic :with company-yasnippet) company-backends))
-
-  ;; (use-package company-box
-  ;;   :ensure t
-  ;;   :after (company all-the-icons)
-  ;;   :hook (company-mode . company-box-mode)
-  ;;   :functions (all-the-icons-faicon
-  ;;               all-the-icons-material
-  ;;               all-the-icons-octicon
-  ;;               all-the-icons-alltheicon)
-  ;;   :config
-  ;;   (setq company-box-frame-behavior 'point
-  ;;         company-box-icons-alist 'company-box-icons-images
-  ;;         company-box-backends-colors t
-  ;;         company-box-icon-right-margin 0.5
-  ;;         company-box-backends-colors '((company-yasnippet
-  ;;                                        :all (:foreground "RosyBrown1" :background nil :italic t)
-  ;;                                        :selected (:foreground "black" :background "RosyBrown4")))
-  ;;         company-box-doc-delay 1))
-
-  ;; (defun setup-swift-mode-company ()
-  ;; 	"Setup company with separate bakends merged into one."
-  ;; 	(setq-local company-backends
-  ;; 							'((company-capf :with company-dabbrev-code company-yasnippet ))))
-
-  (use-package company-quickhelp
-    :ensure t
-    :hook (company-mode . company-quickhelp-mode))
-
-  (use-package company-statistics
-    :ensure t
-    :hook (company-mode . company-statistics-mode))
-
-
-  (use-package company-anaconda
-    :ensure t
-    :defer
-    :after company
-    :config (add-to-list 'company-backends 'company-anaconda))
-
-  ;; Company mode Show
-  (setq company-idle-delay 0)
-  (setq company-minimum-prefix-length 1)
 #+end_src
 
 #+RESULTS:
