@@ -2,8 +2,6 @@
 #+AUTHOR: Berezhnev Vladimir (Tell396)
 #+DESCRIPTION: Berezhnev's personal Emacs config.
 
-I don't want to use init.el to config Emacs.  I want to use an org file to config Emacs because I like literate configs with lots of comments.  The following code block should be your init.el.  This tells init.el to use the source code blocks from this file (README.org).
-
 * File structure of files
 #+BEGIN_SRC example 
 .
@@ -222,31 +220,31 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 * Setting font face
 ** Setting fonts
 #+begin_src emacs-lisp
-  ;; (set-face-attribute 'default t
-  ;;                     :font "Hack" ;; Iosevka, Input, Hack
-  ;;                     :height 90
-  ;;                     :weight 'regular
-  ;;                     )
-  ;; (set-face-attribute 'variable-pitch nil
-  ;;                     :font "Hack"
-  ;;                     :height 90
-  ;;                     :weight 'medium
-  ;;                     )
-  ;; (set-face-attribute 'fixed-pitch nil
-  ;;                     :font "Hack"
-  ;;                     :height 90
-  ;;                     :weight 'medium
-  ;;                     )
+  (set-face-attribute 'default t
+                      :font "Hack" ;; Iosevka, Input, Hack
+                      :height 110
+                      :weight 'regular
+                      )
+  (set-face-attribute 'variable-pitch nil
+                      :font "Hack"
+                      :height 110
+                      :weight 'medium
+                      )
+  (set-face-attribute 'fixed-pitch nil
+                      :font "Hack"
+                      :height 110
+                      :weight 'medium
+                      )
 
-  ;; (set-frame-font "JetBrains Mono" nil t)
+  (set-frame-font "JetBrains Mono" nil t)
 
   ;; Makes commented text and keywords italics.
   ;; This is working in emacsclient but not emacs.
   ;; Your font must have an italic face available.
   (set-face-attribute 'font-lock-comment-face nil
-		      :slant 'italic)
+          :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil
-		      :slant 'italic)
+          :slant 'italic)
 
 
   ;; Uncomment the following line if line spacing needs adjusting.
@@ -255,7 +253,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
   ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
   (add-to-list 'default-frame-alist '(font . "Hack 12"))
   (add-to-list 'default-frame-alist
-	       '(font . "DejaVu Sans Mono-11"))
+         '(font . "DejaVu Sans Mono-11"))
 
   (add-to-list 'default-frame-alist '(font . "Hack"))
   ;; changes certain keywords to symbols, such as lamda!
@@ -266,11 +264,8 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 : t
 
 ** Setting and installing themes
-#+begin_src example
+#+begin_src emacs-lisp
   ;; (use-package 'gruvbox-theme
-  ;; 	:ensure t)
-
-  ;; (use-package 'modus-themes
   ;; 	:ensure t)
 
   (use-package doom-themes
@@ -283,18 +278,18 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     (doom-themes-visual-bell-config)
     ;; or for treemacs users
     ;; (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
+
     (doom-themes-treemacs-config)
     ;; Corrects (and improves) org-mode's native fontification.
     (doom-themes-org-config)
     )
 
-
   ;; (load-theme 'atom-one-dark t)
-  (load-theme 'doom-monokai-classic t)
+  ;; (load-theme 'doom-monokai-classic t)
 	#+end_src
 
 ** Change theme by time
-#+begin_src example :lexical no
+#+begin_src emacs-lisp :lexical no
   (use-package theme-changer
     :ensure t
     :config
@@ -302,7 +297,9 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
     (setq calendar-latitude 43.11)
     (setq calendar-longitude 131.88))
 
-  (change-theme 'gruvbox-light-medium 'gruvbox-dark-soft)
+  (change-theme 'doom-one-light 'gruvbox-dark-medium)
+  ;; (change-theme 'doom-one-light 'doom-one)
+  ;; (change-theme 'doom-ayu-light 'doom-ayu-dark)
 #+end_src
 
 * Setting packages
@@ -619,7 +616,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
            ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
            ("C-c n i" . org-roam-node-insert)
            ("C-c n c" . org-roam-capture)
-           ;; ("C-c n t" . org-roam-tag-add)
+           ("C-c n t" . org-roam-tag-add)
            ("C-c n r" . org-roam-ref-add)
 
            ("C-c g" . org-id-get-create)
@@ -664,17 +661,6 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 #+end_src
 
 #+RESULTS:
-**** org-roam tag add with custom prompt
-#+begin_src emacs-lisp :lexical no
-  (defun my/org-roam-tag-add-with-custom-prompt ()
-    "Prompt for a custom tag and add it to the current buffer's ROAM_TAGS."
-    (interactive)
-    (let ((tag (read-string "Tag: ")))
-      (if (> (length tag) 0)
-          (org-roam-tag-add (concat "ROAM_TAGS: " tag)))))
-
-  (define-key org-mode-map (kbd "C-c n t") #'my/org-roam-tag-add-with-custom-prompt)
-#+end_src
 **** Org-roam-ui
 #+begin_src emacs-lisp
   (use-package org-roam-ui
@@ -687,7 +673,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
           org-roam-ui-open-on-start nil))
 #+end_src
 **** Org-roam-bibtex
-#+begin_src emacs-lisp
+#+begin_src example
   (use-package org-roam-bibtex
     :ensure t
     :after org-roam
@@ -712,7 +698,7 @@ I don't want to use init.el to config Emacs.  I want to use an org file to confi
 
 Deps for org-roam-bibtex:
 ***** Org ref
-#+begin_src emacs-lisp
+#+begin_src example
   (use-package org-ref :ensure t
     :config
     (setq reftex-default-bibliography '("~/Org/2Brain/bibtex/ref.bib"))
@@ -732,7 +718,7 @@ Deps for org-roam-bibtex:
 #+end_src
 
 ***** Citar
-#+begin_src emacs-lisp :lexical no
+#+begin_src example :lexical no
   (use-package citar-embark
     :ensure t
     :after citar embark
@@ -754,13 +740,45 @@ Deps for org-roam-bibtex:
 #+RESULTS:
 
 ***** Helm bibtex
-#+begin_src emacs-lisp
+#+begin_src example
 	(use-package helm-bibtex :ensure t)
 #+end_src
 
 #+RESULTS:
 
-***** Org noter
+**** Company-org-roam
+#+begin_src emacs-lisp
+(use-package company-org-roam
+  :straight (:host github :repo "org-roam/company-org-roam")
+  :config
+  (push 'company-org-roam company-backends))
+#+end_src
+
+**** Md-roam (add md for org-roam)
+#+begin_src example
+	(load "~/.emacs.d/local-packages/md-roam")
+	(use-package md-roam
+		:config
+		(md-roam-mode 1) ; md-roam-mode must be active before org-roam-db-sync
+		(setq org-roam-file-extensions '("org" "md"))
+		(setq md-roam-file-extension "md") ; default "md". Specify an extension such as "markdown"
+		)
+	(with-eval-after-load 'markdown-mode
+  (advice-add #'markdown-indent-line :before-until #'completion-at-point))
+#+end_src
+
+**** Org-download
+#+begin_src emacs-lisp
+  (use-package org-download
+    :ensure t)
+
+  (setq-default org-download-image-dir "./assets-org/")
+
+  ;; Drag-and-drop to `dired`
+  (add-hook 'dired-mode-hook 'org-download-enable)
+#+end_src
+
+**** Org noter
 #+begin_src emacs-lisp :lexical no
   (use-package org-noter
     :ensure t)
@@ -807,62 +825,6 @@ Deps for org-roam-bibtex:
 
 #+RESULTS:
 : t
-
-**** Company-org-roam
-#+begin_src emacs-lisp
-(use-package company-org-roam
-  :straight (:host github :repo "org-roam/company-org-roam")
-  :config
-  (push 'company-org-roam company-backends))
-#+end_src
-**** Delve.el
-#+begin_src example
-  (use-package delve
-    :straight (:repo "publicimageltd/delve"
-                     :host github
-                     :type git)
-    :after (org-roam)
-    ;; this is necessary if use-package-always-defer is true
-    :demand t
-    :bind
-    ;; the main entry point, offering a list of all stored collections
-    ;; and of all open Delve buffers:
-    (("<f12>" . delve))
-    :config
-    ;; set meaningful tag names for the dashboard query
-    (setq delve-dashboard-tags '("Tag1" "Tag2"))
-    ;; optionally turn on compact view as default
-    (add-hook #'delve-mode-hook #'delve-compact-view-mode)
-    ;; turn on delve-minor-mode when Org Roam file is opened:
-    (delve-global-minor-mode))
-#+end_src
-
-#+RESULTS:
-: t
-
-**** Md-roam (add md for org-roam)
-#+begin_src example
-	(load "~/.emacs.d/local-packages/md-roam")
-	(use-package md-roam
-		:config
-		(md-roam-mode 1) ; md-roam-mode must be active before org-roam-db-sync
-		(setq org-roam-file-extensions '("org" "md"))
-		(setq md-roam-file-extension "md") ; default "md". Specify an extension such as "markdown"
-		)
-	(with-eval-after-load 'markdown-mode
-  (advice-add #'markdown-indent-line :before-until #'completion-at-point))
-#+end_src
-
-**** Org-download
-#+begin_src emacs-lisp
-  (use-package org-download
-    :ensure t)
-
-  (setq-default org-download-image-dir "./assets-org/")
-
-  ;; Drag-and-drop to `dired`
-  (add-hook 'dired-mode-hook 'org-download-enable)
-#+end_src
 
 *** Org agenda
 ~C-c a~ -- for entering in Org agenda
@@ -1227,6 +1189,20 @@ Deps for org-roam-bibtex:
 
 
 
+** kind-icon
+https://github.com/jdtsmith/kind-icon
+
+#+begin_src emacs-lisp :lexical no
+  (use-package kind-icon
+    :ensure t
+    :after corfu
+    :custom
+    (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+    :config
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+#+end_src
+
+#+RESULTS:
 
 ** Pdf, epub, Djvu readers
 *** PDF Tools (pdf)
@@ -2158,20 +2134,30 @@ BUG BUG BUG
                      (window-height . 0.4))))
 #+end_src
 *** Reverse im
-#+begin_src emacs-lisp :lexical no
-    (use-package reverse-im
-      :ensure t ; install `reverse-im' using package.el
-      :demand t ; always load it
-      :after char-fold ; but only after `char-fold' is loaded
-      :bind
-      ("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
-      :custom
-      (reverse-im-char-fold t) ; use lax matching
-      (reverse-im-read-char-advice-function 'reverse-im-read-char-include)
-      (reverse-im-input-methods '("ukrainian-computer")) ; translate these methods
-      :config
-      (reverse-im-mode t)) ; turn the mode on
-#+end_src
+#+begin_src emacs-lisp
+;; Needed for `:after char-fold' to work
+(use-package char-fold
+  :custom
+  (char-fold-symmetric t)
+  (search-default-mode #'char-fold-to-regexp))
+
+(use-package reverse-im
+  :ensure t ; install `reverse-im' using package.el
+  :demand t ; always load it
+  :after char-fold ; but only after `char-fold' is loaded
+  :bind
+  ("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
+  :custom
+  (reverse-im-char-fold t) ; use lax matching
+  (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
+  (reverse-im-input-methods '("ukrainian-computer")) ; translate these methods
+  :config
+  (reverse-im-mode t)) ; turn the mode on
+  #+end_src
+
+#+RESULTS:
+: t
+
 *** Format all
 #+begin_src emacs-lisp :lexical no
     (use-package format-all
@@ -2249,15 +2235,17 @@ Show vertical lines to guide indentation
 		(add-hook 'before-save-hook 'parrot-start-animation)
 		(add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
 #+end_src
-*** Char fold (*)
-#+begin_src example :lexical no
-    ;; Needed for `:after char-fold' to work
-    (use-package char-fold
-      :ensure t
-      :custom
-      (char-fold-symmetric t)
-      (search-default-mode 'char-fold-to-regexp))
+*** Highlight TODO
+#+begin_src emacs-lisp :lexical no
+  (use-package hl-todo
+    :ensure t
+    :config
+    (hl-todo-mode t))
 #+end_src
+
+#+RESULTS:
+: t
+
 * Setting keymap
 #+begin_src emacs-lisp
   ;; zoom in/out like we do everywhere else.
@@ -2289,21 +2277,24 @@ Show vertical lines to guide indentation
 #+end_src
 
 #+begin_src emacs-lisp 
-  (xterm-mouse-mode t)
+    (xterm-mouse-mode t)
 
-  (setq-default tab-width 2) ; set default tab char's display width to 2 spaces
-  (setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
+    (setq-default tab-width 2) ; set default tab char's display width to 2 spaces
+    (setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
 
-  (dolist (mode '(org-mode-hook ; Disable line numbers for some modes
-                  term-mode-hook
-                  vterm-mode-hook
-                  shell-mode-hook
-                  treemacs-mode-hook
-                  eshell-mode-hook
-                  nov-mode-hook
-                  neotree-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+    (dolist (mode '(org-mode-hook ; Disable line numbers for some modes
+                    term-mode-hook
+                    vterm-mode-hook
+                    shell-mode-hook
+                    treemacs-mode-hook
+                    eshell-mode-hook
+                    nov-mode-hook
+                    neotree-mode-hook
+                    pdf-view-mode-hook))
+      (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
+
+#+RESULTS:
 
 * Setting LSP
 #+begin_src emacs-lisp
@@ -2383,7 +2374,6 @@ Show vertical lines to guide indentation
 ** Setting yasnippet
 #+begin_src emacs-lisp
 	(use-package yasnippet :ensure t)
-
 #+end_src
 ** Setting LSP-Mode
 *** LSP-Mode
@@ -2424,23 +2414,11 @@ Show vertical lines to guide indentation
   ;; optionally if you want to use debugger
   (use-package dap-mode :ensure t)
   ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
-
-  ;; optional if you want which-key integration
-  ;;(use-package which-key
-  ;;		:config
-  ;;		(which-key-mode))
 #+end_src
-
-#+RESULTS:
 
 *** LSP UI
 #+begin_src emacs-lisp
 	(use-package lsp-ui :ensure t)
-#+end_src
-
-*** LSP Doc
-#+begin_src emacs-lisp
-
 #+end_src
 *** JavaScript
 #+begin_src emacs-lisp
@@ -2492,18 +2470,6 @@ Show vertical lines to guide indentation
                                 '("\\.tsx?\\'" . prettier-js-mode))))
 
   (add-hook 'web-mode-hook 'prettier-js-mode)
-#+end_src
-
-*** TypeScript
-#+begin_src example
-  (use-package typescript-mode
-    :ensure t
-    :after tree-sitter
-    :mode (rx ".ts" string-end)
-    :init
-    (define-derived-mode typescript-tsx-mode typescript-mode "typescript-tsx")
-    (add-to-list 'auto-mode-alist (cons (rx ".tsx" string-end) #'typescript-tsx-mode))
-    (add-to-list 'auto-mode-alist (cons (rx ".ts" string-end) #'typescript-tsx-mode)))
 #+end_src
 
 *** TypeScript Tide
@@ -2596,12 +2562,6 @@ Show vertical lines to guide indentation
 *** Rust
 [[https://rust-analyzer.github.io/manual.html#installation#Emacs][*Quick start with rust-analyzer*]]
 
-#+begin_src rust
-  (add-hook 'rust-mode-hook 'lsp-deferred)
-#+end_src
-
-#+RESULTS:
-
 #+begin_src bash
 	cargo install rustfmt
 	cargo install racer
@@ -2625,18 +2585,23 @@ Show vertical lines to guide indentation
     :config
     (add-hook 'rust-mode-hook 'cargo-minor-mode))
 
-  (use-package racer
-    :ensure t
-    :if (executable-find "racer")
-    :after rust-mode
-    :custom
-    (racer-rust-src-path "~/Code/rust/src/src")
-    :hook ((rust-mode . racer-mode)
-           (racer-mode . eldoc-mode)
-           (racer-mode . company-mode))
-    :config
-    (evil-leader/set-key-for-mode 'rust-mode "d" 'racer-find-definition))
+  (add-hook 'rust-mode-hook 'lsp-deferred)
+  
+  ;; (use-package racer
+  ;;   :ensure t
+  ;;   :if (executable-find "racer")
+  ;;   :after rust-mode
+  ;;   :custom
+  ;;   (racer-rust-src-path "~/Code/rust/src/src")
+  ;;   :hook ((rust-mode . racer-mode)
+  ;;          (racer-mode . eldoc-mode)
+  ;;          (racer-mode . company-mode))
+  ;;   :config
+  ;;   (evil-leader/set-key-for-mode 'rust-mode "d" 'racer-find-definition))
 #+end_src
+
+#+RESULTS:
+| lsp-deferred | doom-modeline-env-setup-rust | rust-maybe-initialize-buffer-project | company-mode |
 
 ** Flycheck
 #+begin_src emacs-lisp
@@ -2674,7 +2639,7 @@ Show vertical lines to guide indentation
     ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
     ;; by switching on and off
     (add-hook 'tree-sitter-after-on-hook 'tree-sitter-hl-mode))
-  
+
 
   (use-package tree-sitter-langs
     :ensure t
@@ -2702,7 +2667,7 @@ Make startup faster by reducing the frequency of garbage collection.  The defaul
 	(setq gc-cons-threshold (* 50 1000 1000))
 #+end_src
 
-** [#C] GC setting
+** GC setting
 Make gc pauses faster by decreasing the threshold.
 
 #+begin_src emacs-lisp
