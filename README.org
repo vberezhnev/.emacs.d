@@ -31,7 +31,7 @@
   (set-fringe-mode 1)               ;; Give us some space.
   (delete-selection-mode nil)		  ;; Use a more sane delete mode than evil.
   (fset 'yes-or-no-p 'y-or-n-p)     ;; Set yes or no to y/n
-  ;; (global-font-lock-mode 1)         ;; always highlight code
+  (global-font-lock-mode 1)         ;; always highlight code
   (global-auto-revert-mode 1)       ;; refresh a buffer if changed on disk
   ;; (global-hl-line-mode 1)           ;; Highlight current line
   (semantic-mode 1)								;; help out with semantics
@@ -40,9 +40,9 @@
   ;; (blink-cursor-mode 1)
 
   ;; Setup fonts
-  ;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 130)
-  ;; (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
-  ;;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
+  (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 130)
+  (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
+  (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
   (variable-pitch-mode t)
 
   (prefer-coding-system 'utf-8)
@@ -208,20 +208,20 @@
 
 * Setting font face
 ** Setting fonts
-#+begin_src example
+#+begin_src emacs-lisp
   (set-face-attribute 'default t
                       :font "Iosevka" ;; Terminess Nerd Font Propo, Input, Terminess Nerd Font Propo
-                      :height 110
+                      :height 100
                       :weight 'regular
                       )
   (set-face-attribute 'variable-pitch nil
                       :font "Iosevka"
-                      :height 110
+                      :height 100
                       :weight 'medium
                       )
   (set-face-attribute 'fixed-pitch nil
                       :font "Iosevka"
-                      :height 110
+                      :height 100
                       :weight 'medium
                       )
 
@@ -240,7 +240,7 @@
   (setq-default line-spacing 0.12)
 
   ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-  (add-to-list 'default-frame-alist '(font . "Iosevka 12"))
+  (add-to-list 'default-frame-alist '(font . "Iosevka 11"))
   ;; (add-to-list 'default-frame-alist
   ;;        '(font . "DejaVu Sans Mono-11"))
 
@@ -259,18 +259,18 @@
 
   (use-package doom-themes
     :ensure t
-    :config
+    ;; :config
     ;; Global settings (defaults)
-    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-          doom-themes-enable-italic t) ; if nil, italics is universally disabled
+    ;; (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+    ;;       doom-themes-enable-italic t) ; if nil, italics is universally disabled
     ;; Enable flashing mode-line on errors
-    (doom-themes-visual-bell-config)
+    ;; (doom-themes-visual-bell-config)
     ;; or for treemacs users
     ;; (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
 
-    (doom-themes-treemacs-config)
+    ;; (doom-themes-treemacs-config)
     ;; Corrects (and improves) org-mode's native fontification.
-    (doom-themes-org-config)
+    ;; (doom-themes-org-config)
     )
 
   ;; (load-theme 'atom-one-dark t)
@@ -278,7 +278,7 @@
 	#+end_src
 
         #+RESULTS:
-        : t
+        : doom-themes
 
 ** Change theme by time
 #+begin_src emacs-lisp :lexical no
@@ -304,7 +304,6 @@
     :config
     (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
     (setq
-     org-ellipsis " ᗐ" ;; ⤵ ᗐ
           org-hide-emphasis-markers t
           org-hide-leading-stars t
           org-log-into-drawer t
@@ -372,7 +371,7 @@
 **** Improve org-mode looks
 #+begin_src emacs-lisp :lexical no
   (setq
-   ;; org-ellipsis " ▾"                 ; ↴, ▼, ▶, ⤵, ▾
+   org-ellipsis " ▾"                 ; ↴, ▼, ▶, ⤵, ▾
    org-roam-v2-ack t                 ; anonying startup message
    org-log-done 'time                ; I need to know when a task is done
    org-startup-folded t
@@ -400,7 +399,7 @@
 
 **** Increase the size of various headings
 #+begin_src emacs-lisp :lexical no
-  (set-face-attribute 'org-document-title nil :font "Terminess Nerd Font Propo" ) ;; :weight 'bold :height 1.5
+  (set-face-attribute 'org-document-title nil) ;;  :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
   (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
                   (org-level-3 . 1.05)
@@ -409,7 +408,7 @@
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-   (set-face-attribute (car face) nil :font "Terminess Nerd Font Propo")) ;;  :weight 'medium :height (cdr face)
+   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
 #+end_src
 
 #+RESULTS:
@@ -556,8 +555,7 @@
      (python . t)
      (rust . t)
      (C . t)
-     (latex . t)
-     ))
+     (latex . t)))
 #+end_src
 
 #+RESULTS:
@@ -2790,7 +2788,7 @@ Show vertical lines to guide indentation
 
 * Setting performance
 ** Better GC
-#+begin_src emacs-lisp :lexical no
+#+begin_src example
   (defvar better-gc-cons-threshold 134217728 ; 128mb
     "If you experience freezing, decrease this.
   If you experience stuttering, increase this.")

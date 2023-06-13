@@ -12,18 +12,17 @@
       package-archives
       '(("gnu"   . "https://elpa.gnu.org/packages/")
         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-        ("melpa-stable" . "https://stable.melpa.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")
-        ("org" . "https://orgmode.org/elpa/"))
+        ("melpa" . "https://melpa.org/packages/"))
       package-quickstart nil)
+;; ("melpa-stable" . "https://stable.melpa.org/packages/")
+;; ("org" . "https://orgmode.org/elpa/")
 ;; ("cselpa" . "https://elpa.thecybershadow.net/packages/")
 ;; ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
 ;; ("gnu-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/"))
 
 (setq package-archive-priorities
-      '(("melpa" .  4)
-        ("melpa-stable" . 3)
-        ("org" . 2)
+      '(("melpa" .  3)
+        ("nongnu" . 2)
         ("gnu" . 1)))
 
 ;; Configure Package Manager
@@ -78,20 +77,7 @@
 ;;   "README.org"
 ;;   user-emacs-directory))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(setq default-frame-alist '((undecorated . nil)))
 
 
 (eval-when-compile (defvar display-time-24hr-format t))
@@ -113,7 +99,7 @@
 ;; Setup fonts
 ;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 130)
 ;; (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
-;;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
+;; (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
 (variable-pitch-mode t)
 
 (prefer-coding-system 'utf-8)
@@ -190,10 +176,10 @@
 (kill-buffer "*Messages*")
 
 (add-hook 'minibuffer-exit-hook
-	      '(lambda ()
-	         (let ((buffer "*Completions*"))
-	           (and (get-buffer buffer)
-		            (kill-buffer buffer)))))
+	        '(lambda ()
+	           (let ((buffer "*Completions*"))
+	             (and (get-buffer buffer)
+		                (kill-buffer buffer)))))
 
 (setq initial-major-mode (quote fundamental-mode))
 
@@ -212,6 +198,44 @@
   (display-line-numbers-width 4)
   (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t))
+
+(set-face-attribute 'default t
+                    :font "Iosevka" ;; Terminess Nerd Font Propo, Input, Terminess Nerd Font Propo
+                    :height 100
+                    :weight 'regular
+                    )
+(set-face-attribute 'variable-pitch nil
+                    :font "Iosevka"
+                    :height 100
+                    :weight 'medium
+                    )
+(set-face-attribute 'fixed-pitch nil
+                    :font "Iosevka"
+                    :height 100
+                    :weight 'medium
+                    )
+
+(set-frame-font "Iosevka" nil t)
+
+;; Makes commented text and keywords italics.
+;; This is working in emacsclient but not emacs.
+;; Your font must have an italic face available.
+(set-face-attribute 'font-lock-comment-face nil
+                    :slant 'italic)
+(set-face-attribute 'font-lock-keyword-face nil
+                    :slant 'italic)
+
+;; Uncomment the following line if line spacing needs adjusting.
+(setq-default line-spacing 0.12)
+
+;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
+(add-to-list 'default-frame-alist '(font . "Iosevka 11"))
+;; (add-to-list 'default-frame-alist
+;;        '(font . "DejaVu Sans Mono-11"))
+
+(add-to-list 'default-frame-alist '(font . "Iosevka"))
+;; changes certain keywords to symbols, such as lamda!
+(setq global-prettify-symbols-mode t)
 
 (use-package gruvbox-theme
   :ensure t)
@@ -287,16 +311,16 @@
 ;;; replace-org-char
 ;; Replace list hyphen with dot
 (font-lock-add-keywords 'org-mode
-						'(("^ *\\([-]\\) "
-						   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+						            '(("^ *\\([-]\\) "
+						               (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
 ;; Replace list plus with arrow
 (font-lock-add-keywords 'org-mode
-						'(("^ *\\([+]\\) "
-						   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "➤"))))))
+						            '(("^ *\\([+]\\) "
+						               (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "➤"))))))
 
 (setq
- ;; org-ellipsis " ▾"                 ; ↴, ▼, ▶, ⤵, ▾
+ org-ellipsis " ▾"                 ; ↴, ▼, ▶, ⤵, ▾
  org-roam-v2-ack t                 ; anonying startup message
  org-log-done 'time                ; I need to know when a task is done
  org-startup-folded t
@@ -318,7 +342,7 @@
  org-fontify-quote-and-verse-blocks t
  org-image-actual-width '(300))
 
-(set-face-attribute 'org-document-title nil :font "Terminess Nerd Font Propo" ) ;; :weight 'bold :height 1.5
+(set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
 (dolist (face '((org-level-1 . 1.2)
                 (org-level-2 . 1.1)
                 (org-level-3 . 1.05)
@@ -327,7 +351,7 @@
                 (org-level-6 . 1.1)
                 (org-level-7 . 1.1)
                 (org-level-8 . 1.1)))
-  (set-face-attribute (car face) nil :font "Terminess Nerd Font Propo")) ;;  :weight 'medium :height (cdr face)
+  (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
 
 (defun org-quote-beautify ()
   "Beautify quotes in org-mode."
@@ -617,8 +641,8 @@
                                  (search . " %i %-12:c")))
 
 (setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
-                                                    "\n"
-                                                    (org-agenda-format-date-aligned date))))
+                                               "\n"
+                                               (org-agenda-format-date-aligned date))))
 (setq org-cycle-separator-lines 2)
 ;; (setq org-agenda-category-icon-alist
 ;;       `(("Work" ,(list (all-the-icons-faicon "cogs")) nil nil :ascent center)
@@ -990,36 +1014,34 @@
                           ;;(registers . 3)
                           (bookmarks . 4)
                           (projects . 4))) ;; use standard emacs logo as banner
-  ;; (add-hook 'dashboard-mode-hook (lambda () (setq show-trailing-whitespace nil)))
 
   ;; Format: "(icon title help action face prefix suffix)"
   ;; (setq dashboard-navigator-buttons
-  ;;       `(;; line1
-  ;;         ((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
-  ;;           "Main site"
-  ;;           "Browse homepage"
-  ;;           (lambda (&rest _) (browse-url "homepage")))
-  ;;          ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-  ;;          ("?" "" "?/h" #'show-help nil "<" ">"))
-  ;;         ;; line 2
-  ;;         ((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-  ;;           "Github"
-  ;;           ""
-  ;;           (lambda (&rest _) (browse-url "homepage")))
-  ;;          ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+  ;; 			`(;; line1
+  ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
+  ;; 					"Main site"
+  ;; 					"Browse homepage"
+  ;; 					(lambda (&rest _) (browse-url "homepage")))
+  ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+  ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
+  ;; 				;; line 2
+  ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+  ;; 					"Github"
+  ;; 					""
+  ;; 					(lambda (&rest _) (browse-url "homepage")))
+  ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
   (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
   ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-  ;;                                                    :height 1.1
-  ;;                                                    :v-adjust -0.05
-  ;;                                                    :face 'font-lock-keyword-face))
+  ;; 																									 :height 1.1
+  ;; 																									 :v-adjust -0.05
+  ;; 																									 :face 'font-lock-keyword-face))
   :config
   ;; (dashboard-modify-heading-icons '((recents . "file-text")
   ;;                                   (bookmarks . "book")))
   (dashboard-setup-startup-hook)
   )
 
-(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*"))
-      )
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
 (defun dashboard-refresh-buffer ()
   (interactive)
@@ -1087,33 +1109,33 @@
 ;;                                    `([,ligature-re 0 font-shape-gstring])))
 ;;            char/ligature-re)))
 
-(use-package dired
-  :defer t
-  :config
-  (setq dired-dwim-target t) ; Dired tries to guess the target directory
-  (setq dired-recursive-deletes 'always) ; Allow deleting directories recursively
-  (setq dired-listing-switches "-alh --group-directories-first") ; Use human-readable file sizes and group directories first
-  (setq dired-hide-details-mode t) ; Hide file and directory details by default
-  (setq dired-auto-revert-buffer t) ; Automatically refresh Dired buffers when changes are made
-  (setq diredp-hide-details-initially-flag nil)
-  (put 'dired-find-alternate-file 'disabled nil) ; Allow using Enter key to open files
-  (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; Bind Enter to open files
-  (define-key dired-mode-map (kbd "^")
-	(lambda () (interactive) (find-alternate-file ".."))) ; Bind ^ to go up a directory
-  (define-key dired-mode-map (kbd "(") 'dired-hide-details-mode) ; Bind ( to toggle file and directory details
-  (define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
-  (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
-  (use-package all-the-icons-dired
-	:ensure t
-	:hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
-	:init
-	(setq all-the-icons-dired-mode-inline-electric-icons t)) ; Show electric icons for Dired mode
-  ;; (use-package image-dired
-  ;; 	:ensure t
-  ;; 	:config
-  ;; 	(image-dired-track-modified-flag t) ; Automatically track modifications in images
-  ;; 	(image-dired-thumb-margin 5)) ; Set margin for image thumbnails in Image Dired mode
-  )
+;; (use-package dired
+;;   :defer t
+;;   :config
+;;   (setq dired-dwim-target t) ; Dired tries to guess the target directory
+;;   (setq dired-recursive-deletes 'always) ; Allow deleting directories recursively
+;;   (setq dired-listing-switches "-alh --group-directories-first") ; Use human-readable file sizes and group directories first
+;;   (setq dired-hide-details-mode t) ; Hide file and directory details by default
+;;   (setq dired-auto-revert-buffer t) ; Automatically refresh Dired buffers when changes are made
+;;   (setq diredp-hide-details-initially-flag nil)
+;;   (put 'dired-find-alternate-file 'disabled nil) ; Allow using Enter key to open files
+;;   (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; Bind Enter to open files
+;;   (define-key dired-mode-map (kbd "^")
+;; 	  (lambda () (interactive) (find-alternate-file ".."))) ; Bind ^ to go up a directory
+;;   (define-key dired-mode-map (kbd "(") 'dired-hide-details-mode) ; Bind ( to toggle file and directory details
+;;   (define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
+;;   (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
+;;   (use-package all-the-icons-dired
+;; 	  :ensure t
+;; 	  :hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
+;; 	  :init
+;; 	  (setq all-the-icons-dired-mode-inline-electric-icons t)) ; Show electric icons for Dired mode
+;;   ;; (use-package image-dired
+;;   ;; 	:ensure t
+;;   ;; 	:config
+;;   ;; 	(image-dired-track-modified-flag t) ; Automatically track modifications in images
+;;   ;; 	(image-dired-thumb-margin 5)) ; Set margin for image thumbnails in Image Dired mode
+;;   )
 
 (use-package dired-rainbow
   :ensure t
@@ -1143,40 +1165,38 @@
 
 (use-package doom-modeline
   :ensure t
+  :after all-the-icons
   :hook
   (after-init . doom-modeline-mode)
   :custom
-  (setq doom-modeline-buffer-encoding nil
-        doom-modeline-buffer-file-name-style 'file-name
-        doom-modeline-checker-simple-format t
-        doom-modeline-vcs-max-length 50
-        doom-modeline-major-mode-icon nil
-        doom-modeline-icon t
-        doom-modeline-modal-icon t
-        doom-modeline-lsp nil
-        doom-modeline-major-mode-color-icon nil
-        doom-modeline-buffer-state-icon nil
-        doom-modeline-time-icon nil
-        doom-modeline-battery t
-        doom-modeline-lsp t
-        doom-modeline-workspace-name t
-        doom-modeline-enable-word-count t)
-  (custom-set-faces
-   '(mode-line ((t (:family "Iosevka Aile" :height 1.0))))
-   '(mode-line-active ((t (:family "Iosevka Aile" :height 1.0)))) ; For 29+
-   '(mode-line-inactive ((t (:family "Iosevka Aile" :height 0.95)))))
-  (doom-modeline-buffer-file-name-style 'relative-from-project)
-  )
+  (doom-modeline-buffer-file-name-style 'relative-to-project)
+  (doom-modeline-major-mode-color-icon nil)
+  (doom-modeline-icon (display-graphic-p))
+  (doom-modeline-checker-simple-format t)
+  (doom-modeline-buffer-state-icon nil)
+  (doom-modeline-buffer-encoding nil)
+  (doom-modeline-major-mode-icon nil)
+  (doom-line-numbers-style 'relative)
+  (doom-modeline-enable-word-count t)
+  ;; Don't compact font caches during GC. Windows Laggy Issue
+  (inhibit-compacting-font-caches t)
+  (doom-modeline-vcs-max-length 50)
+  (doom-modeline-workspace-name t)
+  (doom-modeline-flycheck-icon t)
+  (doom-modeline-time-icon nil)
+  (doom-modeline-modal-icon t)
+  (doom-modeline-height 35)
+  (doom-modeline-battery t)
+  (doom-modeline-lsp nil)
+  (doom-modeline-lsp t))
 
-;; (use-package doom-modeline
-;; 	:ensure t
-;; 	:defer t
-;; 	:custom
-;; 	(doom-modeline-modal-icon nil)
-;; 	(doom-modeline-buffer-file-name-style 'relative-from-project)
-;; 	:hook
-;; 	(after-init . doom-modeline-mode)
-;; 	(doom-modeline-mode . display-battery-mode))
+(use-package minions
+  :ensure t
+  :delight " 𝛁"
+  :hook (doom-modeline-mode . minions-mode)
+  :config
+  (minions-mode 1)
+  (setq minions-mode-line-lighter "[+]"))
 
 (use-package elfeed
   :ensure t
@@ -1294,15 +1314,15 @@
   :hook (magit-mode . magit-todos-mode)
   :config
   (setq magit-todos-recursive t
-		magit-todos-depth 4
-		magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/" "target/"))
+		    magit-todos-depth 4
+		    magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/" "target/"))
   (custom-set-variable
    '(magit-todos-keywords (list "TODO" "FIXME" "BUGFIX" "HACK"))))
 
 (use-package blamer
   :ensure t
-  :bind (("s-i" . blamer-show-commit-info)
-         ("C-c i" . ("s-i" . blamer-show-posframe-commit-info)))
+  ;; :bind (("s-i" . blamer-show-commit-info)
+  ;;        ("C-c i" . ("s-i" . blamer-show-posframe-commit-info)))
   :defer 20
   :custom
   (blamer-idle-time 0.3)
@@ -1486,7 +1506,7 @@
 
 (use-package treemacs-all-the-icons
   :ensure t)
-;; (treemacs-load-theme "all-the-icons")
+(treemacs-load-theme "all-the-icons")
 
 (use-package treemacs-evil
   :after (treemacs evil)
@@ -1576,7 +1596,7 @@
 (global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
 
 (use-package all-the-icons
-  :if (display-graphic-p))
+  :ensure t)
 
 (use-package indent-guide
   :ensure t
@@ -1585,7 +1605,7 @@
 
 (defun my/parrot-animate-when-compile-success (buffer result)
   (if (string-match "^finished" result)
-	  (parrot-start-animation)))
+	    (parrot-start-animation)))
 
 (use-package parrot
   :ensure t
@@ -1834,12 +1854,12 @@
   :custom
   (json-reformat:indent-width 2)
   :mode (("\\.bowerrc$"     . json-mode)
-		 ("\\.jshintrc$"    . json-mode)
-		 ("\\.json_schema$" . json-mode)
-		 ("\\.json\\'" . json-mode))
+		     ("\\.jshintrc$"    . json-mode)
+		     ("\\.json_schema$" . json-mode)
+		     ("\\.json\\'" . json-mode))
   :bind (:package json-mode-map
-				  :map json-mode-map
-				  ("C-c <tab>" . json-mode-beautify)))
+				          :map json-mode-map
+				          ("C-c <tab>" . json-mode-beautify)))
 
 ;; Set up before-save hooks to format buffer and add/delete imports.
 ;; Make sure you don't have other gofmt/goimports hooks enabled.
@@ -1925,7 +1945,6 @@
   :config
   (apheleia-global-mode +1))
 
-
 ;; (add-hook 'prog-mode-hook 'linum-mode)
 (add-hook 'prog-mode-hook 'visual-line-mode)
 (add-hook 'prog-mode-hook 'show-paren-mode)
@@ -1935,11 +1954,11 @@
   "If you experience freezing, decrease this.
 If you experience stuttering, increase this.")
 
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold better-gc-cons-threshold)
-            (setq file-name-handler-alist file-name-handler-alist-original)
-            (makunbound 'file-name-handler-alist-original)))
+;; (add-hook 'emacs-startup-hook
+;;           (lambda ()
+;;             (setq gc-cons-threshold better-gc-cons-threshold)
+;;             (setq file-name-handler-alist file-name-handler-alist-original)
+;;             (makunbound 'file-name-handler-alist-original)))
 
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -1967,14 +1986,77 @@ If you experience stuttering, increase this.")
 
 
 
+;;________________________________________________________________
+;;;;    Fancy pkg
+;;________________________________________________________________
+(use-package fancy-battery
+  :config
+  (setq fancy-battery-show-percentage t)
+  (setq battery-update-interval 15)
+  (if window-system
+      (fancy-battery-mode)
+    (display-battery-mode)))
 
+;;;;; olivetti
+(use-package olivetti
+  :hook ((text-mode         . olivetti-mode)
+         ;; (prog-mode         . olivetti-mode)
+         (Info-mode         . olivetti-mode)
+         (org-mode          . olivetti-mode)
+         (nov-mode          . olivetti-mode)
+         (markdown-mode     . olivetti-mode)
+         (mu4e-view-mode    . olivetti-mode)
+         (elfeed-show-mode  . olivetti-mode)
+         (mu4e-compose-mode . olivetti-mode))
+  :custom
+  (olivetti-body-width 80)
+  :delight " ⊗") ; Ⓐ ⊛
 
+;;;;; hl-indent
+(use-package highlight-indent-guides
+  :custom
+  (highlight-indent-guides-delay 0)
+  (highlight-indent-guides-responsive t)
+  (highlight-indent-guides-method 'character)
+  ;; (highlight-indent-guides-auto-enabled t)
+  ;; (highlight-indent-guides-character ?\┆) ;; Indent character samples: | ┆ ┊
+  :commands highlight-indent-guides-mode
+  :hook (prog-mode  . highlight-indent-guides-mode)
+  :delight " ㄓ")
 
+;;;;; hl-volatile
+(use-package volatile-highlights
+  :diminish
+  :commands volatile-highlights-mode
+  :hook (after-init . volatile-highlights-mode)
+  :custom-face
+  (vhl/default-face ((nil (:foreground "#FF3333" :background "BlanchedAlmond"))))) ; "#FFCDCD"
+;; (set-face-background 'highlight "#3e4446") ; also try: "#3e4446"/"#gray6"
+;; (set-face-foreground 'highlight nil)
+;; (set-face-underline-p 'highlight "#ff0000")
 
+;;;;; hl-numbers
+(use-package highlight-numbers
+  :hook (prog-mode . highlight-numbers-mode))
 
-
-
-
+;;;;; beacon
+(use-package beacon
+  :commands beacon-mode
+  :init (beacon-mode t)
+  :bind ("C-S-l" . 'beacon-blink)
+  :config
+  (setq
+   beacon-blink-when-window-changes t  ; only flash on window/buffer changes...
+   beacon-blink-when-window-scrolls nil
+   beacon-blink-when-point-moves nil
+   beacon-dont-blink-commands nil
+   beacon-blink-when-focused t
+   beacon-blink-duration .5
+   beacon-blink-delay .5
+   beacon-push-mark 1
+   beacon-color "#50D050"
+   beacon-size 20)
+  :delight)
 
 ;;________________________________________________________________
 ;;;    Settings
@@ -2025,7 +2107,7 @@ If you experience stuttering, increase this.")
  compilation-always-kill t         ; kill compilation process before starting another.
  compilation-ask-about-save nil    ; save all buffers on `compile'.
  compilation-scroll-output t
- tab-width 4
+ tab-width 2
  indent-tabs-mode nil              ; set indentation with spaces instead of tabs with 4 spaces.
  indent-line-function 'insert-tab
  require-final-newline t
@@ -2084,62 +2166,3 @@ If you experience stuttering, increase this.")
  speedbar-show-unknown-files t ; browse source tree with Speedbar file browser
  frame-title-format '(buffer-file-name "Emacs: %b (%f)" "Emacs: %b") ; name of the file I am editing as the name of the window.
  )
-
-
-
-
-
-
-
-
-
-
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(before-save-hook '(parrot-start-animation format-all-buffer))
- '(custom-safe-themes
-   '("2ff9ac386eac4dffd77a33e93b0c8236bb376c5a5df62e36d4bfa821d56e4e20" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "fa49766f2acb82e0097e7512ae4a1d6f4af4d6f4655a48170d0a00bcb7183970" "d80952c58cf1b06d936b1392c38230b74ae1a2a6729594770762dc0779ac66b7" "2e05569868dc11a52b08926b4c1a27da77580daa9321773d92822f7a639956ce" "70b596389eac21ab7f6f7eb1cf60f8e60ad7c34ead1f0244a577b1810e87e58c" "a589c43f8dd8761075a2d6b8d069fc985660e731ae26f6eddef7068fece8a414" "631c52620e2953e744f2b56d102eae503017047fb43d65ce028e88ef5846ea3b" "a44e2d1636a0114c5e407a748841f6723ed442dc3a0ed086542dc71b92a87aee" "7e068da4ba88162324d9773ec066d93c447c76e9f4ae711ddd0c5d3863489c52" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "512ce140ea9c1521ccaceaa0e73e2487e2d3826cc9d287275550b47c04072bc4" "bf948e3f55a8cd1f420373410911d0a50be5a04a8886cabe8d8e471ad8fdba8e" "171d1ae90e46978eb9c342be6658d937a83aaa45997b1d7af7657546cae5985b" default))
- '(doom-modeline-bar-width 6)
- '(doom-modeline-buffer-file-name-style 'auto)
- '(doom-modeline-buffer-name nil)
- '(doom-modeline-buffer-state-icon t)
- '(doom-modeline-height 30)
- '(doom-modeline-highlight-modified-buffer-name nil)
- '(doom-modeline-icon t)
- '(doom-modeline-project-detection 'projectile)
- '(global-wakatime-mode t)
- '(helm-minibuffer-history-key "M-p")
- '(magit-todos-keywords (list "TODO" "FIXME" "HACK"))
- '(org-agenda-files
-   '("/home/chopin/Org/agenda/calendar.org" "/home/chopin/Org/agenda/agenda.org" "/home/chopin/Org/agenda/cal_inbox.org" "/home/chopin/Org/2Brain/2023-03-10-05:45:45-ооп_это.org" "/home/chopin/Org/2Brain/2023-02-04-16:19:33-школьные_предметы.org" "/home/chopin/Org/2Brain/2023-02-27-23:38:55-7_советов_по_очистке_кода_react.org" "/home/chopin/Org/2Brain/2023-03-05-20:41:26-latin_gender.org" "/home/chopin/Org/2Brain/2023-02-13-19:00:50-rust.org" "/home/chopin/Org/2Brain/20230202193313-bibliotheca_alexandrina.org"))
- '(org-hugo-base-dir ~/Templates/Blog)
- '(org-safe-remote-resources
-   '("\\`https://cs7\\.pikabu\\.ru/post_img/2018/12/17/7/1545041477174040899\\.jpg\\'" "\\`https://cs11\\.pikabu\\.ru/post_img/2018/12/17/7/1545041626180870887\\.jpg\\'" "\\`https://upload\\.wikimedia\\.org/wikipedia/commons/thumb/0/00/Giovanni_Stanchi%2C_Watermelons%2C_Peaches%2C_Pears%2C_and_Other_Fruit_in_a_Landscape\\.jpg/2560px-Giovanni_Stanchi%2C_Watermelons%2C_Peaches%2C_Pears%2C_and_Other_Fruit_in_a_Landscape\\.jpg\\'" "\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'" "\\`https://fniessen\\.github\\.io\\(?:/\\|\\'\\)"))
- '(telega-active-locations-mode t)
- '(telega-appindicator-mode t)
- '(telega-appindicator-show-mentions t)
- '(telega-completing-read-function 'ido-completing-read)
- '(telega-patrons-mode t)
- '(telega-root-auto-fill-mode t)
- '(telega-root-fill-column 232)
- '(telega-sticker-animated-play nil)
- '(telega-translate-to-language-by-default "en")
- '(warning-suppress-log-types
-   '((use-package)
-	 (use-package)
-	 (org-element-cache)
-	 ((org-roam))
-	 (comp)))
- '(warning-suppress-types '((use-package) (org-element-cache) ((org-roam)) (comp))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(blamer-face ((t :foreground "#E46876" :height 140 :italic t)) t)
- '(doom-modeline-time ((t (:inherit (mode-line-buffer-id bold) :box (:line-width (2 . 2) :color "dim gray" :style flat-button))))))
-(put 'dired-find-alternate-file 'disabled nil)
