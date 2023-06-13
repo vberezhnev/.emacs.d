@@ -21,17 +21,6 @@
 #+END_SRC
 
 * Setting base of Emacs
-** Functions
-#+begin_src example
-  (defun indent-org-block-automatically ()
-    (when (org-in-src-block-p)
-      (org-edit-special)
-      (indent-region (point-min) (point-max))
-      (org-edit-src-exit)))
-
-  (run-at-time 1 10 'indent-org-block-automatically)
-#+end_src
-
 ** Window
 #+begin_src emacs-lisp
   (eval-when-compile (defvar display-time-24hr-format t))
@@ -219,24 +208,24 @@
 
 * Setting font face
 ** Setting fonts
-#+begin_src emacs-lisp
+#+begin_src example
   (set-face-attribute 'default t
-                      :font "Hack" ;; Iosevka, Input, Hack
+                      :font "Iosevka" ;; Terminess Nerd Font Propo, Input, Terminess Nerd Font Propo
                       :height 110
                       :weight 'regular
                       )
   (set-face-attribute 'variable-pitch nil
-                      :font "Hack"
+                      :font "Iosevka"
                       :height 110
                       :weight 'medium
                       )
   (set-face-attribute 'fixed-pitch nil
-                      :font "Hack"
+                      :font "Iosevka"
                       :height 110
                       :weight 'medium
                       )
 
-  (set-frame-font "JetBrains Mono" nil t)
+  (set-frame-font "Iosevka" nil t)
 
   ;; Makes commented text and keywords italics.
   ;; This is working in emacsclient but not emacs.
@@ -251,11 +240,11 @@
   (setq-default line-spacing 0.12)
 
   ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-  (add-to-list 'default-frame-alist '(font . "Hack 12"))
-  (add-to-list 'default-frame-alist
-         '(font . "DejaVu Sans Mono-11"))
+  (add-to-list 'default-frame-alist '(font . "Iosevka 12"))
+  ;; (add-to-list 'default-frame-alist
+  ;;        '(font . "DejaVu Sans Mono-11"))
 
-  (add-to-list 'default-frame-alist '(font . "Hack"))
+  (add-to-list 'default-frame-alist '(font . "Iosevka"))
   ;; changes certain keywords to symbols, such as lamda!
   (setq global-prettify-symbols-mode t)
 #+end_src
@@ -265,8 +254,8 @@
 
 ** Setting and installing themes
 #+begin_src emacs-lisp
-  ;; (use-package 'gruvbox-theme
-  ;; 	:ensure t)
+  (use-package gruvbox-theme
+          :ensure t)
 
   (use-package doom-themes
     :ensure t
@@ -287,6 +276,9 @@
   ;; (load-theme 'atom-one-dark t)
   ;; (load-theme 'doom-monokai-classic t)
 	#+end_src
+
+        #+RESULTS:
+        : t
 
 ** Change theme by time
 #+begin_src emacs-lisp :lexical no
@@ -311,7 +303,8 @@
     ;; :hook (org-mode . mk/org-mode-setup)
     :config
     (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-    (setq org-ellipsis " ᗐ" ;; ⤵ ᗐ
+    (setq
+     org-ellipsis " ᗐ" ;; ⤵ ᗐ
           org-hide-emphasis-markers t
           org-hide-leading-stars t
           org-log-into-drawer t
@@ -323,17 +316,17 @@
 
 
     ;; Setup fonts for org-mode
-    ;; (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
-    ;; (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-    ;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-    ;; (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-    ;; (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-    ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-    ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    ;; (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-    ;; (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-    ;; (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
+    (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+    (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+    (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+    (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
 
     (add-hook 'org-babel-after-execute-hook (lambda ()
                                               (when org-inline-image-overlays
@@ -379,7 +372,7 @@
 **** Improve org-mode looks
 #+begin_src emacs-lisp :lexical no
   (setq
-   org-ellipsis " ▾"                 ; ↴, ▼, ▶, ⤵, ▾
+   ;; org-ellipsis " ▾"                 ; ↴, ▼, ▶, ⤵, ▾
    org-roam-v2-ack t                 ; anonying startup message
    org-log-done 'time                ; I need to know when a task is done
    org-startup-folded t
@@ -401,9 +394,13 @@
    org-fontify-quote-and-verse-blocks t
    org-image-actual-width '(300))
 #+end_src
+
+#+RESULTS:
+| 300 |
+
 **** Increase the size of various headings
 #+begin_src emacs-lisp :lexical no
-  (set-face-attribute 'org-document-title nil :font "JetBrains Mono" ) ;; :weight 'bold :height 1.5
+  (set-face-attribute 'org-document-title nil :font "Terminess Nerd Font Propo" ) ;; :weight 'bold :height 1.5
   (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
                   (org-level-3 . 1.05)
@@ -412,8 +409,11 @@
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "JetBrains Mono")) ;;  :weight 'medium :height (cdr face)
+   (set-face-attribute (car face) nil :font "Terminess Nerd Font Propo")) ;;  :weight 'medium :height (cdr face)
 #+end_src
+
+#+RESULTS:
+
 **** Beautiful quotes
 #+begin_src emacs-lisp :lexical no
 (defun org-quote-beautify ()
@@ -440,9 +440,9 @@
 #+end_src
 
 #+RESULTS:
-| org-quote-visual-fill | (lambda nil (set (make-local-variable 'company-backends) '(company-org-block)) (company-mode 1)) | (lambda nil (display-line-numbers-mode 0)) | org-toggle-latex-fragment | (closure (org-agenda-skip-regexp org-fold-core-style org-table1-hline-regexp org-table-tab-recognizes-table.el org-table-dataline-regexp org-table-any-border-regexp org-agenda-restriction-lock-overlay org-agenda-overriding-restriction org-agenda-diary-file org-complex-heading-regexp calendar-mode-map t) nil (setq imenu-create-index-function 'org-imenu-get-tree)) | org-pdftools-setup-link | org-ref-org-menu | (lambda nil Beautify Org Checkbox Symbol (setq prettify-symbols-alist (cons '([ ] . ☐) prettify-symbols-alist)) (setq prettify-symbols-alist (cons '([X] . ☑) prettify-symbols-alist)) (setq prettify-symbols-alist (cons '([-] . ❍) prettify-symbols-alist)) (prettify-symbols-mode)) | org-bullets-mode | (lambda nil (add-hook 'before-save-hook 'org-beautify-quote-blocks nil 'local)) | org-tempo-setup | (closure (org--rds reftex-docstruct-symbol org--single-lines-list-is-paragraph org-element-greater-elements visual-fill-column-width org-clock-history org-agenda-current-date org-with-time org-defdecode org-def org-read-date-inactive org-ans2 org-ans1 org-columns-current-fmt-compiled org-clock-current-task org-clock-effort org-agenda-skip-function org-agenda-skip-comment-trees org-agenda-archives-mode org-end-time-was-given org-time-was-given org-log-note-extra org-log-note-purpose org-log-post-message org-last-inserted-timestamp org-last-changed-timestamp org-entry-property-inherited-from org-blocked-by-checkboxes org-state org-agenda-headline-snapshot-before-repeat org-agenda-buffer-name org-agenda-start-on-weekday org-agenda-buffer-tmp-name org-priority-regexp org-mode-abbrev-table org-mode-syntax-table org-element-cache-persistent buffer-face-mode-face org-tbl-menu org-org-menu org-struct-menu org-entities org-last-state org-id-track-globally org-clock-start-time texmathp-why remember-data-file org-agenda-tags-todo-honor-ignore-options calc-embedded-open-mode calc-embedded-open-formula calc-embedded-close-formula align-mode-rules-list org-emphasis-alist org-emphasis-regexp-components org-export-registered-backends org-modules crm-separator org-babel-load-languages org-id-overriding-file-name org-indent-indentation-per-level org-element--timestamp-regexp org-element-cache-map-continue-from org-element-paragraph-separate org-agenda-buffer-name org-inlinetask-min-level t) nil (add-hook 'change-major-mode-hook 'org-fold-show-all 'append 'local)) | (closure (org-src-window-setup *this* org-babel-confirm-evaluate-answer-no org-babel-tangle-uncomment-comments org-src-preserve-indentation org-src-lang-modes org-edit-src-content-indentation org-babel-library-of-babel t) nil (add-hook 'change-major-mode-hook #'org-babel-show-result-all 'append 'local)) | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+| org-toggle-latex-fragment | flyspell-mode | org-pdftools-setup-link | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | (lambda nil Beautify Org Checkbox Symbol (setq prettify-symbols-alist (cons '([ ] . ☐) prettify-symbols-alist)) (setq prettify-symbols-alist (cons '([X] . ☑) prettify-symbols-alist)) (setq prettify-symbols-alist (cons '([-] . ❍) prettify-symbols-alist)) (prettify-symbols-mode)) | org-bullets-mode | org-quote-beautify | org-tempo-setup | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
 
-**** Org modern
+**** Org modern (disabled)
 #+begin_src example
   (use-package org-modern
     :ensure t
@@ -528,7 +528,7 @@
             ("DONE" . "ForestGreen")
             ("ARCHIVED" .  "SlateBlue"))))
           #+end_src
-
+          
 **** Org timer (Pomodoro)
 #+begin_src emacs-lisp
 	(setq org-clock-sound "~/.emacs.d/sound.wav")
@@ -672,6 +672,10 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start nil))
 #+end_src
+
+#+RESULTS:
+| org-roam-ui-mode | org-persist-load-all | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings |
+
 **** Org-roam-bibtex
 #+begin_src example
   (use-package org-roam-bibtex
@@ -753,6 +757,9 @@ Deps for org-roam-bibtex:
   :config
   (push 'company-org-roam company-backends))
 #+end_src
+
+#+RESULTS:
+: t
 
 **** Md-roam (add md for org-roam)
 #+begin_src example
@@ -1120,7 +1127,7 @@ Deps for org-roam-bibtex:
 
 ** LaTeX
 *** Auctex
-#+begin_src emacs-lisp
+#+begin_src example
   (use-package auctex
     :ensure t)
 
@@ -1144,6 +1151,9 @@ Deps for org-roam-bibtex:
   (add-hook 'TeX-after-compilation-finished-functions
             #'TeX-revert-document-buffer)
 #+end_src
+
+#+RESULTS:
+| TeX-revert-document-buffer |
 
 *** Embed LaTeX in org-mode
 #+begin_src emacs-lisp
@@ -1289,7 +1299,7 @@ https://github.com/jdtsmith/kind-icon
 #+end_src
 
 #+RESULTS:
-: hydra-pdftools/body
+: pdf-view-reset-slice
 
 **** saveplace-view
 #+begin_src emacs-lisp
@@ -1298,7 +1308,7 @@ https://github.com/jdtsmith/kind-icon
 #+end_src
 *** nov.el (epub)
 For more information: https://depp.brause.cc/nov.el/
-#+begin_src emacs-lisp
+#+begin_src example
   (use-package nov
     :ensure t
     :config
@@ -1310,6 +1320,10 @@ For more information: https://depp.brause.cc/nov.el/
     (add-hook 'nov-mode-hook 'visual-fill-column-mode)
     )
 #+end_src
+
+#+RESULTS:
+: t
+
 *** nov-xwidget (epub)
 #+begin_src emacs-lisp
   (load "~/.emacs.d/local-packages/nov-xwidget")
@@ -1326,6 +1340,10 @@ For more information: https://depp.brause.cc/nov.el/
     (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
     (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
 #+end_src
+
+#+RESULTS:
+: t
+
 *** Calibre (books management)
 #+begin_src emacs-lisp
   (setq sql-sqlite-program "/usr/bin/sqlite3")
@@ -1420,66 +1438,138 @@ For more information: https://depp.brause.cc/nov.el/
     "Keymap for `calibredb-search-mode'.")
 
     #+end_src
+
+    #+RESULTS:
+    : calibredb-search-mode-map
+
 ** Dashboard
 #+begin_src emacs-lisp
-  ;; Setting dashboard
-  (use-package dashboard
-    :ensure t
-    :hook (dashboard-mode . (lambda ()
-                              ;; No title
-                              (setq-local frame-title-format nil)
-                              ;; Enable `page-break-lines-mode'
-                              (when (fboundp 'page-break-lines-mode)
-                                (page-break-lines-mode 1))))
-    :init      ;; tweak dashboard config before loading it
-    (setq dashboard-set-heading-icons t
-          dashboard-set-file-icons t
-          dashboard-center-content t
-          dashboard-banner-logo-title "Welcome back, Darling!"
-          dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
-          ;; dashboard-page-separator ""
-          dashboard-set-navigator t
-          dashboard-items '(
-                            (recents . 6)
-                            ;; (agenda . 4 )
-                            ;;(registers . 3)
-                            (bookmarks . 4)
-                            (projects . 4))) ;; use standard emacs logo as banner
+    ;; Setting dashboard
+    (use-package dashboard
+      :ensure t
+      :hook (dashboard-mode . (lambda ()
+                                ;; No title
+                                (setq-local frame-title-format nil)
+                                ;; Enable `page-break-lines-mode'
+                                (when (fboundp 'page-break-lines-mode)
+                                  (page-break-lines-mode 1))))
+      :init      ;; tweak dashboard config before loading it
+      (setq dashboard-set-heading-icons t
+            dashboard-set-file-icons t
+            dashboard-center-content t
+            dashboard-banner-logo-title "Welcome back, Darling!"
+            dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
+            ;; dashboard-page-separator ""
+            dashboard-set-navigator t
+            dashboard-items '(
+                              (recents . 6)
+                              ;; (agenda . 4 )
+                              ;;(registers . 3)
+                              (bookmarks . 4)
+                              (projects . 4))) ;; use standard emacs logo as banner
+  (add-hook 'dashboard-mode-hook (lambda () (setq show-trailing-whitespace nil)))
 
-    ;; Format: "(icon title help action face prefix suffix)"
-    ;; (setq dashboard-navigator-buttons
-    ;; 			`(;; line1
-    ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
-    ;; 					"Main site"
-    ;; 					"Browse homepage"
-    ;; 					(lambda (&rest _) (browse-url "homepage")))
-    ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-    ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
-    ;; 				;; line 2
-    ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-    ;; 					"Github"
-    ;; 					""
-    ;; 					(lambda (&rest _) (browse-url "homepage")))
-    ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
-    (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
-    ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-    ;; 																									 :height 1.1
-    ;; 																									 :v-adjust -0.05
-    ;; 																									 :face 'font-lock-keyword-face))
+      ;; Format: "(icon title help action face prefix suffix)"
+      ;; (setq dashboard-navigator-buttons
+      ;;       `(;; line1
+      ;;         ((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
+      ;;           "Main site"
+      ;;           "Browse homepage"
+      ;;           (lambda (&rest _) (browse-url "homepage")))
+      ;;          ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+      ;;          ("?" "" "?/h" #'show-help nil "<" ">"))
+      ;;         ;; line 2
+      ;;         ((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+      ;;           "Github"
+      ;;           ""
+      ;;           (lambda (&rest _) (browse-url "homepage")))
+      ;;          ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+      (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
+      ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+      ;;                                                    :height 1.1
+      ;;                                                    :v-adjust -0.05
+      ;;                                                    :face 'font-lock-keyword-face))
+      :config
+      ;; (dashboard-modify-heading-icons '((recents . "file-text")
+      ;;                                   (bookmarks . "book")))
+      (dashboard-setup-startup-hook)
+      )
+
+    (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*"))
+  )
+
+    (defun dashboard-refresh-buffer ()
+      (interactive)
+      (when (get-buffer dashboard-buffer-name)
+        (kill-buffer dashboard-buffer-name))
+      (dashboard-insert-startupify-lists)
+      (switch-to-buffer dashboard-buffer-name))
+#+end_src
+
+#+RESULTS:
+: dashboard-refresh-buffer
+
+** Ligature
+#+begin_src emacs-lisp :lexical no
+  (use-package ligature
     :config
-    (dashboard-modify-heading-icons '((recents . "file-text")
-                                      (bookmarks . "book")))
-    (dashboard-setup-startup-hook)
-    )
+    ;; Enable the "www" ligature in every possible major mode
+    (ligature-set-ligatures 't '("www"))
+    ;; Enable traditional ligature support in eww-mode, if the
+    ;; `variable-pitch' face supports it
+    (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+    ;; Enable all Cascadia Code ligatures in programming modes
+    (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                         ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                         "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                         "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                         "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                         "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                         "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                         "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                         ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                         "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                         "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                         "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                         "\\\\" "://"))
+    ;; Enables ligature checks globally in all buffers. You can also do it
+    ;; per mode with `ligature-mode'.
+    (global-ligature-mode t))
 
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-
-  (defun dashboard-refresh-buffer ()
-    (interactive)
-    (when (get-buffer dashboard-buffer-name)
-      (kill-buffer dashboard-buffer-name))
-    (dashboard-insert-startupify-lists)
-    (switch-to-buffer dashboard-buffer-name))
+  ;;;;; ligature-for-jetbrain
+  ;; (when (aorst/font-installed-p "JetBrainsMono")
+  ;;   (dolist (char/ligature-re
+  ;;            `((?-  ,(rx (or (or "-->" "-<<" "->>" "-|" "-~" "-<" "->") (+ "-"))))
+  ;;              (?/  ,(rx (or (or "/==" "/=" "/>" "/**" "/*") (+ "/"))))
+  ;;              (?*  ,(rx (or (or "*>" "*/") (+ "*"))))
+  ;;              (?<  ,(rx (or (or "<<=" "<<-" "<|||" "<==>" "<!--" "<=>" "<||" "<|>" "<-<"
+  ;;                                "<==" "<=<" "<-|" "<~>" "<=|" "<~~" "<$>" "<+>" "</>" "<*>"
+  ;;                                "<->" "<=" "<|" "<:" "<>"  "<$" "<-" "<~" "<+" "</" "<*")
+  ;;                            (+ "<"))))
+  ;;              (?:  ,(rx (or (or ":?>" "::=" ":>" ":<" ":?" ":=") (+ ":"))))
+  ;;              (?=  ,(rx (or (or "=>>" "==>" "=/=" "=!=" "=>" "=:=") (+ "="))))
+  ;;              (?!  ,(rx (or (or "!==" "!=") (+ "!"))))
+  ;;              (?>  ,(rx (or (or ">>-" ">>=" ">=>" ">]" ">:" ">-" ">=") (+ ">"))))
+  ;;              (?&  ,(rx (+ "&")))
+  ;;              (?|  ,(rx (or (or "|->" "|||>" "||>" "|=>" "||-" "||=" "|-" "|>" "|]" "|}" "|=")
+  ;;                            (+ "|"))))
+  ;;              (?.  ,(rx (or (or ".?" ".=" ".-" "..<") (+ "."))))
+  ;;              (?+  ,(rx (or "+>" (+ "+"))))
+  ;;              (?\[ ,(rx (or "[<" "[|")))
+  ;;              (?\{ ,(rx "{|"))
+  ;;              (?\? ,(rx (or (or "?." "?=" "?:") (+ "?"))))
+  ;;              (?#  ,(rx (or (or "#_(" "#[" "#{" "#=" "#!" "#:" "#_" "#?" "#(") (+ "#"))))
+  ;;              (?\; ,(rx (+ ";")))
+  ;;              (?_  ,(rx (or "_|_" "__")))
+  ;;              (?~  ,(rx (or "~~>" "~~" "~>" "~-" "~@")))
+  ;;              (?$  ,(rx "$>"))
+  ;;              (?^  ,(rx "^="))
+  ;;              (?\] ,(rx "]#"))))
+  ;;     (apply (lambda (char ligature-re)
+  ;;              (set-char-table-range composition-function-table char
+  ;;                                    `([,ligature-re 0 font-shape-gstring])))
+  ;;            char/ligature-re)))
+  
 #+end_src
 
 ** Dired
@@ -1594,12 +1684,14 @@ BUG BUG BUG
 
 *** Hide / show dotfiles
 #+begin_src example
-	(use-package dired-hide-dotfiles
-		:hook (dired-mode . dired-hide-dotfiles-mode)
-		:config
-		(evil-collection-define-key 'normal 'dired-mode-map
-			"H" 'dired-hide-dotfiles-mode))
+  (setq dired-omit-mode t)
+
+  (setq dired-omit-files
+      (concat dired-omit-files "\\|^\\..+$"))
 #+end_src
+
+#+RESULTS:
+: t
 
 *** Make dired open in the same window
 #+begin_src example
@@ -1623,6 +1715,38 @@ BUG BUG BUG
 
 	(add-hook 'dired-after-readin-hook 'sof/dired-sort)
 #+end_src
+*** dired-rainbow
+#+begin_src emacs-lisp :lexical no
+  (use-package dired-rainbow
+    :ensure t
+    :config
+    (progn
+      (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+      (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+      (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+      (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+      (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+      (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+      (dired-rainbow-define media "#de751f" ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
+      (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+      (dired-rainbow-define log "#c17d11" ("log"))
+      (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+      (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+      (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
+      (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+      (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+      (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+      (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+      (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+      (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+      (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
+      (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")
+      )) 
+#+end_src
+
+#+RESULTS:
+: t
+
 ** Doom modeline
 #+begin_src emacs-lisp
           (use-package doom-modeline
@@ -1741,6 +1865,10 @@ BUG BUG BUG
     (setq evil-split-window-below t))
   (evil-mode 1)
 #+end_src
+
+#+RESULTS:
+: t
+
 *** General (more keymaps from vim)
 #+begin_src emacs-lisp :lexical no
     (use-package general
@@ -2176,6 +2304,7 @@ BUG BUG BUG
 *** Emojify
 #+begin_src emacs-lisp
   (use-package emojify
+  :ensure t
     :config
     (when (member "Segoe UI Emoji" (font-family-list))
       (set-fontset-font
@@ -2409,7 +2538,7 @@ Show vertical lines to guide indentation
   ;; Symbol highlighting
   (setq lsp-enable-symbol-highlighting nil)
 
-  (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+  (use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
 
   ;; optionally if you want to use debugger
   (use-package dap-mode :ensure t)
@@ -2660,79 +2789,35 @@ Show vertical lines to guide indentation
 #+end_src
 
 * Setting performance
-** Make startup faster by reducing the frequency of GB
-Make startup faster by reducing the frequency of garbage collection.  The default is 800 kilobytes.  Measured in bytes.
+** Better GC
+#+begin_src emacs-lisp :lexical no
+  (defvar better-gc-cons-threshold 134217728 ; 128mb
+    "If you experience freezing, decrease this.
+  If you experience stuttering, increase this.")
 
-#+begin_src emacs-lisp
-	(setq gc-cons-threshold (* 50 1000 1000))
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq gc-cons-threshold better-gc-cons-threshold)
+              (setq file-name-handler-alist file-name-handler-alist-original)
+              (makunbound 'file-name-handler-alist-original)))
 #+end_src
+** Auto GC
+#+begin_src emacs-lisp :lexical no
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (if (boundp 'after-focus-change-function)
+                  (add-function :after after-focus-change-function
+                                (lambda ()
+                                  (unless (frame-focus-state)
+                                    (garbage-collect))))
+                (add-hook 'after-focus-change-function 'garbage-collect))
+              (defun gc-minibuffer-setup-hook ()
+                (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
 
-** GC setting
-Make gc pauses faster by decreasing the threshold.
+              (defun gc-minibuffer-exit-hook ()
+                (garbage-collect)
+                (setq gc-cons-threshold better-gc-cons-threshold))
 
-#+begin_src emacs-lisp
-	(setq gc-cons-threshold (eval-when-compile (* 50 1024 1024)))
-	(run-with-idle-timer 4 t (lambda () (garbage-collect)))
-#+end_src
-
-** Disabling garbage collection
-#+begin_src emacs-lisp
-	(defvar me/gc-cons-threshold 100000000)
-	(setq gc-cons-threshold most-positive-fixnum
-				gc-cons-percentage 0.6)
-	(add-hook 'emacs-startup-hook
-						(lambda ()
-							(setq gc-cons-threshold me/gc-cons-threshold
-										gc-cons-percentage 0.1)))
-	(defun me/defer-garbage-collection-h ()
-		(setq gc-cons-threshold most-positive-fixnum))
-
-	(defun me/restore-garbage-collection-h ()
-		(run-at-time
-		 1 nil (lambda () (setq gc-cons-threshold me/gc-cons-threshold))))
-
-	(add-hook 'minibuffer-setup-hook 'me/defer-garbage-collection-h)
-	(add-hook 'minibuffer-exit-hook 'me/restore-garbage-collection-h)
-#+end_src
-
-** Disable site-run
-#+begin_src emacs-lisp
-(setq site-run-file nil)
-#+end_src
-
-** I/O acceleration
-#+begin_src emacs-lisp
-	(when (boundp 'read-process-output-max)  
-		(setq read-process-output-max (* 1024 1024)))
-#+end_src
-
-** Don't compress the font cache
-#+begin_src emacs-lisp
-	(setq inhibit-compacting-font-caches t)
-#+end_src
-
-* eaf
-#+Begin_src example
-	(use-package eaf
-		:load-path "~/.emacs.d/site-lisp/emacs-application-framework"
-		:custom
-																					; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-		(eaf-browser-continue-where-left-off t)
-		(eaf-browser-enable-adblocker t)
-		(browse-url-browser-function 'eaf-open-browser)
-		:config
-		(eaf-setq eaf-browser-enable-adblocker "true")
-		;; :config
-		;; (defalias 'browse-web #'eaf-open-browser)
-		;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-		;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-		;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-		;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
-		) ;; unbind, see more in the Wiki
-
-	(require 'eaf)
-	(require 'eaf-browser)
-	;; (require 'eaf-pdf-viewer)
-	;; (require 'eaf-org-previewer)
-	;; (require 'eaf-terminal)
+              (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+              (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 #+end_src
