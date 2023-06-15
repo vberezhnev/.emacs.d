@@ -117,7 +117,7 @@
       ediff-split-window-function       'split-window-horizontally
       highlight-nonselected-windows     t
       auto-mode-case-fold               nil
-      backup-by-copying                 t
+      ;; backup-by-copying                 t
       byte-compile-warnings             '(ck-functions)
       confirm-kill-processes            nil
       fast-but-imprecise-scrolling      t
@@ -410,7 +410,7 @@
           ("DONE" . "ForestGreen")
           ("ARCHIVED" .  "SlateBlue"))))
 
-(setq org-clock-sound "~/.emacs.d/sound.wav")
+(setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
 
 (use-package org-alert
   :ensure t)
@@ -1416,8 +1416,10 @@
   (add-hook 'telega-load-hook 'telega-appindicator-mode)
   (add-hook 'telega-load-hook 'global-telega-url-shorten-mode))
 
+(use-package lsp-treemacs)
+
 (use-package treemacs
-  :ensure t
+  :after lsp-treemacs
   :defer t
   :init
   (with-eval-after-load 'winum
@@ -1615,10 +1617,10 @@
   (add-hook 'before-save-hook 'parrot-start-animation)
   (add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
 
-(use-package hl-todo
-  :ensure t
-  :config
-  (hl-todo-mode t))
+(use-package solaire-mode
+  :custom (solaire-mode-remap-fringe t)
+  :config (solaire-global-mode +1)
+  :delight)
 
 ;; zoom in/out like we do everywhere else.
 (global-set-key (kbd "C-=") 'text-scale-increase)
@@ -2039,6 +2041,12 @@ If you experience stuttering, increase this.")
 (use-package highlight-numbers
   :hook (prog-mode . highlight-numbers-mode))
 
+;;;;; hl-todo
+(use-package hl-todo
+  :ensure t
+  :config
+  (hl-todo-mode t))
+
 ;;;;; beacon
 (use-package beacon
   :commands beacon-mode
@@ -2090,17 +2098,17 @@ If you experience stuttering, increase this.")
  ;; confirm-kill-emacs 'yes-or-no-p    ; Confirm before exiting Emacs.
  cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows.
  speedbar t                         ; Quick file access with bar.
- backup-by-copying t                ; don't clobber symlinks.
+ ;; backup-by-copying t                ; don't clobber symlinks.
  ;; backup-directory-alist `(("."~/.emacs.d/var/backup/per-session))
  default-directory "~/"
  custom-safe-themes t
  load-prefer-newer t ; don't use the compiled code if its the older package.
- make-backup-files t               ; backup of a file the first time it is saved.
+ make-backup-files nil               ; backup of a file the first time it is saved.
  delete-by-moving-to-trash t       ; move deleted files to trash.
- delete-old-versions t             ; delete excess backup files silently.
- kept-new-versions 6               ; newest versions to keep when a new numbered backup is made (default: 2).
- kept-old-versions 2               ; oldest versions to keep when a new numbered backup is made (default: 2).
- version-control t                 ; version numbers for backup files.
+ ;; delete-old-versions t             ; delete excess backup files silently.
+ ;; kept-new-versions 6               ; newest versions to keep when a new numbered backup is made (default: 2).
+ ;; kept-old-versions 2               ; oldest versions to keep when a new numbered backup is made (default: 2).
+ ;; version-control t                 ; version numbers for backup files.
  auto-save-default t               ; auto-save every buffer that visits a file.
  auto-save-timeout 30              ; number of seconds idle time before auto-save (default: 30).
  auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300).
