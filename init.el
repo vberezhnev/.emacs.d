@@ -1,10 +1,3 @@
-;; (add-to-list 'package-archives '("melpa"  . "https://melpa.org/packages/"))
-;; (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
-;; (setq package-archive-priorities '(("melpa"  . 3)
-;;                                    ("gnu"    . 2)
-;;                                    ("nongnu" . 1)))
-;; (package-initialize)
-
 (require 'package)
 ;; Select the folder to store packages
 ;; Comment / Uncomment to use desired sites
@@ -77,8 +70,33 @@
 ;;   "README.org"
 ;;   user-emacs-directory))
 
-(setq default-frame-alist '((undecorated . nil)))
+;; (setq default-frame-alist '((undecorated . nil)))
 
+(add-to-list 'load-path "~/.emacs.d/local-packages/hyp-to-org")
+
+  ;;________________________________________________________________
+  ;;    Transparent Emacs
+  ;;________________________________________________________________
+  (set-frame-parameter (selected-frame) 'alpha '(75 . 75))
+  (add-to-list 'default-frame-alist '(alpha . (75 . 75)))
+  ;; (set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
+  ;; (set-frame-parameter (selected-frame) 'alpha <both>)
+
+  ;; Use the following snippet after you’ve set the alpha as above to assign a toggle to “C-c t”:
+  (defun toggle-transparency ()
+    "Crave for transparency!"
+    (interactive)
+    (let ((alpha (frame-parameter nil 'alpha)))
+      (set-frame-parameter
+       nil 'alpha
+       (if (eql (cond ((numberp alpha) alpha)
+                      ((numberp (cdr alpha)) (cdr alpha))
+                      ;; Also handle undocumented (<active> <inactive>) form.
+                      ((numberp (cadr alpha)) (cadr alpha)))
+                100)
+           '(75 . 75) '(100 . 100)
+           ))))
+  (global-set-key (kbd "C-c t b") 'toggle-transparency)
 
 (eval-when-compile (defvar display-time-24hr-format t))
 (eval-when-compile (defvar display-time-default-load-average nil))
@@ -353,27 +371,49 @@
                 (org-level-8 . 1.1)))
   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
 
-(defun org-quote-beautify ()
-  "Beautify quotes in org-mode."
-  (when (org-in-src-block-p)
-    (let ((begin-quote "#+begin_quote")
-          (end-quote "#+end_quote")
-          (quote-symbol "❝")
-          (close-quote-symbol "❞"))
-      (goto-char (point-min))
-      (while (search-forward-regexp begin-quote nil t)
-        (let ((beg (match-beginning 0))
-              (end (search-forward-regexp end-quote)))
-          (when end
-            (let ((buffer-undo-list t)
-                  (buffer-read-only nil))
-              (goto-char beg)
-              (insert quote-symbol)
-              (goto-char end)
-              (insert close-quote-symbol))))))))
+  (use-package org-modern
+    :ensure t
+    :config
+    ;; Add frame borders and window dividers
+    ;; (modify-all-frames-parameters
+    ;;  '((right-divider-width . 40)
+    ;; 	 (internal-border-width . 40)))
+    (dolist (face '(window-divider
+                    window-divider-first-pixel
+                    window-divider-last-pixel))
+      (face-spec-reset-face face)
+      (set-face-foreground face (face-attribute 'default :background)))
+    (set-face-background 'fringe (face-attribute 'default :background))
 
+    (setq
+     ;; Edit settings
+     org-auto-align-tags nil
+     org-tags-column 0
+     org-catch-invisible-edits 'show-and-error
+     org-special-ctrl-a/e t
+     org-insert-heading-respect-content t
 
-(add-hook 'org-mode-hook 'org-quote-beautify)
+     ;; Org styling, hide markup etc.
+     org-hide-emphasis-markers t
+     org-pretty-entities t
+     org-ellipsis "…"
+
+     ;; Agenda styling
+     org-agenda-tags-column 0
+     org-agenda-block-separator ?─
+     org-agenda-time-grid
+     '((daily today require-timed)
+       (800 1000 1200 1400 1600 1800 2000)
+       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+     org-agenda-current-time-string
+     "⭠ now ─────────────────────────────────────────────────")
+    (setq org-enable-table-editor nil)
+    (global-org-modern-mode))
+
+  (add-hook 'org-mode-hook 'my-org-mode-hook)
+  (defun my-org-mode-hook ()
+    (add-hook 'hack-local-variables-hook
+              (lambda () (setq org-enable-table-editor nil)  )))
 
 ;; (use-package org-superstar
 ;; 	:ensure t
@@ -387,12 +427,12 @@
 ;; 	:custom
 ;; 	(org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(use-package org-bullets
-  :ensure t
-  :after org
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○"))) ; "●" "▷" "🞛" "◈" "✖"
+;; (use-package org-bullets
+;;   :ensure t
+;;   :after org
+;;   :hook (org-mode . org-bullets-mode)
+;;   :custom
+;;   (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○"))) ; "●" "▷" "🞛" "◈" "✖"
 
 (with-eval-after-load 'org
   (setq org-log-done 'time))
@@ -725,7 +765,7 @@
          (file "~/Org/agenda/appointments.org") "* TODO %^{Title} %t\n- %?")
         ("w" "Work TODO" entry
          (file "~/Org/agenda/work.org") "* TODO %^{Title}")
-        ("d" "Diary" entry (file "~/Org/2Brain/diary.org.gpg") ;; "~/Org/2Brain/2023-03-14-13:48:46.org.gpg"
+        ("d" "Diary" entry (file "~/Org/diary.org.gpg") ;; "~/Org/2Brain/2023-03-14-13:48:46.org.gpg"
          "* %U\n" :clock-in t :clock-resume t) ;; "*** %?\n%U\n" :clock-in t :clock-resume t)
         ("n" "Notes" entry
          (file "~/Org/agenda/inbox.org") "* %^{Description} %^g\n Added: %U\n%?")
@@ -812,7 +852,7 @@
   :config
   ;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
   (setq-default pdf-view-display-size 'fit-page)
-  ;; (pdf-tools-install)
+  (pdf-tools-install)
   :bind (:map pdf-view-mode-map
               ("\\" . hydra-pdftools/body)
               ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
@@ -1118,7 +1158,6 @@
 ;;   (setq dired-hide-details-mode t) ; Hide file and directory details by default
 ;;   (setq dired-auto-revert-buffer t) ; Automatically refresh Dired buffers when changes are made
 ;;   (setq diredp-hide-details-initially-flag nil)
-;;   (put 'dired-find-alternate-file 'disabled nil) ; Allow using Enter key to open files
 ;;   (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; Bind Enter to open files
 ;;   (define-key dired-mode-map (kbd "^")
 ;; 	  (lambda () (interactive) (find-alternate-file ".."))) ; Bind ^ to go up a directory
@@ -1980,14 +2019,6 @@ If you experience stuttering, increase this.")
             (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 
-
-
-
-
-
-
-
-
 ;;________________________________________________________________
 ;;;;    Fancy pkg
 ;;________________________________________________________________
@@ -2174,3 +2205,4 @@ If you experience stuttering, increase this.")
  speedbar-show-unknown-files t ; browse source tree with Speedbar file browser
  frame-title-format '(buffer-file-name "Emacs: %b (%f)" "Emacs: %b") ; name of the file I am editing as the name of the window.
  )
+(put 'dired-find-alternate-file 'disabled nil)
