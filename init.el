@@ -74,29 +74,33 @@
 
 (add-to-list 'load-path "~/.emacs.d/local-packages/hyp-to-org")
 
-  ;;________________________________________________________________
-  ;;    Transparent Emacs
-  ;;________________________________________________________________
-  (set-frame-parameter (selected-frame) 'alpha '(75 . 75))
-  (add-to-list 'default-frame-alist '(alpha . (75 . 75)))
-  ;; (set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
-  ;; (set-frame-parameter (selected-frame) 'alpha <both>)
+;;________________________________________________________________
+;;    Transparent Emacs
+;;________________________________________________________________
+;; (set-frame-parameter (selected-frame) 'alpha-background '(80 . 80))
+;; (add-to-list 'default-frame-alist '(alpha-background . (80 . 80)))
 
-  ;; Use the following snippet after you’ve set the alpha as above to assign a toggle to “C-c t”:
-  (defun toggle-transparency ()
-    "Crave for transparency!"
-    (interactive)
-    (let ((alpha (frame-parameter nil 'alpha)))
-      (set-frame-parameter
-       nil 'alpha
-       (if (eql (cond ((numberp alpha) alpha)
-                      ((numberp (cdr alpha)) (cdr alpha))
-                      ;; Also handle undocumented (<active> <inactive>) form.
-                      ((numberp (cadr alpha)) (cadr alpha)))
-                100)
-           '(75 . 75) '(100 . 100)
-           ))))
-  (global-set-key (kbd "C-c t b") 'toggle-transparency)
+(set-frame-parameter nil 'alpha-background 80)
+(add-to-list 'default-frame-alist '(alpha-background . 80))
+
+;; (set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
+;; (set-frame-parameter (selected-frame) 'alpha <both>)
+
+;; Use the following snippet after you’ve set the alpha as above to assign a toggle to “C-c t”:
+;; (defun toggle-transparency ()
+;;   "Crave for transparency!"
+;;   (interactive)
+;;   (let ((alpha (frame-parameter nil 'alpha)))
+;;     (set-frame-parameter
+;;      nil 'alpha
+;;      (if (eql (cond ((numberp alpha) alpha)
+;;                     ((numberp (cdr alpha)) (cdr alpha))
+;;                     ;; Also handle undocumented (<active> <inactive>) form.
+;;                     ((numberp (cadr alpha)) (cadr alpha)))
+;;               100)
+;;          '(80 . 100) '(100 . 100)
+;;          ))))
+;; (global-set-key (kbd "C-c t b") 'toggle-transparency)
 
 (eval-when-compile (defvar display-time-24hr-format t))
 (eval-when-compile (defvar display-time-default-load-average nil))
@@ -281,9 +285,12 @@
   (setq calendar-latitude 43.11)
   (setq calendar-longitude 131.88))
 
-(change-theme 'doom-one-light 'gruvbox-dark-medium)
-;; (change-theme 'doom-one-light 'doom-one)
+;; (change-theme 'doom-one-light 'gruvbox-dark-medium)
+(change-theme 'doom-one-light 'doom-one)
 ;; (change-theme 'doom-ayu-light 'doom-ayu-dark)
+
+;; (load-theme 'gruvbox-dark-medium t)
+;; (load-theme 'doom-one t)
 
 (use-package org
   ;; :hook (org-mode . mk/org-mode-setup)
@@ -371,49 +378,148 @@
                 (org-level-8 . 1.1)))
   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
 
-  (use-package org-modern
-    :ensure t
-    :config
-    ;; Add frame borders and window dividers
-    ;; (modify-all-frames-parameters
-    ;;  '((right-divider-width . 40)
-    ;; 	 (internal-border-width . 40)))
-    (dolist (face '(window-divider
-                    window-divider-first-pixel
-                    window-divider-last-pixel))
-      (face-spec-reset-face face)
-      (set-face-foreground face (face-attribute 'default :background)))
-    (set-face-background 'fringe (face-attribute 'default :background))
+(use-package org-modern
+  :ensure t
+  :config
+  ;; Add frame borders and window dividers
+  ;; (modify-all-frames-parameters
+  ;;  '((right-divider-width . 40)
+  ;; 	 (internal-border-width . 40)))
 
-    (setq
-     ;; Edit settings
-     org-auto-align-tags nil
-     org-tags-column 0
-     org-catch-invisible-edits 'show-and-error
-     org-special-ctrl-a/e t
-     org-insert-heading-respect-content t
+  ;; (dolist (face '(window-divider
+  ;;                 window-divider-first-pixel
+  ;;                 window-divider-last-pixel))
+  ;;   (face-spec-reset-face face)
+  ;;   (set-face-foreground face (face-attribute 'default :background)))
+  ;; (set-face-background 'fringe (face-attribute 'default :background))
 
-     ;; Org styling, hide markup etc.
-     org-hide-emphasis-markers t
-     org-pretty-entities t
-     org-ellipsis "…"
+  (setq
+   ;; Edit settings
+   org-auto-align-tags t
+   org-tags-column 0
+   org-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   org-insert-heading-respect-content t
 
-     ;; Agenda styling
-     org-agenda-tags-column 0
-     org-agenda-block-separator ?─
-     org-agenda-time-grid
-     '((daily today require-timed)
-       (800 1000 1200 1400 1600 1800 2000)
-       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-     org-agenda-current-time-string
-     "⭠ now ─────────────────────────────────────────────────")
-    (setq org-enable-table-editor nil)
-    (global-org-modern-mode))
+   ;; Org styling, hide markup etc.
+   org-hide-emphasis-markers nil
+   org-pretty-entities nil
+   org-ellipsis "…"
 
-  (add-hook 'org-mode-hook 'my-org-mode-hook)
-  (defun my-org-mode-hook ()
-    (add-hook 'hack-local-variables-hook
-              (lambda () (setq org-enable-table-editor nil)  )))
+   ;; Agenda styling
+   org-agenda-tags-column 0
+   org-agenda-block-separator ?─
+   org-agenda-time-grid
+   '((daily today require-timed)
+     (800 1000 1200 1400 1600 1800 2000)
+     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+   org-agenda-current-time-string
+   "⭠ now ─────────────────────────────────────────────────")
+  (setq org-enable-table-editor t)
+  (global-org-modern-mode))
+
+;; (add-hook 'org-mode-hook 'my-org-mode-hook)
+;; (defun my-org-mode-hook ()
+;;   (add-hook 'hack-local-variables-hook
+;;             (lambda () (setq org-enable-table-editor nil)  )))
+
+;; (use-package svg-tag-mode
+;;   :config
+;;   (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
+;;   (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
+;;   (defconst day-re "[A-Za-z]\\{3\\}")
+;;   (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
+
+;;   (defun svg-progress-percent (value)
+;;     (svg-image (svg-lib-concat
+;;                 (svg-lib-progress-bar (/ (string-to-number value) 100.0)
+;;                                       nil :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+;;                 (svg-lib-tag (concat value "%")
+;;                              nil :stroke 0 :margin 0)) :ascent 'center))
+
+;;   (defun svg-progress-count (value)
+;;     (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+;;            (count (float (car seq)))
+;;            (total (float (cadr seq))))
+;;       (svg-image (svg-lib-concat
+;;                   (svg-lib-progress-bar (/ count total) nil
+;;                                         :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+;;                   (svg-lib-tag value nil
+;;                                :stroke 0 :margin 0)) :ascent 'center)))
+
+;;   (setq svg-tag-tags
+;;         `(
+;;           ;; Org tags
+;;           (":\\([A-Za-z0-9]+\\)" . ((lambda (tag) (svg-tag-make tag))))
+;;           (":\\([A-Za-z0-9]+[ \-]\\)" . ((lambda (tag) tag)))
+
+;;           ;; Task priority
+;;           ("\\[#[A-Z]\\]" . ( (lambda (tag)
+;;                                 (svg-tag-make tag :face 'org-priority
+;;                                               :beg 2 :end -1 :margin 0))))
+
+;;           ;; Progress
+;;           ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
+;;                                               (svg-progress-percent (substring tag 1 -2)))))
+;;           ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
+;;                                             (svg-progress-count (substring tag 1 -1)))))
+
+;;           ;; TODO / DONE
+;;           ("TODO" . ((lambda (tag) (svg-tag-make "TODO" :face 'org-todo :inverse t :margin 0))))
+;;           ("DONE" . ((lambda (tag) (svg-tag-make "DONE" :face 'org-done :margin 0))))
+
+
+;;           ;; Citation of the form [cite:@Knuth:1984]
+;;           ("\\(\\[cite:@[A-Za-z]+:\\)" . ((lambda (tag)
+;;                                             (svg-tag-make tag
+;;                                                           :inverse t
+;;                                                           :beg 7 :end -1
+;;                                                           :crop-right t))))
+;;           ("\\[cite:@[A-Za-z]+:\\([0-9]+\\]\\)" . ((lambda (tag)
+;;                                                      (svg-tag-make tag
+;;                                                                    :end -1
+;;                                                                    :crop-left t))))
+
+
+;;           ;; Active date (with or without day name, with or without time)
+;;           (,(format "\\(<%s>\\)" date-re) .
+;;            ((lambda (tag)
+;;               (svg-tag-make tag :beg 1 :end -1 :margin 0))))
+;;           (,(format "\\(<%s \\)%s>" date-re day-time-re) .
+;;            ((lambda (tag)
+;;               (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0))))
+;;           (,(format "<%s \\(%s>\\)" date-re day-time-re) .
+;;            ((lambda (tag)
+;;               (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
+
+;;           ;; Inactive date  (with or without day name, with or without time)
+;;           (,(format "\\(\\[%s\\]\\)" date-re) .
+;;            ((lambda (tag)
+;;               (svg-tag-make tag :beg 1 :end -1 :margin 0 :face 'org-date))))
+;;           (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
+;;            ((lambda (tag)
+;;               (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :face 'org-date))))
+;;           (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
+;;            ((lambda (tag)
+;;               (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))))
+
+;;   (svg-tag-mode t)
+
+  ;; To do:         TODO DONE
+  ;; Tags:          :TAG1:TAG2:TAG3:
+  ;; Priorities:    [#A] [#B] [#C]
+  ;; Progress:      [1/3]
+  ;;                [42%]
+  ;; Active date:   <2021-12-24>
+  ;;                <2021-12-24 Fri>
+  ;;                <2021-12-24 14:00>
+  ;;                <2021-12-24 Fri 14:00>
+  ;; Inactive date: [2021-12-24]
+  ;;                [2021-12-24 Fri]
+  ;;                [2021-12-24 14:00]
+  ;;                [2021-12-24 Fri 14:00]
+  ;; Citation:      [cite:@Knuth:1984]
+
 
 ;; (use-package org-superstar
 ;; 	:ensure t
@@ -681,8 +787,8 @@
                                  (search . " %i %-12:c")))
 
 (setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
-                                               "\n"
-                                               (org-agenda-format-date-aligned date))))
+                                                    "\n"
+                                                    (org-agenda-format-date-aligned date))))
 (setq org-cycle-separator-lines 2)
 ;; (setq org-agenda-category-icon-alist
 ;;       `(("Work" ,(list (all-the-icons-faicon "cogs")) nil nil :ascent center)

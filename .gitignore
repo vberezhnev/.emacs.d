@@ -13,8 +13,10 @@ var/
 emojis/
 eln-cache/
 eaf/
+semanticdb/
+multisession/
 dmenu-items
-
+  
 org-caldav*
 nov-places
 places
