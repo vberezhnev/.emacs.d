@@ -379,182 +379,129 @@
   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
 
 (use-package org-modern
-  :ensure t
+  :hook (org-mode . org-modern-mode)
   :config
-  ;; Add frame borders and window dividers
-  ;; (modify-all-frames-parameters
-  ;;  '((right-divider-width . 40)
-  ;; 	 (internal-border-width . 40)))
-
-  ;; (dolist (face '(window-divider
-  ;;                 window-divider-first-pixel
-  ;;                 window-divider-last-pixel))
-  ;;   (face-spec-reset-face face)
-  ;;   (set-face-foreground face (face-attribute 'default :background)))
-  ;; (set-face-background 'fringe (face-attribute 'default :background))
-
   (setq
    ;; Edit settings
-   org-auto-align-tags t
-   org-tags-column 0
    org-catch-invisible-edits 'show-and-error
    org-special-ctrl-a/e t
    org-insert-heading-respect-content t
+   ;; Appearance
+   org-hide-leading-stars t
+   org-startup-indented nil
+   org-modern-radio-target    '("❰" t "❱")
+   org-modern-internal-target '("↪ " t "")
+   org-modern-todo nil
+   org-modern-tag nil
+   org-modern-timestamp t
+   org-modern-statistics nil
+   org-modern-progress nil
+   org-modern-priority nil
+   org-modern-horizontal-rule "──────────"
+   org-modern-hide-stars "·"
+   org-modern-star ["⁖"]
+   org-modern-keyword "‣"
+   org-modern-list '((43 . "•")
+                     (45 . "–")
+                     (42 . "∘"))))
 
-   ;; Org styling, hide markup etc.
-   org-hide-emphasis-markers nil
-   org-pretty-entities nil
-   org-ellipsis "…"
+(custom-set-faces
+ `(org-modern-tag ((t (:background ,(doom-blend (doom-color 'blue) (doom-color 'bg) 0.1) :foreground ,(doom-color 'grey)))))
+ `(org-modern-radio-target ((t (:inherit default :foreground ,(doom-color 'blue))))))
 
-   ;; Agenda styling
-   org-agenda-tags-column 0
-   org-agenda-block-separator ?─
-   org-agenda-time-grid
-   '((daily today require-timed)
-     (800 1000 1200 1400 1600 1800 2000)
-     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-   org-agenda-current-time-string
-   "⭠ now ─────────────────────────────────────────────────")
-  (setq org-enable-table-editor t)
-  (global-org-modern-mode))
+(use-package svg-tag-mode
+  :config
+  (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
+  (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
+  (defconst day-re "[A-Za-z]\\{3\\}")
+  (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
 
-;; (add-hook 'org-mode-hook 'my-org-mode-hook)
-;; (defun my-org-mode-hook ()
-;;   (add-hook 'hack-local-variables-hook
-;;             (lambda () (setq org-enable-table-editor nil)  )))
+  (defun svg-progress-percent (value)
+    (svg-image (svg-lib-concat
+                (svg-lib-progress-bar
+                 (/ (string-to-number value) 100.0) nil
+                 :height 0.8 :foreground (doom-color 'fg) :background (doom-color 'bg)
+                 :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+                (svg-lib-tag (concat value "%") nil
+                             :height 0.8 :foreground (doom-color 'fg) :background (doom-color 'bg)
+                             :stroke 0 :margin 0)) :ascent 'center))
 
-;; (use-package svg-tag-mode
-;;   :config
-;;   (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
-;;   (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
-;;   (defconst day-re "[A-Za-z]\\{3\\}")
-;;   (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
+  (defun svg-progress-count (value)
+    (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+           (count (float (car seq)))
+           (total (float (cadr seq))))
+      (svg-image (svg-lib-concat
+                  (svg-lib-progress-bar (/ count total) nil
+                                        :foreground (doom-color 'fg)
+                                        :background (doom-color 'bg) :height 0.8
+                                        :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+                  (svg-lib-tag value nil
+                               :foreground (doom-color 'fg)
+                               :background (doom-color 'bg)
+                               :stroke 0 :margin 0 :height 0.8)) :ascent 'center)))
 
-;;   (defun svg-progress-percent (value)
-;;     (svg-image (svg-lib-concat
-;;                 (svg-lib-progress-bar (/ (string-to-number value) 100.0)
-;;                                       nil :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-;;                 (svg-lib-tag (concat value "%")
-;;                              nil :stroke 0 :margin 0)) :ascent 'center))
+  (set-face-attribute 'svg-tag-default-face nil :family "Alegreya Sans")
+  (setq svg-tag-tags
+        `(;; Progress e.g. [63%] or [10/15]
+          ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
+                                              (svg-progress-percent (substring tag 1 -2)))))
+          ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
+                                            (svg-progress-count (substring tag 1 -1)))))
+          ;; Task priority e.g. [#A], [#B], or [#C]
+          ("\\[#A\\]" . ((lambda (tag) (svg-tag-make tag :face 'error :inverse-video t :height .85
+                                                     :beg 2 :end -1 :margin 0 :radius 10))))
+          ("\\[#B\\]" . ((lambda (tag) (svg-tag-make tag :face 'warning :inverse-video t :height .85
+                                                     :beg 2 :end -1 :margin 0  :radius 10))))
+          ;; Keywords
+          ("TODO" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face 'org-todo))))
+          ("HOLD" . ((lambda (tag) (svg-tag-make tag :height .85 :face 'org-todo))))
+          ("DONE\|STOP" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face 'org-done))))
+          ("NEXT\|WAIT" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-active))))
+          ("REPEAT\|EVENT\|PROJ\|IDEA" .
+           ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-project))))
+          ("REVIEW" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-onhold))))))
 
-;;   (defun svg-progress-count (value)
-;;     (let* ((seq (mapcar #'string-to-number (split-string value "/")))
-;;            (count (float (car seq)))
-;;            (total (float (cadr seq))))
-;;       (svg-image (svg-lib-concat
-;;                   (svg-lib-progress-bar (/ count total) nil
-;;                                         :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-;;                   (svg-lib-tag value nil
-;;                                :stroke 0 :margin 0)) :ascent 'center)))
+  (add-hook 'org-mode-hook 'svg-tag-mode))
 
-;;   (setq svg-tag-tags
-;;         `(
-;;           ;; Org tags
-;;           (":\\([A-Za-z0-9]+\\)" . ((lambda (tag) (svg-tag-make tag))))
-;;           (":\\([A-Za-z0-9]+[ \-]\\)" . ((lambda (tag) tag)))
-
-;;           ;; Task priority
-;;           ("\\[#[A-Z]\\]" . ( (lambda (tag)
-;;                                 (svg-tag-make tag :face 'org-priority
-;;                                               :beg 2 :end -1 :margin 0))))
-
-;;           ;; Progress
-;;           ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
-;;                                               (svg-progress-percent (substring tag 1 -2)))))
-;;           ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
-;;                                             (svg-progress-count (substring tag 1 -1)))))
-
-;;           ;; TODO / DONE
-;;           ("TODO" . ((lambda (tag) (svg-tag-make "TODO" :face 'org-todo :inverse t :margin 0))))
-;;           ("DONE" . ((lambda (tag) (svg-tag-make "DONE" :face 'org-done :margin 0))))
-
-
-;;           ;; Citation of the form [cite:@Knuth:1984]
-;;           ("\\(\\[cite:@[A-Za-z]+:\\)" . ((lambda (tag)
-;;                                             (svg-tag-make tag
-;;                                                           :inverse t
-;;                                                           :beg 7 :end -1
-;;                                                           :crop-right t))))
-;;           ("\\[cite:@[A-Za-z]+:\\([0-9]+\\]\\)" . ((lambda (tag)
-;;                                                      (svg-tag-make tag
-;;                                                                    :end -1
-;;                                                                    :crop-left t))))
-
-
-;;           ;; Active date (with or without day name, with or without time)
-;;           (,(format "\\(<%s>\\)" date-re) .
-;;            ((lambda (tag)
-;;               (svg-tag-make tag :beg 1 :end -1 :margin 0))))
-;;           (,(format "\\(<%s \\)%s>" date-re day-time-re) .
-;;            ((lambda (tag)
-;;               (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0))))
-;;           (,(format "<%s \\(%s>\\)" date-re day-time-re) .
-;;            ((lambda (tag)
-;;               (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
-
-;;           ;; Inactive date  (with or without day name, with or without time)
-;;           (,(format "\\(\\[%s\\]\\)" date-re) .
-;;            ((lambda (tag)
-;;               (svg-tag-make tag :beg 1 :end -1 :margin 0 :face 'org-date))))
-;;           (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
-;;            ((lambda (tag)
-;;               (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :face 'org-date))))
-;;           (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
-;;            ((lambda (tag)
-;;               (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))))
-
-;;   (svg-tag-mode t)
-
-  ;; To do:         TODO DONE
-  ;; Tags:          :TAG1:TAG2:TAG3:
-  ;; Priorities:    [#A] [#B] [#C]
-  ;; Progress:      [1/3]
-  ;;                [42%]
-  ;; Active date:   <2021-12-24>
-  ;;                <2021-12-24 Fri>
-  ;;                <2021-12-24 14:00>
-  ;;                <2021-12-24 Fri 14:00>
-  ;; Inactive date: [2021-12-24]
-  ;;                [2021-12-24 Fri]
-  ;;                [2021-12-24 14:00]
-  ;;                [2021-12-24 Fri 14:00]
-  ;; Citation:      [cite:@Knuth:1984]
-
-
-;; (use-package org-superstar
-;; 	:ensure t
-;; 	:config
-;; 	(setq org-superstar-headline-bullets-list '("◉" "⬢" "○" "✸" "✿")))
-;; (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
-
-;; (use-package org-bullets
-;; 	:ensure t
-;; 	:hook (org-mode . org-bullets-mode)
-;; 	:custom
-;; 	(org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-;; (use-package org-bullets
-;;   :ensure t
-;;   :after org
-;;   :hook (org-mode . org-bullets-mode)
-;;   :custom
-;;   (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○"))) ; "●" "▷" "🞛" "◈" "✖"
+(use-package org-appear
+  :hook
+  (org-mode . org-appear-mode)
+  :config
+  (setq org-hide-emphasis-markers t
+        org-appear-autolinks 'just-brackets))
 
 (with-eval-after-load 'org
   (setq org-log-done 'time))
 
-(with-eval-after-load 'org
-  (setq org-todo-keywords
-        '((sequence "TODO" "DOING" "BLOCKED" "REVIEW" "|" "DONE" "ARCHIVED"))))
-
-(with-eval-after-load 'org
-  (setq org-todo-keyword-faces
-        '(("TODO" . "SlateGray")
-          ("DOING" . "DarkOrchid")
-          ("BLOCKED" . "Firebrick")
-          ("REVIEW" . "Teal")
-          ("DONE" . "ForestGreen")
-          ("ARCHIVED" .  "SlateBlue"))))
+(setq org-todo-keywords
+      '((sequence
+         "TODO(t)"                    ;What needs to be done
+         "NEXT(n)"                    ;A project without NEXTs is stuck
+         "|"
+         "DONE(d)")
+        (sequence
+         "REPEAT(e)"                    ;Repeating tasks
+         "|"
+         "DONE")
+        (sequence
+         "HOLD(h)"                    ;Task is on hold because of me
+         "PROJ(p)"                    ;Contains sub-tasks
+         "WAIT(w)"                    ;Tasks delegated to others
+         "REVIEW(r)"                  ;Daily notes that need reviews
+         "IDEA(i)"                    ;Daily notes that need reviews
+         "|"
+         "STOP(c)"                    ;Stopped/cancelled
+         "EVENT(m)"                   ;Meetings
+         ))
+      org-todo-keyword-faces
+      '(("[-]"  . +org-todo-active)
+        ("NEXT" . +org-todo-active)
+        ("[?]"  . +org-todo-onhold)
+        ("REVIEW" . +org-todo-onhold)
+        ("HOLD" . +org-todo-cancel)
+        ("PROJ" . +org-todo-project)
+        ("DONE"   . +org-todo-cancel)
+        ("STOP" . +org-todo-cancel)))
 
 (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
 
@@ -597,25 +544,29 @@
 ;;     1 'org-checkbox-done-text prepend))
 ;;  'append)
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;;;;;;;;;;;;; ;; ;;
+;; ;; ORG ROAM SETTING ;; ;; ;;
+;; ;;;;;;;;;;;;;;;;;;;;;; ;; ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package org-roam
   :ensure t
   :custom
-  (org-roam-directory (file-truename "~/Org/2Brain"))
+  (org-roam-directory (file-truename "~/Org/Org-roam"))
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
    '(
      ("d" "Default abstract" plain "%?"
       :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
       :unnarrowed t)
-
      ("s" "Abstract with source" plain "\n\nSource: %^{Source}\n\nTitle: ${title}\n\n"
       :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
       :unnarrowed t)
-
      ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n"
       :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
       :unnarrowed t)
-
      ("e" "Encrypt note" plain "%?"
       :target (file+head "${name-of-file}.org.gpg"
                          "#+title: ${title}\n#+date: %U")
@@ -634,7 +585,6 @@
          ("C-c n j" . org-roam-dailies-capture-today)
          :map org-mode-map
          ("C-M-i"    . completion-at-point))
-
   :config
   ;; If you're using a vertical completion framework, you might want a more informative completion interface
   ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
@@ -647,13 +597,29 @@
   :ensure t
   :hook (after-init . org-roam-ui-mode)
   :config
-  (setq org-roam-ui-sync-theme t
+  (setq orui-sync-theme t
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start nil))
+        org-roam-ui-open-on-start nil
+        ))
+
+(use-package org-roam-graph
+  :straight org-roam
+  :init
+  (setq org-roam-graph-executable	    (executable-find "dot")
+        org-roam-graph-extra-config        '(("overlap" . "false")
+                                             ("concentrate" . "true")
+                                             ("bgcolor" . "lightblue"))
+        org-roam-graph-edge-cites-extra-config
+        '(("color" . "gray")
+          ("style" . "dashed")
+          ("sep" . "20"))
+        org-roam-graph-shorten-titles      'wrap
+        org-roam-graph-max-title-length    50
+        org-roam-graph-exclude-matcher     '("journal")))
 
 (use-package company-org-roam
-  :straight (:host github :repo "org-roam/company-org-roam")
+  :straight (:host github :repo "jethrokuan/company-org-roam")
   :config
   (push 'company-org-roam company-backends))
 
@@ -668,11 +634,108 @@
 (use-package org-noter
   :ensure t)
 
+;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;; ;;
+;; ;; CITES ;; ;;
+;; ;;;;;;;;;;; ;;
+;;;;;;;;;;;;;;;;;
+
+
+(use-package org-roam-bibtex
+  :ensure t
+  :after org-roam
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :config
+  (setq org-roam-bibtex-preformat-keywords
+        '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+  (setq orb-templates
+        '(("r" "ref" plain (function org-roam-capture--get-point)
+           ""
+           :file-name "${slug}"
+           :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+
+  - tags ::
+  - keywords :: ${keywords}
+
+  \n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
+
+           :unnarrowed t)))
+  (require 'org-ref)) ; optional: if using Org-ref v2 or v3 citation links
+
+(use-package org-ref :ensure t
+  :config
+  (setq reftex-default-bibliography '("~/Org/2Brain/bibtex/ref.bib"))
+
+  (setq org-ref-bibliography-notes "~/Org/2Brain/bibtex/ref_notes.org"
+        org-ref-default-bibliography '("~/Org/2Brain/ref.bib")
+        org-ref-pdf-directory "~/Org/2Brain/bibtex/bibtex-pdfs/")
+
+  (setq bibtex-completion-bibliography "~/Org/2Brain/bibtex/ref.bib"
+        bibtex-completion-library-path "~/Org/2Brain/bibtex/bibtex-pdfs/"
+        bibtex-completion-notes-path "~/Org/2Brain/bibtex/bibtex-notes")
+
+                                        ; Optional. Open pdf in external viewer.
+  (setq bibtex-completion-pdf-open-function
+        (lambda (fpath)
+          (start-process "open" "*open*" "open" fpath))))
+
+(use-package citar
+  :hook
+  (LaTeX-mode . citar-capf-setup)
+  (org-mode . citar-capf-setup)
+  :config
+  (setq
+   citar-bibliography (list (concat org-directory "~/Org/References/zotero.bib"))
+   citar-notes-paths (list(concat org-directory "~/Org/Org-roam/literature/"))
+   citar-library-paths (list (concat org-directory "~/Org/Org-roam/"))
+   citar-file-variable "file"
+   citar-symbols
+   `((file ,(all-the-icons-faicon "file-pdf-o" :face 'all-the-icons-red :v-adjust -0.1) . " ")
+     (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
+     (link ,(all-the-icons-material "link" :face 'all-the-icons-blue) . " "))
+   citar-symbol-separator "  "
+   org-cite-global-bibliography citar-bibliography)
+  ;; Search contents of PDFs
+  (after! (embark pdf-occur)
+          (defun citar/search-pdf-contents (keys-entries &optional str)
+            "Search pdfs."
+            (interactive (list (citar-select-refs)))
+            (let ((files (citar-file--files-for-multiple-entries
+                          (citar--ensure-entries keys-entries)
+                          citar-library-paths
+                          '("pdf")))
+                  (search-str (or str (read-string "Search string: "))))
+              (pdf-occur-search files search-str t)))
+          ;; with this, you can exploit embark's multitarget actions, so that you can run `embark-act-all`
+          (add-to-list 'embark-multitarget-actions #'citar/search-pdf-contents)))
+
+(use-package citar-embark
+  :ensure t
+  :after citar embark
+  :no-require
+  :config
+  (org-cite-global-bibliography
+   '("~/Org/2Brain/bibtex/ref.bib"))
+  (citar-embark-mode))
+
+;; Use `citar' with `org-cite'
+(use-package citar-org-roam
+  :after oc
+  :custom
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
+;; ;; ORG PDF, ORG NOTER ;; ;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package org-pdftools
   :ensure t
   :hook (org-mode . org-pdftools-setup-link)
   )
-
 (use-package org-noter-pdftools
   :ensure t
   :after org-noter
@@ -716,10 +779,8 @@
 (defun who/find-org-files (directory)
   (find-lisp-find-files directory "\.org$"))
 
-;; "TODO" "DOING" "BLOCKED" "REVIEW" "|" "DONE" "ARCHIVED"
-
 (defun who-org/agenda-files-update (&rest _)
-  (let ((todo-zettels (->> "rg --files-with-matches '(TODO)|(DOING)|(BLOCKED)|(REVIEW)' ~/Org/2Brain"
+  (let ((todo-zettels (->> "rg --files-with-matches '(TODO)|(NEXT)|(DONE)|(REPEAT)|(DONE)|(HOLD)|(PROJ)|(WAIT)|(REVIEW)|(IDEA)|(STOP)|(EVENT)' ~/Org/Org-roam/"
                            (shell-command-to-string)
                            (s-lines)
                            (-filter (lambda (line) (not (s-blank? line)))))))
@@ -1971,6 +2032,8 @@
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
   (company-mode +1))
+
+(setq tide-format-options '(:tabSize 2 :indentSize 2 ))
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
