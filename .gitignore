@@ -16,7 +16,8 @@ eaf/
 semanticdb/
 multisession/
 dmenu-items
-  
+request/  
+
 org-caldav*
 nov-places
 places

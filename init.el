@@ -86,21 +86,21 @@
 ;; (set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
 ;; (set-frame-parameter (selected-frame) 'alpha <both>)
 
-;; Use the following snippet after you’ve set the alpha as above to assign a toggle to “C-c t”:
-;; (defun toggle-transparency ()
-;;   "Crave for transparency!"
-;;   (interactive)
-;;   (let ((alpha (frame-parameter nil 'alpha)))
-;;     (set-frame-parameter
-;;      nil 'alpha
-;;      (if (eql (cond ((numberp alpha) alpha)
-;;                     ((numberp (cdr alpha)) (cdr alpha))
-;;                     ;; Also handle undocumented (<active> <inactive>) form.
-;;                     ((numberp (cadr alpha)) (cadr alpha)))
-;;               100)
-;;          '(80 . 100) '(100 . 100)
-;;          ))))
-;; (global-set-key (kbd "C-c t b") 'toggle-transparency)
+;; Use the following snippet after you’ve set the alpha as above to assign a toggle to “C-c t b”:
+(defun toggle-transparency ()
+  "Crave for transparency!"
+  (interactive)
+  (let ((alpha-background (frame-parameter nil 'alpha-background)))
+    (set-frame-parameter
+     nil 'alpha-background
+     (if (eql (cond ((numberp alpha-background) alpha-background)
+                    ((numberp (cdr alpha-background)) (cdr alpha-background))
+                    ;; Also handle undocumented (<active> <inactive>) form.
+                    ((numberp (cadr alpha-background)) (cadr alpha-background)))
+              100)
+         '(80 . 100) '(100 . 100)
+         ))))
+(global-set-key (kbd "C-c t b") 'toggle-transparency)
 
 (eval-when-compile (defvar display-time-24hr-format t))
 (eval-when-compile (defvar display-time-default-load-average nil))
@@ -195,7 +195,7 @@
   (toggle-frame-maximized))
 
 (setq-default message-log-max nil)
-(kill-buffer "*Messages*")
+;; (kill-buffer "*Messages*")
 
 (add-hook 'minibuffer-exit-hook
 	        '(lambda ()
@@ -210,8 +210,8 @@
 (tooltip-mode -1)           ; Disable tooltips
 (set-fringe-mode 10)        ; Give some breathing room
 (menu-bar-mode -1)          ; Disable the menu bar
-
 (global-display-line-numbers-mode t)
+
 (use-package display-line-numbers
   ;;:straight nil
   :hook (prog-mode . display-line-numbers-mode)
@@ -399,7 +399,7 @@
    org-modern-priority nil
    org-modern-horizontal-rule "──────────"
    org-modern-hide-stars "·"
-   org-modern-star ["⁖"]
+   ;; org-modern-star ["⁖"]
    org-modern-keyword "‣"
    org-modern-list '((43 . "•")
                      (45 . "–")
@@ -449,9 +449,9 @@
                                             (svg-progress-count (substring tag 1 -1)))))
           ;; Task priority e.g. [#A], [#B], or [#C]
           ("\\[#A\\]" . ((lambda (tag) (svg-tag-make tag :face 'error :inverse-video t :height .85
-                                                     :beg 2 :end -1 :margin 0 :radius 10))))
+                                                :beg 2 :end -1 :margin 0 :radius 10))))
           ("\\[#B\\]" . ((lambda (tag) (svg-tag-make tag :face 'warning :inverse-video t :height .85
-                                                     :beg 2 :end -1 :margin 0  :radius 10))))
+                                                :beg 2 :end -1 :margin 0  :radius 10))))
           ;; Keywords
           ("TODO" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face 'org-todo))))
           ("HOLD" . ((lambda (tag) (svg-tag-make tag :height .85 :face 'org-todo))))
@@ -534,6 +534,20 @@
                            (push '("[-]" . "❍" ) prettify-symbols-alist)
                            (prettify-symbols-mode)))
 
+;; (defun my/pretty-symbols ()
+;;   (setq prettify-symbols-alist
+;;           '(("#+begin_src rust" . "🦀")
+;;             ("#+begin_src emacs-lisp" . "λ")
+;;             ("#+begin_src typescript" . " 🔨")
+;;             ("#+begin_src js" . " 🔨")
+;;             ("#+begin_src С" . "🐍")
+;;             ("#+begin_src python" . "🐍")
+;;             ("#+end_src" . "―")
+;;             ("#+results:" . "🔨")
+;;             ("#+RESULTS:" . "🔨"))))
+
+;; (add-hook 'org-mode-hook 'my/pretty-symbols)
+
 (defface org-checkbox-done-text
   '((t (:foreground "#71696A" :strike-through t)))
   "Face for the text part of a checked org-mode checkbox.")
@@ -579,7 +593,6 @@
          ("C-c n c" . org-roam-capture)
          ("C-c n t" . org-roam-tag-add)
          ("C-c n r" . org-roam-ref-add)
-
          ("C-c g" . org-id-get-create)
          ;; Dailies
          ("C-c n j" . org-roam-dailies-capture-today)
@@ -591,7 +604,27 @@
   (setq org-roam-completion-everywhere t)
   (org-roam-db-autosync-mode)
   ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
+  (require 'org-roam-protocol)
+  ;; Org-roam interface
+  (cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
+    "Return the node's TITLE, as well as it's HIERACHY."
+    (let* ((title (org-roam-node-title node))
+           (olp (mapcar (lambda (s) (if (> (length s) 10) (concat (substring s 0 10)  "...") s)) (org-roam-node-olp node)))
+           (level (org-roam-node-level node))
+           (filetitle (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
+           (filetitle-or-name (if filetitle filetitle (file-name-nondirectory (org-roam-node-file node))))
+           (shortentitle (if (> (length filetitle-or-name) 20) (concat (substring filetitle-or-name 0 20)  "...") filetitle-or-name))
+           (separator (concat " " (all-the-icons-material "chevron_right") " ")))
+      (cond
+       ((= level 1) (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'all-the-icons-dyellow))
+                            (propertize shortentitle 'face 'org-roam-olp) separator title))
+       ((= level 2) (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'all-the-icons-dsilver))
+                            (propertize (concat shortentitle separator (string-join olp separator)) 'face 'org-roam-olp) separator title))
+       ((> level 2) (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'org-roam-olp))
+                            (propertize (concat shortentitle separator (string-join olp separator)) 'face 'org-roam-olp) separator title))
+       (t (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'all-the-icons-yellow))
+                  (if filetitle title (propertize filetitle-or-name 'face 'all-the-icons-dyellow)))))))
+  )
 
 (use-package org-roam-ui
   :ensure t
@@ -602,21 +635,6 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start nil
         ))
-
-(use-package org-roam-graph
-  :straight org-roam
-  :init
-  (setq org-roam-graph-executable	    (executable-find "dot")
-        org-roam-graph-extra-config        '(("overlap" . "false")
-                                             ("concentrate" . "true")
-                                             ("bgcolor" . "lightblue"))
-        org-roam-graph-edge-cites-extra-config
-        '(("color" . "gray")
-          ("style" . "dashed")
-          ("sep" . "20"))
-        org-roam-graph-shorten-titles      'wrap
-        org-roam-graph-max-title-length    50
-        org-roam-graph-exclude-matcher     '("journal")))
 
 (use-package company-org-roam
   :straight (:host github :repo "jethrokuan/company-org-roam")
@@ -662,61 +680,60 @@
            :unnarrowed t)))
   (require 'org-ref)) ; optional: if using Org-ref v2 or v3 citation links
 
-(use-package org-ref :ensure t
-  :config
-  (setq reftex-default-bibliography '("~/Org/2Brain/bibtex/ref.bib"))
+;; (use-package org-ref :ensure t
+;;   :config
+;;   (setq reftex-default-bibliography '("~/Org/2Brain/bibtex/ref.bib"))
 
-  (setq org-ref-bibliography-notes "~/Org/2Brain/bibtex/ref_notes.org"
-        org-ref-default-bibliography '("~/Org/2Brain/ref.bib")
-        org-ref-pdf-directory "~/Org/2Brain/bibtex/bibtex-pdfs/")
+;;   (setq org-ref-bibliography-notes "~/Org/2Brain/bibtex/ref_notes.org"
+;;         org-ref-default-bibliography '("~/Org/2Brain/ref.bib")
+;;         org-ref-pdf-directory "~/Org/2Brain/bibtex/bibtex-pdfs/")
 
-  (setq bibtex-completion-bibliography "~/Org/2Brain/bibtex/ref.bib"
-        bibtex-completion-library-path "~/Org/2Brain/bibtex/bibtex-pdfs/"
-        bibtex-completion-notes-path "~/Org/2Brain/bibtex/bibtex-notes")
+;;   (setq bibtex-completion-bibliography "~/Org/2Brain/bibtex/ref.bib"
+;;         bibtex-completion-library-path "~/Org/2Brain/bibtex/bibtex-pdfs/"
+;;         bibtex-completion-notes-path "~/Org/2Brain/bibtex/bibtex-notes")
 
-                                        ; Optional. Open pdf in external viewer.
-  (setq bibtex-completion-pdf-open-function
-        (lambda (fpath)
-          (start-process "open" "*open*" "open" fpath))))
+;;   ;; Optional. Open pdf in external viewer.
+;;   ;; (setq bibtex-completion-pdf-open-function
+;;   ;;       (lambda (fpath)
+;;   ;;         (start-process "open" "*open*" "open" fpath)))
+;;   ;; )
 
-(use-package citar
-  :hook
-  (LaTeX-mode . citar-capf-setup)
-  (org-mode . citar-capf-setup)
-  :config
-  (setq
-   citar-bibliography (list (concat org-directory "~/Org/References/zotero.bib"))
-   citar-notes-paths (list(concat org-directory "~/Org/Org-roam/literature/"))
-   citar-library-paths (list (concat org-directory "~/Org/Org-roam/"))
-   citar-file-variable "file"
-   citar-symbols
-   `((file ,(all-the-icons-faicon "file-pdf-o" :face 'all-the-icons-red :v-adjust -0.1) . " ")
-     (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
-     (link ,(all-the-icons-material "link" :face 'all-the-icons-blue) . " "))
-   citar-symbol-separator "  "
-   org-cite-global-bibliography citar-bibliography)
-  ;; Search contents of PDFs
-  (after! (embark pdf-occur)
-          (defun citar/search-pdf-contents (keys-entries &optional str)
-            "Search pdfs."
-            (interactive (list (citar-select-refs)))
-            (let ((files (citar-file--files-for-multiple-entries
-                          (citar--ensure-entries keys-entries)
-                          citar-library-paths
-                          '("pdf")))
-                  (search-str (or str (read-string "Search string: "))))
-              (pdf-occur-search files search-str t)))
-          ;; with this, you can exploit embark's multitarget actions, so that you can run `embark-act-all`
-          (add-to-list 'embark-multitarget-actions #'citar/search-pdf-contents)))
+;; (use-package citar
+;;   :config
+;;   (setq
+;;    citar-bibliography (list (concat org-directory "~/Org/References/zotero.bib"))
+;;    citar-notes-paths (list(concat org-directory "~/Org/Org-roam/literature/"))
+;;    citar-library-paths (list (concat org-directory "~/Org/Org-roam/"))
+;;    citar-file-variable "file"
+;;    ;; citar-symbols
+;;    `((file ,(all-the-icons-faicon "file-pdf-o" :face 'all-the-icons-red :v-adjust -0.1) . " ")
+;;      (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
+;;      (link ,(all-the-icons-material "link" :face 'all-the-icons-blue) . " "))
+;;    citar-symbol-separator "  "
+;;    org-cite-global-bibliography citar-bibliography))
 
-(use-package citar-embark
-  :ensure t
-  :after citar embark
-  :no-require
-  :config
-  (org-cite-global-bibliography
-   '("~/Org/2Brain/bibtex/ref.bib"))
-  (citar-embark-mode))
+;; Search contents of PDFs
+;; (after! (embark pdf-occur)
+;;         (defun citar/search-pdf-contents (keys-entries &optional str)
+;;           "Search pdfs."
+;;           (interactive (list (citar-select-refs)))
+;;           (let ((files (citar-file--files-for-multiple-entries
+;;                         (citar--ensure-entries keys-entries)
+;;                         citar-library-paths
+;;                         '("pdf")))
+;;                 (search-str (or str (read-string "Search string: "))))
+;;             (pdf-occur-search files search-str t)))
+;;         ;; with this, you can exploit embark's multitarget actions, so that you can run `embark-act-all`
+;;         (add-to-list 'embark-multitarget-actions #'citar/search-pdf-contents))
+
+;; (use-package citar-embark
+;;   :ensure t
+;;   :after citar embark
+;;   :no-require
+;;   :config
+;;   (org-cite-global-bibliography
+;;    '("~/Org/Org-roam/References/zotero.bib"))
+;;   (citar-embark-mode))
 
 ;; Use `citar' with `org-cite'
 (use-package citar-org-roam
@@ -724,7 +741,25 @@
   :custom
   (org-cite-insert-processor 'citar)
   (org-cite-follow-processor 'citar)
-  (org-cite-activate-processor 'citar))
+  (org-cite-activate-processor 'citar)
+  :config
+  (setq citar-org-roam-subdir "literature"
+        citar-org-roam-note-title-template
+        (string-join
+         '("${author editor} (${year issued date}) ${title}"
+           "#+filetags: literature"
+           "#+startup: overview"
+           "#+startup: hideblocks"
+           "#+options: toc:2 num:t"
+           ""
+           "* What?"
+           "* Why?"
+           "* How?"
+           "* And?"
+           ) "\n"))
+  (citar-org-roam-mode)
+  )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
@@ -932,7 +967,7 @@
          (file "~/Org/agenda/appointments.org") "* TODO %^{Title} %t\n- %?")
         ("w" "Work TODO" entry
          (file "~/Org/agenda/work.org") "* TODO %^{Title}")
-        ("d" "Diary" entry (file "~/Org/diary.org.gpg") ;; "~/Org/2Brain/2023-03-14-13:48:46.org.gpg"
+        ("d" "Diary" entry (file "~/Org/diary.org.gpg")
          "* %U\n" :clock-in t :clock-resume t) ;; "*** %?\n%U\n" :clock-in t :clock-resume t)
         ("n" "Notes" entry
          (file "~/Org/agenda/inbox.org") "* %^{Description} %^g\n Added: %U\n%?")
@@ -1497,7 +1532,7 @@
   :bind
   ;; Don't forget to set keybinds!
   :config
-  (setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
+  (setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll "
         fzf/executable "fzf"
         fzf/git-grep-args "-i --line-number %s"
         ;; command used for `fzf-grep-*` functions
@@ -1507,6 +1542,13 @@
         ;; If nil, the fzf buffer will appear at the top of the window
         fzf/position-bottom t
         fzf/window-height 15))
+
+(defun fzf-node-project ()
+  (interactive)
+  (let ((process-environment
+         (cons (concat "FZF_DEFAULT_COMMAND=ag -g \"\" --ignore node_modules .git build dist")
+               process-environment)))
+    (fzf/start default-directory)))
 
 (use-package magit
   :ensure t
@@ -1940,9 +1982,9 @@
          (javascript-mode . lsp)
          (typescript-mode . lsp)
          (rust-mode . lsp)
+         (LaTeX-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
-  (LaTeX-mode . lsp)
   :commands lsp)
 
 ;; optionally
@@ -1952,7 +1994,10 @@
   :config
   (setq lsp-ui-doc-enable t)
   (setq lsp-ui-sideline-show-diagnostics t)
-  (setq lsp-ui-sideline-show-hover t))
+  (setq lsp-ui-sideline-show-hover t)
+  (setq lsp-ui-doc-delay 2
+        lsp-ui-doc-max-width 80)
+  (setq lsp-signature-function 'lsp-signature-posframe))
 
 ;; if you are helm user
 (use-package helm-lsp :commands helm-lsp-workspace-symbol)
@@ -1960,6 +2005,20 @@
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 ;; Symbol highlighting
 (setq lsp-enable-symbol-highlighting nil)
+
+(use-package corfu
+  :config
+  (defun corfu-enable-in-minibuffer ()
+    "Enable Corfu in the minibuffer if `completion-at-point' is bound."
+    (when (where-is-internal #'completion-at-point (list (current-local-map)))
+      ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
+      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+                  corfu-popupinfo-delay nil)
+      (corfu-mode 1)))
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer))
+
+(setq tab-always-indent 'complete)
+(setq completion-cycle-threshold 3)
 
 (use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
 
@@ -2291,6 +2350,19 @@ If you experience stuttering, increase this.")
       ;; display-time-format "%l:%M%p" ;  %b %y"
       display-time-default-load-average nil)
 (display-time-mode)
+
+(setq frame-title-format
+      '(""
+        (:eval
+         (if (s-contains-p org-roam-directory (or buffer-file-name ""))
+             (replace-regexp-in-string
+              ".*/[0-9]*-?" "☰ "
+              (subst-char-in-string ?_ ?  buffer-file-name))
+           "%b"))
+        (:eval
+         (let ((project-name (projectile-project-name)))
+           (unless (string= "-" project-name)
+             (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
 
 ;;;; General But Better Defaults
 (setq-default
