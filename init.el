@@ -179,7 +179,6 @@
 
 ;; (use-package nov :ensure t)
 
-
 ;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
 
 (use-package pbcopy
@@ -367,6 +366,40 @@
  org-fontify-quote-and-verse-blocks t
  org-image-actual-width '(300))
 
+;; (use-package org-modern
+;;   :hook (org-mode . org-modern-mode)
+;;   :config
+;;   (setq
+;;    ;; Edit settings
+;;    org-catch-invisible-edits 'show-and-error
+;;    org-special-ctrl-a/e t
+;;    org-insert-heading-respect-content t
+;;    ;; Appearance
+;;    org-hide-leading-stars t
+;;    org-startup-indented nil
+;;    org-modern-radio-target    '("❰" t "❱")
+;;    org-modern-internal-target '("↪ " t "")
+;;    org-modern-todo t
+;;    org-modern-tag t
+;;    org-modern-timestamp t
+;;    org-modern-statistics t
+;;    ;; org-modern-table nil
+;;    org-modern-progress t
+;;    org-modern-priority t
+;;    org-modern-horizontal-rule "──────────"
+;;    org-modern-hide-stars "·"
+;;    ;; org-modern-star ["⁖"]
+;;    org-modern-keyword "‣"
+;;    ;; org-modern-list '((43 . "•")
+;;    ;;                   (45 . "–")
+;;    ;;                   (42 . "∘")))
+;;   )
+
+;; (custom-set-faces
+;;  `(org-modern-tag ((t (:background ,(doom-blend (doom-color 'blue) (doom-color 'bg) 0.1) :foreground ,(doom-color 'grey)))))
+;;  `(org-modern-radio-target ((t (:inherit default :foreground ,(doom-color 'blue))))))
+
+;; Spacing of headings
 (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
 (dolist (face '((org-level-1 . 1.2)
                 (org-level-2 . 1.1)
@@ -378,90 +411,59 @@
                 (org-level-8 . 1.1)))
   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
 
-(use-package org-modern
-  :hook (org-mode . org-modern-mode)
-  :config
-  (setq
-   ;; Edit settings
-   org-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   org-insert-heading-respect-content t
-   ;; Appearance
-   org-hide-leading-stars t
-   org-startup-indented nil
-   org-modern-radio-target    '("❰" t "❱")
-   org-modern-internal-target '("↪ " t "")
-   org-modern-todo nil
-   org-modern-tag nil
-   org-modern-timestamp t
-   org-modern-statistics nil
-   org-modern-progress nil
-   org-modern-priority nil
-   org-modern-horizontal-rule "──────────"
-   org-modern-hide-stars "·"
-   ;; org-modern-star ["⁖"]
-   org-modern-keyword "‣"
-   org-modern-list '((43 . "•")
-                     (45 . "–")
-                     (42 . "∘"))))
+;; (use-package svg-tag-mode
+;;   :config
+;;   (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
+;;   (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
+;;   (defconst day-re "[A-Za-z]\\{3\\}")
+;;   (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
 
-(custom-set-faces
- `(org-modern-tag ((t (:background ,(doom-blend (doom-color 'blue) (doom-color 'bg) 0.1) :foreground ,(doom-color 'grey)))))
- `(org-modern-radio-target ((t (:inherit default :foreground ,(doom-color 'blue))))))
+;;   (defun svg-progress-percent (value)
+;;     (svg-image (svg-lib-concat
+;;                 (svg-lib-progress-bar
+;;                  (/ (string-to-number value) 100.0) nil
+;;                  :height 0.8 :foreground (doom-color 'fg) :background (doom-color 'bg)
+;;                  :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+;;                 (svg-lib-tag (concat value "%") nil
+;;                              :height 0.8 :foreground (doom-color 'fg) :background (doom-color 'bg)
+;;                              :stroke 0 :margin 0)) :ascent 'center))
 
-(use-package svg-tag-mode
-  :config
-  (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
-  (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
-  (defconst day-re "[A-Za-z]\\{3\\}")
-  (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
+;;   (defun svg-progress-count (value)
+;;     (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+;;            (count (float (car seq)))
+;;            (total (float (cadr seq))))
+;;       (svg-image (svg-lib-concat
+;;                   (svg-lib-progress-bar (/ count total) nil
+;;                                         :foreground (doom-color 'fg)
+;;                                         :background (doom-color 'bg) :height 0.8
+;;                                         :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+;;                   (svg-lib-tag value nil
+;;                                :foreground (doom-color 'fg)
+;;                                :background (doom-color 'bg)
+;;                                :stroke 0 :margin 0 :height 0.8)) :ascent 'center)))
 
-  (defun svg-progress-percent (value)
-    (svg-image (svg-lib-concat
-                (svg-lib-progress-bar
-                 (/ (string-to-number value) 100.0) nil
-                 :height 0.8 :foreground (doom-color 'fg) :background (doom-color 'bg)
-                 :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-                (svg-lib-tag (concat value "%") nil
-                             :height 0.8 :foreground (doom-color 'fg) :background (doom-color 'bg)
-                             :stroke 0 :margin 0)) :ascent 'center))
+;;   (set-face-attribute 'svg-tag-default-face nil :family "Alegreya Sans")
+;;   (setq svg-tag-tags
+;;         `(;; Progress e.g. [63%] or [10/15]
+;;           ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
+;;                                               (svg-progress-percent (substring tag 1 -2)))))
+;;           ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
+;;                                             (svg-progress-count (substring tag 1 -1)))))
+;;           ;; Task priority e.g. [#A], [#B], or [#C]
+;;           ("\\[#A\\]" . ((lambda (tag) (svg-tag-make tag :face 'error :inverse-video t :height .85
+;;                                                      :beg 2 :end -1 :margin 0 :radius 10))))
+;;           ("\\[#B\\]" . ((lambda (tag) (svg-tag-make tag :face 'warning :inverse-video t :height .85
+;;                                                      :beg 2 :end -1 :margin 0  :radius 10))))
+;;           ;; Keywords
+;;           ("TODO" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face 'org-todo))))
+;;           ("HOLD" . ((lambda (tag) (svg-tag-make tag :height .85 :face 'org-todo))))
+;;           ("DONE\|STOP" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face 'org-done))))
+;;           ("NEXT\|WAIT" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-active))))
+;;           ("REPEAT\|EVENT\|PROJ\|IDEA" .
+;;            ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-project))))
+;;           ("REVIEW" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-onhold))))))
 
-  (defun svg-progress-count (value)
-    (let* ((seq (mapcar #'string-to-number (split-string value "/")))
-           (count (float (car seq)))
-           (total (float (cadr seq))))
-      (svg-image (svg-lib-concat
-                  (svg-lib-progress-bar (/ count total) nil
-                                        :foreground (doom-color 'fg)
-                                        :background (doom-color 'bg) :height 0.8
-                                        :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-                  (svg-lib-tag value nil
-                               :foreground (doom-color 'fg)
-                               :background (doom-color 'bg)
-                               :stroke 0 :margin 0 :height 0.8)) :ascent 'center)))
-
-  (set-face-attribute 'svg-tag-default-face nil :family "Alegreya Sans")
-  (setq svg-tag-tags
-        `(;; Progress e.g. [63%] or [10/15]
-          ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
-                                              (svg-progress-percent (substring tag 1 -2)))))
-          ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
-                                            (svg-progress-count (substring tag 1 -1)))))
-          ;; Task priority e.g. [#A], [#B], or [#C]
-          ("\\[#A\\]" . ((lambda (tag) (svg-tag-make tag :face 'error :inverse-video t :height .85
-                                                :beg 2 :end -1 :margin 0 :radius 10))))
-          ("\\[#B\\]" . ((lambda (tag) (svg-tag-make tag :face 'warning :inverse-video t :height .85
-                                                :beg 2 :end -1 :margin 0  :radius 10))))
-          ;; Keywords
-          ("TODO" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face 'org-todo))))
-          ("HOLD" . ((lambda (tag) (svg-tag-make tag :height .85 :face 'org-todo))))
-          ("DONE\|STOP" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face 'org-done))))
-          ("NEXT\|WAIT" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-active))))
-          ("REPEAT\|EVENT\|PROJ\|IDEA" .
-           ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-project))))
-          ("REVIEW" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-onhold))))))
-
-  (add-hook 'org-mode-hook 'svg-tag-mode))
+;;   (add-hook 'org-mode-hook 'svg-tag-mode))
 
 (use-package org-appear
   :hook
@@ -1917,8 +1919,12 @@
 (helm-mode 1)
 
 (use-package company
-  :ensure t
-  :hook (after-init . global-company-mode)
+  :after lsp-mode
+  :hook (prog-mode . company-mode)
+  :bind (:map company-active-map
+              ("<tab>" . company-complete-selection))
+  (:map lsp-mode-map
+        ("<tab>" . company-indent-or-complete-common))
   :config
   (setq company-idle-delay 0
         company-minimum-prefix-length 1
@@ -1951,6 +1957,9 @@
   (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
   (define-key company-active-map (kbd "RET") 'company-complete-selection))
 
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
 (use-package company-bibtex
   :ensure t)
 
@@ -1972,6 +1981,12 @@
 
 (use-package yasnippet :ensure t)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;;;;;;;;;;;;; ;;
+;; ;; LSP & Completion ;; ;;
+;; ;;;;;;;;;;;;;;;;;;;;;; ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package lsp-mode
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
@@ -1987,16 +2002,22 @@
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
 
+(add-hook 'js-mode-hook #'lsp-mode)
+(add-hook 'typescript-mode-hook #'lsp-mode) ;; for typescript support
+(add-hook 'js3-mode-hook #'lsp-mode) ;; for js3-mode support
+(add-hook 'rjsx-mode #'lsp-mode) ;; for rjsx-mode support
+
 ;; optionally
 (use-package lsp-ui
   :ensure t
+  :hook (lsp-mode . lsp-ui-mode)
   :commands lsp-ui-mode
   :config
   (setq lsp-ui-doc-enable t)
   (setq lsp-ui-sideline-show-diagnostics t)
   (setq lsp-ui-sideline-show-hover t)
-  (setq lsp-ui-doc-delay 2
-        lsp-ui-doc-max-width 80)
+  ;; (setq lsp-ui-doc-delay 2
+  ;;       lsp-ui-doc-max-width 80)
   (setq lsp-signature-function 'lsp-signature-posframe))
 
 ;; if you are helm user
@@ -2005,6 +2026,19 @@
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 ;; Symbol highlighting
 (setq lsp-enable-symbol-highlighting nil)
+
+(use-package sideline
+  :init
+  (setq sideline-backends-skip-current-line t  ; don't display on current line
+        sideline-order-left 'down              ; or 'up
+        sideline-order-right 'up               ; or 'down
+        sideline-format-left "%s   "           ; format for left aligment
+        sideline-format-right "   %s"          ; format for right aligment
+        sideline-priority 100                  ; overlays' priority
+        sideline-display-backend-name t))      ; display the backend name
+
+(use-package sideline-flycheck
+  :hook (flycheck-mode . sideline-flycheck-setup))
 
 (use-package corfu
   :config
@@ -2032,7 +2066,7 @@
   :mode (("\\.js\\'" . web-mode)
          ("\\.jsx\\'" . web-mode)
          ("\\.ts\\'" . web-mode)
-         ("\\.tsx\\'" . typescript-mode)
+         ("\\.tsx\\'" . web-mode)
          ("\\.html\\'" . web-mode)
          ("\\.vue\\'" . web-mode)
          ("\\.json\\'" . web-mode))
@@ -2066,22 +2100,36 @@
               :after-until
               (lambda (c) (eq c ?#))))
 
+(defun enable-minor-mode (my-pair)
+  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+  (if (buffer-file-name)
+      (if (string-match (car my-pair) buffer-file-name)
+          (funcall (cdr my-pair)))))
 
 (add-hook 'web-mode-hook #'(lambda ()
                              (enable-minor-mode
                               '("\\.jsx?\\'" . prettier-js-mode))))
 
-(add-hook 'web-mode-hook #'(lambda ()
-                             (enable-minor-mode
-                              '("\\.tsx?\\'" . prettier-js-mode))))
+;; (add-hook 'web-mode-hook #'(lambda ()
+;;                              (enable-minor-mode
+;;                               '("\\.tsx?\\'" . prettier-js-mode))))
 
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2))
+
+(use-package prettier-js)
+
 (use-package tide
   :ensure t
-  :after (typescript-mode company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
+  :after (company flycheck)
+  :hook ((typescript-ts-mode . tide-setup)
+         (tsx-ts-mode . tide-setup)
+         (typescript-ts-mode . tide-hl-identifier-mode)
          (before-save . tide-format-before-save)))
 (defun setup-tide-mode ()
   (interactive)
@@ -2093,6 +2141,24 @@
   (company-mode +1))
 
 (setq tide-format-options '(:tabSize 2 :indentSize 2 ))
+;; TSX with treesitter
+(add-hook 'tsx-ts-mode-hook #'setup-tide-mode)
+
+(add-hook 'js2-mode-hook #'setup-tide-mode)
+;; configure javascript-tide checker to run after your default javascript checker
+;; (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
+
+(add-hook 'web-mode-hook
+          (lambda ()
+            (when (string-equal "jsx" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+;; (add-hook 'web-mode-hook
+;;           (lambda ()
+;;             (when (string-equal "tsx" (file-name-extension buffer-file-name))
+;;               (setup-tide-mode))))
+;; configure jsx-tide checker to run after your default jsx checker
+(flycheck-add-mode 'javascript-eslint 'web-mode)
+;; (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
@@ -2161,17 +2227,25 @@
 
 (add-hook 'rust-mode-hook 'lsp-deferred)
 
-;; (use-package racer
-;;   :ensure t
-;;   :if (executable-find "racer")
-;;   :after rust-mode
-;;   :custom
-;;   (racer-rust-src-path "~/Code/rust/src/src")
-;;   :hook ((rust-mode . racer-mode)
-;;          (racer-mode . eldoc-mode)
-;;          (racer-mode . company-mode))
-;;   :config
-;;   (evil-leader/set-key-for-mode 'rust-mode "d" 'racer-find-definition))
+(use-package tree-sitter
+  :ensure t
+  :config
+  ;; activate tree-sitter on any buffer containing code for which it has a parser available
+  (global-tree-sitter-mode)
+  ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
+  ;; by switching on and off
+  (add-hook 'tree-sitter-after-on-hook 'tree-sitter-hl-mode))
+
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter)
+
+;;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;;;;; ;;
+;; ;; Flycheck ;; ;;
+;; ;;;;;;;;;;;;;; ;;
+;;;;;;;;;;;;;;;;;;;;
 
 (use-package flycheck
   :ensure t
@@ -2192,20 +2266,6 @@
   :config
   (with-eval-after-load 'rust-mode
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
-
-(use-package tree-sitter
-  :ensure t
-  :config
-  ;; activate tree-sitter on any buffer containing code for which it has a parser available
-  (global-tree-sitter-mode)
-  ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
-  ;; by switching on and off
-  (add-hook 'tree-sitter-after-on-hook 'tree-sitter-hl-mode))
-
-
-(use-package tree-sitter-langs
-  :ensure t
-  :after tree-sitter)
 
 ;; auto-format different source code files extremely intelligently
 ;; https://github.com/radian-software/apheleia
@@ -2250,13 +2310,13 @@ If you experience stuttering, increase this.")
 ;;________________________________________________________________
 ;;;;    Fancy pkg
 ;;________________________________________________________________
-(use-package fancy-battery
-  :config
-  (setq fancy-battery-show-percentage t)
-  (setq battery-update-interval 15)
-  (if window-system
-      (fancy-battery-mode)
-    (display-battery-mode)))
+;; (use-package fancy-battery
+;;   :config
+;;   (setq fancy-battery-show-percentage t)
+;;   (setq battery-update-interval 15)
+;;   (if window-system
+;;       (fancy-battery-mode)
+;;     (display-battery-mode)))
 
 ;;;;; olivetti
 (use-package olivetti
