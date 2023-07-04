@@ -23,13 +23,13 @@
   (setq package-enable-at-startup nil) ; To prevent initializing twice
   (package-initialize))
 
-;; set use-package-verbose to t for interpreted .emacs,
-;; and to nil for byte-compiled .emacs.elc.
+;; Set use-package-verbose to t for interpreted .emacs, and to nil for byte-compiled .emacs.elc.
 (eval-and-compile
   (setq use-package-verbose (not (bound-and-true-p byte-compile-current-file))))
 
-;;; use-package
-;; Install use-package if not installed
+;;________________________________________________________________
+;;    Install use-package if not installed
+;;________________________________________________________________
 (eval-and-compile
   (unless (and (fboundp 'package-installed-p)
                (package-installed-p 'use-package))
@@ -40,7 +40,9 @@
     (setq use-package-compute-statistics nil))
   (require 'use-package))
 
-;; Configure use-package
+;;________________________________________________________________
+;;    Configure use-package
+;;________________________________________________________________
 (use-package use-package
   :custom
   (use-package-verbose t)
@@ -49,7 +51,9 @@
   (use-package-expand-minimally t)
   (use-package-enable-imenu-support t))
 
-;; Install straight.el
+;;________________________________________________________________
+;;    Install straight.el
+;;________________________________________________________________
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -62,7 +66,6 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
-
 (straight-use-package 'org)
 
 ;; (org-babel-load-file
@@ -105,18 +108,18 @@
 (eval-when-compile (defvar display-time-24hr-format t))
 (eval-when-compile (defvar display-time-default-load-average nil))
 
-(display-battery-mode t)		  ;; Show battery.
-(display-time-mode t)			  ;; Show time.
-(set-fringe-mode 1)               ;; Give us some space.
-(delete-selection-mode nil)		  ;; Use a more sane delete mode than evil.
-(fset 'yes-or-no-p 'y-or-n-p)     ;; Set yes or no to y/n
-;; (global-font-lock-mode 1)         ;; always highlight code
-(global-auto-revert-mode 1)       ;; refresh a buffer if changed on disk
-;; (global-hl-line-mode 1)           ;; Highlight current line
-(semantic-mode 1)								;; help out with semantics
-(savehist-mode 1)                 ;; Save history
-(save-place-mode 1)               ;; when buffer is closed, save the cursor position
-;; (blink-cursor-mode 1)
+(display-battery-mode t)		  ; Show battery.
+(display-time-mode t)			  ; Show time.
+(set-fringe-mode 1)               ; Give us some space.
+(delete-selection-mode nil)		  ; Use a more sane delete mode than evil.
+(fset 'yes-or-no-p 'y-or-n-p)     ; Set yes or no to y/n
+(global-font-lock-mode 1)         ;; always highlight code
+(global-auto-revert-mode 1)       ; refresh a buffer if changed on disk
+(global-hl-line-mode 1)           ;; Highlight current line
+(semantic-mode 1)								; help out with semantics
+(savehist-mode 1)                 ; Save history
+(save-place-mode 1)               ; when buffer is closed, save the cursor position
+(blink-cursor-mode 1)
 
 ;; Setup fonts
 ;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 130)
@@ -160,7 +163,6 @@
       undo-outer-limit                  1006632960) ;; x 10 (960mb), (Emacs uses x100), but this seems too high.
 
 (use-package go-mode :ensure t)
-(use-package company :ensure t)
 
 ;; (load "~/.emacs.d/local-packages/epubmode")
 ;; (require 'epubmode)
@@ -223,19 +225,15 @@
 (set-face-attribute 'default t
                     :font "Iosevka" ;; Terminess Nerd Font Propo, Input, Terminess Nerd Font Propo
                     :height 100
-                    :weight 'regular
-                    )
+                    :weight 'regular)
 (set-face-attribute 'variable-pitch nil
                     :font "Iosevka"
                     :height 100
-                    :weight 'medium
-                    )
+                    :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
                     :font "Iosevka"
                     :height 100
-                    :weight 'medium
-                    )
-
+                    :weight 'medium)
 (set-frame-font "Iosevka" nil t)
 
 ;; Makes commented text and keywords italics.
@@ -251,38 +249,37 @@
 
 ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
 (add-to-list 'default-frame-alist '(font . "Iosevka 11"))
-;; (add-to-list 'default-frame-alist
-;;        '(font . "DejaVu Sans Mono-11"))
+(add-to-list 'default-frame-alist
+             '(font . "Iosevka 11"))
 
-(add-to-list 'default-frame-alist '(font . "Iosevka"))
-;; changes certain keywords to symbols, such as lamda!
+(add-to-list 'default-frame-alist '(font . "Iosevka 11"))
+;; Changes certain keywords to symbols, such as lamda
 (setq global-prettify-symbols-mode t)
 
-(use-package gruvbox-theme
-  :ensure t)
-
-(use-package doom-themes
-  :ensure t
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
-
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config)
-  )
 
 (use-package theme-changer
   :ensure t
   :config
   (setq calendar-location-name "Vladivostok, RU")
   (setq calendar-latitude 43.11)
-  (setq calendar-longitude 131.88))
+  (setq calendar-longitude 131.88)
+  
+  (use-package gruvbox-theme
+    :ensure t)
+
+  (use-package doom-themes
+    :ensure t
+    :config
+    ;; Global settings (defaults)
+    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+          doom-themes-enable-italic t) ; if nil, italics is universally disabled
+    ;; Enable flashing mode-line on errors
+    (doom-themes-visual-bell-config)
+    ;; or for treemacs users
+    (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
+    (doom-themes-treemacs-config)
+    ;; Corrects (and improves) org-mode's native fontification.
+    (doom-themes-org-config)))
 
 ;; (change-theme 'doom-one-light 'gruvbox-dark-medium)
 (change-theme 'doom-one-light 'doom-one)
@@ -305,7 +302,6 @@
 (with-eval-after-load 'org
   (setq org-confirm-babel-evaluate nil)
   (require 'org-tempo)
-
 
   ;; Setup fonts for org-mode
   (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
@@ -366,38 +362,33 @@
  org-fontify-quote-and-verse-blocks t
  org-image-actual-width '(300))
 
-;; (use-package org-modern
-;;   :hook (org-mode . org-modern-mode)
-;;   :config
-;;   (setq
-;;    ;; Edit settings
-;;    org-catch-invisible-edits 'show-and-error
-;;    org-special-ctrl-a/e t
-;;    org-insert-heading-respect-content t
-;;    ;; Appearance
-;;    org-hide-leading-stars t
-;;    org-startup-indented nil
-;;    org-modern-radio-target    '("❰" t "❱")
-;;    org-modern-internal-target '("↪ " t "")
-;;    org-modern-todo t
-;;    org-modern-tag t
-;;    org-modern-timestamp t
-;;    org-modern-statistics t
-;;    ;; org-modern-table nil
-;;    org-modern-progress t
-;;    org-modern-priority t
-;;    org-modern-horizontal-rule "──────────"
-;;    org-modern-hide-stars "·"
-;;    ;; org-modern-star ["⁖"]
-;;    org-modern-keyword "‣"
-;;    ;; org-modern-list '((43 . "•")
-;;    ;;                   (45 . "–")
-;;    ;;                   (42 . "∘")))
-;;   )
-
-;; (custom-set-faces
-;;  `(org-modern-tag ((t (:background ,(doom-blend (doom-color 'blue) (doom-color 'bg) 0.1) :foreground ,(doom-color 'grey)))))
-;;  `(org-modern-radio-target ((t (:inherit default :foreground ,(doom-color 'blue))))))
+(use-package org-modern
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq
+   ;; Edit settings
+   org-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   org-insert-heading-respect-content t
+   ;; Appearance
+   org-hide-leading-stars t
+   org-startup-indented nil
+   org-modern-radio-target    '("❰" t "❱")
+   org-modern-internal-target '("↪ " t "")
+   org-modern-todo t
+   org-modern-tag t
+   org-modern-timestamp t
+   org-modern-statistics t
+   ;; org-modern-table nil
+   org-modern-progress t
+   org-modern-priority t
+   org-modern-horizontal-rule "──────────"
+   org-modern-hide-stars "·"
+   ;; org-modern-star ["⁖"]
+   org-modern-keyword "‣"
+   org-modern-list '((43 . "•")
+                     (45 . "–")
+                     (42 . "∘"))))
 
 ;; Spacing of headings
 (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
@@ -526,8 +517,7 @@
    (python . t)
    (rust . t)
    (C . t)
-   (latex . t)
-   ))
+   (latex . t)))
 
 (add-hook 'org-mode-hook (lambda ()
                            "Beautify Org Checkbox Symbol"
@@ -536,29 +526,22 @@
                            (push '("[-]" . "❍" ) prettify-symbols-alist)
                            (prettify-symbols-mode)))
 
-;; (defun my/pretty-symbols ()
-;;   (setq prettify-symbols-alist
-;;           '(("#+begin_src rust" . "🦀")
-;;             ("#+begin_src emacs-lisp" . "λ")
-;;             ("#+begin_src typescript" . " 🔨")
-;;             ("#+begin_src js" . " 🔨")
-;;             ("#+begin_src С" . "🐍")
-;;             ("#+begin_src python" . "🐍")
-;;             ("#+end_src" . "―")
-;;             ("#+results:" . "🔨")
-;;             ("#+RESULTS:" . "🔨"))))
 
-;; (add-hook 'org-mode-hook 'my/pretty-symbols)
+(add-hook 'org-mode-hook (defun my/pretty-symbols ()
+                           (setq prettify-symbols-alist
+                                 '(("#+begin_src rust" . "🦀")
+                                   ("#+begin_src emacs-lisp" . "λ")
+                                   ("#+begin_src typescript" . " 🔨")
+                                   ("#+begin_src js" . " 🔨")
+                                   ("#+begin_src С" . "🐍")
+                                   ("#+begin_src python" . "🐍")
+                                   ("#+end_src" . "―")
+                                   ("#+results:" . "🔨")
+                                   ("#+RESULTS:" . "🔨")))))
 
 (defface org-checkbox-done-text
   '((t (:foreground "#71696A" :strike-through t)))
   "Face for the text part of a checked org-mode checkbox.")
-
-;; (font-lock-add-keywords
-;;  'org-mode
-;;  `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?:X\\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)"
-;;     1 'org-checkbox-done-text prepend))
-;;  'append)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -659,7 +642,6 @@
 ;; ;; CITES ;; ;;
 ;; ;;;;;;;;;;; ;;
 ;;;;;;;;;;;;;;;;;
-
 
 (use-package org-roam-bibtex
   :ensure t
@@ -885,14 +867,14 @@
                                  (search . " %i %-12:c")))
 
 (setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
-                                                    "\n"
-                                                    (org-agenda-format-date-aligned date))))
+                                               "\n"
+                                               (org-agenda-format-date-aligned date))))
 (setq org-cycle-separator-lines 2)
-;; (setq org-agenda-category-icon-alist
-;;       `(("Work" ,(list (all-the-icons-faicon "cogs")) nil nil :ascent center)
-;;         ("Personal" ,(list (all-the-icons-material "person")) nil nil :ascent center)
-;;         ("Calendar" ,(list (all-the-icons-faicon "calendar")) nil nil :ascent center)
-;;         ("Reading" ,(list (all-the-icons-faicon "book")) nil nil :ascent center)))
+(setq org-agenda-category-icon-alist
+      `(("Work" ,(list (all-the-icons-faicon "cogs")) nil nil :ascent center)
+        ("Personal" ,(list (all-the-icons-material "person")) nil nil :ascent center)
+        ("Calendar" ,(list (all-the-icons-faicon "calendar")) nil nil :ascent center)
+        ("Reading" ,(list (all-the-icons-faicon "book")) nil nil :ascent center)))
 
 (use-package org-super-agenda :ensure t)
 
@@ -938,28 +920,6 @@
 
 (setq org-directory "~/Org")
 (setq org-default-notes-file "~/Org/agenda/notes.org")
-
-;; (setq org-capture-templates
-;;       '(("t" "todo" entry (file org-default-notes-file)
-;;          "* TODO %?\n%u\n%a\n" :clock-in t :clock-resume t)
-;;         ("m" "Meeting" entry (file org-default-notes-file)
-;;          "* MEETING with %? :MEETING:\n%t" :clock-in t :clock-resume t)
-;;         ("d" "Diary" entry (file+datetree "~/Org/diary.org")
-;;          "* %?\n%U\n" :clock-in t :clock-resume t)
-;;         ("i" "Idea" entry (file org-default-notes-file)
-;;          "* %? :IDEA: \n%t" :clock-in t :clock-resume t)
-;;         ))
-
-;; (setq org-capture-templates
-;;       `(("i" "inbox" entry (file ,(concat who/org-agenda-directory "inbox.org"))
-;;          "* TODO %?\n")
-;;         ("a" "appointment" entry (file "~/Org/gtd/calendars/personal.org" ))
-;;         ("e" "email" entry (file+headline ,(concat who/org-agenda-directory "inbox.org") "Emails")
-;;          "* TODO [#B] %a" :immediate-finish t)
-;;         ("l" "link" entry (file ,(concat who/org-agenda-directory "inbox.org"))
-;;          "* TODO %(org-cliplink-capture)" :immediate-finish t)
-;;         ("c" "org-protocol-capture" entry (file ,(concat who/org-agenda-directory "inbox.org"))
-;;          "* TODO [[%:link][%:description]]\n\n %i" :immediate-finish t)))
 
 (setq org-capture-templates
       '(
@@ -1079,54 +1039,54 @@
               ("b"  . pdf-view-set-slice-from-bounding-box)
               ("r"  . pdf-view-reset-slice)))
 
-;; (defhydra hydra-pdftools (:color blue :hint nil)
-;; 	"
-;; 																																			 ╭───────────┐
-;; 				Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-;; 		╭──────────────────────────────────────────────────────────────────┴───────────╯
-;; 					^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-;; 					^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-;; 					^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-;; 					^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-;; 		 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-;; 					^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-;; 					^^_n_^^      ^ ^  _r_eset slice box
-;; 					^^^↓^^^
-;; 					^^_G_^^
-;; 		--------------------------------------------------------------------------------
-;; 				 "
-;; 	("\\" hydra-master/body "back")
-;; 	("<ESC>" nil "quit")
-;; 	("al" pdf-annot-list-annotations)
-;; 	("ad" pdf-annot-delete)
-;; 	("aa" pdf-annot-attachment-dired)
-;; 	("am" pdf-annot-add-markup-annotation)
-;; 	("at" pdf-annot-add-text-annotation)
-;; 	("y"  pdf-view-kill-ring-save)
-;; 	("+" pdf-view-enlarge :color red)
-;; 	("-" pdf-view-shrink :color red)
-;; 	("0" pdf-view-scale-reset)
-;; 	("H" pdf-view-fit-height-to-window)
-;; 	("W" pdf-view-fit-width-to-window)
-;; 	("P" pdf-view-fit-page-to-window)
-;; 	("n" pdf-view-next-page-command :color red)
-;; 	("p" pdf-view-previous-page-command :color red)
-;; 	("d" pdf-view-dark-minor-mode)
-;; 	("b" pdf-view-set-slice-from-bounding-box)
-;; 	("r" pdf-view-reset-slice)
-;; 	("g" pdf-view-first-page)
-;; 	("G" pdf-view-last-page)
-;; 	("e" pdf-view-goto-page)
-;; 	("o" pdf-outline)
-;; 	("s" pdf-occur)
-;; 	("i" pdf-misc-display-metadata)
-;; 	("u" pdf-view-revert-buffer)
-;; 	("F" pdf-links-action-perfom)
-;; 	("f" pdf-links-isearch-link)
-;; 	("B" pdf-history-backward :color red)
-;; 	("N" pdf-history-forward :color red)
-;; 	("l" image-forward-hscroll :color red)
-;; 	("h" image-backward-hscroll :color red))
+(defhydra hydra-pdftools (:color blue :hint nil)
+	"
+																																			 ╭───────────┐
+				Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+		╭──────────────────────────────────────────────────────────────────┴───────────╯
+					^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+					^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+					^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+					^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+		 _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+					^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+					^^_n_^^      ^ ^  _r_eset slice box
+					^^^↓^^^
+					^^_G_^^
+		--------------------------------------------------------------------------------
+				 "
+	("\\" hydra-master/body "back")
+	("<ESC>" nil "quit")
+	("al" pdf-annot-list-annotations)
+	("ad" pdf-annot-delete)
+	("aa" pdf-annot-attachment-dired)
+	("am" pdf-annot-add-markup-annotation)
+	("at" pdf-annot-add-text-annotation)
+	("y"  pdf-view-kill-ring-save)
+	("+" pdf-view-enlarge :color red)
+	("-" pdf-view-shrink :color red)
+	("0" pdf-view-scale-reset)
+	("H" pdf-view-fit-height-to-window)
+	("W" pdf-view-fit-width-to-window)
+	("P" pdf-view-fit-page-to-window)
+	("n" pdf-view-next-page-command :color red)
+	("p" pdf-view-previous-page-command :color red)
+	("d" pdf-view-dark-minor-mode)
+	("b" pdf-view-set-slice-from-bounding-box)
+	("r" pdf-view-reset-slice)
+	("g" pdf-view-first-page)
+	("G" pdf-view-last-page)
+	("e" pdf-view-goto-page)
+	("o" pdf-outline)
+	("s" pdf-occur)
+	("i" pdf-misc-display-metadata)
+	("u" pdf-view-revert-buffer)
+	("F" pdf-links-action-perfom)
+	("f" pdf-links-isearch-link)
+	("B" pdf-history-backward :color red)
+	("N" pdf-history-forward :color red)
+	("l" image-forward-hscroll :color red)
+	("h" image-backward-hscroll :color red))
 
 (use-package saveplace-pdf-view :ensure t)
 (save-place-mode 1)
@@ -1319,66 +1279,27 @@
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
 
-;;;;; ligature-for-jetbrain
-;; (when (aorst/font-installed-p "JetBrainsMono")
-;;   (dolist (char/ligature-re
-;;            `((?-  ,(rx (or (or "-->" "-<<" "->>" "-|" "-~" "-<" "->") (+ "-"))))
-;;              (?/  ,(rx (or (or "/==" "/=" "/>" "/**" "/*") (+ "/"))))
-;;              (?*  ,(rx (or (or "*>" "*/") (+ "*"))))
-;;              (?<  ,(rx (or (or "<<=" "<<-" "<|||" "<==>" "<!--" "<=>" "<||" "<|>" "<-<"
-;;                                "<==" "<=<" "<-|" "<~>" "<=|" "<~~" "<$>" "<+>" "</>" "<*>"
-;;                                "<->" "<=" "<|" "<:" "<>"  "<$" "<-" "<~" "<+" "</" "<*")
-;;                            (+ "<"))))
-;;              (?:  ,(rx (or (or ":?>" "::=" ":>" ":<" ":?" ":=") (+ ":"))))
-;;              (?=  ,(rx (or (or "=>>" "==>" "=/=" "=!=" "=>" "=:=") (+ "="))))
-;;              (?!  ,(rx (or (or "!==" "!=") (+ "!"))))
-;;              (?>  ,(rx (or (or ">>-" ">>=" ">=>" ">]" ">:" ">-" ">=") (+ ">"))))
-;;              (?&  ,(rx (+ "&")))
-;;              (?|  ,(rx (or (or "|->" "|||>" "||>" "|=>" "||-" "||=" "|-" "|>" "|]" "|}" "|=")
-;;                            (+ "|"))))
-;;              (?.  ,(rx (or (or ".?" ".=" ".-" "..<") (+ "."))))
-;;              (?+  ,(rx (or "+>" (+ "+"))))
-;;              (?\[ ,(rx (or "[<" "[|")))
-;;              (?\{ ,(rx "{|"))
-;;              (?\? ,(rx (or (or "?." "?=" "?:") (+ "?"))))
-;;              (?#  ,(rx (or (or "#_(" "#[" "#{" "#=" "#!" "#:" "#_" "#?" "#(") (+ "#"))))
-;;              (?\; ,(rx (+ ";")))
-;;              (?_  ,(rx (or "_|_" "__")))
-;;              (?~  ,(rx (or "~~>" "~~" "~>" "~-" "~@")))
-;;              (?$  ,(rx "$>"))
-;;              (?^  ,(rx "^="))
-;;              (?\] ,(rx "]#"))))
-;;     (apply (lambda (char ligature-re)
-;;              (set-char-table-range composition-function-table char
-;;                                    `([,ligature-re 0 font-shape-gstring])))
-;;            char/ligature-re)))
-
-;; (use-package dired
-;;   :defer t
-;;   :config
-;;   (setq dired-dwim-target t) ; Dired tries to guess the target directory
-;;   (setq dired-recursive-deletes 'always) ; Allow deleting directories recursively
-;;   (setq dired-listing-switches "-alh --group-directories-first") ; Use human-readable file sizes and group directories first
-;;   (setq dired-hide-details-mode t) ; Hide file and directory details by default
-;;   (setq dired-auto-revert-buffer t) ; Automatically refresh Dired buffers when changes are made
-;;   (setq diredp-hide-details-initially-flag nil)
-;;   (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; Bind Enter to open files
-;;   (define-key dired-mode-map (kbd "^")
-;; 	  (lambda () (interactive) (find-alternate-file ".."))) ; Bind ^ to go up a directory
-;;   (define-key dired-mode-map (kbd "(") 'dired-hide-details-mode) ; Bind ( to toggle file and directory details
-;;   (define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
-;;   (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
-;;   (use-package all-the-icons-dired
-;; 	  :ensure t
-;; 	  :hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
-;; 	  :init
-;; 	  (setq all-the-icons-dired-mode-inline-electric-icons t)) ; Show electric icons for Dired mode
-;;   ;; (use-package image-dired
-;;   ;; 	:ensure t
-;;   ;; 	:config
-;;   ;; 	(image-dired-track-modified-flag t) ; Automatically track modifications in images
-;;   ;; 	(image-dired-thumb-margin 5)) ; Set margin for image thumbnails in Image Dired mode
-;;   )
+(use-package dired
+  :ensure nil
+  :defer t
+  :config
+  (setq dired-dwim-target t) ; Dired tries to guess the target directory
+  (setq dired-recursive-deletes 'always) ; Allow deleting directories recursively
+  (setq dired-listing-switches "-alh --group-directories-first") ; Use human-readable file sizes and group directories first
+  (setq dired-hide-details-mode t) ; Hide file and directory details by default
+  (setq dired-auto-revert-buffer t) ; Automatically refresh Dired buffers when changes are made
+  (setq diredp-hide-details-initially-flag nil)
+  (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file) ; Bind Enter to open files
+  (define-key dired-mode-map (kbd "^")
+	            (lambda () (interactive) (find-alternate-file ".."))) ; Bind ^ to go up a directory
+  (define-key dired-mode-map (kbd "(") 'dired-hide-details-mode) ; Bind ( to toggle file and directory details
+  (define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
+  (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
+  (use-package all-the-icons-dired
+	  :ensure t
+	  :hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
+	  :init
+	  (setq all-the-icons-dired-mode-inline-electric-icons t))) ; Show electric icons for Dired mode
 
 (use-package dired-rainbow
   :ensure t
@@ -1981,11 +1902,9 @@
 
 (use-package yasnippet :ensure t)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ;;;;;;;;;;;;;;;;;;;;;; ;;
-;; ;; LSP & Completion ;; ;;
-;; ;;;;;;;;;;;;;;;;;;;;;; ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;________________________________________________________________
+;;;    LSP & Completion
+;;________________________________________________________________
 
 (use-package lsp-mode
   :init
@@ -2241,11 +2160,9 @@
   :ensure t
   :after tree-sitter)
 
-;;;;;;;;;;;;;;;;;;;;
-;; ;;;;;;;;;;;;;; ;;
-;; ;; Flycheck ;; ;;
-;; ;;;;;;;;;;;;;; ;;
-;;;;;;;;;;;;;;;;;;;;
+;;________________________________________________________________
+;;;    Flycheck
+;;________________________________________________________________
 
 (use-package flycheck
   :ensure t
@@ -2310,13 +2227,13 @@ If you experience stuttering, increase this.")
 ;;________________________________________________________________
 ;;;;    Fancy pkg
 ;;________________________________________________________________
-;; (use-package fancy-battery
-;;   :config
-;;   (setq fancy-battery-show-percentage t)
-;;   (setq battery-update-interval 15)
-;;   (if window-system
-;;       (fancy-battery-mode)
-;;     (display-battery-mode)))
+(use-package fancy-battery
+  :config
+  (setq fancy-battery-show-percentage t)
+  (setq battery-update-interval 15)
+  (if window-system
+      (fancy-battery-mode)
+    (display-battery-mode)))
 
 ;;;;; olivetti
 (use-package olivetti
