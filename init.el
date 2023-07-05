@@ -71,11 +71,21 @@
 ;;________________________________________________________________
 ;;    Install quelpa
 ;;________________________________________________________________
-(unless (package-installed-p 'quelpa)
-  (with-temp-buffer
-    (url-insert-file-contents "https://raw.githubusercontent.com/quelpa/quelpa/master/quelpa.el")
-    (eval-buffer)
-    (quelpa-self-upgrade)))
+;; (unless (package-installed-p 'quelpa)
+;;   (with-temp-buffer
+;;     (url-insert-file-contents "https://raw.githubusercontent.com/quelpa/quelpa/master/quelpa.el")
+;;     (eval-buffer)
+;;     (quelpa-self-upgrade)))
+;; (require 'quelpa)
+
+;;________________________________________________________________
+;;    Install quelpa-use-package
+;;________________________________________________________________
+;; (quelpa
+;;  '(quelpa-use-package
+;;    :fetcher git
+;;    :url "https://github.com/quelpa/quelpa-use-package.git"))
+;; (require 'quelpa-use-package)
 
 ;; (org-babel-load-file
 ;;  (expand-file-name
@@ -380,16 +390,16 @@
      org-modern-tag t
      org-modern-timestamp t
      org-modern-statistics t
-     ;; org-modern-table nil
-     org-modern-progress t
+     org-modern-table nil
+     ;; org-modern-progress t
      org-modern-priority t
      org-modern-horizontal-rule "──────────"
-     org-modern-hide-stars "·"
+     org-modern-hide-stars "·"))
+     ;; org-modern-keyword "‣")
      ;; org-modern-star ["⁖"]
      ;; org-modern-list '((43 . "•")
      ;;                   (45 . "–")
-     ;;                   (42 . "∘"))))
-     org-modern-keyword "‣"))
+     ;;                   (42 . "∘")))))
 
   ;; Spacing of headings
   ;; (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
@@ -404,7 +414,7 @@
   ;;   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
 
   (use-package org-padding
-    :quelpa (org-padding :repo "TonCherAmi/org-padding" :fetcher github)
+    :straight (:host github :repo "TonCherAmi/org-padding")
     :config
     (setq org-padding-block-begin-line-padding '(2.0 . nil))
     (setq org-padding-block-end-line-padding '(nil . 1.0))
