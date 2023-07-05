@@ -1898,6 +1898,7 @@
   (add-hook 'rust-mode-hook #'company-mode)
   (add-hook 'go-mode-hook #'company-mode)
   (add-hook 'typescript-mode-hook #'company-mode)
+  (add-hook 'web-mode-hook #'company-mode)
   (add-hook 'js-mode-hook #'company-mode)
   (add-hook 'rjsx-mode-hook #'company-mode)
 
@@ -1952,6 +1953,7 @@
          (go-mode . lsp)
          (javascript-mode . lsp)
          (typescript-mode . lsp)
+         (web-mode . lsp)
          (rust-mode . lsp)
          (LaTeX-mode . lsp)
          ;; if you want which-key integration
@@ -2284,7 +2286,7 @@ If you experience stuttering, increase this.")
          (elfeed-show-mode  . olivetti-mode)
          (mu4e-compose-mode . olivetti-mode))
   :custom
-  (olivetti-body-width 80)
+  (olivetti-body-width 90)
   :delight " ⊗") ; Ⓐ ⊛
 
 ;;;;; hl-indent
