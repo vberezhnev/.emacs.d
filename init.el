@@ -46,7 +46,7 @@
 (use-package use-package
   :custom
   (use-package-verbose t)
-  (use-package-always-ensure t)  ; :ensure t by default
+  (use-package-always-ensure t)  ;   by default
   (use-package-always-defer nil) ; :defer t by default
   (use-package-expand-minimally t)
   (use-package-enable-imenu-support t))
@@ -203,10 +203,10 @@
       undo-strong-limit                 100663296 ;; x 1.5 (96mb)
       undo-outer-limit                  1006632960) ;; x 10 (960mb), (Emacs uses x100), but this seems too high.
 
-(use-package go-mode :ensure t)
+(use-package go-mode  )
 
 (use-package pbcopy
-  :ensure t)
+  )
 
 ;; Disable backup
 (setq backup-inhibited t)
@@ -281,20 +281,20 @@
 (setq global-prettify-symbols-mode t)
 
 ;;________________________________________________________________
-;;    Setup theme 
+;;    Setup theme
 ;;________________________________________________________________
 (use-package theme-changer
-  :ensure t
+
   :config
   (setq calendar-location-name "Vladivostok, RU")
   (setq calendar-latitude 43.11)
   (setq calendar-longitude 131.88)
 
   (use-package gruvbox-theme
-    :ensure t)
+    )
 
   (use-package doom-themes
-    :ensure t
+
     :config
     ;; Global settings (defaults)
     (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
@@ -314,7 +314,7 @@
   (change-theme 'doom-one-light 'doom-one))
 
 ;;________________________________________________________________
-;;    Setup org-mode 
+;;    Setup org-mode
 ;;________________________________________________________________
 (use-package org
   :config
@@ -408,64 +408,6 @@
      org-modern-horizontal-rule "──────────"
      org-modern-keyword "‣"
      org-modern-hide-stars "·"))
-     ;; org-modern-star ["⁖"]
-     ;; org-modern-list '((43 . "•")
-     ;;                   (45 . "–")
-     ;;                   (42 . "∘")))))
-
-  ;; (use-package svg-tag-mode
-  ;;   :config
-  ;;   (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
-  ;;   (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
-  ;;   (defconst day-re "[A-Za-z]\\{3\\}")
-  ;;   (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
-
-  ;;   (defun svg-progress-percent (value)
-  ;;     (svg-image (svg-lib-concat
-  ;;                 (svg-lib-progress-bar
-  ;;                  (/ (string-to-number value) 100.0) nil
-  ;;                  :height 0.8 :foreground (doom-color 'fg) :background (doom-color 'bg)
-  ;;                  :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-  ;;                 (svg-lib-tag (concat value "%") nil
-  ;;                              :height 0.8 :foreground (doom-color 'fg) :background (doom-color 'bg)
-  ;;                              :stroke 0 :margin 0)) :ascent 'center))
-
-  ;;   (defun svg-progress-count (value)
-  ;;     (let* ((seq (mapcar #'string-to-number (split-string value "/")))
-  ;;            (count (float (car seq)))
-  ;;            (total (float (cadr seq))))
-  ;;       (svg-image (svg-lib-concat
-  ;;                   (svg-lib-progress-bar (/ count total) nil
-  ;;                                         :foreground (doom-color 'fg)
-  ;;                                         :background (doom-color 'bg) :height 0.8
-  ;;                                         :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-  ;;                   (svg-lib-tag value nil
-  ;;                                :foreground (doom-color 'fg)
-  ;;                                :background (doom-color 'bg)
-  ;;                                :stroke 0 :margin 0 :height 0.8)) :ascent 'center)))
-
-  ;;   (set-face-attribute 'svg-tag-default-face nil :family "Alegreya Sans")
-  ;;   (setq svg-tag-tags
-  ;;         `(;; Progress e.g. [63%] or [10/15]
-  ;;           ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
-  ;;                                               (svg-progress-percent (substring tag 1 -2)))))
-  ;;           ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
-  ;;                                             (svg-progress-count (substring tag 1 -1)))))
-  ;;           ;; Task priority e.g. [#A], [#B], or [#C]
-  ;;           ("\\[#A\\]" . ((lambda (tag) (svg-tag-make tag :face 'error :inverse-video t :height .85
-  ;;                                                      :beg 2 :end -1 :margin 0 :radius 10))))
-  ;;           ("\\[#B\\]" . ((lambda (tag) (svg-tag-make tag :face 'warning :inverse-video t :height .85
-  ;;                                                      :beg 2 :end -1 :margin 0  :radius 10))))
-  ;;           ;; Keywords
-  ;;           ("TODO" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face 'org-todo))))
-  ;;           ("HOLD" . ((lambda (tag) (svg-tag-make tag :height .85 :face 'org-todo))))
-  ;;           ("DONE\|STOP" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face 'org-done))))
-  ;;           ("NEXT\|WAIT" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-active))))
-  ;;           ("REPEAT\|EVENT\|PROJ\|IDEA" .
-  ;;            ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-project))))
-  ;;           ("REVIEW" . ((lambda (tag) (svg-tag-make tag :inverse-video t :height .85 :face '+org-todo-onhold))))))
-
-  ;;   (add-hook 'org-mode-hook 'svg-tag-mode))
 
   (use-package org-appear
     :hook
@@ -474,19 +416,6 @@
     (setq org-hide-emphasis-markers t
           org-appear-autolinks 'just-brackets))
 
-
-  ;; Spacing of headings
-  ;; (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
-  ;; (dolist (face '((org-level-1 . 1.2)
-  ;;                 (org-level-2 . 1.1)
-  ;;                 (org-level-3 . 1.05)
-  ;;                 (org-level-4 . 1.0)
-  ;;                 (org-level-5 . 1.1)
-  ;;                 (org-level-6 . 1.1)
-  ;;                 (org-level-7 . 1.1)
-  ;;                 (org-level-8 . 1.1)))
-  ;;   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
-
   (use-package org-padding
     :straight (:host github :repo "TonCherAmi/org-padding")
     :config
@@ -494,50 +423,53 @@
     (setq org-padding-block-end-line-padding '(nil . 1.0))
     (setq org-padding-heading-padding-alist
           '((4.0 . 1.5) (3.0 . 0.5) (3.0 . 0.5) (3.0 . 0.5) (2.5 . 0.5) (2.0 . 0.5) (1.5 . 0.5) (0.5 . 0.5))))
-  
+
   (with-eval-after-load 'org
     (setq org-log-done 'time))
 
   (setq org-todo-keywords
         '((sequence
-           "TODO(t)"                    ;What needs to be done
-           "NEXT(n)"                    ;A project without NEXTs is stuck
+           "TODO(t)"  ; A task that needs doing & is ready to do
+           "PROJ(p)"  ; A project, which usually contains other tasks
+           "LOOP(r)"  ; A recurring task
+           "STRT(s)"  ; A task that is in progress
+           "WAIT(w)"  ; Something external is holding up this task
+           "HOLD(h)"  ; This task is paused/on hold because of me
+           "IDEA(i)"  ; An unconfirmed and unapproved task or notion
            "|"
-           "DONE(d)")
+           "DONE(d)"  ; Task successfully completed
+           "KILL(k)") ; Task was cancelled, aborted or is no longer applicable
           (sequence
-           "REPEAT(e)"                    ;Repeating tasks
+           "[ ](T)"   ; A task that needs doing
+           "[-](S)"   ; Task is in progress
+           "[?](W)"   ; Task is being held up or paused
            "|"
-           "DONE")
+           "[X](D)")  ; Task was completed
           (sequence
-           "HOLD(h)"                    ;Task is on hold because of me
-           "PROJ(p)"                    ;Contains sub-tasks
-           "WAIT(w)"                    ;Tasks delegated to others
-           "REVIEW(r)"                  ;Daily notes that need reviews
-           "IDEA(i)"                    ;Daily notes that need reviews
            "|"
-           "STOP(c)"                    ;Stopped/cancelled
-           "EVENT(m)"                   ;Meetings
-           ))
+           "OKAY(o)"
+           "YES(y)"
+           "NO(n)"))
         org-todo-keyword-faces
         '(("[-]"  . +org-todo-active)
-          ("NEXT" . +org-todo-active)
+          ("STRT" . +org-todo-active)
           ("[?]"  . +org-todo-onhold)
-          ("REVIEW" . +org-todo-onhold)
-          ("HOLD" . +org-todo-cancel)
+          ("WAIT" . +org-todo-onhold)
+          ("HOLD" . +org-todo-onhold)
           ("PROJ" . +org-todo-project)
-          ("DONE"   . +org-todo-cancel)
-          ("STOP" . +org-todo-cancel)))
+          ("NO"   . +org-todo-cancel)
+          ("KILL" . +org-todo-cancel)))
 
   (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
 
   (use-package org-alert
-    :ensure t)
+    )
 
   (use-package ob-typescript
-    :ensure t)
+    )
 
   (use-package ob-rust
-    :ensure t)
+    )
 
   ;; Execute org src block
   (org-babel-do-load-languages
@@ -551,21 +483,21 @@
      (C . t)
      (latex . t)))
 
-;;   (add-hook 'org-mode-hook (defun my/pretty-symbols ()
-;;                              (setq prettify-symbols-alist
-;;                                    '(("#+begin_src rust" . "🦀")
-;;                                      ("#+begin_src emacs-lisp" . "λ")
-;;                                      ("#+begin_src typescript" . " 🔨")
-;;                                      ("#+begin_src js" . " 🔨")
-;;                                      ("#+begin_src С" . "🔨")
-;;                                      ("#+begin_src python" . "🐍")
-;;                                      ("#+begin_quote" . "❝")
-;;                                      ("#+end_quote" . "❞")
-;;                                      ("#+end_src" . "―")
-;;                                      ("#+results:" . "🔨")
-;;                                      ("#+RESULTS:" . "🔨")))))
-;; (prettify-symbols-mode t)
-  
+  ;;   (add-hook 'org-mode-hook (defun my/pretty-symbols ()
+  ;;                              (setq prettify-symbols-alist
+  ;;                                    '(("#+begin_src rust" . "🦀")
+  ;;                                      ("#+begin_src emacs-lisp" . "λ")
+  ;;                                      ("#+begin_src typescript" . " 🔨")
+  ;;                                      ("#+begin_src js" . " 🔨")
+  ;;                                      ("#+begin_src С" . "🔨")
+  ;;                                      ("#+begin_src python" . "🐍")
+  ;;                                      ("#+begin_quote" . "❝")
+  ;;                                      ("#+end_quote" . "❞")
+  ;;                                      ("#+end_src" . "―")
+  ;;                                      ("#+results:" . "🔨")
+  ;;                                      ("#+RESULTS:" . "🔨")))))
+  ;; (prettify-symbols-mode t)
+
   (add-hook 'org-mode-hook (lambda ()
                              "Beautify Org Checkbox Symbol"
                              (push '("[ ]" .  "☐") prettify-symbols-alist)
@@ -588,7 +520,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package org-roam
-  :ensure t
+
   :custom
   (org-roam-directory (file-truename "~/Org/Org-roam"))
   (org-roam-completion-everywhere t)
@@ -649,7 +581,7 @@
   )
 
 (use-package org-roam-ui
-  :ensure t
+
   :hook (after-init . org-roam-ui-mode)
   :config
   (setq orui-sync-theme t
@@ -664,7 +596,7 @@
   (push 'company-org-roam company-backends))
 
 (use-package org-download
-  :ensure t)
+  )
 
 (setq-default org-download-image-dir "./assets-org/")
 
@@ -672,7 +604,7 @@
 (add-hook 'dired-mode-hook 'org-download-enable)
 
 (use-package org-noter
-  :ensure t)
+  )
 
 ;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;; ;;
@@ -681,7 +613,7 @@
 ;;;;;;;;;;;;;;;;;
 
 (use-package org-roam-bibtex
-  :ensure t
+
   :after org-roam
   :hook (org-roam-mode . org-roam-bibtex-mode)
   :config
@@ -701,7 +633,7 @@
            :unnarrowed t)))
   (require 'org-ref)) ; optional: if using Org-ref v2 or v3 citation links
 
-;; (use-package org-ref :ensure t
+;; (use-package org-ref
 ;;   :config
 ;;   (setq reftex-default-bibliography '("~/Org/2Brain/bibtex/ref.bib"))
 
@@ -748,7 +680,7 @@
 ;;         (add-to-list 'embark-multitarget-actions #'citar/search-pdf-contents))
 
 ;; (use-package citar-embark
-;;   :ensure t
+;;
 ;;   :after citar embark
 ;;   :no-require
 ;;   :config
@@ -789,11 +721,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package org-pdftools
-  :ensure t
+
   :hook (org-mode . org-pdftools-setup-link)
   )
 (use-package org-noter-pdftools
-  :ensure t
+
   :after org-noter
   :config
   ;; Add a function to ensure precise note is inserted
@@ -874,14 +806,14 @@
       calendar-week-start-day 1
       calendar-mark-diary-entries-flag nil)
 
-(alert-define-style 'who/alert-style-reminder
-                    :title "Agenda reminders"
-                    :notifier (lambda (info)
-                                (alert-libnotify-notify (plist-put info :persistent t))))
+;; (alert-define-style 'who/alert-style-reminder
+;;                     :title "Agenda reminders"
+;;                     :notifier (lambda (info)
+;;                                 (alert-libnotify-notify (plist-put info :persistent t))))
 
-(add-to-list 'alert-user-configuration
-             '(((:title . "Agenda"))
-               who/alert-style-reminder))
+;; (add-to-list 'alert-user-configuration
+;;              '(((:title . "Agenda"))
+;;                who/alert-style-reminder))
 
 (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
 
@@ -913,7 +845,7 @@
 ;;         ("Calendar" ,(list (all-the-icons-faicon "calendar")) nil nil :ascent center)
 ;;         ("Reading" ,(list (all-the-icons-faicon "book")) nil nil :ascent center)))
 
-(use-package org-super-agenda :ensure t)
+(use-package org-super-agenda  )
 
 (setq org-agenda-custom-commands
       '(("z" "Hugo view"
@@ -973,7 +905,7 @@
         ))
 
 (use-package org-caldav
-  :ensure t
+
   :custom
   (org-caldav-url "https://lunarcloud.ddns.net/remote.php/dav/calendars/ncp")
   (org-caldav-calendar-id "personal")
@@ -984,17 +916,17 @@
 ;; (org-caldav-sync)
 
 (use-package ox-hugo
-  :ensure t   ;Auto-install the package from Melpa
+                                        ;Auto-install the package from Melpa
   :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
   :after ox)
 
-(use-package org-re-reveal :ensure t)
-(use-package ox-reveal :ensure t)
+(use-package org-re-reveal  )
+(use-package ox-reveal  )
 
 (setq org-reveal-root "file:~/Org/Presentations/reveal.js/")
 
 (use-package ement
-  :ensure t)
+  )
 
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'org-mode-hook 'flyspell-mode)
@@ -1004,42 +936,8 @@
 (setq ispell-local-dictionary-alist
       '(("ru_RU" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8)))
 
-;; (require 'ox-latex)
-;; (setq org-latex-create-formula-image-program 'dvipng)
-;; (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
-
-(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
-
-;; Set up default LaTeX preview configuration
-(setq org-latex-create-formula-image-program 'imagemagick)
-(setq org-preview-latex-default-process 'imagemagick) ; or 'dvisvgm
-(setq org-preview-latex-process-alist
-      '((imagemagick :programs ("latex" "convert")
-                     :description "imagemagick"
-                     :message "You need to install the programs: latex and imagemagick."
-                     :image-input-type "pdf"
-                     :image-output-type "png"
-                     :image-size-adjust (1.0 . 1.0)
-                     :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
-                     :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))
-        (dvisvgm :programs ("latex" "dvisvgm")
-                 :description "dvisvgm"
-                 :message "You need to install the programs: latex and dvisvgm."
-                 :image-input-type "xdv"
-                 :image-output-type "svg"
-                 :image-size-adjust (1.7 . 1.5)
-                 :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
-                 :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))))
-
-;; Enable inline LaTeX previews in org-mode
-(add-hook 'org-mode-hook 'org-toggle-latex-fragment)
-
-;; Display images in org-mode buffers
-(setq org-startup-with-inline-images t)
-(setq org-image-actual-width nil) ; adjust to your liking
-
 (use-package kind-icon
-  :ensure t
+
   :after corfu
   :custom
   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
@@ -1047,7 +945,7 @@
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package pdf-tools
-  :ensure t
+
   :defer t
   :mode (("\\.pdf\\'" . pdf-view-mode))
   :config
@@ -1125,13 +1023,13 @@
 	("l" image-forward-hscroll :color red)
 	("h" image-backward-hscroll :color red))
 
-(use-package saveplace-pdf-view :ensure t)
+(use-package saveplace-pdf-view  )
 (save-place-mode 1)
 
 ;; (load "~/.emacs.d/local-packages/nov-xwidget")
 ;; (require 'nov-xwidget)
 
-(use-package cl-lib :ensure t)
+(use-package cl-lib  )
 
 ;; Best .epub reader
 ;; (use-package nov-xwidget
@@ -1145,7 +1043,7 @@
 ;; (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 
 (use-package calibredb
-  :ensure t
+
   :defer t
   :config
   (setq calibredb-root-dir "~/Calibre Library")
@@ -1234,7 +1132,7 @@
 
 ;; Setting dashboard
 (use-package dashboard
-  :ensure t
+
   :hook (dashboard-mode . (lambda ()
                             ;; No title
                             (setq-local frame-title-format nil)
@@ -1333,13 +1231,13 @@
   (define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
   (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
   (use-package all-the-icons-dired
-	  :ensure t
+
 	  :hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
 	  :init
 	  (setq all-the-icons-dired-mode-inline-electric-icons t))) ; Show electric icons for Dired mode
 
 (use-package dired-rainbow
-  :ensure t
+
   :config
   (progn
     (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
@@ -1365,7 +1263,7 @@
     ))
 
 (use-package doom-modeline
-  :ensure t
+
   :after all-the-icons
   :hook
   (after-init . doom-modeline-mode)
@@ -1388,11 +1286,10 @@
   (doom-modeline-modal-icon t)
   (doom-modeline-height 35)
   (doom-modeline-battery t)
-  (doom-modeline-lsp nil)
   (doom-modeline-lsp t))
 
 (use-package minions
-  :ensure t
+
   :delight " 𝛁"
   :hook (doom-modeline-mode . minions-mode)
   :config
@@ -1400,7 +1297,7 @@
   (setq minions-mode-line-lighter "[+]"))
 
 (use-package elfeed
-  :ensure t
+
   :config
   ;; data is stored in ~/.elfeed
   (setq elfeed-feeds
@@ -1449,14 +1346,14 @@
   (setq-default elfeed-search-title-min-width 100))
 
 (use-package elfeed-dashboard
-  :ensure t
+
   :config
   (setq elfeed-dashboard-file "~/elfeed-dashboard.org")
   ;; update feed counts on elfeed-quit
   (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
 
 (use-package evil
-  :ensure t
+
   :init      ;; tweak evil's configuration before loading it
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
@@ -1464,12 +1361,12 @@
   (setq evil-split-window-below t))
 
 (use-package general
-  :ensure t)
+  )
 (general-evil-setup t)
 
 (use-package evil-collection
   :after evil
-  :ensure t
+
   :config
   (setq evil-emacs-state-cursor '("#FF5D62" box))
   (setq evil-normal-state-cursor '("#FF5D62" box))
@@ -1488,7 +1385,7 @@
 (evil-set-initial-state 'sunrise-mode 'emacs)
 
 (use-package fzf
-  :ensure t
+
   :bind
   ;; Don't forget to set keybinds!
   :config
@@ -1511,13 +1408,13 @@
     (fzf/start default-directory)))
 
 (use-package magit
-  :ensure t
+
   :commands (magit-status magit-ediff-show-working-tree)
   :bind ("C-c C-d" . magit-ediff-show-working-tree)
   :custom (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
 
 (use-package magit-todos
-  :ensure t
+
   :commands (magit-todos-mode)
   :hook (magit-mode . magit-todos-mode)
   :config
@@ -1528,7 +1425,7 @@
    '(magit-todos-keywords (list "TODO" "FIXME" "BUGFIX" "HACK"))))
 
 (use-package blamer
-  :ensure t
+
   ;; :bind (("s-i" . blamer-show-commit-info)
   ;;        ("C-c i" . ("s-i" . blamer-show-posframe-commit-info)))
   :defer 20
@@ -1566,32 +1463,15 @@
 (setq blamer-bindings '(("<mouse-3>" . blamer-callback-open-remote)
                         ("<mouse-1>" . blamer-callback-show-commit-diff)))
 
-;; (use-package blamer
-;;   :ensure t
-;;   :commands (blamer-mode)
-;;   :config
-;;   (setq blamer-view 'overlay
-;;         blamer-type 'posframe-popup
-;;         blamer-max-commit-message-length 70
-;;         blamer-force-truncate-long-line nil
-;;         blamer-author-formatter " ✎ [%s] - "
-;;         blamer-commit-formatter "● %s ● ")
-;;   :custom
-;;   (blamer-idle-time 1.0)
-;;   :custom-face
-;;   (blamer-face ((t :foreground "#E46876"
-;;                    :height 140
-;;                    :italic t))))
-
 (use-package git-gutter
-  :ensure t
+
   :hook (prog-mode . git-gutter-mode)
   :diminish git-gutter-mode
   :config
   (setq git-gutter:update-interval 0.5))
 
 (use-package git-gutter-fringe
-  :ensure t
+
   :after git-gutter
   :config
   (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
@@ -1601,7 +1481,7 @@
 (global-git-gutter-mode +1)
 
 (use-package projectile
-  :ensure t
+
   :init
   (projectile-mode +1)
   :bind (:map projectile-mode-map
@@ -1616,16 +1496,21 @@
 (add-hook 'prog-mode-hook 'my/highlight-todo-like-words)
 (setq projectile-globally-ignored-files "node_modules")
 
+
+;;________________________________________________________________
+;;    Telega.el
+;;________________________________________________________________
 (use-package telega
-  :ensure t
+
   :config
   (setq telega-use-docker t)
   (add-hook 'telega-load-hook 'telega-notifications-mode)
   (add-hook 'telega-load-hook 'telega-appindicator-mode)
   (add-hook 'telega-load-hook 'global-telega-url-shorten-mode))
 
-(use-package lsp-treemacs)
-
+;;________________________________________________________________
+;;    Treemacs
+;;________________________________________________________________
 (use-package treemacs
   :after lsp-treemacs
   :defer t
@@ -1715,41 +1600,57 @@
         ("C-x t M-t" . treemacs-find-tag)))
 
 (use-package treemacs-all-the-icons
-  :ensure t)
-(treemacs-load-theme "all-the-icons")
+
+  :after (treemacs)
+  :config
+  (treemacs-load-theme "all-the-icons"))
+
+(use-package lsp-treemacs)
 
 (use-package treemacs-evil
   :after (treemacs evil)
-  :ensure t)
+  )
 
 (use-package vterm
-  :ensure t)
+  )
 
 (use-package multi-vterm
-  :ensure t
+
   :bind
   ("C-x q" . vterm-clear)
   ("C-x w" . multi-vterm))
 
 (use-package helm
-  :ensure t
-  :defer t
-  :custom
-  (helm-M-x-use-completion-styles nil)
-  (helm-split-window-inside-p t)
-  (helm-follow-mode-persistent t)
-  (helm-buffers-show-icons t)
-  :bind (:map helm-map
-              ("<tab>" . 'helm-execute-persistent-action))
+  :demand t
+  :init
+  ;; Настройка сочетаний клавиш для Helm
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-x b") 'helm-buffers-list)
+  (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
   :config
-  (helm-mode 1))
+  ;; Оптимизация Helm для улучшения производительности
+  (setq helm-candidate-number-limit 500
+        helm-idle-delay 0.0
+        helm-input-idle-delay 0.01
+        helm-quick-update t
+        helm-M-x-fuzzy-match t
+        helm-buffers-fuzzy-matching t
+        helm-recentf-fuzzy-match t
+        helm-apropos-fuzzy-match t
+        helm-lisp-fuzzy-completion t
+        helm-completion-in-region-fuzzy-match t
+        helm-mode-fuzzy-match t
+        helm-move-to-line-cycle-in-source t
+        helm-scroll-amount 8
+        helm-ff-file-name-history-use-recentf t
+        helm-echo-input-in-header-line t))
 
-(with-eval-after-load 'helm
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*helm.*\\*\\'"
-                 (display-buffer-in-side-window)
-                 (inhibit-same-window . t)
-                 (window-height . 0.4))))
+;; (with-eval-after-load 'helm
+;;   (add-to-list 'display-buffer-alist
+;;                '("\\`\\*helm.*\\*\\'"
+;;                  (display-buffer-in-side-window)
+;;                  (inhibit-same-window . t)
+;;                  (window-height . 0.4))))
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold
@@ -1758,7 +1659,7 @@
   (search-default-mode #'char-fold-to-regexp))
 
 (use-package reverse-im
-  :ensure t ; install `reverse-im' using package.el
+                                        ; install `reverse-im' using package.el
   :demand t ; always load it
   :after char-fold ; but only after `char-fold' is loaded
   :bind
@@ -1771,7 +1672,7 @@
   (reverse-im-mode t)) ; turn the mode on
 
 (use-package format-all
-  :ensure t
+
   :preface
   (defun ian/format-code ()
     "Auto-format whole buffer."
@@ -1784,7 +1685,7 @@
   (add-hook 'prog-mode-hook 'format-all-ensure-formatter))
 
 (use-package emojify
-  :ensure t
+
   :config
   (when (member "Segoe UI Emoji" (font-family-list))
     (set-fontset-font
@@ -1794,22 +1695,22 @@
   (bind-key* (kbd "C-c e") #'emojify-insert-emoji)) ; override binding in any mode
 
 (use-package rainbow-delimiters
-  :ensure t
+
   :hook
   (prog-mode . rainbow-delimiters-mode))
 
 (use-package which-key
-  :ensure t
+
   :config (which-key-mode))
 
-(use-package zygospore :ensure t)
+(use-package zygospore  )
 (global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
 
 (use-package all-the-icons
-  :ensure t)
+  )
 
 (use-package indent-guide
-  :ensure t
+
   :config
   (indent-guide-global-mode))
 
@@ -1818,7 +1719,7 @@
 	    (parrot-start-animation)))
 
 (use-package parrot
-  :ensure t
+
   :config
   (parrot-mode)
   (parrot-set-parrot-type 'thumbsup)
@@ -1877,68 +1778,143 @@
 (helm-mode 1)
 
 (use-package company
-  :after lsp-mode
-  :hook (prog-mode . company-mode)
-  :bind (:map company-active-map
-              ("<tab>" . company-complete-selection))
-  (:map lsp-mode-map
-        ("<tab>" . company-indent-or-complete-common))
+  :hook (after-init . global-company-mode)
   :config
-  (setq company-idle-delay 0
-        company-minimum-prefix-length 1
+  ;; Оптимизация компании для ускорения загрузки
+  (setq company-idle-delay 0.2
+        company-minimum-prefix-length 3
         company-tooltip-limit 10
-        company-show-numbers t
         company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil
-        company-require-match nil
-        company-global-modes '(not erc-mode message-mode help-mode)
-        company-transformers '(company-sort-by-occurrence))
-
-  ;; Enable company mode in specific modes
-  (add-hook 'rust-mode-hook #'company-mode)
-  (add-hook 'go-mode-hook #'company-mode)
-  (add-hook 'typescript-mode-hook #'company-mode)
-  (add-hook 'web-mode-hook #'company-mode)
-  (add-hook 'js-mode-hook #'company-mode)
-  (add-hook 'rjsx-mode-hook #'company-mode)
-
-  ;; Set up company backends for each major mode
-  (setq company-backends-rust '((company-capf company-files)))
-  (setq company-backends-go '((company-capf company-files)))
-  (setq company-backends-typescript '((company-tide company-files)))
-  (setq company-backends-js '((company-tide company-files)))
-  (setq company-backends-react '((company-tide company-files)))
-
-  ;; Set keybindings for company
-  (define-key company-active-map (kbd "C-n") 'company-select-next)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
-  (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
-  (define-key company-active-map (kbd "RET") 'company-complete-selection))
+        company-dabbrev-code-other-buffers t
+        company-dabbrev-code-everywhere t
+        company-dabbrev-code-ignore-case nil
+        company-etags-ignore-case nil
+        company-etags-file-name-prefix ""
+        company-global-modes '(not eshell-mode comint-mode erc-mode message-mode help-mode gud-mode)
+        company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend)
+        company-backends '((company-capf :with company-yasnippet)
+                           company-files
+                           (company-dabbrev-code company-gtags company-keywords)
+                           company-dabbrev)))
 
 (use-package company-box
-  :hook (company-mode . company-box-mode))
+  :hook (company-mode . company-box-mode)
+  :config
+  (setq company-box-show-single-candidate t
+        company-box-backends-colors nil
+        company-box-max-candidates 50
+        company-box-icons-alist 'company-box-icons-all-the-icons
+        ;; Move company-box-icons--elisp to the end, because it has a catch-all
+        ;; clause that ruins icons from other backends in elisp buffers.
+        company-box-icons-functions
+        (cons #'+company-box-icons--elisp-fn
+              (delq 'company-box-icons--elisp
+                    company-box-icons-functions))
+        company-box-icons-all-the-icons
+        (let ((all-the-icons-scale-factor 0.8))
+          `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
+            (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
+            (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+            (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+            (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+            (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+            (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
+            (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+            (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
+            (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
+            (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
+            (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
+            (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
+            (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
+            (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
+            (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
+            (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
+            (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
+            (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
+            (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
+            (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
+            (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
+            (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
+            (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
+            (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
+            (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+            (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))
+            (ElispFunction . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+            (ElispVariable . ,(all-the-icons-material "check_circle"             :face 'all-the-icons-blue))
+            (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
+            (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink)))))
+
+  ;; HACK Fix oversized scrollbar in some odd cases
+  ;; REVIEW `resize-mode' is deprecated and may stop working in the future.
+  ;; TODO PR me upstream?
+  (setq x-gtk-resize-child-frames 'resize-mode)
+
+  ;; Disable tab-bar in company-box child frames
+  ;; TODO PR me upstream!
+  (add-to-list 'company-box-frame-parameters '(tab-bar-lines . 0))
+
+  (defun +company-box-icons--elisp-fn (candidate)
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (let ((sym (intern candidate)))
+        (cond ((fboundp sym)  'ElispFunction)
+              ((boundp sym)   'ElispVariable)
+              ((featurep sym) 'ElispFeature)
+              ((facep sym)    'ElispFace))))))
 
 (use-package company-bibtex
-  :ensure t)
+  )
 
 (use-package ac-math
-  :ensure t)
+  )
 
 (use-package company-auctex
-  :ensure t)
+
+  :config
+  ;; (require 'ox-latex)
+  ;; (setq org-latex-create-formula-image-program 'dvipng)
+  ;; (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
+
+  ;; Set up default LaTeX preview configuration
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+  (setq org-latex-create-formula-image-program 'imagemagick)
+  (setq org-preview-latex-default-process 'imagemagick) ; or 'dvisvgm
+  (setq org-preview-latex-process-alist
+        '((imagemagick :programs ("latex" "convert")
+                       :description "imagemagick"
+                       :message "You need to install the programs: latex and imagemagick."
+                       :image-input-type "pdf"
+                       :image-output-type "png"
+                       :image-size-adjust (1.0 . 1.0)
+                       :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
+                       :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))
+          (dvisvgm :programs ("latex" "dvisvgm")
+                   :description "dvisvgm"
+                   :message "You need to install the programs: latex and dvisvgm."
+                   :image-input-type "xdv"
+                   :image-output-type "svg"
+                   :image-size-adjust (1.7 . 1.5)
+                   :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
+                   :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))))
+
+  ;; Enable inline LaTeX previews in org-mode
+  (add-hook 'org-mode-hook 'org-toggle-latex-fragment)
+
+  ;; Display images in org-mode buffers
+  (setq org-image-actual-width nil) ; adjust to your liking
+  (setq org-startup-with-inline-images t))
 
 (company-auctex-init)
 
 (use-package company-org-block
-  :ensure t
+
   :custom
   (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
   :hook ((org-mode . (lambda ()
                        (setq-local company-backends '(company-org-block))
                        (company-mode +1)))))
 
-(use-package yasnippet :ensure t)
+(use-package yasnippet  )
 
 ;;________________________________________________________________
 ;;;    LSP & Completion
@@ -1967,7 +1943,7 @@
 
 ;; optionally
 (use-package lsp-ui
-  :ensure t
+
   :hook (lsp-mode . lsp-ui-mode)
   :commands lsp-ui-mode
   :config
@@ -2012,15 +1988,15 @@
 (setq tab-always-indent 'complete)
 (setq completion-cycle-threshold 3)
 
-(use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
+(use-package lsp-treemacs   :commands lsp-treemacs-errors-list)
 
 ;; optionally if you want to use debugger
-(use-package dap-mode :ensure t)
+(use-package dap-mode  )
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
-(use-package lsp-ui :ensure t)
+(use-package lsp-ui  )
 
-(use-package web-mode :ensure t
+(use-package web-mode
   :mode (("\\.js\\'" . web-mode)
          ("\\.jsx\\'" . web-mode)
          ("\\.ts\\'" . web-mode)
@@ -2034,13 +2010,13 @@
         '(("jsx" . "\\.js[x]?\\'")))
   )
 
-(use-package import-js :ensure t)
+(use-package import-js  )
 
 ;; JSX syntax highlighting
 (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
 (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
-(use-package js2-mode :ensure t :defer 20
+(use-package js2-mode   :defer 20
   :mode
   (("\\.js\\'" . js2-mode))
   :custom
@@ -2083,7 +2059,7 @@
 (use-package prettier-js)
 
 (use-package tide
-  :ensure t
+
   :after (company flycheck)
   :hook ((typescript-ts-mode . tide-setup)
          (tsx-ts-mode . tide-setup)
@@ -2143,7 +2119,7 @@
 (flycheck-add-mode 'javascript-eslint 'web-mode)
 ;; (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
-(use-package json-mode :ensure t :defer 20
+(use-package json-mode   :defer 20
   :custom
   (json-reformat:indent-width 2)
   :mode (("\\.bowerrc$"     . json-mode)
@@ -2166,14 +2142,14 @@
 ;; 		'(("gopls.completeUnimported" t t)
 ;; 		("gopls.staticcheck" t t)))
 
-(use-package rust-playground :ensure t)
+(use-package rust-playground  )
 
 (use-package rust-mode
-  :ensure t
+
   :if (executable-find "rustc"))
 
 (use-package cargo
-  :ensure t
+
   :if (executable-find "cargo")
   :after rust-mode
   :bind (:map cargo-minor-mode-map
@@ -2186,7 +2162,7 @@
 (add-hook 'rust-mode-hook 'lsp-deferred)
 
 (use-package tree-sitter
-  :ensure t
+
   :config
   ;; activate tree-sitter on any buffer containing code for which it has a parser available
   (global-tree-sitter-mode)
@@ -2196,7 +2172,7 @@
 
 
 (use-package tree-sitter-langs
-  :ensure t
+
   :after tree-sitter)
 
 ;;________________________________________________________________
@@ -2204,7 +2180,7 @@
 ;;________________________________________________________________
 
 (use-package flycheck
-  :ensure t
+
   :hook (prog-mode . flycheck-mode)
   :diminish
   :custom
@@ -2214,11 +2190,11 @@
   (flycheck-idle-change-delay 2))
 
 (use-package flycheck-inline
-  :ensure t
+
   :hook (flycheck-mode . turn-on-flycheck-inline))
 
 (use-package flycheck-rust
-  :ensure t
+
   :config
   (with-eval-after-load 'rust-mode
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
@@ -2226,7 +2202,7 @@
 ;; auto-format different source code files extremely intelligently
 ;; https://github.com/radian-software/apheleia
 (use-package apheleia
-  :ensure t
+
   :config
   (apheleia-global-mode +1))
 
@@ -2318,7 +2294,7 @@ If you experience stuttering, increase this.")
 
 ;;;;; hl-todo
 (use-package hl-todo
-  :ensure t
+
   :config
   (hl-todo-mode t))
 
