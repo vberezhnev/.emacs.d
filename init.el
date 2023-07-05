@@ -94,7 +94,26 @@
 
 ;; (setq default-frame-alist '((undecorated . nil)))
 
+;;________________________________________________________________
+;;    Init local packages
+;;________________________________________________________________
 (add-to-list 'load-path "~/.emacs.d/local-packages/hyp-to-org")
+;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
+
+;; (load "~/.emacs.d/local-packages/epubmode")
+;; (require 'epubmode)
+
+;; (load "~/.emacs.d/local-packages/company-go")
+;; (require 'company-go)
+
+;; (load "~/.emacs.d/local-packages/chep-video")
+;; (require 'chep-video)
+
+;; (load "~/.emacs.d/local-packages/dired+")
+;; (require 'dired+)
+
+;; (load "~/.emacs.d/local-packages/nov")
+;; (require 'nov)
 
 ;;________________________________________________________________
 ;;    Transparent Emacs
@@ -109,21 +128,24 @@
 ;; (set-frame-parameter (selected-frame) 'alpha <both>)
 
 ;; Use the following snippet after you’ve set the alpha as above to assign a toggle to “C-c t b”:
-(defun toggle-transparency ()
-  "Crave for transparency!"
-  (interactive)
-  (let ((alpha-background (frame-parameter nil 'alpha-background)))
-    (set-frame-parameter
-     nil 'alpha-background
-     (if (eql (cond ((numberp alpha-background) alpha-background)
-                    ((numberp (cdr alpha-background)) (cdr alpha-background))
-                    ;; Also handle undocumented (<active> <inactive>) form.
-                    ((numberp (cadr alpha-background)) (cadr alpha-background)))
-              100)
-         '(80 . 100) '(100 . 100)
-         ))))
-(global-set-key (kbd "C-c t b") 'toggle-transparency)
+;; (defun toggle-transparency ()
+;;   "Crave for transparency!"
+;;   (interactive)
+;;   (let ((alpha-background (frame-parameter nil 'alpha-background)))
+;;     (set-frame-parameter
+;;      nil 'alpha-background
+;;      (if (eql (cond ((numberp alpha-background) alpha-background)
+;;                     ((numberp (cdr alpha-background)) (cdr alpha-background))
+;;                     ;; Also handle undocumented (<active> <inactive>) form.
+;;                     ((numberp (cadr alpha-background)) (cadr alpha-background)))
+;;               100)
+;;          '(80 . 100) '(100 . 100)
+;;          ))))
+;; (global-set-key (kbd "C-c t b") 'toggle-transparency)
 
+;;________________________________________________________________
+;;    Base settings of Emacs
+;;________________________________________________________________
 (eval-when-compile (defvar display-time-24hr-format t))
 (eval-when-compile (defvar display-time-default-load-average nil))
 
@@ -134,7 +156,7 @@
 (fset 'yes-or-no-p 'y-or-n-p)     ; Set yes or no to y/n
 (global-font-lock-mode 1)         ; always highlight code
 (global-auto-revert-mode 1)       ; refresh a buffer if changed on disk
-(global-hl-line-mode 1)           ; Highlight current line
+;; (global-hl-line-mode 1)           ; Highlight current line
 (semantic-mode 1)								; help out with semantics
 (savehist-mode 1)                 ; Save history
 (save-place-mode 1)               ; when buffer is closed, save the cursor position
@@ -183,25 +205,6 @@
 
 (use-package go-mode :ensure t)
 
-;; (load "~/.emacs.d/local-packages/epubmode")
-;; (require 'epubmode)
-
-;; (load "~/.emacs.d/local-packages/company-go")
-;; (require 'company-go)
-
-;; (load "~/.emacs.d/local-packages/chep-video")
-;; (require 'chep-video)
-
-;; (load "~/.emacs.d/local-packages/dired+")
-;; (require 'dired+)
-
-;; (load "~/.emacs.d/local-packages/nov")
-;; (require 'nov)
-
-;; (use-package nov :ensure t)
-
-;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
-
 (use-package pbcopy
   :ensure t)
 
@@ -240,6 +243,9 @@
   (display-line-numbers-grow-only t)
   (display-line-numbers-width-start t))
 
+;;________________________________________________________________
+;;    Setup fonts
+;;________________________________________________________________
 (set-face-attribute 'default t
                     :font "Iosevka" ;; Terminess Nerd Font Propo, Input, Terminess Nerd Font Propo
                     :height 100
@@ -274,6 +280,9 @@
 ;; Changes certain keywords to symbols, such as lamda
 (setq global-prettify-symbols-mode t)
 
+;;________________________________________________________________
+;;    Setup theme 
+;;________________________________________________________________
 (use-package theme-changer
   :ensure t
   :config
@@ -304,6 +313,9 @@
   ;; (load-theme 'doom-one t)
   (change-theme 'doom-one-light 'doom-one))
 
+;;________________________________________________________________
+;;    Setup org-mode 
+;;________________________________________________________________
 (use-package org
   :config
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
@@ -391,35 +403,15 @@
      org-modern-timestamp t
      org-modern-statistics t
      org-modern-table nil
-     ;; org-modern-progress t
+     ;; org-modern-progress t Gives an error
      org-modern-priority t
      org-modern-horizontal-rule "──────────"
+     org-modern-keyword "‣"
      org-modern-hide-stars "·"))
-     ;; org-modern-keyword "‣")
      ;; org-modern-star ["⁖"]
      ;; org-modern-list '((43 . "•")
      ;;                   (45 . "–")
      ;;                   (42 . "∘")))))
-
-  ;; Spacing of headings
-  ;; (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
-  ;; (dolist (face '((org-level-1 . 1.2)
-  ;;                 (org-level-2 . 1.1)
-  ;;                 (org-level-3 . 1.05)
-  ;;                 (org-level-4 . 1.0)
-  ;;                 (org-level-5 . 1.1)
-  ;;                 (org-level-6 . 1.1)
-  ;;                 (org-level-7 . 1.1)
-  ;;                 (org-level-8 . 1.1)))
-  ;;   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
-
-  (use-package org-padding
-    :straight (:host github :repo "TonCherAmi/org-padding")
-    :config
-    (setq org-padding-block-begin-line-padding '(2.0 . nil))
-    (setq org-padding-block-end-line-padding '(nil . 1.0))
-    (setq org-padding-heading-padding-alist
-          '((4.0 . 1.5) (3.0 . 0.5) (3.0 . 0.5) (3.0 . 0.5) (2.5 . 0.5) (2.0 . 0.5) (1.5 . 0.5) (0.5 . 0.5))))
 
   ;; (use-package svg-tag-mode
   ;;   :config
@@ -482,6 +474,27 @@
     (setq org-hide-emphasis-markers t
           org-appear-autolinks 'just-brackets))
 
+
+  ;; Spacing of headings
+  ;; (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
+  ;; (dolist (face '((org-level-1 . 1.2)
+  ;;                 (org-level-2 . 1.1)
+  ;;                 (org-level-3 . 1.05)
+  ;;                 (org-level-4 . 1.0)
+  ;;                 (org-level-5 . 1.1)
+  ;;                 (org-level-6 . 1.1)
+  ;;                 (org-level-7 . 1.1)
+  ;;                 (org-level-8 . 1.1)))
+  ;;   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
+
+  (use-package org-padding
+    :straight (:host github :repo "TonCherAmi/org-padding")
+    :config
+    (setq org-padding-block-begin-line-padding '(2.0 . nil))
+    (setq org-padding-block-end-line-padding '(nil . 1.0))
+    (setq org-padding-heading-padding-alist
+          '((4.0 . 1.5) (3.0 . 0.5) (3.0 . 0.5) (3.0 . 0.5) (2.5 . 0.5) (2.0 . 0.5) (1.5 . 0.5) (0.5 . 0.5))))
+  
   (with-eval-after-load 'org
     (setq org-log-done 'time))
 
@@ -538,29 +551,30 @@
      (C . t)
      (latex . t)))
 
-  ;; (add-hook 'org-mode-hook (defun my/pretty-symbols ()
-  ;;                            (setq prettify-symbols-alist
-  ;;                                  '(("#+begin_src rust" . "🦀")
-  ;;                                    ("#+begin_src emacs-lisp" . "λ")
-  ;;                                    ("#+begin_src typescript" . " 🔨")
-  ;;                                    ("#+begin_src js" . " 🔨")
-  ;;                                    ("#+begin_src С" . "🔨")
-  ;;                                    ("#+begin_src python" . "🐍")
-  ;;                                    ("#+begin_quote" . "❝")
-  ;;                                    ("#+end_quote" . "❞")
-  ;;                                    ("#+end_src" . "―")
-  ;;                                    ("#+results:" . "🔨")
-  ;;                                    ("#+RESULTS:" . "🔨")))))
-
-  ;; (add-hook 'org-mode-hook (lambda ()
-  ;;                            "Beautify Org Checkbox Symbol"
-  ;;                            (push '("[ ]" .  "☐") prettify-symbols-alist)
-  ;;                            (push '("[X]" . "☑" ) prettify-symbols-alist)
-  ;;                            (push '("[-]" . "❍" ) prettify-symbols-alist)
-  ;;                            (push '("#+begin_src rust" . "🦀" ) prettify-symbols-alist)
-  ;;                            (push '("#+begin_quote" . "❝" ) prettify-symbols-alist)
-  ;;                            (push '("#+end_quote" . "❞" ) prettify-symbols-alist)
-  ;;                            (prettify-symbols-mode)))
+;;   (add-hook 'org-mode-hook (defun my/pretty-symbols ()
+;;                              (setq prettify-symbols-alist
+;;                                    '(("#+begin_src rust" . "🦀")
+;;                                      ("#+begin_src emacs-lisp" . "λ")
+;;                                      ("#+begin_src typescript" . " 🔨")
+;;                                      ("#+begin_src js" . " 🔨")
+;;                                      ("#+begin_src С" . "🔨")
+;;                                      ("#+begin_src python" . "🐍")
+;;                                      ("#+begin_quote" . "❝")
+;;                                      ("#+end_quote" . "❞")
+;;                                      ("#+end_src" . "―")
+;;                                      ("#+results:" . "🔨")
+;;                                      ("#+RESULTS:" . "🔨")))))
+;; (prettify-symbols-mode t)
+  
+  (add-hook 'org-mode-hook (lambda ()
+                             "Beautify Org Checkbox Symbol"
+                             (push '("[ ]" .  "☐") prettify-symbols-alist)
+                             (push '("[X]" . "☑" ) prettify-symbols-alist)
+                             (push '("[-]" . "❍" ) prettify-symbols-alist)
+                             (push '("#+begin_src rust" . "🦀" ) prettify-symbols-alist)
+                             (push '("#+begin_quote" . "❝" ) prettify-symbols-alist)
+                             (push '("#+end_quote" . "❞" ) prettify-symbols-alist)
+                             (prettify-symbols-mode)))
 
   (defface org-checkbox-done-text
     '((t (:foreground "#71696A" :strike-through t)))
