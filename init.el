@@ -47,7 +47,7 @@
   :custom
   (use-package-verbose t)
   (use-package-always-ensure t)  ;   by default
-  (use-package-always-defer nil) ; :defer t by default
+  (use-package-always-defer t) ; :defer t by default
   (use-package-expand-minimally t)
   (use-package-enable-imenu-support t))
 
@@ -284,34 +284,25 @@
 ;;    Setup theme
 ;;________________________________________________________________
 (use-package theme-changer
-
+  ;; :defer nil
   :config
   (setq calendar-location-name "Vladivostok, RU")
   (setq calendar-latitude 43.11)
-  (setq calendar-longitude 131.88)
+  (setq calendar-longitude 131.88))
+  ;; (change-theme 'doom-one-light 'doom-one)
 
-  (use-package gruvbox-theme
-    )
-
-  (use-package doom-themes
-
-    :config
-    ;; Global settings (defaults)
-    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-          doom-themes-enable-italic t) ; if nil, italics is universally disabled
-    ;; Enable flashing mode-line on errors
-    (doom-themes-visual-bell-config)
-    ;; or for treemacs users
-    (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
-    (doom-themes-treemacs-config)
-    ;; Corrects (and improves) org-mode's native fontification.
-    (doom-themes-org-config))
-
-  ;; (change-theme 'doom-one-light 'gruvbox-dark-medium)
-  ;; (change-theme 'doom-ayu-light 'doom-ayu-dark)
-  ;; (load-theme 'gruvbox-dark-medium t)
-  ;; (load-theme 'doom-one t)
-  (change-theme 'doom-one-light 'doom-one))
+(use-package gruvbox-theme)
+(use-package doom-themes
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (doom-themes-visual-bell-config) ; Enable flashing mode-line on errors
+  (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+(load-theme 'doom-one-light t)
 
 ;;________________________________________________________________
 ;;    Setup org-mode
@@ -1132,7 +1123,7 @@
 
 ;; Setting dashboard
 (use-package dashboard
-
+  :defer nil
   :hook (dashboard-mode . (lambda ()
                             ;; No title
                             (setq-local frame-title-format nil)
@@ -1237,7 +1228,6 @@
 	  (setq all-the-icons-dired-mode-inline-electric-icons t))) ; Show electric icons for Dired mode
 
 (use-package dired-rainbow
-
   :config
   (progn
     (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
@@ -1259,11 +1249,10 @@
     (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
     (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
     (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
-    (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")
-    ))
+    (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")))
 
 (use-package doom-modeline
-
+  :defer nil
   :after all-the-icons
   :hook
   (after-init . doom-modeline-mode)
@@ -1297,7 +1286,6 @@
   (setq minions-mode-line-lighter "[+]"))
 
 (use-package elfeed
-
   :config
   ;; data is stored in ~/.elfeed
   (setq elfeed-feeds
@@ -1346,27 +1334,28 @@
   (setq-default elfeed-search-title-min-width 100))
 
 (use-package elfeed-dashboard
-
   :config
   (setq elfeed-dashboard-file "~/elfeed-dashboard.org")
   ;; update feed counts on elfeed-quit
   (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
 
 (use-package evil
-
+  :defer nil
   :init      ;; tweak evil's configuration before loading it
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
   (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t))
+  (setq evil-split-window-below t)
+  (evil-mode))
 
 (use-package general
-  )
-(general-evil-setup t)
+  :after evil
+  :config
+  (general-evil-setup t))
 
 (use-package evil-collection
+  :defer nil
   :after evil
-
   :config
   (setq evil-emacs-state-cursor '("#FF5D62" box))
   (setq evil-normal-state-cursor '("#FF5D62" box))
@@ -1374,18 +1363,17 @@
   (setq evil-insert-state-cursor '("#E82424" bar))
   (setq evil-replace-state-cursor '("#FF9E3B" hbar))
   (setq evil-operator-state-cursor '("#7E9CD8" hollow))
-  (evil-collection-init)
-  (evil-mode 1))
 
-(evil-set-initial-state 'ibuffer-mode 'normal)
-(evil-set-initial-state 'bookmark-bmenu-mode 'normal)
-(evil-set-initial-state 'vterm-mode 'normal)
-(evil-set-initial-state 'calibredb-mode 'normal)
-;; (evil-set-initial-state 'dired-mode 'emacs)
-(evil-set-initial-state 'sunrise-mode 'emacs)
+	(evil-set-initial-state 'ibuffer-mode 'normal)
+	(evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+	(evil-set-initial-state 'vterm-mode 'normal)
+	(evil-set-initial-state 'calibredb-mode 'normal)
+	;; (evil-set-initial-state 'dired-mode 'emacs)
+	(evil-set-initial-state 'sunrise-mode 'emacs)
+
+  (evil-collection-init))
 
 (use-package fzf
-
   :bind
   ;; Don't forget to set keybinds!
   :config
@@ -1408,13 +1396,11 @@
     (fzf/start default-directory)))
 
 (use-package magit
-
   :commands (magit-status magit-ediff-show-working-tree)
   :bind ("C-c C-d" . magit-ediff-show-working-tree)
   :custom (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
 
 (use-package magit-todos
-
   :commands (magit-todos-mode)
   :hook (magit-mode . magit-todos-mode)
   :config
@@ -1425,10 +1411,9 @@
    '(magit-todos-keywords (list "TODO" "FIXME" "BUGFIX" "HACK"))))
 
 (use-package blamer
-
-  ;; :bind (("s-i" . blamer-show-commit-info)
-  ;;        ("C-c i" . ("s-i" . blamer-show-posframe-commit-info)))
-  :defer 20
+  :bind (("s-i" . blamer-show-commit-info)
+         ("C-c i" . ("s-i" . blamer-show-posframe-commit-info)))
+  :defer nil
   :custom
   (blamer-idle-time 0.3)
   (blamer-min-offset 70)
@@ -1438,7 +1423,6 @@
                    :height 140
                    :italic t)))
   :config
-
   (setq blamer-view 'overlay
         blamer-type 'posframe-popup
         blamer-max-commit-message-length 70
@@ -1464,24 +1448,21 @@
                         ("<mouse-1>" . blamer-callback-show-commit-diff)))
 
 (use-package git-gutter
-
+  :defer nil
   :hook (prog-mode . git-gutter-mode)
   :diminish git-gutter-mode
   :config
   (setq git-gutter:update-interval 0.5))
 
 (use-package git-gutter-fringe
-
   :after git-gutter
   :config
   (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:deleted [224] nil nil '(center repeated)))
-
 (global-git-gutter-mode +1)
 
 (use-package projectile
-
   :init
   (projectile-mode +1)
   :bind (:map projectile-mode-map
@@ -1501,7 +1482,6 @@
 ;;    Telega.el
 ;;________________________________________________________________
 (use-package telega
-
   :config
   (setq telega-use-docker t)
   (add-hook 'telega-load-hook 'telega-notifications-mode)
@@ -1512,7 +1492,7 @@
 ;;    Treemacs
 ;;________________________________________________________________
 (use-package treemacs
-  :after lsp-treemacs
+  :after (all-the-icons)
   :defer t
   :init
   (with-eval-after-load 'winum
@@ -1600,22 +1580,19 @@
         ("C-x t M-t" . treemacs-find-tag)))
 
 (use-package treemacs-all-the-icons
-
-  :after (treemacs)
+  :after (treemacs all-the-icons)
   :config
-  (treemacs-load-theme "all-the-icons"))
+  (treemacs-load-theme "doom-colors"))
 
-(use-package lsp-treemacs)
+(use-package lsp-treemacs
+  :after treemacs)
 
 (use-package treemacs-evil
-  :after (treemacs evil)
-  )
+  :after (treemacs evil))
 
-(use-package vterm
-  )
+(use-package vterm)
 
 (use-package multi-vterm
-
   :bind
   ("C-x q" . vterm-clear)
   ("C-x w" . multi-vterm))
@@ -1643,14 +1620,13 @@
         helm-move-to-line-cycle-in-source t
         helm-scroll-amount 8
         helm-ff-file-name-history-use-recentf t
-        helm-echo-input-in-header-line t))
-
-;; (with-eval-after-load 'helm
-;;   (add-to-list 'display-buffer-alist
-;;                '("\\`\\*helm.*\\*\\'"
-;;                  (display-buffer-in-side-window)
-;;                  (inhibit-same-window . t)
-;;                  (window-height . 0.4))))
+        helm-echo-input-in-header-line t)
+  (with-eval-after-load 'helm
+    (add-to-list 'display-buffer-alist
+                 '("\\`\\*helm.*\\*\\'"
+                   (display-buffer-in-side-window)
+                   (inhibit-same-window . t)
+                   (window-height . 0.4)))))
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold
@@ -1707,7 +1683,7 @@
 (global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
 
 (use-package all-the-icons
-  )
+  :defer nil)
 
 (use-package indent-guide
 
@@ -1862,21 +1838,13 @@
               ((featurep sym) 'ElispFeature)
               ((facep sym)    'ElispFace))))))
 
-(use-package company-bibtex
-  )
-
-(use-package ac-math
-  )
+(use-package company-bibtex)
 
 (use-package company-auctex
-
+	:after (latex)
   :config
-  ;; (require 'ox-latex)
-  ;; (setq org-latex-create-formula-image-program 'dvipng)
-  ;; (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
-
   ;; Set up default LaTeX preview configuration
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+  ;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
   (setq org-latex-create-formula-image-program 'imagemagick)
   (setq org-preview-latex-default-process 'imagemagick) ; or 'dvisvgm
   (setq org-preview-latex-process-alist
@@ -1902,7 +1870,10 @@
 
   ;; Display images in org-mode buffers
   (setq org-image-actual-width nil) ; adjust to your liking
-  (setq org-startup-with-inline-images t))
+  (setq org-startup-with-inline-images t)
+
+
+  (use-package ac-math))
 
 (company-auctex-init)
 
@@ -2086,13 +2057,6 @@
           (lambda ()
             (when (string-equal "jsx" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
-;; (add-hook 'web-mode-hook
-;;           (lambda ()
-;;             (when (string-equal "tsx" (file-name-extension buffer-file-name))
-;;               (setup-tide-mode))))
-;; configure jsx-tide checker to run after your default jsx checker
-(flycheck-add-mode 'javascript-eslint 'web-mode)
-;; (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
@@ -2102,21 +2066,15 @@
 
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
 
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "tsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
-;; enable typescript-tslint checker
-(flycheck-add-mode 'typescript-tslint 'web-mode)
-
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "jsx" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
 ;; configure jsx-tide checker to run after your default jsx checker
-(flycheck-add-mode 'javascript-eslint 'web-mode)
+;; (flycheck-add-mode 'javascript-eslint 'web-mode)
 ;; (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
 (use-package json-mode   :defer 20
@@ -2187,7 +2145,10 @@
   (flycheck-indication-mode 'left-fringe)
   (flycheck-display-errors-delay 0.2)
   (flycheck-check-syntax-automatically '(save idle-change))
-  (flycheck-idle-change-delay 2))
+  (flycheck-idle-change-delay 2)
+	:config
+	;; enable typescript-tslint checker
+	(flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package flycheck-inline
 
