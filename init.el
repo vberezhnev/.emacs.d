@@ -97,8 +97,13 @@
 ;;________________________________________________________________
 ;;    Init local packages
 ;;________________________________________________________________
-(add-to-list 'load-path "~/.emacs.d/local-packages/hyp-to-org")
+;; (add-to-list 'load-path "~/.emacs.d/local-packages/hyp-to-org")
 ;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
+
+;; (use-package hyp-to-org
+;;   :defer nil)
+
+(use-package org-hyperscheduler)
 
 ;; (load "~/.emacs.d/local-packages/epubmode")
 ;; (require 'epubmode)
@@ -115,13 +120,16 @@
 ;; (load "~/.emacs.d/local-packages/nov")
 ;; (require 'nov)
 
+;; (load "~/.emacs.d/local-packages/nov-xwidget")
+;; (require 'nov-xwidget)
+
 ;;________________________________________________________________
 ;;    Transparent Emacs
 ;;________________________________________________________________
 ;; (set-frame-parameter (selected-frame) 'alpha-background '(80 . 80))
 ;; (add-to-list 'default-frame-alist '(alpha-background . (80 . 80)))
 
-(set-frame-parameter nil 'alpha-background 80)
+(set-frame-parameter nil 'alpha-background 70)
 ;; (add-to-list 'default-frame-alist '(alpha-background . 80))
 
 ;; (set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
@@ -203,10 +211,9 @@
       undo-strong-limit                 100663296 ;; x 1.5 (96mb)
       undo-outer-limit                  1006632960) ;; x 10 (960mb), (Emacs uses x100), but this seems too high.
 
-(use-package go-mode  )
+(use-package go-mode)
 
-(use-package pbcopy
-  )
+(use-package pbcopy)
 
 ;; Disable backup
 (setq backup-inhibited t)
@@ -289,7 +296,7 @@
   (setq calendar-location-name "Vladivostok, RU")
   (setq calendar-latitude 43.11)
   (setq calendar-longitude 131.88))
-  ;; (change-theme 'doom-one-light 'doom-one)
+;; (change-theme 'doom-one-light 'doom-one)
 
 (use-package gruvbox-theme)
 (use-package doom-themes
@@ -407,6 +414,18 @@
     (setq org-hide-emphasis-markers t
           org-appear-autolinks 'just-brackets))
 
+  ;; Spacing of headings
+  (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
+
   (use-package org-padding
     :straight (:host github :repo "TonCherAmi/org-padding")
     :config
@@ -453,14 +472,10 @@
 
   (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
 
-  (use-package org-alert
-    )
+  (use-package org-alert)
 
-  (use-package ob-typescript
-    )
-
-  (use-package ob-rust
-    )
+  (use-package ob-typescript)
+  (use-package ob-rust)
 
   ;; Execute org src block
   (org-babel-do-load-languages
@@ -511,7 +526,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package org-roam
-
   :custom
   (org-roam-directory (file-truename "~/Org/Org-roam"))
   (org-roam-completion-everywhere t)
@@ -572,7 +586,6 @@
   )
 
 (use-package org-roam-ui
-
   :hook (after-init . org-roam-ui-mode)
   :config
   (setq orui-sync-theme t
@@ -586,16 +599,11 @@
   :config
   (push 'company-org-roam company-backends))
 
-(use-package org-download
-  )
+(use-package org-download)
 
 (setq-default org-download-image-dir "./assets-org/")
 
-;; Drag-and-drop to `dired`
-(add-hook 'dired-mode-hook 'org-download-enable)
-
-(use-package org-noter
-  )
+(use-package org-noter)
 
 ;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;; ;;
@@ -604,9 +612,9 @@
 ;;;;;;;;;;;;;;;;;
 
 (use-package org-roam-bibtex
-
   :after org-roam
   :hook (org-roam-mode . org-roam-bibtex-mode)
+  :ensure t
   :config
   (setq org-roam-bibtex-preformat-keywords
         '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
@@ -615,46 +623,62 @@
            ""
            :file-name "${slug}"
            :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
-
   - tags ::
   - keywords :: ${keywords}
-
   \n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
-
            :unnarrowed t)))
-  (require 'org-ref)) ; optional: if using Org-ref v2 or v3 citation links
+  (require 'org-ref)) ;  optional:if using Org-ref v2 or v3 citation links
 
-;; (use-package org-ref
-;;   :config
-;;   (setq reftex-default-bibliography '("~/Org/2Brain/bibtex/ref.bib"))
+(use-package org-ref
+  :ensure t
+  :config
+  (setq reftex-default-bibliography '("~/Org/Org-roam/bibtex/ref.bib"))
+  (setq org-ref-bibliography-notes "~/Org/Org-roam/bibtex/ref_notes.org"
+        org-ref-default-bibliography '("~/Org/Org-roam/ref.bib")
+        org-ref-pdf-directory "~/Org/Org-roam/bibtex/bibtex-pdfs/")
+  (setq bibtex-completion-bibliography "~/Org/Org-roam/bibtex/ref.bib"
+        bibtex-completion-library-path "~/Org/Org-roam/bibtex/bibtex-pdfs/"
+        ;; bibtex-completion-notes-path "~/Org/Org-roam/bibtex/bibtex-notes"
+        )
 
-;;   (setq org-ref-bibliography-notes "~/Org/2Brain/bibtex/ref_notes.org"
-;;         org-ref-default-bibliography '("~/Org/2Brain/ref.bib")
-;;         org-ref-pdf-directory "~/Org/2Brain/bibtex/bibtex-pdfs/")
+  (setq
+   bibtex-completion-notes-path "~/Org/Org-roam/bibtex/bibtex-notes/"
+   bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
 
-;;   (setq bibtex-completion-bibliography "~/Org/2Brain/bibtex/ref.bib"
-;;         bibtex-completion-library-path "~/Org/2Brain/bibtex/bibtex-pdfs/"
-;;         bibtex-completion-notes-path "~/Org/2Brain/bibtex/bibtex-notes")
+   bibtex-completion-additional-search-fields '(keywords)
+   bibtex-completion-display-formats
+   '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+	   (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+	   (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+	   (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+	   (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+   bibtex-completion-pdf-open-function
+   (lambda (fpath)
+	   (call-process "open" nil 0 nil fpath)))
+  
+  (setq bibtex-autokey-year-length 4
+        bibtex-autokey-name-year-separator "-"
+        bibtex-autokey-year-title-separator "-"
+        bibtex-autokey-titleword-separator "-"
+        bibtex-autokey-titlewords 2
+        bibtex-autokey-titlewords-stretch 1
+        bibtex-autokey-titleword-length 5))
 
-;;   ;; Optional. Open pdf in external viewer.
-;;   ;; (setq bibtex-completion-pdf-open-function
-;;   ;;       (lambda (fpath)
-;;   ;;         (start-process "open" "*open*" "open" fpath)))
-;;   ;; )
+;; Optional. Open pdf in external viewer.
+;; (setq bibtex-completion-pdf-open-function
+;;       (lambda (fpath)
+;;         (start-process "open" "*open*" "open" fpath)))
 
-;; (use-package citar
-;;   :config
-;;   (setq
-;;    citar-bibliography (list (concat org-directory "~/Org/References/zotero.bib"))
-;;    citar-notes-paths (list(concat org-directory "~/Org/Org-roam/literature/"))
-;;    citar-library-paths (list (concat org-directory "~/Org/Org-roam/"))
-;;    citar-file-variable "file"
-;;    ;; citar-symbols
-;;    `((file ,(all-the-icons-faicon "file-pdf-o" :face 'all-the-icons-red :v-adjust -0.1) . " ")
-;;      (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
-;;      (link ,(all-the-icons-material "link" :face 'all-the-icons-blue) . " "))
-;;    citar-symbol-separator "  "
-;;    org-cite-global-bibliography citar-bibliography))
+(use-package citar
+  :ensure t
+  :config
+  (setq
+   citar-bibliography (list (concat org-directory "~/Org/References/zotero.bib"))
+   citar-notes-paths (list(concat org-directory "~/Org/Org-roam/literature/"))
+   citar-library-paths (list (concat org-directory "~/Org/Org-roam/"))
+   citar-file-variable "file"
+   citar-symbol-separator "  "
+   org-cite-global-bibliography citar-bibliography))
 
 ;; Search contents of PDFs
 ;; (after! (embark pdf-occur)
@@ -670,14 +694,13 @@
 ;;         ;; with this, you can exploit embark's multitarget actions, so that you can run `embark-act-all`
 ;;         (add-to-list 'embark-multitarget-actions #'citar/search-pdf-contents))
 
-;; (use-package citar-embark
-;;
-;;   :after citar embark
-;;   :no-require
-;;   :config
-;;   (org-cite-global-bibliography
-;;    '("~/Org/Org-roam/References/zotero.bib"))
-;;   (citar-embark-mode))
+(use-package citar-embark
+  :after citar embark
+  :no-require
+  :config
+  (org-cite-global-bibliography
+   '("~/Org/Org-roam/bibtex/ref.bib"))
+  (citar-embark-mode))
 
 ;; Use `citar' with `org-cite'
 (use-package citar-org-roam
@@ -701,8 +724,7 @@
            "* How?"
            "* And?"
            ) "\n"))
-  (citar-org-roam-mode)
-  )
+  (citar-org-roam-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1017,18 +1039,7 @@
 (use-package saveplace-pdf-view  )
 (save-place-mode 1)
 
-;; (load "~/.emacs.d/local-packages/nov-xwidget")
-;; (require 'nov-xwidget)
-
 (use-package cl-lib  )
-
-;; Best .epub reader
-;; (use-package nov-xwidget
-;;   :demand t
-;;   :after nov
-;;   :config
-;;   (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
-;;   (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
 
 (setq sql-sqlite-program "/usr/bin/sqlite3")
 ;; (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
@@ -1047,7 +1058,6 @@
   (setq calibredb-format-icons-in-terminal t))
 
 ;; Keybindings
-
 (defvar calibredb-show-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "?" #'calibredb-entry-dispatch)
@@ -1121,64 +1131,109 @@
     map)
   "Keymap for `calibredb-search-mode'.")
 
-;; Setting dashboard
 (use-package dashboard
-  :defer nil
-  :hook (dashboard-mode . (lambda ()
-                            ;; No title
-                            (setq-local frame-title-format nil)
-                            ;; Enable `page-break-lines-mode'
-                            (when (fboundp 'page-break-lines-mode)
-                              (page-break-lines-mode 1))))
-  :init      ;; tweak dashboard config before loading it
-  (setq dashboard-set-heading-icons t
-        dashboard-set-file-icons t
-        dashboard-center-content t
-        dashboard-banner-logo-title "Welcome back, Darling!"
-        dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
-        ;; dashboard-page-separator ""
-        dashboard-set-navigator t
-        dashboard-items '(
-                          (recents . 6)
-                          ;; (agenda . 4 )
-                          ;;(registers . 3)
-                          (bookmarks . 4)
-                          (projects . 4))) ;; use standard emacs logo as banner
-
-  ;; Format: "(icon title help action face prefix suffix)"
-  ;; (setq dashboard-navigator-buttons
-  ;; 			`(;; line1
-  ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
-  ;; 					"Main site"
-  ;; 					"Browse homepage"
-  ;; 					(lambda (&rest _) (browse-url "homepage")))
-  ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-  ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
-  ;; 				;; line 2
-  ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-  ;; 					"Github"
-  ;; 					""
-  ;; 					(lambda (&rest _) (browse-url "homepage")))
-  ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
-  (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
-  ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-  ;; 																									 :height 1.1
-  ;; 																									 :v-adjust -0.05
-  ;; 																									 :face 'font-lock-keyword-face))
+  :straight (:build t)
+  :ensure t
+  :after all-the-icons
   :config
-  ;; (dashboard-modify-heading-icons '((recents . "file-text")
-  ;;                                   (bookmarks . "book")))
+  (setq dashboard-banner-logo-title "Welcome back, Darling!"
+        dashboard-startup-banner "~/.emacs.d/images/emacs-e-small.png"
+        dashboard-center-content    t
+        dashboard-show-shortcuts    t
+        dashboard-set-navigator     t
+        dashboard-set-heading-icons t
+        dashboard-set-file-icons    t
+        initial-buffer-choice       (lambda () (get-buffer "*dashboard*"))
+        dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
+  (setq dashboard-navigator-buttons
+        `(((,(all-the-icons-faicon "language" :height 1.1 :v-adjust 0.0)
+            "Linguistics Website"
+            ""
+            (lambda (&rest _) (browse-url "https://langue.phundrak.com")))
+
+           (,(all-the-icons-faicon "firefox" :height 1.1 :v-adjust 0.0)
+            "Config Website"
+            ""
+            (lambda (&rest _) (browse-url "https://config.phundrak.com"))))
+
+          ((,(all-the-icons-octicon "git-branch" :height 1.1 :v-adjust 0.0)
+            "Dotfiles Sources"
+            ""
+            (lambda (&rest _) (browse-url "https://labs.phundrak.com/phundrak/dotfiles")))
+           ("!" "Issues" "Show issues" (lambda (&rest _)
+                                         (browse-url "https://labs.phundrak.com/phundrak/dotfiles/issues"))
+            warning))
+          ((,(all-the-icons-faicon "level-up" :height 1.1 :v-adjust 0.0)
+            "Update Packages"
+            ""
+            (lambda (&rest _) (progn
+                                (require 'straight)
+                                (straight-pull-all)
+                                (straight-rebuild-all)))))))
+
+  (setq dashboard-items '((recents  . 15)
+                          (agenda   . 10)
+                          (projects . 10)))
   (dashboard-setup-startup-hook)
-  )
+  :init
+  (add-hook 'after-init-hook 'dashboard-refresh-buffer))
 
-(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+;; Setting dashboard
+;; (use-package dashboard
+;;   ;; :defer nil
+;;   :hook (dashboard-mode . (lambda ()
+;;                             ;; No title
+;;                             (setq-local frame-title-format nil)
+;;                             ;; Enable `page-break-lines-mode'
+;;                             (when (fboundp 'page-break-lines-mode)
+;;                               (page-break-lines-mode 1))))
+;;   :init      ;; tweak dashboard config before loading it
+;;   (setq dashboard-set-heading-icons t
+;;         dashboard-set-file-icons t
+;;         dashboard-center-content t
+;;         ;; dashboard-page-separator ""
+;;         dashboard-set-navigator t
+;;         dashboard-items '(
+;;                           (recents . 6)
+;;                           ;; (agenda . 4 )
+;;                           ;;(registers . 3)
+;;                           (bookmarks . 4)
+;;                           (projects . 4))) ;; use standard emacs logo as banner
 
-(defun dashboard-refresh-buffer ()
-  (interactive)
-  (when (get-buffer dashboard-buffer-name)
-    (kill-buffer dashboard-buffer-name))
-  (dashboard-insert-startupify-lists)
-  (switch-to-buffer dashboard-buffer-name))
+;;   ;; Format: "(icon title help action face prefix suffix)"
+;;   ;; (setq dashboard-navigator-buttons
+;;   ;; 			`(;; line1
+;;   ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
+;;   ;; 					"Main site"
+;;   ;; 					"Browse homepage"
+;;   ;; 					(lambda (&rest _) (browse-url "homepage")))
+;;   ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+;;   ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
+;;   ;; 				;; line 2
+;;   ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+;;   ;; 					"Github"
+;;   ;; 					""
+;;   ;; 					(lambda (&rest _) (browse-url "homepage")))
+;;   ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+;;   (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
+;;   ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+;;   ;; 																									 :height 1.1
+;;   ;; 																									 :v-adjust -0.05
+;;   ;; 																									 :face 'font-lock-keyword-face))
+;;   :config
+;;   ;; (dashboard-modify-heading-icons '((recents . "file-text")
+;;   ;;                                   (bookmarks . "book")))
+;;   (dashboard-setup-startup-hook)
+;;   )
+
+;; (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+
+;; (defun dashboard-refresh-buffer ()
+;;   (interactive)
+;;   (when (get-buffer dashboard-buffer-name)
+;;     (kill-buffer dashboard-buffer-name))
+;;   (dashboard-insert-startupify-lists)
+;;   (switch-to-buffer dashboard-buffer-name))
 
 (use-package ligature
   :config
@@ -1221,8 +1276,11 @@
   (define-key dired-mode-map (kbd "(") 'dired-hide-details-mode) ; Bind ( to toggle file and directory details
   (define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
   (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
-  (use-package all-the-icons-dired
 
+  ;; Drag-and-drop to `dired`
+  (add-hook 'dired-mode-hook 'org-download-enable)
+
+  (use-package all-the-icons-dired
 	  :hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
 	  :init
 	  (setq all-the-icons-dired-mode-inline-electric-icons t))) ; Show electric icons for Dired mode
@@ -1411,8 +1469,8 @@
    '(magit-todos-keywords (list "TODO" "FIXME" "BUGFIX" "HACK"))))
 
 (use-package blamer
-  :bind (("s-i" . blamer-show-commit-info)
-         ("C-c i" . ("s-i" . blamer-show-posframe-commit-info)))
+  ;; :bind (("s-i" . blamer-show-commit-info)
+  ;;        ("C-c i" . ("s-i" . blamer-show-posframe-commit-info)))
   :defer nil
   :custom
   (blamer-idle-time 0.3)
@@ -1448,19 +1506,17 @@
                         ("<mouse-1>" . blamer-callback-show-commit-diff)))
 
 (use-package git-gutter
-  :defer nil
   :hook (prog-mode . git-gutter-mode)
-  :diminish git-gutter-mode
+  :defer nil
   :config
-  (setq git-gutter:update-interval 0.5))
+  (setq git-gutter:update-interval 0.02))
 
 (use-package git-gutter-fringe
-  :after git-gutter
+  :defer nil
   :config
   (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'git-gutter-fr:deleted [224] nil nil '(center repeated)))
-(global-git-gutter-mode +1)
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
 (use-package projectile
   :init
@@ -1493,7 +1549,6 @@
 ;;________________________________________________________________
 (use-package treemacs
   :after (all-the-icons)
-  :defer t
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") 'treemacs-select-window))
@@ -1581,7 +1636,7 @@
 
 (use-package treemacs-all-the-icons
   :after (treemacs all-the-icons)
-  :config
+  :init
   (treemacs-load-theme "doom-colors"))
 
 (use-package lsp-treemacs
@@ -1635,8 +1690,8 @@
   (search-default-mode #'char-fold-to-regexp))
 
 (use-package reverse-im
-                                        ; install `reverse-im' using package.el
   :demand t ; always load it
+  :defer nil
   :after char-fold ; but only after `char-fold' is loaded
   :bind
   ("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
@@ -1914,21 +1969,17 @@
 
 ;; optionally
 (use-package lsp-ui
-
-  :hook (lsp-mode . lsp-ui-mode)
   :commands lsp-ui-mode
   :config
-  (setq lsp-ui-doc-enable t)
-  (setq lsp-ui-sideline-show-diagnostics t)
-  (setq lsp-ui-sideline-show-hover t)
-  ;; (setq lsp-ui-doc-delay 2
-  ;;       lsp-ui-doc-max-width 80)
-  (setq lsp-signature-function 'lsp-signature-posframe))
+  (setq lsp-ui-doc-enable nil)
+  (setq lsp-ui-doc-header t)
+  (setq lsp-ui-doc-include-signature t)
+  (setq lsp-ui-doc-border (face-foreground 'default))
+  (setq lsp-ui-sideline-show-code-actions t)
+  (setq lsp-ui-sideline-delay 0.05))
 
 ;; if you are helm user
 (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 ;; Symbol highlighting
 (setq lsp-enable-symbol-highlighting nil)
 
@@ -2400,3 +2451,19 @@ If you experience stuttering, increase this.")
  frame-title-format '(buffer-file-name "Emacs: %b (%f)" "Emacs: %b") ; name of the file I am editing as the name of the window.
  )
 (put 'dired-find-alternate-file 'disabled nil)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-minibuffer-history-key "M-p")
+ '(org-hyperscheduler-exclude-from-org-roam t)
+ '(org-hyperscheduler-hide-done-tasks nil)
+ '(org-hyperscheduler-inbox-file "~/Org/agenda/cal_inbox.org")
+ '(org-hyperscheduler-readonly-mode nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
