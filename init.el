@@ -46,8 +46,8 @@
 (use-package use-package
   :custom
   (use-package-verbose t)
-  (use-package-always-ensure t)  ;   by default
-  (use-package-always-defer t) ; :defer t by default
+  (use-package-always-ensure t)  ; :ensure t  by default
+  (use-package-always-defer  t) ; :defer t by default
   (use-package-expand-minimally t)
   (use-package-enable-imenu-support t))
 
@@ -129,7 +129,7 @@
 ;; (set-frame-parameter (selected-frame) 'alpha-background '(80 . 80))
 ;; (add-to-list 'default-frame-alist '(alpha-background . (80 . 80)))
 
-(set-frame-parameter nil 'alpha-background 70)
+(set-frame-parameter nil 'alpha-background 75)
 ;; (add-to-list 'default-frame-alist '(alpha-background . 80))
 
 ;; (set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
@@ -255,15 +255,15 @@
 ;;________________________________________________________________
 (set-face-attribute 'default t
                     :font "Iosevka" ;; Terminess Nerd Font Propo, Input, Terminess Nerd Font Propo
-                    :height 100
+                    :height 115
                     :weight 'regular)
 (set-face-attribute 'variable-pitch nil
                     :font "Iosevka"
-                    :height 100
+                    :height 115
                     :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
                     :font "Iosevka"
-                    :height 100
+                    :height 115
                     :weight 'medium)
 (set-frame-font "Iosevka" nil t)
 
@@ -279,11 +279,11 @@
 (setq-default line-spacing 0.12)
 
 ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-(add-to-list 'default-frame-alist '(font . "Iosevka 11"))
+(add-to-list 'default-frame-alist '(font . "Iosevka 12"))
 (add-to-list 'default-frame-alist
-             '(font . "Iosevka 11"))
+             '(font . "Iosevka 12"))
 
-(add-to-list 'default-frame-alist '(font . "Iosevka 11"))
+(add-to-list 'default-frame-alist '(font . "Iosevka 12"))
 ;; Changes certain keywords to symbols, such as lamda
 (setq global-prettify-symbols-mode t)
 
@@ -291,13 +291,12 @@
 ;;    Setup theme
 ;;________________________________________________________________
 (use-package theme-changer
-  ;; :defer nil
+  :defer nil
   :config
   (setq calendar-location-name "Vladivostok, RU")
   (setq calendar-latitude 43.11)
   (setq calendar-longitude 131.88))
 ;; (change-theme 'doom-one-light 'doom-one)
-
 (use-package gruvbox-theme)
 (use-package doom-themes
   :config
@@ -305,10 +304,11 @@
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
   (doom-themes-visual-bell-config) ; Enable flashing mode-line on errors
-  (setq doom-themes-treemacs-theme "all-the-icons") ; use "doom-colors" for less minimal icon theme
+  (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+
 (load-theme 'doom-one-light t)
 
 ;;________________________________________________________________
@@ -342,6 +342,7 @@
    org-src-preserve-indentation nil
    org-edit-src-content-indentation 2
    org-fontify-quote-and-verse-blocks t
+   org-export-with-smart-quotes t
    org-image-actual-width '(300))
 
   (with-eval-after-load 'org
@@ -426,13 +427,13 @@
                   (org-level-8 . 1.1)))
     (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
 
-  (use-package org-padding
-    :straight (:host github :repo "TonCherAmi/org-padding")
-    :config
-    (setq org-padding-block-begin-line-padding '(2.0 . nil))
-    (setq org-padding-block-end-line-padding '(nil . 1.0))
-    (setq org-padding-heading-padding-alist
-          '((4.0 . 1.5) (3.0 . 0.5) (3.0 . 0.5) (3.0 . 0.5) (2.5 . 0.5) (2.0 . 0.5) (1.5 . 0.5) (0.5 . 0.5))))
+  ;; (use-package org-padding
+  ;;   :straight (:host github :repo "TonCherAmi/org-padding")
+  ;;   :config
+  ;;   (setq org-padding-block-begin-line-padding '(2.0 . nil))
+  ;;   (setq org-padding-block-end-line-padding '(nil . 1.0))
+  ;;   (setq org-padding-heading-padding-alist
+  ;;         '((4.0 . 1.5) (3.0 . 0.5) (3.0 . 0.5) (3.0 . 0.5) (2.5 . 0.5) (2.0 . 0.5) (1.5 . 0.5) (0.5 . 0.5))))
 
   (with-eval-after-load 'org
     (setq org-log-done 'time))
@@ -588,11 +589,10 @@
 (use-package org-roam-ui
   :hook (after-init . org-roam-ui-mode)
   :config
-  (setq orui-sync-theme t
+  (setq orui-sync-theme nil
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start nil
-        ))
+        org-roam-ui-open-on-start nil ))
 
 (use-package company-org-roam
   :straight (:host github :repo "jethrokuan/company-org-roam")
@@ -611,35 +611,77 @@
 ;; ;;;;;;;;;;; ;;
 ;;;;;;;;;;;;;;;;;
 
+;; BibLaTeX settings
+(setq bibtex-dialect 'biblatex)
+
 (use-package org-roam-bibtex
   :after org-roam
   :hook (org-roam-mode . org-roam-bibtex-mode)
-  :ensure t
   :config
   (setq org-roam-bibtex-preformat-keywords
-        '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
-  (setq orb-templates
-        '(("r" "ref" plain (function org-roam-capture--get-point)
-           ""
-           :file-name "${slug}"
-           :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
-  - tags ::
-  - keywords :: ${keywords}
-  \n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
-           :unnarrowed t)))
-  (require 'org-ref)) ;  optional:if using Org-ref v2 or v3 citation links
+        '("citekey" "title" "author-or-editor" "keywords" "file")
+        org-ref-default-bibliography '("~/Org/Org-roam/Bibliography/ref.bib"))
+
+  (setq orb-preformat-bibliography '("~/Org/Org-roam/Bibliography/ref.bib")
+
+        (setq orb-templates
+              '(("r" "ref" plain (function org-roam-capture--get-point)
+                 ""
+                 :file-name "${citekey}"
+                 :head "#+TITLE: ${citekey}: ${title}\n#+ROAM_KEY: ${ref}\n\n- keywords :: ${keywords}\n\n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${citekey}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${citekey}\")\n  :NOTER_PAGE:\n  :END:\n\n"
+                 :unnarrowed t)))
+
+        (setq orb-preformat-pdf-field "file"
+              orb-preformat-pdf-external-program "evince")
+
+        (add-hook 'org-mode-hook #'org-roam-bibtex-mode)))
+
+(use-package company-bibtex)
+
+;; (use-package org-ref
+;;   :ensure t
+;;   :config
+;;   (setq reftex-default-bibliography '("~/Org/Org-roam/bibtex/ref.bib"))
+;;   (setq org-ref-bibliography-notes "~/Org/Org-roam/bibtex/ref_notes.org"
+;;         org-ref-default-bibliography '("~/Org/Org-roam/ref.bib")
+;;         org-ref-pdf-directory "~/Org/Org-roam/bibtex/bibtex-pdfs/")
+;;   (setq bibtex-completion-bibliography "~/Org/Org-roam/bibtex/ref.bib"
+;;         bibtex-completion-library-path "~/Org/Org-roam/bibtex/bibtex-pdfs/")
+;;         ;; bibtex-completion-notes-path "~/Org/Org-roam/bibtex/bibtex-notes"
+;;   (setq
+;;    bibtex-completion-notes-path "~/Org/Org-roam/bibtex/bibtex-notes/"
+;;    bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+;;    bibtex-completion-additional-search-fields '(keywords)
+;;    bibtex-completion-display-formats
+;;    '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+;; 	   (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+;; 	   (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+;; 	   (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+;; 	   (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+;;    bibtex-completion-pdf-open-function
+;;    (lambda (fpath)
+;; 	   (call-process "open" nil 0 nil fpath)))
+;;   (setq bibtex-autokey-year-length 4
+;;         bibtex-autokey-name-year-separator "-"
+;;         bibtex-autokey-year-title-separator "-"
+;;         bibtex-autokey-titleword-separator "-"
+;;         bibtex-autokey-titlewords 2
+;;         bibtex-autokey-titlewords-stretch 1
+;;         bibtex-autokey-titleword-length 5))
 
 (use-package org-ref
   :ensure t
+  :defer nil
+  :init
+  (setq org-ref-default-bibliography '("~/Org/Org-roam/Bibliography/ref.bib"))
+
   :config
-  (setq reftex-default-bibliography '("~/Org/Org-roam/bibtex/ref.bib"))
-  (setq org-ref-bibliography-notes "~/Org/Org-roam/bibtex/ref_notes.org"
-        org-ref-default-bibliography '("~/Org/Org-roam/ref.bib")
-        org-ref-pdf-directory "~/Org/Org-roam/bibtex/bibtex-pdfs/")
-  (setq bibtex-completion-bibliography "~/Org/Org-roam/bibtex/ref.bib"
-        bibtex-completion-library-path "~/Org/Org-roam/bibtex/bibtex-pdfs/"
-        ;; bibtex-completion-notes-path "~/Org/Org-roam/bibtex/bibtex-notes"
-        )
+  ;; Дополнительные настройки
+  (setq org-ref-bibliography-notes "~/Org/Org-roam/Bibliography/ref_notes.org"
+        org-ref-pdf-directory "~/Org/Org-roam/Bibliography/bibtex-pdfs/")
+
+  (setq org-ref-note-title-format "* TODO %y - %t\n%a\n\n")
+
 
   (setq
    bibtex-completion-notes-path "~/Org/Org-roam/bibtex/bibtex-notes/"
@@ -651,48 +693,70 @@
 	   (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
 	   (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
 	   (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
-	   (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
-   bibtex-completion-pdf-open-function
-   (lambda (fpath)
-	   (call-process "open" nil 0 nil fpath)))
-  
-  (setq bibtex-autokey-year-length 4
-        bibtex-autokey-name-year-separator "-"
-        bibtex-autokey-year-title-separator "-"
-        bibtex-autokey-titleword-separator "-"
-        bibtex-autokey-titlewords 2
-        bibtex-autokey-titlewords-stretch 1
-        bibtex-autokey-titleword-length 5))
+	   (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}")))
+  (setq bibtex-completion-pdf-open-function
+        (lambda (fpath)
+          (call-process "okular" nil 0 nil fpath)))
 
-;; Optional. Open pdf in external viewer.
-;; (setq bibtex-completion-pdf-open-function
-;;       (lambda (fpath)
-;;         (start-process "open" "*open*" "open" fpath)))
+  (use-package helm-bibtex
+    :ensure t
+    :bind (("C-c h" . helm-bibtex)))
+
+  (add-hook 'org-mode-hook 'org-ref-mode))
+
+;; keyboard macro to convert reftex citations to `cite:' links
+(defun insert-org-cite ()
+  (interactive)
+  (org-reftex-citation)
+  (setq last-command-event 127)
+  (org-delete-backward-char 1)
+  (setq last-command-event 93)
+  (org-self-insert-command 1)
+  (setq last-command-event 93)
+  (org-self-insert-command 1)
+  (setq last-command-event 134217826)
+  (backward-word 1)
+  (setq last-command-event 127)
+  (org-delete-backward-char 1)
+  (setq last-command-event 58)
+  (org-self-insert-command 1)
+  (setq last-command-event 134217826)
+  (backward-word 1)
+  (setq last-command-event 127)
+  (org-delete-backward-char 1)
+  (setq last-command-event 91)
+  (org-self-insert-command 1)
+  (setq last-command-event 91)
+  (org-self-insert-command 1)
+  (setq last-command-event 'f4))
+
+(with-eval-after-load 'org
+  (bind-key "C-c C-x ]" #'insert-org-cite org-mode-map))
 
 (use-package citar
-  :ensure t
-  :config
-  (setq
-   citar-bibliography (list (concat org-directory "~/Org/References/zotero.bib"))
-   citar-notes-paths (list(concat org-directory "~/Org/Org-roam/literature/"))
-   citar-library-paths (list (concat org-directory "~/Org/Org-roam/"))
-   citar-file-variable "file"
-   citar-symbol-separator "  "
-   org-cite-global-bibliography citar-bibliography))
+  :no-require
+  :custom
+  (org-cite-global-bibliography '("~/Org/Org-roam/Bibliography/ref.bib"))
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  (citar-bibliography org-cite-global-bibliography)
+  (setq citar-templates
+        '((main . "${author editor:30%sn}     ${date year issued:4}     ${title:48}")
+          (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
+          (preview . "${author editor:%etal} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+          (note . "Notes on ${author editor:%etal}, ${title}")))
+  ;; optional: org-cite-insert is also bound to C-c C-x C-@
+  :bind
+  (:map org-mode-map :package org ("C-c b" . #'org-cite-insert)))
 
-;; Search contents of PDFs
-;; (after! (embark pdf-occur)
-;;         (defun citar/search-pdf-contents (keys-entries &optional str)
-;;           "Search pdfs."
-;;           (interactive (list (citar-select-refs)))
-;;           (let ((files (citar-file--files-for-multiple-entries
-;;                         (citar--ensure-entries keys-entries)
-;;                         citar-library-paths
-;;                         '("pdf")))
-;;                 (search-str (or str (read-string "Search string: "))))
-;;             (pdf-occur-search files search-str t)))
-;;         ;; with this, you can exploit embark's multitarget actions, so that you can run `embark-act-all`
-;;         (add-to-list 'embark-multitarget-actions #'citar/search-pdf-contents))
+;; Use `citar' with `org-cite'
+;; (use-package citar-org
+;;   :after oc
+;;   :custom
+;;   (org-cite-insert-processor 'citar)
+;;   (org-cite-follow-processor 'citar)
+;;   (org-cite-activate-processor 'citar))
 
 (use-package citar-embark
   :after citar embark
@@ -725,7 +789,6 @@
            "* And?"
            ) "\n"))
   (citar-org-roam-mode))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
@@ -1134,6 +1197,7 @@
 (use-package dashboard
   :straight (:build t)
   :ensure t
+  :defer nil
   :after all-the-icons
   :config
   (setq dashboard-banner-logo-title "Welcome back, Darling!"
@@ -1143,37 +1207,24 @@
         dashboard-set-navigator     t
         dashboard-set-heading-icons t
         dashboard-set-file-icons    t
-        initial-buffer-choice       (lambda () (get-buffer "*dashboard*"))
-        dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
+        initial-buffer-choice       (lambda () (get-buffer "*dashboard*")))
+  
   (setq dashboard-navigator-buttons
-        `(((,(all-the-icons-faicon "language" :height 1.1 :v-adjust 0.0)
-            "Linguistics Website"
-            ""
-            (lambda (&rest _) (browse-url "https://langue.phundrak.com")))
+  			`(;; line1
+  				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
+  					"Main site"
+  					"Browse homepage"
+  					(lambda (&rest _) (browse-url "https://berezhnev.netlify.app"))
+  				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error)))
+  				;; line 2
+  				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+  					"Github"
+  					""
+  					(lambda (&rest _) (browse-url "https://github.com/tell396"))))))
 
-           (,(all-the-icons-faicon "firefox" :height 1.1 :v-adjust 0.0)
-            "Config Website"
-            ""
-            (lambda (&rest _) (browse-url "https://config.phundrak.com"))))
-
-          ((,(all-the-icons-octicon "git-branch" :height 1.1 :v-adjust 0.0)
-            "Dotfiles Sources"
-            ""
-            (lambda (&rest _) (browse-url "https://labs.phundrak.com/phundrak/dotfiles")))
-           ("!" "Issues" "Show issues" (lambda (&rest _)
-                                         (browse-url "https://labs.phundrak.com/phundrak/dotfiles/issues"))
-            warning))
-          ((,(all-the-icons-faicon "level-up" :height 1.1 :v-adjust 0.0)
-            "Update Packages"
-            ""
-            (lambda (&rest _) (progn
-                                (require 'straight)
-                                (straight-pull-all)
-                                (straight-rebuild-all)))))))
-
-  (setq dashboard-items '((recents  . 15)
-                          (agenda   . 10)
-                          (projects . 10)))
+  (setq dashboard-items '((recents  . 8)
+                          ;; (agenda   . 14)
+                          (projects . 8)))
   (dashboard-setup-startup-hook)
   :init
   (add-hook 'after-init-hook 'dashboard-refresh-buffer))
@@ -1316,16 +1367,17 @@
   (after-init . doom-modeline-mode)
   :custom
   (doom-modeline-buffer-file-name-style 'relative-to-project)
-  (doom-modeline-major-mode-color-icon nil)
-  (doom-modeline-icon (display-graphic-p))
+  ;; (doom-modeline-major-mode-color-icon nil)
+  ;; (doom-modeline-icon (display-graphic-p))
+  (doom-modeline-icon t)
   (doom-modeline-checker-simple-format t)
-  (doom-modeline-buffer-state-icon nil)
+  (doom-modeline-buffer-state-icon t)
   (doom-modeline-buffer-encoding nil)
-  (doom-modeline-major-mode-icon nil)
   (doom-line-numbers-style 'relative)
   (doom-modeline-enable-word-count t)
   ;; Don't compact font caches during GC. Windows Laggy Issue
   (inhibit-compacting-font-caches t)
+  (doom-modeline-major-mode-icon t)
   (doom-modeline-vcs-max-length 50)
   (doom-modeline-workspace-name t)
   (doom-modeline-flycheck-icon t)
@@ -1336,7 +1388,6 @@
   (doom-modeline-lsp t))
 
 (use-package minions
-
   :delight " 𝛁"
   :hook (doom-modeline-mode . minions-mode)
   :config
@@ -1390,12 +1441,6 @@
   (setq-default elfeed-search-filter "@7-days-ago +unread")
   (setq-default elfeed-search-title-max-width 100)
   (setq-default elfeed-search-title-min-width 100))
-
-(use-package elfeed-dashboard
-  :config
-  (setq elfeed-dashboard-file "~/elfeed-dashboard.org")
-  ;; update feed counts on elfeed-quit
-  (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links))
 
 (use-package evil
   :defer nil
@@ -1548,10 +1593,11 @@
 ;;    Treemacs
 ;;________________________________________________________________
 (use-package treemacs
-  :after (all-the-icons)
+  :ensure t
+  :defer t
   :init
   (with-eval-after-load 'winum
-    (define-key winum-keymap (kbd "M-0") 'treemacs-select-window))
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :config
   (progn
     (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
@@ -1588,6 +1634,7 @@
           treemacs-recenter-after-project-jump     'always
           treemacs-recenter-after-project-expand   'on-distance
           treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+          treemacs-project-follow-into-home        nil
           treemacs-show-cursor                     nil
           treemacs-show-hidden-files               t
           treemacs-silent-filewatch                nil
@@ -1608,7 +1655,7 @@
 
     ;; The default width and height of the icons is 22 pixels. If you are
     ;; using a Hi-DPI display, uncomment this to double the icon size.
-    ;; (treemacs-resize-icons 48)
+    ;;(treemacs-resize-icons 44)
 
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
@@ -1634,16 +1681,41 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
-(use-package treemacs-all-the-icons
-  :after (treemacs all-the-icons)
-  :init
-  (treemacs-load-theme "doom-colors"))
+(use-package treemacs-evil
+  :after (treemacs evil)
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t)
+
+(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
+  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
+  :ensure t
+  :config (treemacs-set-scope-type 'Perspectives))
+
+(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
+  :after (treemacs)
+  :ensure t
+  :config (treemacs-set-scope-type 'Tabs))
+
+;; (use-package treemacs-all-the-icons
+;;   :after (treemacs all-the-icons)
+;;   :init
+;;   (treemacs-load-theme "doom-colors"))
 
 (use-package lsp-treemacs
-  :after treemacs)
-
-(use-package treemacs-evil
-  :after (treemacs evil))
+  :after treemacs
+  :config
+  (lsp-treemacs-sync-mode 1))
 
 (use-package vterm)
 
@@ -1653,7 +1725,6 @@
   ("C-x w" . multi-vterm))
 
 (use-package helm
-  :demand t
   :init
   ;; Настройка сочетаний клавиш для Helm
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
@@ -1661,27 +1732,30 @@
   (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
   :config
   ;; Оптимизация Helm для улучшения производительности
-  (setq helm-candidate-number-limit 500
-        helm-idle-delay 0.0
-        helm-input-idle-delay 0.01
-        helm-quick-update t
-        helm-M-x-fuzzy-match t
-        helm-buffers-fuzzy-matching t
-        helm-recentf-fuzzy-match t
-        helm-apropos-fuzzy-match t
-        helm-lisp-fuzzy-completion t
-        helm-completion-in-region-fuzzy-match t
-        helm-mode-fuzzy-match t
-        helm-move-to-line-cycle-in-source t
-        helm-scroll-amount 8
-        helm-ff-file-name-history-use-recentf t
-        helm-echo-input-in-header-line t)
-  (with-eval-after-load 'helm
-    (add-to-list 'display-buffer-alist
-                 '("\\`\\*helm.*\\*\\'"
-                   (display-buffer-in-side-window)
-                   (inhibit-same-window . t)
-                   (window-height . 0.4)))))
+  (setq
+   ;; helm-candidate-number-limit 500
+   ;;      helm-idle-delay 0.0
+   ;;      helm-input-idle-delay 0.01
+   helm-quick-update t
+   helm-M-x-fuzzy-match t
+   helm-buffers-fuzzy-matching t
+   ;; helm-recentf-fuzzy-match t
+   helm-apropos-fuzzy-match t
+   helm-lisp-fuzzy-completion t
+   helm-completion-in-region-fuzzy-match t
+   helm-mode-fuzzy-match t
+   helm-move-to-line-cycle-in-source t
+   helm-scroll-amount 8
+   helm-ff-file-name-history-use-recentf nil
+   helm-echo-input-in-header-line nil
+   )
+  ;; (with-eval-after-load 'helm
+  ;;   (add-to-list 'display-buffer-alist
+  ;;                '("\\`\\*helm.*\\*\\'"
+  ;;                  (display-buffer-in-side-window)
+  ;;                  (inhibit-same-window . t)
+  ;;                  (window-height . 0.4))))
+  )
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold
@@ -1805,7 +1879,6 @@
                 pdf-view-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(lsp-treemacs-sync-mode 1)
 (helm-mode 1)
 
 (use-package company
@@ -1893,13 +1966,11 @@
               ((featurep sym) 'ElispFeature)
               ((facep sym)    'ElispFace))))))
 
-(use-package company-bibtex)
-
 (use-package company-auctex
 	:after (latex)
   :config
   ;; Set up default LaTeX preview configuration
-  ;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+  ;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 2))
   (setq org-latex-create-formula-image-program 'imagemagick)
   (setq org-preview-latex-default-process 'imagemagick) ; or 'dvisvgm
   (setq org-preview-latex-process-alist
@@ -2009,8 +2080,6 @@
 
 (setq tab-always-indent 'complete)
 (setq completion-cycle-threshold 3)
-
-(use-package lsp-treemacs   :commands lsp-treemacs-errors-list)
 
 ;; optionally if you want to use debugger
 (use-package dap-mode  )
@@ -2306,7 +2375,6 @@ If you experience stuttering, increase this.")
 
 ;;;;; hl-todo
 (use-package hl-todo
-
   :config
   (hl-todo-mode t))
 
@@ -2349,24 +2417,19 @@ If you experience stuttering, increase this.")
 (when window-system (global-prettify-symbols-mode t))
 
 ;;;; Modeline
-(size-indication-mode)
-(setq display-time-24hr-format t
-      ;; display-time-format "%l:%M%p" ;  %b %y"
-      display-time-default-load-average nil)
-(display-time-mode)
 
-(setq frame-title-format
-      '(""
-        (:eval
-         (if (s-contains-p org-roam-directory (or buffer-file-name ""))
-             (replace-regexp-in-string
-              ".*/[0-9]*-?" "☰ "
-              (subst-char-in-string ?_ ?  buffer-file-name))
-           "%b"))
-        (:eval
-         (let ((project-name (projectile-project-name)))
-           (unless (string= "-" project-name)
-             (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
+;; (setq frame-title-format
+;;       '(""
+;;         (:eval
+;;          (if (s-contains-p org-roam-directory (or buffer-file-name ""))
+;;              (replace-regexp-in-string
+;;               ".*/[0-9]*-?" "☰ "
+;;               (subst-char-in-string ?_ ?  buffer-file-name))
+;;            "%b"))
+;;         (:eval
+;;          (let ((project-name (projectile-project-name)))
+;;            (unless (string= "-" project-name)
+;;              (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
 
 ;;;; General But Better Defaults
 (setq-default
