@@ -103,8 +103,6 @@
 ;; (use-package hyp-to-org
 ;;   :defer nil)
 
-(use-package org-hyperscheduler)
-
 ;; (load "~/.emacs.d/local-packages/epubmode")
 ;; (require 'epubmode)
 
@@ -290,13 +288,15 @@
 ;;________________________________________________________________
 ;;    Setup theme
 ;;________________________________________________________________
-(use-package theme-changer
-  :defer nil
-  :config
-  (setq calendar-location-name "Vladivostok, RU")
-  (setq calendar-latitude 43.11)
-  (setq calendar-longitude 131.88))
-;; (change-theme 'doom-one-light 'doom-one)
+;; (use-package theme-changer
+;;   :demand t
+;;   :defer nil
+;;   :config
+;;   (setq calendar-location-name "Vladivostok, RU")
+;;   (setq calendar-latitude 43.11)
+;;   (setq calendar-longitude 131.88)
+;;   (change-theme 'doom-one-light 'doom-one))
+
 (use-package gruvbox-theme)
 (use-package doom-themes
   :config
@@ -391,7 +391,7 @@
      ;; Edit settings
      org-catch-invisible-edits 'show-and-error
      org-special-ctrl-a/e t
-     org-insert-heading-respect-content t
+     ;; org-insert-heading-respect-content t
      ;; Appearance
      org-hide-leading-stars t
      org-startup-indented nil
@@ -405,8 +405,8 @@
      ;; org-modern-progress t Gives an error
      org-modern-priority t
      org-modern-horizontal-rule "──────────"
-     org-modern-keyword "‣"
-     org-modern-hide-stars "·"))
+     org-modern-hide-stars " "
+     org-modern-keyword "‣"))
 
   (use-package org-appear
     :hook
@@ -416,16 +416,16 @@
           org-appear-autolinks 'just-brackets))
 
   ;; Spacing of headings
-  (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
-  (dolist (face '((org-level-1 . 1.2)
-                  (org-level-2 . 1.1)
-                  (org-level-3 . 1.05)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
+  ;; (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
+  ;; (dolist (face '((org-level-1 . 1.2)
+  ;;                 (org-level-2 . 1.1)
+  ;;                 (org-level-3 . 1.05)
+  ;;                 (org-level-4 . 1.0)
+  ;;                 (org-level-5 . 1.1)
+  ;;                 (org-level-6 . 1.1)
+  ;;                 (org-level-7 . 1.1)
+  ;;                 (org-level-8 . 1.1)))
+  ;;   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
 
   ;; (use-package org-padding
   ;;   :straight (:host github :repo "TonCherAmi/org-padding")
@@ -670,8 +670,8 @@
 ;;         bibtex-autokey-titleword-length 5))
 
 (use-package org-ref
-  :ensure t
   :defer nil
+  :demand t
   :init
   (setq org-ref-default-bibliography '("~/Org/Org-roam/Bibliography/ref.bib"))
 
@@ -681,7 +681,6 @@
         org-ref-pdf-directory "~/Org/Org-roam/Bibliography/bibtex-pdfs/")
 
   (setq org-ref-note-title-format "* TODO %y - %t\n%a\n\n")
-
 
   (setq
    bibtex-completion-notes-path "~/Org/Org-roam/bibtex/bibtex-notes/"
@@ -700,9 +699,7 @@
 
   (use-package helm-bibtex
     :ensure t
-    :bind (("C-c h" . helm-bibtex)))
-
-  (add-hook 'org-mode-hook 'org-ref-mode))
+    :bind (("C-c h" . helm-bibtex))))
 
 ;; keyboard macro to convert reftex citations to `cite:' links
 (defun insert-org-cite ()
@@ -1108,7 +1105,6 @@
 ;; (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 
 (use-package calibredb
-
   :defer t
   :config
   (setq calibredb-root-dir "~/Calibre Library")
@@ -1193,6 +1189,8 @@
     (define-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
   "Keymap for `calibredb-search-mode'.")
+
+(use-package djvu)
 
 (use-package dashboard
   :straight (:build t)
@@ -1361,6 +1359,7 @@
     (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")))
 
 (use-package doom-modeline
+  :demand t
   :defer nil
   :after all-the-icons
   :hook
@@ -1386,6 +1385,7 @@
   (doom-modeline-height 35)
   (doom-modeline-battery t)
   (doom-modeline-lsp t))
+(doom-modeline-mode)
 
 (use-package minions
   :delight " 𝛁"
@@ -1759,6 +1759,9 @@
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold
+  :demand t
+  :defer nil
+  :after char-fold
   :custom
   (char-fold-symmetric t)
   (search-default-mode #'char-fold-to-regexp))
@@ -1773,8 +1776,8 @@
   (reverse-im-char-fold t) ; use lax matching
   (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
   (reverse-im-input-methods '("ukrainian-computer")) ; translate these methods
-  :config
-  (reverse-im-mode t)) ; turn the mode on
+  ) ; turn the mode on
+(reverse-im-mode t)
 
 (use-package format-all
 
@@ -1885,8 +1888,8 @@
   :hook (after-init . global-company-mode)
   :config
   ;; Оптимизация компании для ускорения загрузки
-  (setq company-idle-delay 0.2
-        company-minimum-prefix-length 3
+  (setq company-minimum-prefix-length 3
+        ;; company-idle-delay 0.2
         company-tooltip-limit 10
         company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil
