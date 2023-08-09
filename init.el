@@ -28,45 +28,48 @@
   (setq use-package-verbose (not (bound-and-true-p byte-compile-current-file))))
 
 ;;________________________________________________________________
-;;    Install use-package if not installed
+;;    Install use-package if not installed & configure
 ;;________________________________________________________________
-(eval-and-compile
-  (unless (and (fboundp 'package-installed-p)
-               (package-installed-p 'use-package))
-    (package-refresh-contents) ; update archives
-    (package-install 'use-package)) ; grab the newest use-package
-  (if init-file-debug
-      (setq use-package-compute-statistics t)
-    (setq use-package-compute-statistics nil))
-  (require 'use-package))
+  ;; (eval-and-compile
+  ;; (unless (and (fboundp 'package-installed-p)
+  ;;              (package-installed-p 'use-package))
+  ;;   (package-refresh-contents) ; update archives
+  ;;   (package-install 'use-package)) ; grab the newest use-package
+  ;; (if init-file-debug
+  ;;     (setq use-package-compute-statistics t)
+  ;;   (setq use-package-compute-statistics nil))
+  ;; (require 'use-package))
 
-;;________________________________________________________________
-;;    Configure use-package
-;;________________________________________________________________
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(eval-when-compile
+  (require 'use-package))
 (use-package use-package
   :custom
   (use-package-verbose t)
   (use-package-always-ensure t)  ; :ensure t  by default
-  (use-package-always-defer  t) ; :defer t by default
+  (use-package-always-defer  nil) ; :defer t by default
   (use-package-expand-minimally t)
   (use-package-enable-imenu-support t))
 
 ;;________________________________________________________________
 ;;    Install straight.el
 ;;________________________________________________________________
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-(straight-use-package 'org)
+;; (defvar bootstrap-version)
+;; (let ((bootstrap-file
+;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+;;       (bootstrap-version 5))
+;;   (unless (file-exists-p bootstrap-file)
+;;     (with-current-buffer
+;;         (url-retrieve-synchronously
+;;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+;;          'silent 'inhibit-cookies)
+;;       (goto-char (point-max))
+;;       (eval-print-last-sexp)))
+;;   (load bootstrap-file nil 'nomessage))
+;; (straight-use-package 'org)
 
 ;;________________________________________________________________
 ;;    Install quelpa
@@ -87,6 +90,10 @@
 ;;    :url "https://github.com/quelpa/quelpa-use-package.git"))
 ;; (require 'quelpa-use-package)
 
+
+;;________________________________________________________________
+;;    Setup config using org-mode
+;;________________________________________________________________
 ;; (org-babel-load-file
 ;;  (expand-file-name
 ;;   "README.org"
@@ -95,41 +102,18 @@
 ;; (setq default-frame-alist '((undecorated . nil)))
 
 ;;________________________________________________________________
-;;    Init local packages
-;;________________________________________________________________
-;; (add-to-list 'load-path "~/.emacs.d/local-packages/hyp-to-org")
-;;(add-to-list 'load-path "~/.emacs.d/local-themes/catppucin-macchiato-theme")
-
-;; (use-package hyp-to-org
-;;   :defer nil)
-
-;; (load "~/.emacs.d/local-packages/epubmode")
-;; (require 'epubmode)
-
-;; (load "~/.emacs.d/local-packages/company-go")
-;; (require 'company-go)
-
-;; (load "~/.emacs.d/local-packages/chep-video")
-;; (require 'chep-video)
-
-;; (load "~/.emacs.d/local-packages/dired+")
-;; (require 'dired+)
-
-;; (load "~/.emacs.d/local-packages/nov")
-;; (require 'nov)
-
-;; (load "~/.emacs.d/local-packages/nov-xwidget")
-;; (require 'nov-xwidget)
-
-;;________________________________________________________________
 ;;    Transparent Emacs
 ;;________________________________________________________________
+
+(set-frame-parameter nil 'alpha-background 75) ; For current frame
+(add-to-list 'default-frame-alist '(alpha-background . 75)) ; For all new frames henceforth
+
+;; Only for emacs 29
+;; (set-frame-parameter nil 'alpha-background 75)
+
 ;; (set-frame-parameter (selected-frame) 'alpha-background '(80 . 80))
 ;; (add-to-list 'default-frame-alist '(alpha-background . (80 . 80)))
-
-(set-frame-parameter nil 'alpha-background 75)
 ;; (add-to-list 'default-frame-alist '(alpha-background . 80))
-
 ;; (set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
 ;; (set-frame-parameter (selected-frame) 'alpha <both>)
 
@@ -309,7 +293,7 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-(load-theme 'doom-one-light t)
+(load-theme 'doom-one t)
 
 ;;________________________________________________________________
 ;;    Setup org-mode
@@ -393,8 +377,8 @@
      org-special-ctrl-a/e t
      ;; org-insert-heading-respect-content t
      ;; Appearance
-     org-hide-leading-stars t
-     org-startup-indented nil
+     ;; org-hide-leading-stars t
+     ;; org-startup-indented nil
      org-modern-radio-target    '("❰" t "❱")
      org-modern-internal-target '("↪ " t "")
      org-modern-todo t
@@ -404,7 +388,7 @@
      org-modern-table nil
      ;; org-modern-progress t Gives an error
      org-modern-priority t
-     org-modern-horizontal-rule "──────────"
+     ;; org-modern-horizontal-rule "──────────"
      org-modern-hide-stars " "
      org-modern-keyword "‣"))
 
@@ -583,8 +567,7 @@
        ((> level 2) (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'org-roam-olp))
                             (propertize (concat shortentitle separator (string-join olp separator)) 'face 'org-roam-olp) separator title))
        (t (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'all-the-icons-yellow))
-                  (if filetitle title (propertize filetitle-or-name 'face 'all-the-icons-dyellow)))))))
-  )
+                  (if filetitle title (propertize filetitle-or-name 'face 'all-the-icons-dyellow))))))))
 
 (use-package org-roam-ui
   :hook (after-init . org-roam-ui-mode)
@@ -594,16 +577,16 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start nil ))
 
-(use-package company-org-roam
-  :straight (:host github :repo "jethrokuan/company-org-roam")
-  :config
-  (push 'company-org-roam company-backends))
+;; (use-package company-org-roam
+;;   :straight (:host github :repo "jethrokuan/company-org-roam")
+;;   :config
+;;   (push 'company-org-roam company-backends))
 
 (use-package org-download)
+(use-package org-noter)
 
 (setq-default org-download-image-dir "./assets-org/")
 
-(use-package org-noter)
 
 ;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;; ;;
@@ -1104,96 +1087,96 @@
 (setq sql-sqlite-program "/usr/bin/sqlite3")
 ;; (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 
-(use-package calibredb
-  :defer t
-  :config
-  (setq calibredb-root-dir "~/Calibre Library")
-  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-  (setq calibredb-library-alist '(("~/Books")))
-  (setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
-                                          ("2. Read it later" . "Readit epub")
-                                          ("3. Development - rust" . "rust")))
-  (setq calibredb-format-all-the-icons t)
-  (setq calibredb-format-icons-in-terminal t))
+;; (use-package calibredb
+;;   :defer t
+;;   :config
+;;   (setq calibredb-root-dir "~/Calibre Library")
+;;   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+;;   (setq calibredb-library-alist '(("~/Books")))
+;;   (setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
+;;                                           ("2. Read it later" . "Readit epub")
+;;                                           ("3. Development - rust" . "rust")))
+;;   (setq calibredb-format-all-the-icons t)
+;;   (setq calibredb-format-icons-in-terminal t))
 
-;; Keybindings
-(defvar calibredb-show-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "?" #'calibredb-entry-dispatch)
-    (define-key map "o" #'calibredb-find-file)
-    (define-key map "O" #'calibredb-find-file-other-frame)
-    (define-key map "V" #'calibredb-open-file-with-default-tool)
-    (define-key map "s" #'calibredb-set-metadata-dispatch)
-    (define-key map "e" #'calibredb-export-dispatch)
-    (define-key map "q" #'calibredb-entry-quit)
-    (define-key map "y" #'calibredb-yank-dispatch)
-    (define-key map "," #'calibredb-quick-look)
-    (define-key map "." #'calibredb-open-dired)
-    (define-key map "\M-/" #'calibredb-rga)
-    (define-key map "\M-t" #'calibredb-set-metadata--tags)
-    (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
-    (define-key map "\M-A" #'calibredb-set-metadata--authors)
-    (define-key map "\M-T" #'calibredb-set-metadata--title)
-    (define-key map "\M-c" #'calibredb-set-metadata--comments)
-    map)
-  "Keymap for `calibredb-show-mode'.")
+;; ;; Keybindings
+;; (defvar calibredb-show-mode-map
+;;   (let ((map (make-sparse-keymap)))
+;;     (define-key map "?" #'calibredb-entry-dispatch)
+;;     (define-key map "o" #'calibredb-find-file)
+;;     (define-key map "O" #'calibredb-find-file-other-frame)
+;;     (define-key map "V" #'calibredb-open-file-with-default-tool)
+;;     (define-key map "s" #'calibredb-set-metadata-dispatch)
+;;     (define-key map "e" #'calibredb-export-dispatch)
+;;     (define-key map "q" #'calibredb-entry-quit)
+;;     (define-key map "y" #'calibredb-yank-dispatch)
+;;     (define-key map "," #'calibredb-quick-look)
+;;     (define-key map "." #'calibredb-open-dired)
+;;     (define-key map "\M-/" #'calibredb-rga)
+;;     (define-key map "\M-t" #'calibredb-set-metadata--tags)
+;;     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
+;;     (define-key map "\M-A" #'calibredb-set-metadata--authors)
+;;     (define-key map "\M-T" #'calibredb-set-metadata--title)
+;;     (define-key map "\M-c" #'calibredb-set-metadata--comments)
+;;     map)
+;;   "Keymap for `calibredb-show-mode'.")
 
-(defvar calibredb-search-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [mouse-3] #'calibredb-search-mouse)
-    (define-key map (kbd "<RET>") #'calibredb-find-file)
-    (define-key map "?" #'calibredb-dispatch)
-    (define-key map "a" #'calibredb-add)
-    (define-key map "A" #'calibredb-add-dir)
-    (define-key map "c" #'calibredb-clone)
-    (define-key map "d" #'calibredb-remove)
-    (define-key map "D" #'calibredb-remove-marked-items)
-    (define-key map "j" #'calibredb-next-entry)
-    (define-key map "k" #'calibredb-previous-entry)
-    (define-key map "l" #'calibredb-virtual-library-list)
-    (define-key map "L" #'calibredb-library-list)
-    (define-key map "n" #'calibredb-virtual-library-next)
-    (define-key map "N" #'calibredb-library-next)
-    (define-key map "p" #'calibredb-virtual-library-previous)
-    (define-key map "P" #'calibredb-library-previous)
-    (define-key map "s" #'calibredb-set-metadata-dispatch)
-    (define-key map "S" #'calibredb-switch-library)
-    (define-key map "o" #'calibredb-find-file)
-    (define-key map "O" #'calibredb-find-file-other-frame)
-    (define-key map "v" #'calibredb-view)
-    (define-key map "V" #'calibredb-open-file-with-default-tool)
-    (define-key map "," #'calibredb-quick-look)
-    (define-key map "." #'calibredb-open-dired)
-    (define-key map "y" #'calibredb-yank-dispatch)
-    (define-key map "b" #'calibredb-catalog-bib-dispatch)
-    (define-key map "e" #'calibredb-export-dispatch)
-    (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
-    (define-key map "R" #'calibredb-search-clear-filter)
-    (define-key map "q" #'calibredb-search-quit)
-    (define-key map "m" #'calibredb-mark-and-forward)
-    (define-key map "f" #'calibredb-toggle-favorite-at-point)
-    (define-key map "x" #'calibredb-toggle-archive-at-point)
-    (define-key map "h" #'calibredb-toggle-highlight-at-point)
-    (define-key map "u" #'calibredb-unmark-and-forward)
-    (define-key map "i" #'calibredb-edit-annotation)
-    (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
-    (define-key map (kbd "<backtab>") #'calibredb-toggle-view)
-    (define-key map (kbd "TAB") #'calibredb-toggle-view-at-point)
-    (define-key map "\M-n" #'calibredb-show-next-entry)
-    (define-key map "\M-p" #'calibredb-show-previous-entry)
-    (define-key map "/" #'calibredb-search-live-filter)
-    (define-key map "\M-t" #'calibredb-set-metadata--tags)
-    (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
-    (define-key map "\M-A" #'calibredb-set-metadata--authors)
-    (define-key map "\M-T" #'calibredb-set-metadata--title)
-    (define-key map "\M-c" #'calibredb-set-metadata--comments)
-    map)
-  "Keymap for `calibredb-search-mode'.")
+;; (defvar calibredb-search-mode-map
+;;   (let ((map (make-sparse-keymap)))
+;;     (define-key map [mouse-3] #'calibredb-search-mouse)
+;;     (define-key map (kbd "<RET>") #'calibredb-find-file)
+;;     (define-key map "?" #'calibredb-dispatch)
+;;     (define-key map "a" #'calibredb-add)
+;;     (define-key map "A" #'calibredb-add-dir)
+;;     (define-key map "c" #'calibredb-clone)
+;;     (define-key map "d" #'calibredb-remove)
+;;     (define-key map "D" #'calibredb-remove-marked-items)
+;;     (define-key map "j" #'calibredb-next-entry)
+;;     (define-key map "k" #'calibredb-previous-entry)
+;;     (define-key map "l" #'calibredb-virtual-library-list)
+;;     (define-key map "L" #'calibredb-library-list)
+;;     (define-key map "n" #'calibredb-virtual-library-next)
+;;     (define-key map "N" #'calibredb-library-next)
+;;     (define-key map "p" #'calibredb-virtual-library-previous)
+;;     (define-key map "P" #'calibredb-library-previous)
+;;     (define-key map "s" #'calibredb-set-metadata-dispatch)
+;;     (define-key map "S" #'calibredb-switch-library)
+;;     (define-key map "o" #'calibredb-find-file)
+;;     (define-key map "O" #'calibredb-find-file-other-frame)
+;;     (define-key map "v" #'calibredb-view)
+;;     (define-key map "V" #'calibredb-open-file-with-default-tool)
+;;     (define-key map "," #'calibredb-quick-look)
+;;     (define-key map "." #'calibredb-open-dired)
+;;     (define-key map "y" #'calibredb-yank-dispatch)
+;;     (define-key map "b" #'calibredb-catalog-bib-dispatch)
+;;     (define-key map "e" #'calibredb-export-dispatch)
+;;     (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
+;;     (define-key map "R" #'calibredb-search-clear-filter)
+;;     (define-key map "q" #'calibredb-search-quit)
+;;     (define-key map "m" #'calibredb-mark-and-forward)
+;;     (define-key map "f" #'calibredb-toggle-favorite-at-point)
+;;     (define-key map "x" #'calibredb-toggle-archive-at-point)
+;;     (define-key map "h" #'calibredb-toggle-highlight-at-point)
+;;     (define-key map "u" #'calibredb-unmark-and-forward)
+;;     (define-key map "i" #'calibredb-edit-annotation)
+;;     (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
+;;     (define-key map (kbd "<backtab>") #'calibredb-toggle-view)
+;;     (define-key map (kbd "TAB") #'calibredb-toggle-view-at-point)
+;;     (define-key map "\M-n" #'calibredb-show-next-entry)
+;;     (define-key map "\M-p" #'calibredb-show-previous-entry)
+;;     (define-key map "/" #'calibredb-search-live-filter)
+;;     (define-key map "\M-t" #'calibredb-set-metadata--tags)
+;;     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
+;;     (define-key map "\M-A" #'calibredb-set-metadata--authors)
+;;     (define-key map "\M-T" #'calibredb-set-metadata--title)
+;;     (define-key map "\M-c" #'calibredb-set-metadata--comments)
+;;     map)
+;;   "Keymap for `calibredb-search-mode'.")
 
 (use-package djvu)
 
 (use-package dashboard
-  :straight (:build t)
+  ;; :straight (:build t)
   :ensure t
   :defer nil
   :after all-the-icons
@@ -1204,8 +1187,8 @@
         dashboard-show-shortcuts    t
         dashboard-set-navigator     t
         dashboard-set-heading-icons t
-        dashboard-set-file-icons    t
-        initial-buffer-choice       (lambda () (get-buffer "*dashboard*")))
+        initial-buffer-choice       (lambda () (get-buffer "*dashboard*"))
+        dashboard-set-file-icons    t)
   
   (setq dashboard-navigator-buttons
   			`(;; line1
@@ -1222,7 +1205,7 @@
 
   (setq dashboard-items '((recents  . 8)
                           ;; (agenda   . 14)
-                          (projects . 8)))
+                          (projects . 6)))
   (dashboard-setup-startup-hook)
   :init
   (add-hook 'after-init-hook 'dashboard-refresh-buffer))
@@ -1400,7 +1383,7 @@
   (setq elfeed-feeds
         '(
           ;; freelance
-          ("https://freelance.habr.com/user_rss_tasks/vsE2OtRKoyNeUnK7RGd+0w==" freelance)
+          ;;("https://freelance.habr.com/user_rss_tasks/vsE2OtRKoyNeUnK7RGd+0w==" freelance)
 
           ;;
           ("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
@@ -1408,12 +1391,12 @@
           ;; programming
           ;;("https://news.ycombinator.com/rss" hacker)
           ;;("https://www.reddit.com/r/programming.rss" programming)
-          ("https://www.reddit.com/r/emacs.rss" emacs)
+          ;;("https://www.reddit.com/r/emacs.rss" emacs)
           ("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
           ;; ("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
-          ("https://habr.com/ru/rss/news/?fl=ru" habr-news)
+          ;;("https://habr.com/ru/rss/news/?fl=ru" habr-news)
           ("https://nuancesprog.ru/feed" nop)
-          ("https://dev.to/feed" dev-to)
+          ;;("https://dev.to/feed" dev-to)
 
           ;; hobby
           ("https://www.reddit.com/r/nasa.rss" nasa)
@@ -1443,7 +1426,7 @@
   (setq-default elfeed-search-title-min-width 100))
 
 (use-package evil
-  :defer nil
+  ;; :defer nil
   :init      ;; tweak evil's configuration before loading it
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
