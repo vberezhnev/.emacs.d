@@ -50,7 +50,7 @@
   :custom
   (use-package-verbose t)
   (use-package-always-ensure t)  ; :ensure t  by default
-  (use-package-always-defer  nil) ; :defer t by default
+  (use-package-always-defer  t) ; :defer t by default
   (use-package-expand-minimally t)
   (use-package-enable-imenu-support t))
 
@@ -105,8 +105,8 @@
 ;;    Transparent Emacs
 ;;________________________________________________________________
 
-(set-frame-parameter nil 'alpha-background 75) ; For current frame
-(add-to-list 'default-frame-alist '(alpha-background . 75)) ; For all new frames henceforth
+(set-frame-parameter nil 'alpha-background 70) ; For current frame
+(add-to-list 'default-frame-alist '(alpha-background . 70)) ; For all new frames henceforth
 
 ;; Only for emacs 29
 ;; (set-frame-parameter nil 'alpha-background 75)
@@ -2509,7 +2509,9 @@ If you experience stuttering, increase this.")
  '(org-hyperscheduler-exclude-from-org-roam t)
  '(org-hyperscheduler-hide-done-tasks nil)
  '(org-hyperscheduler-inbox-file "~/Org/agenda/cal_inbox.org")
- '(org-hyperscheduler-readonly-mode nil))
+ '(org-hyperscheduler-readonly-mode nil)
+ '(package-selected-packages
+   '(beacon highlight-numbers volatile-highlights highlight-indent-guides olivetti fancy-battery apheleia flycheck-rust flycheck-inline tree-sitter-langs tree-sitter cargo rust-mode rust-playground json-mode tide prettier-js typescript-mode js2-mode import-js web-mode dap-mode corfu sideline-flycheck sideline helm-lsp lsp-ui company-org-block ac-math company-auctex company-box solaire-mode parrot indent-guide zygospore which-key rainbow-delimiters emojify format-all reverse-im multi-vterm vterm lsp-treemacs treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs telega projectile git-gutter-fringe git-gutter blamer magit-todos magit fzf evil-collection general evil elfeed minions doom-modeline dired-rainbow all-the-icons-dired ligature dashboard djvu saveplace-pdf-view kind-icon ement ox-reveal org-re-reveal ox-hugo org-caldav org-super-agenda use-package pbcopy org-roam-ui org-roam-bibtex org-ref org-noter-pdftools org-modern org-download org-appear org-alert ob-typescript ob-rust helm-bibtex gruvbox-theme go-mode doom-themes company-bibtex citar-org-roam citar-embark)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
