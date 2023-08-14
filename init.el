@@ -955,7 +955,7 @@
         ("w" "Work TODO" entry
          (file "~/Org/agenda/work.org") "* TODO %^{Title}")
         ("d" "Diary" entry (file "~/Org/diary.org.gpg")
-         "* %U\n" :clock-in t :clock-resume t) ;; "*** %?\n%U\n" :clock-in t :clock-resume t)
+         "*** %U\n\n**** Что я сделал за сегодня?\n\n**** 3 вещи, за которые я благодарен?" :clock-in t :clock-resume t)
         ("n" "Notes" entry
          (file "~/Org/agenda/inbox.org") "* %^{Description} %^g\n Added: %U\n%?")
         ))
