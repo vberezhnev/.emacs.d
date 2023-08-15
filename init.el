@@ -117,21 +117,22 @@
 ;; (set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
 ;; (set-frame-parameter (selected-frame) 'alpha <both>)
 
+ (set-frame-parameter (selected-frame) 'alpha '(90 . 75))
+ (add-to-list 'default-frame-alist '(alpha . (90 . 75)))
+
 ;; Use the following snippet after you’ve set the alpha as above to assign a toggle to “C-c t b”:
-;; (defun toggle-transparency ()
-;;   "Crave for transparency!"
-;;   (interactive)
-;;   (let ((alpha-background (frame-parameter nil 'alpha-background)))
-;;     (set-frame-parameter
-;;      nil 'alpha-background
-;;      (if (eql (cond ((numberp alpha-background) alpha-background)
-;;                     ((numberp (cdr alpha-background)) (cdr alpha-background))
-;;                     ;; Also handle undocumented (<active> <inactive>) form.
-;;                     ((numberp (cadr alpha-background)) (cadr alpha-background)))
-;;               100)
-;;          '(80 . 100) '(100 . 100)
-;;          ))))
-;; (global-set-key (kbd "C-c t b") 'toggle-transparency)
+;;  (defun toggle-transparency ()
+;;    (interactive)
+;;    (let ((alpha (frame-parameter nil 'alpha)))
+;;      (set-frame-parameter
+;;       nil 'alpha
+;;       (if (eql (cond ((numberp alpha) alpha)
+;;                      ((numberp (cdr alpha)) (cdr alpha))
+;;                      ;; Also handle undocumented (<active> <inactive>) form.
+;;                      ((numberp (cadr alpha)) (cadr alpha)))
+;;                100)
+;;           '(75 . 50) '(100 . 100)))))
+;; (global-set-key (kbd "C-c t") 'toggle-transparency)
 
 ;;________________________________________________________________
 ;;    Base settings of Emacs
@@ -530,22 +531,35 @@
                          "#+title: ${title}\n#+date: %U")
       :unnarrowed t)
      ))
+  (org-roam-dailies-capture-templates
+      '(
+        ("d" "Diary" entry "* %<%I:%M %p>: %?\n\n* Что я сделал за сегодня?\n\n* 3 вещи, за которые я благодарен?" :clock-in t :clock-resume t
+         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n\n" )))) ;; :clock-in t :clock-resume t
+   
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
-         ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
          ("C-c n i" . org-roam-node-insert)
          ("C-c n c" . org-roam-capture)
          ("C-c n t" . org-roam-tag-add)
          ("C-c n r" . org-roam-ref-add)
          ("C-c g" . org-id-get-create)
+         ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
+         
          ;; Dailies
          ("C-c n j" . org-roam-dailies-capture-today)
+         ;; :map org-roam-dailies-map
+         ;; ("Y" . org-roam-dailies-capture-yesterday)
+         ;; ("T" . org-roam-dailies-capture-tomorrow)
+         
          :map org-mode-map
          ("C-M-i"    . completion-at-point))
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)
   :config
   ;; If you're using a vertical completion framework, you might want a more informative completion interface
   ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (setq org-roam-completion-everywhere t)
+  ;; (setq org-roam-dailies-directory "../Org-journal")
   (org-roam-db-autosync-mode)
   ;; If using org-roam-protocol
   (require 'org-roam-protocol)
