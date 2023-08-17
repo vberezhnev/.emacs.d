@@ -274,7 +274,7 @@
 ;;    Setup theme
 ;;________________________________________________________________
 ;; (use-package theme-changer
-;;   :demand t
+;;   :ensure t
 ;;   :defer nil
 ;;   :config
 ;;   (setq calendar-location-name "Vladivostok, RU")
@@ -294,7 +294,7 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-(load-theme 'doom-one t)
+(load-theme 'doom-one-light t)
 
 ;;________________________________________________________________
 ;;    Setup org-mode
@@ -511,77 +511,375 @@
 ;; ;;;;;;;;;;;;;;;;;;;;;; ;; ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Org roam
+;; These are specified so they can be dynamically configured
+;; by calling emacs in batch mode in a CI context
+(setq org-roam-notes-path (or (getenv "ORG_ROAM_NOTES_PATH") "~/Org/Org-roam"))
+(setq org-roam-publish-path (or (getenv "ORG_ROAM_PUBLISH_PATH") "~/Org/Projects/Zettel"))
+
+(defun my/org-roam-capture-set-file-name (&rest r)
+  "Set the file name as the buffer name if possible. Fixes eglot not
+     working on capture and dailies."
+  (when-let* ((buf-name (buffer-name)))
+    (setq-local buffer-file-name
+                (format "%s/%s"
+                        (file-truename org-roam-notes-path)
+                        (string-replace "CAPTURE-" "" (buffer-name))))))
+
 (use-package org-roam
+  :after (org helm)
+  :bind (:map org-mode-map
+              ("M-." . org-open-at-point)
+              ("M-," . org-mark-ring-goto))
+  :bind  (("C-c n l" . org-roam-buffer-toggle)
+          ("C-c n g" . org-roam-graph)
+          ("C-c n c" . org-roam-capture)
+          ("C-c n i" . org-roam-node-insert)
+          ("C-c n j" . org-roam-dailies-capture-today)
+          ("C-c n r" . org-roam-random-note)
+          ("C-c n u" . org-roam-unlinked-references)
+          ("C-c n e" . org-roam-to-hugo-md)
+          ;; Full text search notes with an action to insert
+          ;; org-mode link
+          ("C-c n s" . helm-rg))
+
   :custom
-  (org-roam-directory (file-truename "~/Org/Org-roam"))
-  (org-roam-completion-everywhere t)
-  (org-roam-capture-templates
-   '(
-     ("d" "Default abstract" plain "%?"
-      :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
-      :unnarrowed t)
-     ("s" "Abstract with source" plain "\n\nSource: %^{Source}\n\nTitle: ${title}\n\n"
-      :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U")
-      :unnarrowed t)
-     ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n"
-      :if-new (file+head "%<%Y-%m-%d-%H:%M:%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Books: :%^{Book type}:\n")
-      :unnarrowed t)
-     ("e" "Encrypt note" plain "%?"
-      :target (file+head "${name-of-file}.org.gpg"
-                         "#+title: ${title}\n#+date: %U")
-      :unnarrowed t)
-     ))
-  (org-roam-dailies-capture-templates
-      '(
-        ("d" "Diary" entry "* %<%I:%M %p>: %?\n\n* Что я сделал за сегодня?\n\n* 3 вещи, за которые я благодарен?" :clock-in t :clock-resume t
-         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n\n" )))) ;; :clock-in t :clock-resume t
-   
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ("C-c n t" . org-roam-tag-add)
-         ("C-c n r" . org-roam-ref-add)
-         ("C-c g" . org-id-get-create)
-         ;; ("C-c n g" . org-roam-graph) ;; Require graphviz package
-         
-         ;; Dailies
-         ("C-c n j" . org-roam-dailies-capture-today)
-         ;; :map org-roam-dailies-map
-         ;; ("Y" . org-roam-dailies-capture-yesterday)
-         ;; ("T" . org-roam-dailies-capture-tomorrow)
-         
-         :map org-mode-map
-         ("C-M-i"    . completion-at-point))
-  :bind-keymap
-  ("C-c n d" . org-roam-dailies-map)
+  (org-roam-mode-section-functions
+   (list #'org-roam-backlinks-section
+         #'org-roam-reflinks-section
+         #'org-roam-unlinked-references-section))
+  :hook
+  ;; Need to add advice after-init otherwise they won't take
+  ((after-init . (lambda ()
+                   (advice-add 'org-roam-capture
+                               :after
+                               'my/note-taking-init)
+
+                   (advice-add 'org-roam-capture
+                               :after
+                               'my/org-roam-capture-set-file-name)
+
+                   (advice-add 'org-roam-dailies-capture-today
+                               :after
+                               'my/note-taking-init)
+
+                   (advice-add 'org-roam-dailies-capture-today
+                               :after
+                               'my/org-roam-capture-set-file-name)
+
+                   ;; (advice-add 'org-roam-node-visit
+                   ;;             :after
+                   ;;             'my/note-taking-init)
+                   ))
+   org-roam-capture-new-node-hook . (lambda () (my/note-taking-init)))
+
+  :init
+  (setq org-roam-directory org-roam-notes-path)
+  ;; Needed to supress update warning
+  (setq org-roam-v2-ack t)
+  ;; Fix Emacs 28.2 can't find `sqlite`
+  (setq org-roam-database-connector 'sqlite3)
+  ;; Use efm-langserver for prose linting
+  (add-hook 'org-roam-mode #'eglot-ensure)
+  (add-hook 'org-roam-capture-new-node-hook #'eglot-ensure)
+
+  (setq org-roam-dailies-directory org-roam-notes-path)
+  ;; Fix helm results wrapping when there are tags
+  ;; https://github.com/org-roam/org-roam/issues/1640
+  (require 'helm-mode)
+  (add-to-list 'helm-completing-read-handlers-alist
+               '(org-roam-node-find . helm-completing-read-sync-default-handler))
+  ;; Include tags in note search results
+  (setq org-roam-node-display-template "${title}      ${tags}")
+
+  ;; Custom helm source for searching notes based on
+  ;; https://ag91.github.io/blog/2022/02/05/an-helm-source-for-org-roam-v2/
+  (defun helm-org-roam (&optional input candidates)
+    (interactive)
+    (require 'org-roam)
+    (helm
+     :input input
+     :sources (list
+               (helm-build-sync-source "Find note: "
+                 :must-match nil
+                 :fuzzy-match t
+                 :candidates (or candidates (org-roam-node-read--completions))
+                 :persistent-action (lambda (x)
+                                      (--> x
+                                           (view-file (org-roam-node-file it))))
+                 :action
+                 '(("Find File" . (lambda (x)
+                                    (--> x
+                                         (org-roam-node-visit it t))))
+                   ("Preview" . (lambda (x)
+                                  (--> x
+                                       (view-file (org-roam-node-file it)))))
+                   ("Insert link" . (lambda (x)
+                                      (--> x
+                                           (insert
+                                            (format
+                                             "[[id:%s][%s]]"
+                                             (org-roam-node-id it)
+                                             (org-roam-node-title it))))))
+                   ("Follow backlinks" . (lambda (x)
+                                           (let ((candidates
+                                                  (--> x
+                                                       org-roam-backlinks-get
+                                                       (--map
+                                                        (org-roam-node-title
+                                                         (org-roam-backlink-source-node it))
+                                                        it))))
+                                             (helm-org-roam nil (or candidates (list x))))))))
+               (helm-build-dummy-source
+                   "Create note"
+                 :action '(("Capture note" . (lambda (candidate)
+                                               (org-roam-capture-
+                                                :node (org-roam-node-create :title candidate)
+                                                :props '(:finalize find-file)))))))))
+
+  (global-set-key (kbd "C-c n f") 'helm-org-roam)
+
+  ;; Customize the org-roam buffer
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-direction)
+                 (direction . right)
+                 (window-width . 0.33)
+                 (window-height . fit-window-to-buffer)))
+  ;; Find only projects
+  (defun my/org-roam-node-find-project ()
+    (interactive)
+    (org-roam-node-find
+     nil nil
+     (lambda (node)
+       (seq-contains-p (org-roam-node-tags node) "project"))))
+  (global-set-key (kbd "C-c n p") 'my/org-roam-node-find-project)
+
+  ;; Only show the paragraph with the link in the org-roam buffer
+  (defun my/preview-fetcher ()
+    (let* ((elem (org-element-context))
+           (parent (org-element-property :parent elem)))
+      ;; TODO: alt handling for non-paragraph elements
+      (string-trim-right (buffer-substring-no-properties
+                          (org-element-property :begin parent)
+                          (org-element-property :end parent)))))
+
+  (setq org-roam-preview-function #'my/preview-fetcher)
+  ;; These functions need to be in :init otherwise they will not be
+  ;; callable in an emacs --batch context which for some reason
+  ;; can't be found in autoloads if it's under :config
+  (defun my/org-roam--extract-note-body (file)
+    (with-temp-buffer
+      (insert-file-contents file)
+      (org-mode)
+      (first (org-element-map (org-element-parse-buffer) 'paragraph
+               (lambda (paragraph)
+                 (let ((begin (plist-get (first (cdr paragraph)) :begin))
+                       (end (plist-get (first (cdr paragraph)) :end)))
+                   (buffer-substring begin end)))))))
+  ;; Include backlinks in org exported notes not tagged as private or
+  ;; draft or section
+  (defun my/org-roam--backlinks-list (id file)
+    (--reduce-from
+     (concat acc (format "- [[id:%s][%s]]\n  #+begin_quote\n  %s\n  #+end_quote\n"
+                         (car it)
+                         (title-capitalization (org-roam-node-title (org-roam-node-from-id (car it))))
+                         (my/org-roam--extract-note-body (org-roam-node-file (org-roam-node-from-id (car it))))))
+     ""
+     (org-roam-db-query
+      (format
+       ;; The percentage sign needs to be escaped twice because there
+       ;; is two format calls—once here and the other by emacsql
+       "SELECT id FROM (SELECT links.source AS id, group_concat(tags.tag) AS alltags FROM links LEFT OUTER JOIN tags ON links.source = tags.node_id WHERE links.type = '\"id\"' AND links.dest = '\"%s\"' GROUP BY links.source) Q WHERE alltags IS NULL OR (','||alltags||',' NOT LIKE '%%%%,\"private\",%%%%' AND ','||alltags||',' NOT LIKE '%%%%,\"draft\",%%%%' AND ','||alltags||',' NOT LIKE '%%%%,\"section\",%%%%')"
+       id))))
+
+  (defun file-path-to-md-file-name (path)
+    (let ((file-name (first (last (split-string path "/")))))
+      (concat (first (split-string file-name "\\.")) ".md")))
+
+  (defun file-path-to-slug (path)
+    (let* ((file-name (file-name-nondirectory path))
+           (note-name (car (last (split-string file-name "--"))))
+           (title (first (split-string note-name "\\."))))
+      (replace-regexp-in-string (regexp-quote "_") "-" title nil 'literal)))
+
+  ;; Org export is very slow when processing org-id links. Override it
+  ;; to skip opening the file and loading all modes.
+  (defun my/org-export--collect-tree-properties (data info)
+    "Extract tree properties from parse tree.
+
+    DATA is the parse tree from which information is retrieved.  INFO
+    is a list holding export options.
+
+    Following tree properties are set or updated:
+
+    `:headline-offset' Offset between true level of headlines and
+                       local level.  An offset of -1 means a headline
+                       of level 2 should be considered as a level
+                       1 headline in the context.
+
+    `:headline-numbering' Alist of all headlines as key and the
+                          associated numbering as value.
+
+    `:id-alist' Alist of all ID references as key and associated file
+                as value.
+
+    Return updated plist."
+    ;; Install the parse tree in the communication channel.
+    (setq info (plist-put info :parse-tree data))
+    ;; Compute `:headline-offset' in order to be able to use
+    ;; `org-export-get-relative-level'.
+    (setq info
+          (plist-put info
+                     :headline-offset
+                     (- 1 (org-export--get-min-level data info))))
+    ;; From now on, properties order doesn't matter: get the rest of the
+    ;; tree properties.
+    (org-combine-plists
+     info
+     (list :headline-numbering (org-export--collect-headline-numbering data info)
+           :id-alist
+           (org-element-map data 'link
+             (lambda (l)
+               (and (string= (org-element-property :type l) "id")
+                    (let* ((id (org-element-property :path l))
+                           (file (org-id-find-id-file id)))
+                      (and file (cons id (file-relative-name file))))))))))
+
+  (advice-add 'org-export--collect-tree-properties :override #'my/org-export--collect-tree-properties)
+
+  ;; No notes use anchor links so ignore this to speed it up
+  (defun my/org-hugo-link--headline-anchor-maybe (link)
+    "")
+  (advice-add 'org-hugo-link--headline-anchor-maybe :override #'my/org-hugo-link--headline-anchor-maybe)
+
+  ;; ox-hugo doesn't set the `relref` path correctly so we need to
+  ;; tell it how to do it
+  (defun my/org-id-path-fix (strlist)
+    (file-name-nondirectory strlist))
+
+  (advice-add 'org-export-resolve-id-link :filter-return #'my/org-id-path-fix)
+
+  ;; Fetches all org-roam files and exports to hugo markdown
+  ;; files. Adds in necessary hugo properties
+  ;; e.g. HUGO_BASE_DIR. Ignores notes tagged as private or draft
+  (defun org-roam-to-hugo-md ()
+    (interactive)
+    ;; Make sure the author is set
+    (setq user-full-name "Alex Kehayias")
+
+    ;; Don't include any files tagged as private or
+    ;; draft. The way we filter tags doesn't work nicely
+    ;; with emacsql's DSL so just use a raw SQL query
+    ;; for clarity
+    (let ((notes (org-roam-db-query "SELECT id, file FROM (SELECT nodes.id, nodes.file, group_concat(tags.tag) AS alltags FROM nodes LEFT OUTER JOIN tags ON nodes.id = tags.node_id GROUP BY nodes.file) WHERE alltags is null or (','||alltags||',' not like '%%,\"private\",%%' and ','||alltags||',' not like '%%,\"draft\",%%')")))
+      (-map
+       (-lambda ((id file))
+         ;; Use temporary buffer to prevent a buffer being opened for
+         ;; each note file.
+         (with-temp-buffer
+           (message "Working on: %s" file)
+
+           (insert-file-contents file)
+
+           ;; Adding these tags must go after file content because it
+           ;; will include a :PROPERTIES: drawer as of org-roam v2
+           ;; which must be the first item on the page
+
+           ;; Add in hugo tags for export. This lets you write the
+           ;; notes without littering HUGO_* tags everywhere
+           ;; HACK:
+           ;; org-export-output-file-name doesn't play nicely with
+           ;; temp buffers since it attempts to get the file name from
+           ;; the buffer. Instead we explicitely add the name of the
+           ;; exported .md file otherwise you would get prompted for
+           ;; the output file name on every note.
+           (goto-char (point-min))
+           (re-search-forward ":END:")
+           (newline)
+           (insert
+            (format "#+HUGO_BASE_DIR: %s\n#+HUGO_SECTION: ./\n#+HUGO_SLUG: %s\n#+EXPORT_FILE_NAME: %s\n"
+                    org-roam-publish-path
+                    (file-path-to-slug file)
+                    (file-path-to-md-file-name file)))
+
+           ;; If this is a placeholder note (no content in the
+           ;; body) then add default text. This makes it look ok when
+           ;; showing note previews in the index and avoids a headline
+           ;; followed by a headline in the note detail page.
+           (if (eq (my/org-roam--extract-note-body file) nil)
+               (progn
+                 (goto-char (point-max))
+                 (insert "\n/This note does not have a description yet./\n")))
+
+           ;; Add in backlinks (at the end of the file) because
+           ;; org-export-before-processing-hook won't be useful the
+           ;; way we are using a temp buffer
+           (let ((links (my/org-roam--backlinks-list id file)))
+             (if (not (string= links ""))
+                 (progn
+                   (goto-char (point-max))
+                   (insert (concat "\n* Links to this note\n") links))))
+
+           (org-hugo-export-to-md)))
+       notes)))
+
   :config
-  ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-  (setq org-roam-completion-everywhere t)
-  ;; (setq org-roam-dailies-directory "../Org-journal")
-  (org-roam-db-autosync-mode)
-  ;; If using org-roam-protocol
-  (require 'org-roam-protocol)
-  ;; Org-roam interface
-  (cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
-    "Return the node's TITLE, as well as it's HIERACHY."
-    (let* ((title (org-roam-node-title node))
-           (olp (mapcar (lambda (s) (if (> (length s) 10) (concat (substring s 0 10)  "...") s)) (org-roam-node-olp node)))
-           (level (org-roam-node-level node))
-           (filetitle (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
-           (filetitle-or-name (if filetitle filetitle (file-name-nondirectory (org-roam-node-file node))))
-           (shortentitle (if (> (length filetitle-or-name) 20) (concat (substring filetitle-or-name 0 20)  "...") filetitle-or-name))
-           (separator (concat " " (all-the-icons-material "chevron_right") " ")))
-      (cond
-       ((= level 1) (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'all-the-icons-dyellow))
-                            (propertize shortentitle 'face 'org-roam-olp) separator title))
-       ((= level 2) (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'all-the-icons-dsilver))
-                            (propertize (concat shortentitle separator (string-join olp separator)) 'face 'org-roam-olp) separator title))
-       ((> level 2) (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'org-roam-olp))
-                            (propertize (concat shortentitle separator (string-join olp separator)) 'face 'org-roam-olp) separator title))
-       (t (concat (propertize (format "=level:%d=" level) 'display (all-the-icons-material "insert_drive_file" :face 'all-the-icons-yellow))
-                  (if filetitle title (propertize filetitle-or-name 'face 'all-the-icons-dyellow))))))))
+  (defun my/org-id-update-org-roam-files ()
+    "Update Org-ID locations for all Org-roam files."
+    ;; https://org-roam.discourse.group/t/org-roam-v2-org-id-id-link-resolution-problem/1491/4
+    (interactive)
+    (org-id-update-id-locations (org-roam-list-files)))
+
+  (setq org-roam-capture-templates
+	(quote (("d" "Default" plain
+                 "%?"
+                 :if-new (file+head
+                          "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--${slug}.org\" (current-time) t)"
+                          "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n\n")
+                 :unnarrowed t)
+                ("s" "Section" plain
+                  "%?"
+                  :if-new (file+head
+                           "${slug}.org"
+                           "#+TITLE: ${title}\n#+FILETAGS: section\n\n")
+                  :unnarrowed t)
+                ("P" "Project" plain
+                 "%?"
+                 :if-new (file+head
+                          "%(format-time-string \"%Y-%m-%d--project-${slug}.org\" (current-time) t)"
+                          "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n#+CATEGORY: ${slug}\n#+FILETAGS: private project\n\n")
+                 :unnarrowed t)
+                ("p" "Project Note" plain
+                 "%?"
+                 :if-new (file+head
+                          "%(format-time-string \"%Y-%m-%d--%H-%M-%SZ--project-${slug}.org\" (current-time) t)"
+                          "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n#+FILETAGS: private project_note\n\n")
+                 :unnarrowed t)
+                ("e" "Entity" plain
+                 "%?"
+                 :if-new (file+head
+                          "%(format-time-string \"%Y-%m-%d--entity-${slug}.org\" (current-time) t)"
+                          "#+TITLE: @${title}\n#+DATE: %<%Y-%m-%d>\n#+FILETAGS: private entity\n\n")
+                 :unnarrowed t))))
+
+  ;; Journaling setup
+  (setq org-roam-dailies-directory "")
+
+  (setq org-roam-dailies-capture-templates
+	(quote (("d" "Default" plain
+                 "%?"
+                 :if-new (file+head
+                          "%(format-time-string \"%Y-%m-%d--journal.org\" (current-time) t)"
+                          "#+TITLE: Journal %<%Y-%m-%d>\n#+DATE: %<%Y-%m-%d>\n#+FILETAGS: private journal\n\n\n")
+                 :unnarrowed t))))
+
+  ;; Use writeroom mode when capturing new notes. Hide the ugly
+  ;; preamble of org attributes by scrolling up.
+  (defun my/note-taking-init (&rest r)
+    (with-current-buffer (current-buffer)
+      (writeroom-mode)))
+  (org-roam-db-autosync-mode))
 
 (use-package org-roam-ui
   :hook (after-init . org-roam-ui-mode)
@@ -591,10 +889,11 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start nil ))
 
-;; (use-package company-org-roam
-;;   :straight (:host github :repo "jethrokuan/company-org-roam")
-;;   :config
-;;   (push 'company-org-roam company-backends))
+(use-package org-roam-timestamps
+  :after org-roam
+  :config (org-roam-timestamps-mode))
+(setq org-roam-timestamps-parent-file t)
+(setq org-roam-timestamps-remember-timestamps t)
 
 (use-package org-download)
 (use-package org-noter)
@@ -964,8 +1263,8 @@
       '(
         ("t" "TODO" entry
          (file "~/Org/agenda/inbox.org") "* TODO %^{Title}")
-        ("m" "Meeting notes" entry
-         (file "~/Org/agenda/appointments.org") "* TODO %^{Title} %t\n- %?")
+        ;; ("m" "Meeting notes" entry
+        ;;  (file "~/Org/agenda/appointments.org") "* TODO %^{Title} %t\n- %?")
         ("w" "Work TODO" entry
          (file "~/Org/agenda/work.org") "* TODO %^{Title}")
         ("d" "Diary" entry (file "~/Org/diary.org.gpg")
@@ -975,18 +1274,18 @@
         ))
 
 (use-package org-caldav
-
   :custom
   (org-caldav-url "https://lunarcloud.ddns.net/remote.php/dav/calendars/ncp")
   (org-caldav-calendar-id "personal")
-  (org-caldav-inbox "~/Org/agenda/cal_inbox.org")
-  (org-caldav-files '("~/Org/agenda/calendar.org"))
+  ;; (org-caldav-calendar-id "XZRo6AtbiyiaBbpE")
+  (org-caldav-inbox "~/Org/agenda/calendar.org")
+  ;; (org-caldav-files '("~/Org/agenda/calendar.org"))
   (org-icalendar-timezone "Asia/Vladivostok")
-  (org-caldav-delete-org-entries 'never))
-;; (org-caldav-sync)
+  (org-caldav-delete-org-entries 'never)
+(org-caldav-sync))
 
 (use-package ox-hugo
-                                        ;Auto-install the package from Melpa
+  ;;Auto-install the package from Melpa
   :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
   :after ox)
 
@@ -1679,7 +1978,8 @@
         ("C-x t M-t" . treemacs-find-tag)))
 
 (use-package treemacs-evil
-  :after (treemacs evil)
+  ;; :after (treemacs evil)
+  :defer nil
   :ensure t)
 
 (use-package treemacs-projectile
@@ -1745,14 +2045,13 @@
    helm-scroll-amount 8
    helm-ff-file-name-history-use-recentf nil
    helm-echo-input-in-header-line nil
-   )
+   ))
   ;; (with-eval-after-load 'helm
   ;;   (add-to-list 'display-buffer-alist
   ;;                '("\\`\\*helm.*\\*\\'"
   ;;                  (display-buffer-in-side-window)
   ;;                  (inhibit-same-window . t)
   ;;                  (window-height . 0.4))))
-  )
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold
@@ -1876,7 +2175,8 @@
                 eshell-mode-hook
                 nov-mode-hook
                 neotree-mode-hook
-                pdf-view-mode-hook))
+                pdf-view-mode-hook
+                treemacs-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (helm-mode 1)
@@ -2522,10 +2822,11 @@ If you experience stuttering, increase this.")
  '(helm-minibuffer-history-key "M-p")
  '(org-hyperscheduler-exclude-from-org-roam t)
  '(org-hyperscheduler-hide-done-tasks nil)
- '(org-hyperscheduler-inbox-file "~/Org/agenda/cal_inbox.org")
+ '(org-hyperscheduler-inbox-file "~/Org/agenda/calendar.org")
  '(org-hyperscheduler-readonly-mode nil)
  '(package-selected-packages
-   '(beacon highlight-numbers volatile-highlights highlight-indent-guides olivetti fancy-battery apheleia flycheck-rust flycheck-inline tree-sitter-langs tree-sitter cargo rust-mode rust-playground json-mode tide prettier-js typescript-mode js2-mode import-js web-mode dap-mode corfu sideline-flycheck sideline helm-lsp lsp-ui company-org-block ac-math company-auctex company-box solaire-mode parrot indent-guide zygospore which-key rainbow-delimiters emojify format-all reverse-im multi-vterm vterm lsp-treemacs treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs telega projectile git-gutter-fringe git-gutter blamer magit-todos magit fzf evil-collection general evil elfeed minions doom-modeline dired-rainbow all-the-icons-dired ligature dashboard djvu saveplace-pdf-view kind-icon ement ox-reveal org-re-reveal ox-hugo org-caldav org-super-agenda use-package pbcopy org-roam-ui org-roam-bibtex org-ref org-noter-pdftools org-modern org-download org-appear org-alert ob-typescript ob-rust helm-bibtex gruvbox-theme go-mode doom-themes company-bibtex citar-org-roam citar-embark)))
+   '(theme-changer beacon highlight-numbers volatile-highlights highlight-indent-guides olivetti fancy-battery apheleia flycheck-rust flycheck-inline tree-sitter-langs tree-sitter cargo rust-mode rust-playground json-mode tide prettier-js typescript-mode js2-mode import-js web-mode dap-mode corfu sideline-flycheck sideline helm-lsp lsp-ui company-org-block ac-math company-auctex company-box solaire-mode parrot indent-guide zygospore which-key rainbow-delimiters emojify format-all reverse-im multi-vterm vterm lsp-treemacs treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs telega projectile git-gutter-fringe git-gutter blamer magit-todos magit fzf evil-collection general evil elfeed minions doom-modeline dired-rainbow all-the-icons-dired ligature dashboard djvu saveplace-pdf-view kind-icon ement ox-reveal org-re-reveal ox-hugo org-caldav org-super-agenda use-package pbcopy org-roam-ui org-roam-bibtex org-ref org-noter-pdftools org-modern org-download org-appear org-alert ob-typescript ob-rust helm-bibtex gruvbox-theme go-mode doom-themes company-bibtex citar-org-roam citar-embark))
+ '(warning-suppress-log-types '((org-roam))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
