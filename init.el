@@ -518,18 +518,24 @@
   (org-roam-capture-templates
    '(
      ("a" "Atomic note (with source)" plain "%?"
-      :if-new (file+head "%<%Y-%m-%d-%H:%M>--${slug}.org" "#+title: ${title}\n#+date: %U\n+ Source: %^{Source}\n\n\n* See also:\n+ ")
+      :if-new (file+head "%<%Y-%m-%d-%H:%M>--${slug}.org" "#+title: ${title}\n#+date: %U\n\n+ Source: %^{Source}\n\n\n* See also:\n+ ")
+      :unnarrowed t)
+     ("p" "Project" plain "%?"
+      :if-new (file+head "thoughts/%<%Y-%m-%d-%H:%M>--project-${slug}.org" "#+title: ${title}\n+filetags: :Project:\n#+date: %U\n\n+ Repository: \n\n\n* See also:\n+ \n+ \n+ ")
       :unnarrowed t)
      ("t" "Thought" plain "%?"
       :if-new (file+head "thoughts/%<%Y-%m-%d-%H:%M>--thought-${slug}.org" "#+title: ${title}\n#+date: %U\n\n\n* See also:\n+ ")
       :unnarrowed t)
      ("b" "Books" plain "\n* Source\n\nAuthor: %^{Author}\n\nTitle: ${title}\n\nYear: %^{Year}\n\n"
-      :if-new (file+head "%<%Y-%m-%d-%H:%M>--book-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :%^{Book type}:Books:\n\n\n* See also:\n+ ")
+      :if-new (file+head "%<%Y-%m-%d-%H:%M>--book-${slug}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Book:%^{Book type}:\n\n\n* See also:\n+ ")
       :unnarrowed t)))
 
   (org-roam-dailies-capture-templates
    '(
-     ("d" "Diary" entry "* %U: %?\n\n** Что я сделал за сегодня?\n\n** 3 вещи, за которые я благодарен?" :clock-in t :clock-resume t
+     ("m" "Morning diary" entry "* %U: %?\n\n** Что я сегодня обязан сделать?\n\n** Каковы мои ожидания от этого дня?" :clock-in t :clock-resume t
+      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n" ))
+     
+     ("e" "Evening iary" entry "* %U: %?\n\n** Что я сделал за сегодня?\n\n** 3 вещи, за которые я благодарен?" :clock-in t :clock-resume t
       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n" ))))
 
   :bind (("C-c n l" . org-roam-buffer-toggle)
@@ -2421,22 +2427,26 @@ If you experience stuttering, increase this.")
    frame-title-format '(buffer-file-name "Emacs: %b (%f)" "Emacs: %b") ; name of the file I am editing as the name of the window.
    )
   (put 'dired-find-alternate-file 'disabled nil)
-  (custom-set-variables
-   ;; custom-set-variables was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(helm-minibuffer-history-key "M-p")
-   '(org-hyperscheduler-exclude-from-org-roam t)
-   '(org-hyperscheduler-hide-done-tasks nil)
-   '(org-hyperscheduler-inbox-file "~/Org/agenda/calendar.org")
-   '(org-hyperscheduler-readonly-mode nil)
-   '(package-selected-packages
-     '(theme-changer beacon highlight-numbers volatile-highlights highlight-indent-guides olivetti fancy-battery apheleia flycheck-rust flycheck-inline tree-sitter-langs tree-sitter cargo rust-mode rust-playground json-mode tide prettier-js typescript-mode js2-mode import-js web-mode dap-mode corfu sideline-flycheck sideline helm-lsp lsp-ui company-org-block ac-math company-auctex company-box solaire-mode parrot indent-guide zygospore which-key rainbow-delimiters emojify format-all reverse-im multi-vterm vterm lsp-treemacs treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs telega projectile git-gutter-fringe git-gutter blamer magit-todos magit fzf evil-collection general evil elfeed minions doom-modeline dired-rainbow all-the-icons-dired ligature dashboard djvu saveplace-pdf-view kind-icon ement ox-reveal org-re-reveal ox-hugo org-caldav org-super-agenda use-package pbcopy org-roam-ui org-roam-bibtex org-ref org-noter-pdftools org-modern org-download org-appear org-alert ob-typescript ob-rust helm-bibtex gruvbox-theme go-mode doom-themes company-bibtex citar-org-roam citar-embark))
-   '(warning-suppress-log-types '((org-roam))))
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   )
+  
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-minibuffer-history-key "M-p")
+ '(org-agenda-files
+   '("~/Nextcloud/Org/Org-roam/daily/2023-08-20.org" "/home/chopin/Org/Getting Started with Orgzly.org" "/home/chopin/Org/agendainbox.org" "/home/chopin/Org/diary.org"))
+ '(org-hyperscheduler-exclude-from-org-roam t)
+ '(org-hyperscheduler-hide-done-tasks nil)
+ '(org-hyperscheduler-inbox-file "~/Org/agenda/calendar.org")
+ '(org-hyperscheduler-readonly-mode nil)
+ '(package-selected-packages
+   '(theme-changer beacon highlight-numbers volatile-highlights highlight-indent-guides olivetti fancy-battery apheleia flycheck-rust flycheck-inline tree-sitter-langs tree-sitter cargo rust-mode rust-playground json-mode tide prettier-js typescript-mode js2-mode import-js web-mode dap-mode corfu sideline-flycheck sideline helm-lsp lsp-ui company-org-block ac-math company-auctex company-box solaire-mode parrot indent-guide zygospore which-key rainbow-delimiters emojify format-all reverse-im multi-vterm vterm lsp-treemacs treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs telega projectile git-gutter-fringe git-gutter blamer magit-todos magit fzf evil-collection general evil elfeed minions doom-modeline dired-rainbow all-the-icons-dired ligature dashboard djvu saveplace-pdf-view kind-icon ement ox-reveal org-re-reveal ox-hugo org-caldav org-super-agenda use-package pbcopy org-roam-ui org-roam-bibtex org-ref org-noter-pdftools org-modern org-download org-appear org-alert ob-typescript ob-rust helm-bibtex gruvbox-theme go-mode doom-themes company-bibtex citar-org-roam citar-embark))
+ '(warning-suppress-log-types '((org-roam))))
+  
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
