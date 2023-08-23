@@ -1,0 +1,2 @@
+
+((((taxy-magit-section-section . #("People" 0 6 (face ement-room-list-direct))) (taxy-magit-section-section . #1="Ement Rooms") (taxy-magit-section-section)) . show) (((taxy-magit-section-section . "Unspaced") (taxy-magit-section-section . #1#) (taxy-magit-section-section)) . hide) (((taxy-magit-section-section . "Unread") (taxy-magit-section-section . #1#) (taxy-magit-section-section)) . hide))

@@ -482,10 +482,10 @@
   (org-roam-capture-templates
    '(
      ("a" "Atomic note (with source)" plain "%?"
-      :if-new (file+head "%<%Y-%m-%d-%H:%M>--${slug}.org" "#+title: ${title}\n#+date: %U\n\n+ Source: %^{Source}\n\n\n* See also:\n+ ")
+      :if-new (file+head "%<%Y-%m-%d-%H:%M>--${slug}.org" "#+title: ${title}\n#+date: %U\n\n+ Title: ${title}\n+ Source: %^{Source}\n\n\n* See also:\n+ ")
       :unnarrowed t)
      ("p" "Project" plain "%?"
-      :if-new (file+head "thoughts/%<%Y-%m-%d-%H:%M>--project-${slug}.org" "#+title: ${title}\n+filetags: :Project:\n#+date: %U\n\n+ Repository: \n\n\n* See also:\n+ \n+ \n+ ")
+      :if-new (file+head "thoughts/%<%Y-%m-%d-%H:%M>--project-${slug}.org" "#+title: ${title}\n+filetags: :Project:\n#+date: %U\n\n+ Title: ${title}\n+ Repository: \n\n\n* See also:\n+ \n+ \n+ ")
       :unnarrowed t)
      ("t" "Thought" plain "%?"
       :if-new (file+head "thoughts/%<%Y-%m-%d-%H:%M>--thought-${slug}.org" "#+title: ${title}\n#+date: %U\n\n\n* See also:\n+ ")
