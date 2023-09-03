@@ -104,8 +104,10 @@
 ;;    Transparent Emacs
 ;;________________________________________________________________
 
-(set-frame-parameter (selected-frame) 'alpha '(87 . 80))
-(add-to-list 'default-frame-alist '(alpha . (87 . 80)))
+(server-start)
+
+(set-frame-parameter (selected-frame) 'alpha '(97 .97))
+(add-to-list 'default-frame-alist '(alpha . (97 . 97)))
 
 ;;________________________________________________________________
 ;;    Base settings of Emacs
@@ -136,7 +138,7 @@
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
-(setq-default shell-file-name "/usr/bin/fish")
+(setq-default shell-file-name "/bin/fish")
 
 (setq ad-redefinition-action            'accept
       default-buffer-file-coding-system 'utf-8
@@ -197,14 +199,15 @@
 (global-display-line-numbers-mode t)
 
 (use-package display-line-numbers
-  ;;:straight nil
-  :hook (prog-mode . display-line-numbers-mode)
-  :custom
-  (setq display-line-numbers-type 'relative)
-  (display-line-numbers-width 4)
-  (display-line-numbers-grow-only t)
-  (display-line-numbers-width-start t))
-
+  :ensure nil
+  :commands (display-line-numbers-scale-linum)
+  :hook ((prog-mode . display-line-numbers-mode))
+  :config
+  (defun display-line-numbers-scale-linum ()
+    (set-face-attribute 'line-number nil :height 0.6 :background (face-background 'solaire-default-face))
+    (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
+  (display-line-numbers-scale-linum)
+  (setq display-line-numbers-width 3))
 ;;________________________________________________________________
 ;;    Setup fonts
 ;;________________________________________________________________
@@ -242,6 +245,13 @@
 ;; Changes certain keywords to symbols, such as lamda
 (setq global-prettify-symbols-mode t)
 
+;; Change color of divider (horizontal rules)
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (font-lock-add-keywords
+;;              nil
+;;              '(("^-\\{5,\\}"  0 '(:foreground "green" :weight bold))))))
+
 ;;________________________________________________________________
 ;;    Setup theme
 ;;________________________________________________________________
@@ -257,7 +267,6 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-(load-theme 'doom-one-light t)
 
 (use-package theme-changer
   :ensure t
@@ -269,7 +278,6 @@
 
 (require 'theme-changer)
 (change-theme 'doom-one-light 'doom-one)
-
 ;;________________________________________________________________
 ;;    Setup org-mode
 ;;________________________________________________________________
@@ -354,7 +362,7 @@
      org-modern-table nil
      ;; org-modern-progress t Gives an error
      org-modern-priority t
-     ;; org-modern-horizontal-rule "──────────"
+     org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
      org-modern-hide-stars " "
      org-modern-keyword "‣"))
   (use-package org-appear
@@ -383,38 +391,40 @@
   ;;         '((4.0 . 1.5) (3.0 . 0.5) (3.0 . 0.5) (3.0 . 0.5) (2.5 . 0.5) (2.0 . 0.5) (1.5 . 0.5) (0.5 . 0.5))))
   (with-eval-after-load 'org
     (setq org-log-done 'time))
+  ;; (setq org-todo-keywords
+  ;;       '((sequence
+  ;;          "TODO(t)"  ; A task that needs doing & is ready to do
+  ;;          "PROJ(p)"  ; A project, which usually contains other tasks
+  ;;          "LOOP(r)"  ; A recurring task
+  ;;          "STRT(s)"  ; A task that is in progress
+  ;;          "WAIT(w)"  ; Something external is holding up this task
+  ;;          "HOLD(h)"  ; This task is paused/on hold because of me
+  ;;          "IDEA(i)"  ; An unconfirmed and unapproved task or notion
+  ;;          "|"
+  ;;          "DONE(d)"  ; Task successfully completed
+  ;;          "KILL(k)") ; Task was cancelled, aborted or is no longer applicable
+  ;;         (sequence
+  ;;          "[ ](T)"   ; A task that needs doing
+  ;;          "[-](S)"   ; Task is in progress
+  ;;          "[?](W)"   ; Task is being held up or paused
+  ;;          "|"
+  ;;          "[X](D)")  ; Task was completed
+  ;;         (sequence
+  ;;          "|"
+  ;;          "OKAY(o)"
+  ;;          "YES(y)"
+  ;;          "NO(n)"))
+  ;;       org-todo-keyword-faces
+  ;;       '(("[-]"  . +org-todo-active)
+  ;;         ("STRT" . +org-todo-active)
+  ;;         ("[?]"  . +org-todo-onhold)
+  ;;         ("WAIT" . +org-todo-onhold)
+  ;;         ("HOLD" . +org-todo-onhold)
+  ;;         ("PROJ" . +org-todo-project)
+  ;;         ("NO"   . +org-todo-cancel)
+  ;;         ("KILL" . +org-todo-cancel)))
   (setq org-todo-keywords
-        '((sequence
-           "TODO(t)"  ; A task that needs doing & is ready to do
-           "PROJ(p)"  ; A project, which usually contains other tasks
-           "LOOP(r)"  ; A recurring task
-           "STRT(s)"  ; A task that is in progress
-           "WAIT(w)"  ; Something external is holding up this task
-           "HOLD(h)"  ; This task is paused/on hold because of me
-           "IDEA(i)"  ; An unconfirmed and unapproved task or notion
-           "|"
-           "DONE(d)"  ; Task successfully completed
-           "KILL(k)") ; Task was cancelled, aborted or is no longer applicable
-          (sequence
-           "[ ](T)"   ; A task that needs doing
-           "[-](S)"   ; Task is in progress
-           "[?](W)"   ; Task is being held up or paused
-           "|"
-           "[X](D)")  ; Task was completed
-          (sequence
-           "|"
-           "OKAY(o)"
-           "YES(y)"
-           "NO(n)"))
-        org-todo-keyword-faces
-        '(("[-]"  . +org-todo-active)
-          ("STRT" . +org-todo-active)
-          ("[?]"  . +org-todo-onhold)
-          ("WAIT" . +org-todo-onhold)
-          ("HOLD" . +org-todo-onhold)
-          ("PROJ" . +org-todo-project)
-          ("NO"   . +org-todo-cancel)
-          ("KILL" . +org-todo-cancel)))
+        '((sequence "TODO" "DOING" "|" "DONE" "ARCHIVED")))
   (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
   (use-package org-alert)
   (use-package ob-typescript)
@@ -463,6 +473,10 @@
       :if-new
       (file+head "%<%Y-%m-%d-%H:%M>--${slug}.org" "#+title: ${title}\n#+date: %U\n\n")
       :unnarrowed t)
+     ("t" "Article" plain (file "~/Org/Templates/Article.org")
+      :if-new
+      (file+head "articles/%<%Y-%m-%d-%H:%M>-article--${slug}.org" "#+title: ${title}\n#+filetags: :Article:\n#+date: %U\n\n")
+      :unnarrowed t)
      ("t" "Thought" plain "%?"
       :if-new (file+head "thoughts/%<%Y-%m-%d-%H:%M>--thought-${slug}.org" "#+title: ${title}\n#+filetags: :Thought:\n#+date: %U\n\n\n* See also:\n+ ")
       :unnarrowed t)
@@ -486,7 +500,7 @@
       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n" ))
      ("d" "Default diary" entry "* %U: «%?»‎\n\n" :clock-in t :clock-resume t
       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n" ))
-     ("e" "Evening iary" entry "* Evening (%U): %?\n\n** Что я сделал за сегодня?\n\n** 3 вещи, за которые я благодарен?" :clock-in t :clock-resume t
+     ("e" "Evening diary" entry "* Evening (%U): %?\n\n** Что я сделал за сегодня?\n\n** 3 вещи, за которые я благодарен?" :clock-in t :clock-resume t
       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n" ))))
 
   ;; Org-noter integration with org-roam-bibtex
@@ -528,6 +542,29 @@
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start nil ))
+
+(defun org-roam-insert-note-from-headline ()
+  "Create an Org-roam note from the current headline and jump to it.
+
+Normally, insert the headline’s title using the ’#title:’ file-level property
+and delete the Org-mode headline. However, if the current headline has a
+Org-mode properties drawer already, keep the headline and don’t insert
+‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
+‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
+  (interactive)
+  (let ((title (nth 4 (org-heading-components)))
+        (has-properties (org-get-property-block)))
+    (org-cut-subtree)
+    (org-roam-node-find 'other-window title nil)
+    (org-paste-subtree)
+    (unless has-properties
+      (kill-line)
+      (while (outline-next-heading)
+        (org-promote)))
+    (goto-char (point-min))
+    (when has-properties
+      (kill-line)
+      (kill-line))))
 
 ;; Better sort exp.
 (use-package org-transclusion
@@ -736,169 +773,165 @@
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
-(setq org-agenda-files   (list "~/Org/agenda")
-      org-log-done 'time)
+(use-package org-agenda
+  :ensure nil
+  :demand t
+  :defer t
+  :config
+  (use-package org-super-agenda)
 
-(setq who/org-agenda-directory "~/Org/agenda")
+  (setq org-agenda-files (list "~/Org/agenda/PlanAhead.org")
+        org-log-done 'time)
+  (setq org-cycle-separator-lines 2)
+  (setq org-directory "~/Org")
+  ;; (setq org-agenda-include-diary t) ;; Calendar/Diary integration
+  ;; (setq org-default-notes-file "~/Org/agenda/notes.org")
+  ;; (setq who/org-agenda-directory "~/Org/agenda/")
 
-(require 'find-lisp)
-(defun who/find-org-files (directory)
-  (find-lisp-find-files directory "\.org$"))
+  ;; (use-package org-agenda-property
+  ;;   :config
+  ;;   (customize-set-variable 'org-agenda-property-list
+  ;;                           '("WAITING?" "DEFERRED?" "CANCELLED?" "NOTE"))
+  ;;   (customize-set-variable 'org-agenda-property-position 'same-line))
 
-(defun who-org/agenda-files-update (&rest _)
-  (let ((todo-zettels (->> "rg --files-with-matches '(TODO)|(NEXT)|(DONE)|(REPEAT)|(DONE)|(HOLD)|(PROJ)|(WAIT)|(REVIEW)|(IDEA)|(STOP)|(EVENT)' ~/Org/Org-roam/"
-                           (shell-command-to-string)
-                           (s-lines)
-                           (-filter (lambda (line) (not (s-blank? line)))))))
-    (setq org-agenda-files (append (who/find-org-files who/org-agenda-directory)
-                                   todo-zettels))))
+  ;; (require 'find-lisp)
+  ;; (defun who/find-org-files (directory)
+  ;;   (find-lisp-find-files directory "\.org$"))
 
-(advice-add 'org-agenda :before #'who-org/agenda-files-update)
+  ;; (defun who-org/agenda-files-update (&rest _)
+  ;;   (let ((todo-zettels (->> "rg --files-with-matches '(TODO)|(NEXT)|(DONE)|(REPEAT)|(DONE)|(HOLD)|(PROJ)|(WAIT)|(REVIEW)|(IDEA)|(STOP)|(EVENT)' ~/Org/Org-roam/"
+  ;;                            (shell-command-to-string)
+  ;;                            (s-lines)
+  ;;                            (-filter (lambda (line) (not (s-blank? line)))))))
+  ;;     (setq org-agenda-files (append (who/find-org-files who/org-agenda-directory)
+  ;;                                    todo-zettels))))
+  ;; (advice-add 'org-agenda :before #'who-org/agenda-files-update)
 
-;; Set default column view headings: Task Total-Time Time-Stamp
-(setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
+  ;; Set default column view headings: Task Total-Time Time-Stamp
+  (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
 
-(setq org-agenda-skip-scheduled-if-done t
-      org-agenda-skip-deadline-if-done t
-      org-agenda-include-deadlines t
-      org-agenda-block-separator #x2501
-      org-agenda-compact-blocks t
-      org-agenda-start-with-log-mode t)
-(with-eval-after-load 'org-journal
-  (define-key org-journal-mode-map (kbd "<C-tab>") 'yas-expand))
-(setq org-agenda-clockreport-parameter-plist
-      (quote (:link t :maxlevel 5 :fileskip0 t :compact t :narrow 80)))
-(setq org-agenda-deadline-faces
-      '((1.0001 . org-warning)              ; due yesterday or before
-        (0.0    . org-upcoming-deadline)))  ; due today or later(setq-default org-icalendar-include-todo t)
-(setq org-combined-agenda-icalendar-file "~/Org/calendar.ics")
-;; (icalendar-import-file "~/Org/calendar.ics" "diary-google")
-(setq org-icalendar-combined-name "Hugo Org")
-(setq org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo))
-(setq org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo))
-(setq org-icalendar-timezone "Asia/Vladivostok")
-(setq org-icalendar-store-UID t)
-(setq org-icalendar-alarm-time 30)
-(setq calendar-date-style 'european
-      calendar-mark-holidays-flag t
-      calendar-week-start-day 1
-      calendar-mark-diary-entries-flag nil)
+  (setq org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-include-deadlines t
+        org-agenda-block-separator #x2501
+        org-agenda-compact-blocks t
+        org-agenda-start-with-log-mode t)
+  ;; (with-eval-after-load 'org-journal
+  ;;   (define-key org-journal-mode-map (kbd "<C-tab>") 'yas-expand))
+  (setq org-agenda-clockreport-parameter-plist
+        (quote (:link t :maxlevel 5 :fileskip t :compact t :narrow 80)))
+  (setq org-agenda-deadline-faces
+        '((1.0001 . org-warning)              ; due yesterday or before
+          (0.0    . org-upcoming-deadline)))  ; due today or later(setq-default org-icalendar-include-todo t)
+  ;; (setq org-combined-agenda-icalendar-file "~/Org/calendar.ics")
+  ;; (icalendar-import-file "~/Org/calendar.ics" "diary-google")
+  (setq org-icalendar-combined-name "Hugo Org")
+  (setq org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo))
+  (setq org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo))
+  (setq org-icalendar-timezone "Asia/Vladivostok")
+  (setq org-icalendar-store-UID t)
+  (setq org-icalendar-alarm-time 30)
+  (setq calendar-date-style 'european
+        calendar-mark-holidays-flag t
+        calendar-week-start-day 1)
+        ;; calendar-mark-diary-entries-flag t
 
-;; (alert-define-style 'who/alert-style-reminder
-;;                     :title "Agenda reminders"
-;;                     :notifier (lambda (info)
-;;                                 (alert-libnotify-notify (plist-put info :persistent t))))
+  (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
 
-;; (add-to-list 'alert-user-configuration
-;;              '(((:title . "Agenda"))
-;;                who/alert-style-reminder))
+  (defun my/style-org-agenda()
+    ;; (my/buffer-face-mode-variable)
+    (set-face-attribute 'org-agenda-date nil :height 1.1)
+    (set-face-attribute 'org-agenda-date-today nil :height 1.1 :slant 'italic)
+    (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
+  (add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
 
-(setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
+  (setq org-agenda-breadcrumbs-separator " ❱ "
+        org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
+        org-agenda-time-grid '((weekly today require-timed)
+                               (800 1000 1200 1400 1600 1800 2000)
+                               "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
+        org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t%b% s")
+                                   (todo . " %i %-12:c")
+                                   (tags . " %i %-12:c")
+                                   (search . " %i %-12:c")))
 
-(defun my/style-org-agenda()
-  ;; (my/buffer-face-mode-variable)
-  (set-face-attribute 'org-agenda-date nil :height 1.1)
-  (set-face-attribute 'org-agenda-date-today nil :height 1.1 :slant 'italic)
-  (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
+  (setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
+                                                 "\n"
+                                                 (org-agenda-format-date-aligned date))))
 
-(add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
+  (setq org-agenda-custom-commands
+        '(("z" "Hugo view"
+           ((agenda "" ((org-agenda-span 'week) ; day
+                        (org-super-agenda-groups
+                         '((:name "Today"
+                                  :time-grid t
+                                  :date today
+                                  :todo "TODAY"
+                                  :scheduled today
+                                  :order 1)))))
+            (alltodo "" ((org-agenda-overriding-header "")
+                         (org-super-agenda-groups
+                          '(;; Each group has an implicit boolean OR operator between its selectors.
+                            (:name "Today"
+                                   :deadline today
+                                   :face (:background "black"))
+                            (:name "Passed deadline"
+                                   :and (:deadline past :todo ("TODO" "DOING" "BLOCKED" "REVIEW"))
+                                   :face (:background "#7f1b19"))
+                            (:name "Work important"
+                                   :and (:priority>= "B" :category "Work" :todo ("TODO" "NEXT")))
+                            (:name "Work other"
+                                   :and (:category "Work" :todo ("TODO" "NEXT")))
+                            (:name "Important"
+                                   :priority "A")
+                            (:priority<= "B"
+                                         ;; Show this section after "Today" and "Important", because
+                                         ;; their order is unspecified, defaulting to 0. Sections
+                                         ;; are displayed lowest-number-first.
+                                         :order 1)
+                            (:name "Papers"
+                                   :file-path "org/roam/notes")
+                            (:name "Waiting"
+                                   :todo "WAITING"
+                                   :order 9)
+                            (:name "On review"
+                                   :todo "REVIEW"
+                                   :order 10)))))))))
+  (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
-(setq org-agenda-breadcrumbs-separator " ❱ "
-      org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
-      org-agenda-time-grid '((weekly today require-timed)
-                             (800 1000 1200 1400 1600 1800 2000)
-                             "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
-      org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t%b% s")
-                                 (todo . " %i %-12:c")
-                                 (tags . " %i %-12:c")
-                                 (search . " %i %-12:c")))
-
-(setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
-                                                    "\n"
-                                                    (org-agenda-format-date-aligned date))))
-(setq org-cycle-separator-lines 2)
-
-(use-package org-super-agenda  )
-
-(setq org-agenda-custom-commands
-      '(("z" "Hugo view"
-         ((agenda "" ((org-agenda-span 'day)
-                      (org-super-agenda-groups
-                       '((:name "Today"
-                                :time-grid t
-                                :date today
-                                :todo "TODAY"
-                                :scheduled today
-                                :order 1)))))
-          (alltodo "" ((org-agenda-overriding-header "")
-                       (org-super-agenda-groups
-                        '(;; Each group has an implicit boolean OR operator between its selectors.
-                          (:name "Today"
-                                 :deadline today
-                                 :face (:background "black"))
-                          (:name "Passed deadline"
-                                 :and (:deadline past :todo ("TODO" "DOING" "BLOCKED" "REVIEW"))
-                                 :face (:background "#7f1b19"))
-                          (:name "Work important"
-                                 :and (:priority>= "B" :category "Work" :todo ("TODO" "NEXT")))
-                          (:name "Work other"
-                                 :and (:category "Work" :todo ("TODO" "NEXT")))
-                          (:name "Important"
-                                 :priority "A")
-                          (:priority<= "B"
-                                       ;; Show this section after "Today" and "Important", because
-                                       ;; their order is unspecified, defaulting to 0. Sections
-                                       ;; are displayed lowest-number-first.
-                                       :order 1)
-                          (:name "Papers"
-                                 :file-path "org/roam/notes")
-                          (:name "Waiting"
-                                 :todo "WAITING"
-                                 :order 9)
-                          (:name "On review"
-                                 :todo "REVIEW"
-                                 :order 10)))))))))
-(add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
-
-(setq org-directory "~/Org")
-(setq org-default-notes-file "~/Org/agenda/notes.org")
+     ;; ("b" "Biography (Person)" plain (file "~/Org/Templates/Person.org")
+     ;;  :if-new (file+head "persons/%<%Y-%m-%d-%H:%M>--person-${slug}.org" "#+title: ${title}\n#+filetags: :Biography:\n#+date: %U\n")
+     ;;  :unnarrowed t)
 
 ;; (setq org-capture-templates
-;;       '(
-;;         ("t" "TODO" entry
-;;          (file "~/Org/agenda/inbox.org") "* TODO %^{Title}")
-;;         ;; ("m" "Meeting notes" entry
-;;         ;;  (file "~/Org/agenda/appointments.org") "* TODO %^{Title} %t\n- %?")
-;;         ("w" "Work TODO" entry
-;;          (file "~/Org/agenda/work.org") "* TODO %^{Title}")
-;;         ("d" "Diary" entry (file "~/Org/diary.org.gpg")
-;;          "*** %U\n\n**** Что я сделал за сегодня?\n\n**** 3 вещи, за которые я благодарен?" :clock-in t :clock-resume t)
-;;         ("n" "Notes" entry
-;;          (file "~/Org/agenda/inbox.org") "* %^{Description} %^g\n Added: %U\n%?")))
+;;       '(("d" "Daily goals" plain (file "~/Org/Templates/Goals/Day.org"))
+;;         ("w" "Weekly goals" entry (file "~/Org/agenda/weekly-tasks.org" "Задачи на неделю")
+;;          "* TODO %?\n  DEADLINE: %t")
+;;         ("m" "Monthly goals" entry (file "~/Org/agenda/monthly-tasks.org" "Задачи на месяц")
+;;          "* TODO %?\n  DEADLINE: %t")))
 
-(use-package org-caldav
-  :custom
-  (org-caldav-url "https://lunarcloud.ddns.net/remote.php/dav/calendars/ncp")
-  (org-caldav-calendar-id "personal")
-  ;; (org-caldav-calendar-id "XZRo6AtbiyiaBbpE")
-  (org-caldav-inbox "~/Org/agenda/calendar.org")
-  ;; (org-caldav-files '("~/Org/agenda/calendar.org"))
-  (org-icalendar-timezone "Asia/Vladivostok")
-  (org-caldav-delete-org-entries 'never)
-  (org-caldav-sync))
+;; (use-package org-caldav
+;;   :custom
+;;   (org-caldav-url "https://lunarcloud.ddns.net/remote.php/dav/calendars/ncp")
+;;   (org-caldav-calendar-id "personal")
+;;   ;; (org-caldav-calendar-id "XZRo6AtbiyiaBbpE")
+;;   (org-caldav-inbox "~/Org/agenda/calendar.org")
+;;   ;; (org-caldav-files '("~/Org/agenda/calendar.org"))
+;;   (org-icalendar-timezone "Asia/Vladivostok")
+;;   (org-caldav-delete-org-entries 'never)
+;;   (org-caldav-sync))
 
 (use-package ox-hugo
   ;;Auto-install the package from Melpa
   :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
-  :after ox)
+  :after ox
+  :config
+  (use-package org-re-reveal  )
+  (use-package ox-reveal  )
+  (setq org-reveal-root "file:~/Org/Presentations/reveal.js/"))
 
-(use-package org-re-reveal  )
-(use-package ox-reveal  )
-
-(setq org-reveal-root "file:~/Org/Presentations/reveal.js/")
-
-(use-package ement
-  )
+;; Matrix
+(use-package ement)
 
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'org-mode-hook 'flyspell-mode)
@@ -909,7 +942,6 @@
       '(("ru_RU" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8)))
 
 (use-package kind-icon
-
   :after corfu
   :custom
   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
@@ -917,11 +949,12 @@
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package pdf-tools
-
   :defer t
   :mode (("\\.pdf\\'" . pdf-view-mode))
   :config
   ;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+  (use-package saveplace-pdf-view  )
+  (save-place-mode 1)
   (setq-default pdf-view-display-size 'fit-page)
   (pdf-tools-install)
   :bind (:map pdf-view-mode-map
@@ -995,11 +1028,7 @@
   ("l" image-forward-hscroll :color red)
   ("h" image-backward-hscroll :color red))
 
-(use-package saveplace-pdf-view  )
-(save-place-mode 1)
-
 (use-package cl-lib  )
-
 (setq sql-sqlite-program "/usr/bin/sqlite3")
 ;; (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 
@@ -1100,88 +1129,31 @@
   (setq dashboard-banner-logo-title "Welcome back, Darling!"
         dashboard-startup-banner "~/.emacs.d/images/Emacs-logo.svg"
         dashboard-center-content    t
-        dashboard-show-shortcuts    t
-        dashboard-set-navigator     t
-        dashboard-set-heading-icons t
+        dashboard-show-shortcuts    nil
+        dashboard-set-navigator     nil
+        dashboard-set-heading-icons nil
         initial-buffer-choice       (lambda () (get-buffer "*dashboard*"))
         dashboard-set-file-icons    t)
 
-  (setq dashboard-navigator-buttons
-  			`(;; line1
-  				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
-  					"Main site"
-  					"Browse homepage"
-  					(lambda (&rest _) (browse-url "https://berezhnev.netlify.app"))
-  				  ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error)))
-  				;; line 2
-  				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-  					"Github"
-  					""
-  					(lambda (&rest _) (browse-url "https://github.com/tell396"))))))
+  ;; (setq dashboard-navigator-buttons
+  ;; 			`(;; line1
+  ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
+  ;; 					"Main site"
+  ;; 					"Browse homepage"
+  ;; 					(lambda (&rest _) (browse-url "https://berezhnev.netlify.app"))
+  ;; 				  ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error)))
+  ;; 				;; line 2
+  ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
+  ;; 					"Github"
+  ;; 					""
+  ;; 					(lambda (&rest _) (browse-url "https://github.com/tell396"))))))
 
   (setq dashboard-items '((recents  . 8)
-                          ;; (agenda   . 14)
+                          (agenda   . 14)
                           (projects . 6)))
   (dashboard-setup-startup-hook)
   :init
   (add-hook 'after-init-hook 'dashboard-refresh-buffer))
-
-;; Setting dashboard
-;; (use-package dashboard
-;;   ;; :defer nil
-;;   :hook (dashboard-mode . (lambda ()
-;;                             ;; No title
-;;                             (setq-local frame-title-format nil)
-;;                             ;; Enable `page-break-lines-mode'
-;;                             (when (fboundp 'page-break-lines-mode)
-;;                               (page-break-lines-mode 1))))
-;;   :init      ;; tweak dashboard config before loading it
-;;   (setq dashboard-set-heading-icons t
-;;         dashboard-set-file-icons t
-;;         dashboard-center-content t
-;;         ;; dashboard-page-separator ""
-;;         dashboard-set-navigator t
-;;         dashboard-items '(
-;;                           (recents . 6)
-;;                           ;; (agenda . 4 )
-;;                           ;;(registers . 3)
-;;                           (bookmarks . 4)
-;;                           (projects . 4))) ;; use standard emacs logo as banner
-
-;;   ;; Format: "(icon title help action face prefix suffix)"
-;;   ;; (setq dashboard-navigator-buttons
-;;   ;; 			`(;; line1
-;;   ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
-;;   ;; 					"Main site"
-;;   ;; 					"Browse homepage"
-;;   ;; 					(lambda (&rest _) (browse-url "homepage")))
-;;   ;; 				 ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-;;   ;; 				 ("?" "" "?/h" #'show-help nil "<" ">"))
-;;   ;; 				;; line 2
-;;   ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-;;   ;; 					"Github"
-;;   ;; 					""
-;;   ;; 					(lambda (&rest _) (browse-url "homepage")))
-;;   ;; 				 ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
-;;   (setq dashboard-footer-messages '("Richard Stallman is proud of you."))
-;;   ;; (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-;;   ;; 																									 :height 1.1
-;;   ;; 																									 :v-adjust -0.05
-;;   ;; 																									 :face 'font-lock-keyword-face))
-;;   :config
-;;   ;; (dashboard-modify-heading-icons '((recents . "file-text")
-;;   ;;                                   (bookmarks . "book")))
-;;   (dashboard-setup-startup-hook)
-;;   )
-
-;; (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-
-;; (defun dashboard-refresh-buffer ()
-;;   (interactive)
-;;   (when (get-buffer dashboard-buffer-name)
-;;     (kill-buffer dashboard-buffer-name))
-;;   (dashboard-insert-startupify-lists)
-;;   (switch-to-buffer dashboard-buffer-name))
 
 (use-package ligature
   :config
@@ -1208,8 +1180,10 @@
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
 
+'(global-dired-hide-details-mode t)
 (use-package dired
   :ensure nil
+  :demand t
   :defer t
   :config
   (setq dired-dwim-target t) ; Dired tries to guess the target directory
@@ -1225,66 +1199,121 @@
   (define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
   (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
 
+  ;; (use-package all-the-icons-dired
+	;;   :hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
+	;;   :init
+	;;   (setq all-the-icons-dired-mode-inline-electric-icons t))) ; Show electric icons for Dired mode
+
   ;; Drag-and-drop to `dired`
   (add-hook 'dired-mode-hook 'org-download-enable)
 
-  (use-package all-the-icons-dired
-	  :hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
-	  :init
-	  (setq all-the-icons-dired-mode-inline-electric-icons t))) ; Show electric icons for Dired mode
+  (use-package dired-open
+    :config
+    ;; Doesn't work as expected!
+    (add-to-list 'dired-open-functions #'dired-open-xdg t))
 
-(use-package dired-rainbow
-  :config
-  (progn
-    (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
-    (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
-    (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
-    (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
-    (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
-    (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
-    (dired-rainbow-define media "#de751f" ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
-    (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
-    (dired-rainbow-define log "#c17d11" ("log"))
-    (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
-    (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
-    (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
-    (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
-    (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
-    (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
-    (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
-    (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
-    (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
-    (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
-    (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")))
+  (use-package dired-sidebar
+    :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
+    :ensure t
+    :commands (dired-sidebar-toggle-sidebar)
+    :init
+    (add-hook 'dired-sidebar-mode-hook
+              (lambda ()
+                (unless (file-remote-p default-directory)
+                  (auto-revert-mode))))
+    :config
+    (push 'toggle-window-split dired-sidebar-toggle-hidden-commands)
+    (push 'rotate-windows dired-sidebar-toggle-hidden-commands)
+
+    (setq dired-sidebar-subtree-line-prefix "__")
+    (setq dired-sidebar-theme 'vscode)
+    (setq dired-sidebar-use-term-integration t)
+    (setq dired-sidebar-use-custom-font t))
+
+  ;; (evil-collection-define-key 'normal 'dired-mode-map
+  ;;   "h" 'dired-single-up-directory
+  ;;   "l" 'dired-single-buffer)
+  (use-package dired-single)
+
+  (use-package dired-rainbow
+    :config
+    (progn
+      (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+      (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+      (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+      (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+      (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+      (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+      (dired-rainbow-define media "#de751f" ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
+      (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+      (dired-rainbow-define log "#c17d11" ("log"))
+      (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+      (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+      (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
+      (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+      (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+      (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+      (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+      (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+      (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+      (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
+      (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))))
 
 (use-package doom-modeline
-  :demand t
-  :defer nil
-  :after all-the-icons
-  :hook
-  (after-init . doom-modeline-mode)
-  :custom
-  (doom-modeline-buffer-file-name-style 'relative-to-project)
-  ;; (doom-modeline-major-mode-color-icon nil)
-  ;; (doom-modeline-icon (display-graphic-p))
-  (doom-modeline-icon t)
-  (doom-modeline-checker-simple-format t)
-  (doom-modeline-buffer-state-icon t)
-  (doom-modeline-buffer-encoding nil)
-  (doom-line-numbers-style 'relative)
-  (doom-modeline-enable-word-count t)
-  ;; Don't compact font caches during GC. Windows Laggy Issue
-  (inhibit-compacting-font-caches t)
-  (doom-modeline-major-mode-icon t)
-  (doom-modeline-vcs-max-length 50)
-  (doom-modeline-workspace-name t)
-  (doom-modeline-flycheck-icon t)
-  (doom-modeline-time-icon nil)
-  (doom-modeline-modal-icon t)
-  (doom-modeline-height 35)
-  (doom-modeline-battery t)
-  (doom-modeline-lsp t))
-(doom-modeline-mode)
+  :hook (after-init . doom-modeline-mode)
+  :init
+  (setq doom-modeline-bar-width 5
+        doom-modeline-buffer-file-name-style 'truncate-except-project
+        doom-modeline-lsp t
+        doom-modeline-env-version t
+        doom-modeline-indent-info t
+        doom-modeline-buffer-encoding nil
+        doom-modeline-enable-word-count t
+        doom-modeline-vcs-max-length 20
+        doom-modeline-major-mode-color-icon t
+        doom-modeline-time-icon t
+        doom-modeline-battery t
+        doom-modeline-time t
+        doom-modeline-workspace-name t
+        doom-modeline-env-version t
+        doom-modeline-modal-modern-icon t
+        doom-modeline-modal-icon t
+        doom-modeline-modal t)
+  :config
+  (set-face-attribute 'region nil
+                      :foreground (face-background 'doom-modeline-bar)
+                      :background (face-background 'default))
+  (set-face-attribute 'highlight nil
+                      :foreground (face-background 'doom-modeline-bar)
+                      :background (face-background 'default))
+  (eval-when-compile
+    'company
+    (doom-modeline-def-segment company-backend
+      "Display the current company backend. `company-backend'."
+      (when (company--active-p)
+        (format "%s"
+                (--map (s-replace "company-" "" (format "%s" it))
+                       (if (listp company-backend) company-backend (list company-backend)))))))
+  (doom-modeline-def-segment
+    buffer-info
+    "Overwrite of buffer info to not include the icon"
+    (concat
+     (doom-modeline--buffer-state-icon)
+     (doom-modeline--buffer-name)))
+  (doom-modeline-def-segment
+    buffer-type
+    "Buffer icon and version if it exists"
+    (concat
+     (doom-modeline-spc)
+     (doom-modeline--buffer-mode-icon)
+     (when (and doom-modeline-env-version doom-modeline-env--version)
+       (propertize
+        (format "%s " doom-modeline-env--version)
+        'face '(:height 0.7)))))
+  (doom-modeline-def-modeline
+    'main
+    '(bar workspace-name window-number modals matches buffer-type buffer-info remote-host)
+    '(company-backend misc-info persp-name battery debug lsp input-method buffer-encoding  process vcs checker)))
 
 (use-package minions
   :delight " 𝛁"
@@ -1300,10 +1329,8 @@
         '(
           ;; freelance
           ;;("https://freelance.habr.com/user_rss_tasks/vsE2OtRKoyNeUnK7RGd+0w==" freelance)
-
           ;;
           ("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
-
           ;; programming
           ;;("https://news.ycombinator.com/rss" hacker)
           ;;("https://www.reddit.com/r/programming.rss" programming)
@@ -1313,22 +1340,18 @@
           ;;("https://habr.com/ru/rss/news/?fl=ru" habr-news)
           ("https://nuancesprog.ru/feed" nop)
           ;;("https://dev.to/feed" dev-to)
-
           ;; hobby
           ("https://www.reddit.com/r/nasa.rss" nasa)
           ("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
           ;; ("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
           ("https://nplus1.ru/rss" np1)
-
           ;; programming languages
           ("https://www.reddit.com/r/javascript.rss" javascript)
           ("https://www.reddit.com/r/typescript.rss" typescript)
           ("https://www.reddit.com/r/golang.rss" golang)
           ("https://www.reddit.com/r/rust.rss" rust)
-
           ;; Books
           ;; ("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
-
           ;; cloud
           ;;("https://www.reddit.com/r/aws.rss" aws)
           ;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
@@ -1336,7 +1359,6 @@
           ;;("https://www.reddit.com/r/devops.rss" devops)
           ;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
           ))
-
   (setq-default elfeed-search-filter "@7-days-ago +unread")
   (setq-default elfeed-search-title-max-width 100)
   (setq-default elfeed-search-title-min-width 100))
@@ -1365,14 +1387,12 @@
   (setq evil-insert-state-cursor '("#E82424" bar))
   (setq evil-replace-state-cursor '("#FF9E3B" hbar))
   (setq evil-operator-state-cursor '("#7E9CD8" hollow))
-
 	(evil-set-initial-state 'ibuffer-mode 'normal)
 	(evil-set-initial-state 'bookmark-bmenu-mode 'normal)
 	(evil-set-initial-state 'vterm-mode 'normal)
 	(evil-set-initial-state 'calibredb-mode 'normal)
 	;; (evil-set-initial-state 'dired-mode 'emacs)
 	(evil-set-initial-state 'sunrise-mode 'emacs)
-
   (evil-collection-init))
 
 (use-package fzf
@@ -1389,7 +1409,6 @@
         ;; If nil, the fzf buffer will appear at the top of the window
         fzf/position-bottom t
         fzf/window-height 15))
-
 (defun fzf-node-project ()
   (interactive)
   (let ((process-environment
@@ -1477,7 +1496,6 @@
 (add-hook 'prog-mode-hook 'my/highlight-todo-like-words)
 (setq projectile-globally-ignored-files "node_modules")
 
-
 ;;________________________________________________________________
 ;;    Telega.el
 ;;________________________________________________________________
@@ -1551,24 +1569,20 @@
           treemacs-width-increment                 1
           treemacs-width-is-initially-locked       t
           treemacs-workspace-switch-cleanup        nil)
-
     ;; The default width and height of the icons is 22 pixels. If you are
     ;; using a Hi-DPI display, uncomment this to double the icon size.
     ;;(treemacs-resize-icons 44)
-
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode 'always)
     (when treemacs-python-executable
       (treemacs-git-commit-diff-mode t))
-
     (pcase (cons (not (null (executable-find "git")))
                  (not (null treemacs-python-executable)))
       (`(t . t)
        (treemacs-git-mode 'deferred))
       (`(t . _)
        (treemacs-git-mode 'simple)))
-
     (treemacs-hide-gitignored-files-mode nil))
   :bind
   (:map global-map
@@ -1613,10 +1627,10 @@
   :demand t
   :config (treemacs-set-scope-type 'Tabs))
 
-;; (use-package treemacs-all-the-icons
-;;   :after (treemacs all-the-icons)
-;;   :init
-;;   (treemacs-load-theme "doom-colors"))
+(use-package treemacs-all-the-icons
+  :after (treemacs all-the-icons)
+  :init
+  (treemacs-load-theme "doom-colors"))
 
 (use-package lsp-treemacs
   :after treemacs
@@ -1624,9 +1638,12 @@
   :config
   (lsp-treemacs-sync-mode 1))
 
-(use-package vterm)
+(use-package vterm
+  :demand t)
 
 (use-package multi-vterm
+  :ensure t
+  :after vterm
   :bind
   ("C-x q" . vterm-clear)
   ("C-x w" . multi-vterm))
@@ -1654,14 +1671,7 @@
    helm-move-to-line-cycle-in-source t
    helm-scroll-amount 8
    helm-ff-file-name-history-use-recentf nil
-   helm-echo-input-in-header-line nil
-   ))
-;; (with-eval-after-load 'helm
-;;   (add-to-list 'display-buffer-alist
-;;                '("\\`\\*helm.*\\*\\'"
-;;                  (display-buffer-in-side-window)
-;;                  (inhibit-same-window . t)
-;;                  (window-height . 0.4))))
+   helm-echo-input-in-header-line nil))
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold
@@ -1684,7 +1694,6 @@
   (reverse-im-mode t)) ; turn the mode on
 
 (use-package format-all
-
   :preface
   (defun ian/format-code ()
     "Auto-format whole buffer."
@@ -1697,7 +1706,6 @@
   (add-hook 'prog-mode-hook 'format-all-ensure-formatter))
 
 (use-package emojify
-
   :config
   (when (member "Segoe UI Emoji" (font-family-list))
     (set-fontset-font
@@ -1707,22 +1715,29 @@
   (bind-key* (kbd "C-c e") #'emojify-insert-emoji)) ; override binding in any mode
 
 (use-package rainbow-delimiters
-
   :hook
   (prog-mode . rainbow-delimiters-mode))
 
 (use-package which-key
-
   :config (which-key-mode))
 
 (use-package zygospore  )
 (global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
 
+(set-fontset-font t 'unicode "FontAwesome" nil 'prepend)
 (use-package all-the-icons
-  :defer nil)
+  :demand t
+  :ensure t
+  :config
+  ;; Make sure the icon fonts are good to go
+  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
 
 (use-package indent-guide
-
   :config
   (indent-guide-global-mode))
 
@@ -1730,13 +1745,12 @@
   (if (string-match "^finished" result)
 	    (parrot-start-animation)))
 
-(use-package parrot
-
-  :config
-  (parrot-mode)
-  (parrot-set-parrot-type 'thumbsup)
-  (add-hook 'before-save-hook 'parrot-start-animation)
-  (add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
+;; (use-package parrot
+;;   :config
+;;   (parrot-mode)
+;;   (parrot-set-parrot-type 'thumbsup)
+;;   (add-hook 'before-save-hook 'parrot-start-animation)
+;;   (add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
 
 (use-package solaire-mode
   :custom (solaire-mode-remap-fringe t)
@@ -1748,9 +1762,8 @@
 (global-set-key (kbd "C--") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-                                        ; Mak;; ESC quit prompts
+;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
 (global-auto-revert-mode t)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-x") 'helm-M-x)
@@ -1861,11 +1874,9 @@
   ;; REVIEW `resize-mode' is deprecated and may stop working in the future.
   ;; TODO PR me upstream?
   (setq x-gtk-resize-child-frames 'resize-mode)
-
   ;; Disable tab-bar in company-box child frames
   ;; TODO PR me upstream!
   (add-to-list 'company-box-frame-parameters '(tab-bar-lines . 0))
-
   (defun +company-box-icons--elisp-fn (candidate)
     (when (derived-mode-p 'emacs-lisp-mode)
       (let ((sym (intern candidate)))
@@ -1898,21 +1909,15 @@
                    :image-size-adjust (1.7 . 1.5)
                    :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
                    :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))))
-
   ;; Enable inline LaTeX previews in org-mode
   (add-hook 'org-mode-hook 'org-toggle-latex-fragment)
-
   ;; Display images in org-mode buffers
   (setq org-image-actual-width nil) ; adjust to your liking
   (setq org-startup-with-inline-images t)
-
-
   (use-package ac-math))
-
 (company-auctex-init)
 
 (use-package company-org-block
-
   :custom
   (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
   :hook ((org-mode . (lambda ()
@@ -2422,21 +2427,19 @@ If you experience stuttering, increase this.")
  frame-title-format '(buffer-file-name "Emacs: %b (%f)" "Emacs: %b") ; name of the file I am editing as the name of the window.
  )
 (put 'dired-find-alternate-file 'disabled nil)
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(helm-minibuffer-history-key "M-p")
+ '(org-agenda-files
+   '("/home/chopin/Org/agenda/weekly-tasks.org" "/home/chopin/Org/agenda/monthly-tasks.org" "/home/chopin/Org/agenda/daily-tasks.org"))
  '(package-selected-packages
-   '(org-cliplink beacon highlight-numbers volatile-highlights highlight-indent-guides olivetti fancy-battery apheleia flycheck-rust flycheck-inline tree-sitter-langs tree-sitter cargo rust-mode rust-playground json-mode tide prettier-js typescript-mode js2-mode import-js web-mode dap-mode corfu sideline-flycheck sideline helm-lsp lsp-ui company-org-block ac-math company-auctex company-box solaire-mode parrot indent-guide zygospore which-key rainbow-delimiters emojify format-all reverse-im multi-vterm vterm lsp-treemacs treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs telega projectile git-gutter-fringe git-gutter blamer magit-todos magit fzf evil-collection general evil elfeed minions doom-modeline dired-rainbow all-the-icons-dired ligature dashboard djvu saveplace-pdf-view kind-icon ement ox-reveal org-re-reveal ox-hugo org-caldav org-super-agenda use-package pbcopy org-roam-ui org-roam-bibtex org-ref org-noter-pdftools org-modern org-download org-appear org-alert ob-typescript ob-rust helm-bibtex gruvbox-theme go-mode doom-themes company-bibtex citar-org-roam citar-embark))
- '(warning-suppress-log-types '((org-roam)))
- '(warning-suppress-types '((lsp-mode))))
-
+   '(org-agenda-property zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs tide theme-changer telega solaire-mode sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters prettier-js pbcopy parrot ox-reveal ox-hugo org-transclusion org-super-agenda org-roam-ui org-roam-timestamps org-roam-bibtex org-ref org-re-reveal org-noter-pdftools org-modern org-download org-cliplink org-caldav org-appear org-alert olivetti ob-typescript ob-rust multi-vterm minions magit-todos lsp-ui ligature kind-icon json-mode js2-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp helm-bibtex gruvbox-theme go-mode git-gutter-fringe general fzf format-all flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement elfeed doom-themes doom-modeline djvu dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-bibtex company-auctex citar-org-roam citar-embark cargo blamer beacon apheleia ac-math)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(org-modern-horizontal-rule ((t (:inherit org-hide :strike-through "light sky blue")))))

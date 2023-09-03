@@ -17,7 +17,8 @@ semanticdb/
 multisession/
 dmenu-items
 request/  
-
+persist/
+  
 org-caldav*
 nov-places
 places
