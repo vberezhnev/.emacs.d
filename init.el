@@ -371,6 +371,13 @@
     :config
     (setq org-hide-emphasis-markers t
           org-appear-autolinks 'just-brackets))
+
+  (use-package russian-holidays
+    :config
+    (require 'calendar)
+    (require 'russian-holidays)
+    (setq calendar-holidays russian-holidays))
+
   ;; Spacing of headings
   ;; (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
   ;; (dolist (face '((org-level-1 . 1.2)
@@ -423,12 +430,28 @@
   ;;         ("PROJ" . +org-todo-project)
   ;;         ("NO"   . +org-todo-cancel)
   ;;         ("KILL" . +org-todo-cancel)))
+  (setq org-todo-keyword-faces
+        '(
+          ("TODO" :background "brown1" :foreground "black" :weight bold)
+          ("DOING" :background "salmon" :foreground "black" :weight bold)
+          ("NEXT" :background "sky blue" :foreground "black" :weight bold)
+          ("DONE" :background "green yellow" :weight bold)
+          ("ARCHIVED" :background "light slate blue" :weight bold)
+          ("BLOCKED" :background "red" :foreground "black" :weight bold)))
   (setq org-todo-keywords
-        '((sequence "TODO" "DOING" "|" "DONE" "ARCHIVED")))
+        '((sequence "TODO" "DOING" "NEXT" "|" "DONE" "ARCHIVED" "BLOCKED")))
+  ;; (setq org-todo-keyword-faces
+  ;;       '(("TODO" . (:foreground "#ff39a3" :weight bold))
+  ;;         ("DOING" . "red")
+  ;;         ("NEXT" . "blue")
+  ;;         ("BLOCKED" . (:foreground "white" :background "#4d4d4d" :weight bold))))
+  ;; ("POSTPONED" . "#008080"))
+
   (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
   (use-package org-alert)
   (use-package ob-typescript)
   (use-package ob-rust)
+  (use-package ob-sql-mode)
   ;; Execute org src block
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -439,6 +462,7 @@
      (python . t)
      (rust . t)
      (C . t)
+     (sql . t)
      (latex . t)))
   (add-hook 'org-mode-hook (lambda ()
                              "Beautify Org Checkbox Symbol"
@@ -451,10 +475,26 @@
                              (prettify-symbols-mode)))
   (defface org-checkbox-done-text
     '((t (:foreground "#71696A" :strike-through t)))
-    "Face for the text part of a checked org-mode checkbox."))
+    "Face for the text part of a checked org-mode checkbox.")
 
-(use-package org-cliplink
-  :demand t)
+  (use-package org-cliplink
+    :demand t)
+  ;; (use-package focus
+  ;;   :demand t
+  ;;   :config
+  ;;   '((prog-mode . defun) (text-mode . sentence)))
+  (use-package org-recur
+    :hook ((org-mode . org-recur-mode)
+           (org-agenda-mode . org-recur-agenda-mode))
+    :config
+    (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+    ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
+    (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
+    (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
+    (setq org-recur-finish-done t
+          org-recur-finish-archive t))
+  (use-package org-rainbow-tags
+    :ensure t))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -778,15 +818,17 @@ Org-mode properties drawer already, keep the headline and don’t insert
   :demand t
   :defer t
   :config
-  (use-package org-super-agenda)
+  (use-package org-super-agenda
+    :demand t)
 
-  (setq org-agenda-files (list "~/Org/agenda/PlanAhead.org")
-        org-log-done 'time)
+  ;; (setq org-agenda-files (list "~/Org/agenda/PlanAhead.org" "~/Org/agenda/PlannedDay.org")
+  ;; org-log-done 'time)
+
+  (setq org-agenda-files '("~/Org/agenda"))
   (setq org-cycle-separator-lines 2)
   (setq org-directory "~/Org")
   ;; (setq org-agenda-include-diary t) ;; Calendar/Diary integration
   ;; (setq org-default-notes-file "~/Org/agenda/notes.org")
-  ;; (setq who/org-agenda-directory "~/Org/agenda/")
 
   ;; (use-package org-agenda-property
   ;;   :config
@@ -834,7 +876,7 @@ Org-mode properties drawer already, keep the headline and don’t insert
   (setq calendar-date-style 'european
         calendar-mark-holidays-flag t
         calendar-week-start-day 1)
-        ;; calendar-mark-diary-entries-flag t
+  ;; calendar-mark-diary-entries-flag t
 
   (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
 
@@ -861,7 +903,7 @@ Org-mode properties drawer already, keep the headline and don’t insert
 
   (setq org-agenda-custom-commands
         '(("z" "Hugo view"
-           ((agenda "" ((org-agenda-span 'week) ; day
+           ((agenda "" ((org-agenda-span 'day)
                         (org-super-agenda-groups
                          '((:name "Today"
                                   :time-grid t
@@ -879,9 +921,9 @@ Org-mode properties drawer already, keep the headline and don’t insert
                                    :and (:deadline past :todo ("TODO" "DOING" "BLOCKED" "REVIEW"))
                                    :face (:background "#7f1b19"))
                             (:name "Work important"
-                                   :and (:priority>= "B" :category "Work" :todo ("TODO" "NEXT")))
+                                   :and (:priority>= "B" :category "work" :todo ("TODO" "NEXT")))
                             (:name "Work other"
-                                   :and (:category "Work" :todo ("TODO" "NEXT")))
+                                   :and (:category "work" :todo ("TODO" "NEXT")))
                             (:name "Important"
                                    :priority "A")
                             (:priority<= "B"
@@ -899,16 +941,14 @@ Org-mode properties drawer already, keep the headline and don’t insert
                                    :order 10)))))))))
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
-     ;; ("b" "Biography (Person)" plain (file "~/Org/Templates/Person.org")
-     ;;  :if-new (file+head "persons/%<%Y-%m-%d-%H:%M>--person-${slug}.org" "#+title: ${title}\n#+filetags: :Biography:\n#+date: %U\n")
-     ;;  :unnarrowed t)
-
-;; (setq org-capture-templates
-;;       '(("d" "Daily goals" plain (file "~/Org/Templates/Goals/Day.org"))
-;;         ("w" "Weekly goals" entry (file "~/Org/agenda/weekly-tasks.org" "Задачи на неделю")
-;;          "* TODO %?\n  DEADLINE: %t")
-;;         ("m" "Monthly goals" entry (file "~/Org/agenda/monthly-tasks.org" "Задачи на месяц")
-;;          "* TODO %?\n  DEADLINE: %t")))
+(setq org-capture-templates
+      '(("d" "Daily task" entry (file+function
+                                 "~/Org/agenda/PlannedDay.org"
+                                 (lambda ()
+                                   (org-datetree-find-date-create
+                                    (org-date-to-gregorian (org-today)) t)
+                                   (re-search-forward "^\\*.+ log" nil t)))
+         "* TODO something\n* TODO something")))
 
 ;; (use-package org-caldav
 ;;   :custom
@@ -950,7 +990,7 @@ Org-mode properties drawer already, keep the headline and don’t insert
 
 (use-package pdf-tools
   :defer t
-  :mode (("\\.pdf\\'" . pdf-view-mode))
+  ;; :mode (("\\.pdf\\'" . pdf-view-mode))
   :config
   ;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
   (use-package saveplace-pdf-view  )
@@ -1180,6 +1220,59 @@ Org-mode properties drawer already, keep the headline and don’t insert
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
 
+(use-package dirvish
+  :init
+  (dirvish-override-dired-mode)
+  :demand t
+  :custom
+  (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+   '(("h" "~/"                          "Home")
+     ("d" "~/Downloads/"                "Downloads")
+     ("m" "/mnt/"                       "Drives")))
+  :config
+  ;; (dirvish-peek-mode) ; Preview files in minibuffer
+  ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+  (setq dirvish-mode-line-format
+        '(:left (sort symlink) :right (omit yank index)))
+  (setq dirvish-hide-details-mode nil)
+  (setq dirvish-attributes
+        '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+        "-l --almost-all --human-readable --group-directories-first --no-group")
+  :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+  (("C-c f" . dirvish-fd)
+   :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
+   ("a"   . dirvish-quick-access)
+   ("f"   . dirvish-file-info-menu)
+   ("y"   . dirvish-yank-menu)
+   ("N"   . dirvish-narrow)
+   ("^"   . dirvish-history-last)
+   ("h"   . dirvish-history-jump) ; remapped `describe-mode'
+   ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
+   ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
+   ("TAB" . dirvish-subtree-toggle)
+   ("M-f" . dirvish-history-go-forward)
+   ("M-b" . dirvish-history-go-backward)
+   ("M-l" . dirvish-ls-switches-menu)
+   ("M-m" . dirvish-mark-menu)
+   ("M-t" . dirvish-layout-toggle)
+   ("M-s" . dirvish-setup-menu)
+   ("M-e" . dirvish-emerge-menu)
+   ("M-j" . dirvish-fd-jump)))
+
+;; Addtional syntax highlighting for dired
+(use-package diredfl
+  :hook
+  ((dired-mode . diredfl-mode)
+   ;; highlight parent and directory preview as well
+   (dirvish-directory-view-mode . diredfl-mode))
+  :config
+  (set-face-attribute 'diredfl-dir-name nil :bold t))
+
+;; Use `all-the-icons' as Dirvish's icon backend
+;; (use-package all-the-icons)
+
 '(global-dired-hide-details-mode t)
 (use-package dired
   :ensure nil
@@ -1198,42 +1291,13 @@ Org-mode properties drawer already, keep the headline and don’t insert
   (define-key dired-mode-map (kbd "(") 'dired-hide-details-mode) ; Bind ( to toggle file and directory details
   (define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
   (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
+  ;; Drag-and-drop to `dired`
+  (add-hook 'dired-mode-hook 'org-download-enable)
 
   ;; (use-package all-the-icons-dired
 	;;   :hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
 	;;   :init
 	;;   (setq all-the-icons-dired-mode-inline-electric-icons t))) ; Show electric icons for Dired mode
-
-  ;; Drag-and-drop to `dired`
-  (add-hook 'dired-mode-hook 'org-download-enable)
-
-  (use-package dired-open
-    :config
-    ;; Doesn't work as expected!
-    (add-to-list 'dired-open-functions #'dired-open-xdg t))
-
-  (use-package dired-sidebar
-    :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
-    :ensure t
-    :commands (dired-sidebar-toggle-sidebar)
-    :init
-    (add-hook 'dired-sidebar-mode-hook
-              (lambda ()
-                (unless (file-remote-p default-directory)
-                  (auto-revert-mode))))
-    :config
-    (push 'toggle-window-split dired-sidebar-toggle-hidden-commands)
-    (push 'rotate-windows dired-sidebar-toggle-hidden-commands)
-
-    (setq dired-sidebar-subtree-line-prefix "__")
-    (setq dired-sidebar-theme 'vscode)
-    (setq dired-sidebar-use-term-integration t)
-    (setq dired-sidebar-use-custom-font t))
-
-  ;; (evil-collection-define-key 'normal 'dired-mode-map
-  ;;   "h" 'dired-single-up-directory
-  ;;   "l" 'dired-single-buffer)
-  (use-package dired-single)
 
   (use-package dired-rainbow
     :config
@@ -1257,7 +1321,34 @@ Org-mode properties drawer already, keep the headline and don’t insert
       (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
       (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
       (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
-      (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))))
+      (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")))
+
+  (use-package dired-open
+    :config
+    ;; Doesn't work as expected!
+    (add-to-list 'dired-open-functions #'dired-open-xdg t))
+
+  (use-package dired-sidebar
+    :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
+    :ensure t
+    :commands (dired-sidebar-toggle-sidebar)
+    :init
+    (add-hook 'dired-sidebar-mode-hook
+              (lambda ()
+                (unless (file-remote-p default-directory)
+                  (auto-revert-mode))))
+    :config
+    (push 'toggle-window-split dired-sidebar-toggle-hidden-commands)
+    (push 'rotate-windows dired-sidebar-toggle-hidden-commands)
+    (setq dired-sidebar-subtree-line-prefix "__")
+    (setq dired-sidebar-theme 'vscode)
+    (setq dired-sidebar-use-term-integration t)
+    (setq dired-sidebar-use-custom-font t))
+
+  ;; (evil-collection-define-key 'normal 'dired-mode-map
+  ;;   "h" 'dired-single-up-directory
+  ;;   "l" 'dired-single-buffer)
+  (use-package dired-single))
 
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
@@ -1796,7 +1887,7 @@ Org-mode properties drawer already, keep the headline and don’t insert
                 eshell-mode-hook
                 nov-mode-hook
                 neotree-mode-hook
-                pdf-view-mode-hook
+                ;; pdf-view-mode-hook
                 treemacs-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
@@ -2063,7 +2154,6 @@ Org-mode properties drawer already, keep the headline and don’t insert
 (use-package prettier-js)
 
 (use-package tide
-
   :after (company flycheck)
   :hook ((typescript-ts-mode . tide-setup)
          (tsx-ts-mode . tide-setup)
@@ -2256,7 +2346,7 @@ If you experience stuttering, increase this.")
          (elfeed-show-mode  . olivetti-mode)
          (mu4e-compose-mode . olivetti-mode))
   :custom
-  (olivetti-body-width 90)
+  (olivetti-body-width 120)
   :delight " ⊗") ; Ⓐ ⊛
 
 ;;;;; hl-indent
@@ -2433,10 +2523,8 @@ If you experience stuttering, increase this.")
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(helm-minibuffer-history-key "M-p")
- '(org-agenda-files
-   '("/home/chopin/Org/agenda/weekly-tasks.org" "/home/chopin/Org/agenda/monthly-tasks.org" "/home/chopin/Org/agenda/daily-tasks.org"))
  '(package-selected-packages
-   '(org-agenda-property zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs tide theme-changer telega solaire-mode sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters prettier-js pbcopy parrot ox-reveal ox-hugo org-transclusion org-super-agenda org-roam-ui org-roam-timestamps org-roam-bibtex org-ref org-re-reveal org-noter-pdftools org-modern org-download org-cliplink org-caldav org-appear org-alert olivetti ob-typescript ob-rust multi-vterm minions magit-todos lsp-ui ligature kind-icon json-mode js2-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp helm-bibtex gruvbox-theme go-mode git-gutter-fringe general fzf format-all flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement elfeed doom-themes doom-modeline djvu dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-bibtex company-auctex citar-org-roam citar-embark cargo blamer beacon apheleia ac-math)))
+   '(ob-sql-mode dirvish bug-hunter focus org-recur org-agenda-property zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs tide theme-changer telega solaire-mode sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters prettier-js pbcopy parrot ox-reveal ox-hugo org-transclusion org-super-agenda org-roam-ui org-roam-timestamps org-roam-bibtex org-ref org-re-reveal org-noter-pdftools org-modern org-download org-cliplink org-caldav org-appear org-alert olivetti ob-typescript ob-rust multi-vterm minions magit-todos lsp-ui ligature kind-icon json-mode js2-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp helm-bibtex gruvbox-theme go-mode git-gutter-fringe general fzf format-all flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement elfeed doom-themes doom-modeline djvu dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-bibtex company-auctex citar-org-roam citar-embark cargo blamer beacon apheleia ac-math)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
