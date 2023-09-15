@@ -212,18 +212,18 @@
 ;;    Setup fonts
 ;;________________________________________________________________
 (set-face-attribute 'default t
-                    :font "Iosevka" ;; Terminess Nerd Font Propo, Input, Terminess Nerd Font Propo
+                    :font "Hack" ;; Terminess Nerd Font Propo, Input, Terminess Nerd Font Propo
                     :height 120
                     :weight 'regular)
 (set-face-attribute 'variable-pitch nil
-                    :font "Iosevka"
+                    :font "Hack"
                     :height 120
                     :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
-                    :font "Iosevka"
+                    :font "Hack"
                     :height 120
                     :weight 'medium)
-(set-frame-font "Iosevka" nil t)
+(set-frame-font "Hack" nil t)
 
 ;; Makes commented text and keywords italics.
 ;; This is working in emacsclient but not emacs.
@@ -240,33 +240,26 @@
 (add-to-list 'default-frame-alist '(font . "Iosevka 12"))
 (add-to-list 'default-frame-alist
              '(font . "Iosevka 12"))
-
 (add-to-list 'default-frame-alist '(font . "Iosevka 12"))
+
 ;; Changes certain keywords to symbols, such as lamda
 (setq global-prettify-symbols-mode t)
-
-;; Change color of divider (horizontal rules)
-;; (add-hook 'org-mode-hook
-;;           (lambda ()
-;;             (font-lock-add-keywords
-;;              nil
-;;              '(("^-\\{5,\\}"  0 '(:foreground "green" :weight bold))))))
 
 ;;________________________________________________________________
 ;;    Setup theme
 ;;________________________________________________________________
-(use-package gruvbox-theme)
-(use-package doom-themes
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (doom-themes-visual-bell-config) ; Enable flashing mode-line on errors
-  (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
-
+;; (use-package gruvbox-theme)
+;; (use-package doom-themes
+;;   :config
+;;   ;; Global settings (defaults)
+;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;;   (doom-themes-visual-bell-config) ; Enable flashing mode-line on errors
+;;   (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
+;;   (doom-themes-treemacs-config)
+;;   ;; Corrects (and improves) org-mode's native fontification.
+;;   (doom-themes-org-config))
+(use-package nano-theme)
 
 (use-package theme-changer
   :ensure t
@@ -277,7 +270,7 @@
   (setq calendar-longitude 131.88))
 
 (require 'theme-changer)
-(change-theme 'doom-one-light 'doom-one)
+(change-theme 'modus-operandi 'modus-vivendi)
 ;;________________________________________________________________
 ;;    Setup org-mode
 ;;________________________________________________________________
@@ -330,18 +323,9 @@
                                               (when org-inline-image-overlays
                                                 (org-redisplay-inline-images))))
     (add-to-list 'org-modules 'org-tempo t))
+
   (setq org-display-remote-inline-images t)
-  (add-to-list 'org-emphasis-alist
-               '("[" (:foreground "red")))
-;;; replace-org-char
-  ;; Replace list hyphen with dot
-  (font-lock-add-keywords 'org-mode
-						              '(("^ *\\([-]\\) "
-						                 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-  ;; Replace list plus with arrow
-  (font-lock-add-keywords 'org-mode
-						              '(("^ *\\([+]\\) "
-						                 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "➤"))))))
+
   (use-package org-modern
     :hook (org-mode . org-modern-mode)
     :config
@@ -349,22 +333,19 @@
      ;; Edit settings
      org-catch-invisible-edits 'show-and-error
      org-special-ctrl-a/e t
-     ;; org-insert-heading-respect-content t
      ;; Appearance
-     ;; org-hide-leading-stars t
-     ;; org-startup-indented nil
      org-modern-radio-target    '("❰" t "❱")
      org-modern-internal-target '("↪ " t "")
-     org-modern-todo t
+     org-modern-todo nil
      org-modern-tag t
      org-modern-timestamp t
      org-modern-statistics t
      org-modern-table nil
-     ;; org-modern-progress t Gives an error
      org-modern-priority t
      org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
      org-modern-hide-stars " "
      org-modern-keyword "‣"))
+
   (use-package org-appear
     :hook
     (org-mode . org-appear-mode)
@@ -372,86 +353,34 @@
     (setq org-hide-emphasis-markers t
           org-appear-autolinks 'just-brackets))
 
-  (use-package russian-holidays
-    :config
-    (require 'calendar)
-    (require 'russian-holidays)
-    (setq calendar-holidays russian-holidays))
-
-  ;; Spacing of headings
-  ;; (set-face-attribute 'org-document-title nil) ;; :font "Terminess Nerd Font Propo" :weight 'bold :height 1.5
-  ;; (dolist (face '((org-level-1 . 1.2)
-  ;;                 (org-level-2 . 1.1)
-  ;;                 (org-level-3 . 1.05)
-  ;;                 (org-level-4 . 1.0)
-  ;;                 (org-level-5 . 1.1)
-  ;;                 (org-level-6 . 1.1)
-  ;;                 (org-level-7 . 1.1)
-  ;;                 (org-level-8 . 1.1)))
-  ;;   (set-face-attribute (car face) nil)) ;;  :font "Terminess Nerd Font Propo" :weight 'medium :height (cdr face)
-  ;; (use-package org-padding
-  ;;   :straight (:host github :repo "TonCherAmi/org-padding")
-  ;;   :config
-  ;;   (setq org-padding-block-begin-line-padding '(2.0 . nil))
-  ;;   (setq org-padding-block-end-line-padding '(nil . 1.0))
-  ;;   (setq org-padding-heading-padding-alist
-  ;;         '((4.0 . 1.5) (3.0 . 0.5) (3.0 . 0.5) (3.0 . 0.5) (2.5 . 0.5) (2.0 . 0.5) (1.5 . 0.5) (0.5 . 0.5))))
   (with-eval-after-load 'org
     (setq org-log-done 'time))
-  ;; (setq org-todo-keywords
-  ;;       '((sequence
-  ;;          "TODO(t)"  ; A task that needs doing & is ready to do
-  ;;          "PROJ(p)"  ; A project, which usually contains other tasks
-  ;;          "LOOP(r)"  ; A recurring task
-  ;;          "STRT(s)"  ; A task that is in progress
-  ;;          "WAIT(w)"  ; Something external is holding up this task
-  ;;          "HOLD(h)"  ; This task is paused/on hold because of me
-  ;;          "IDEA(i)"  ; An unconfirmed and unapproved task or notion
-  ;;          "|"
-  ;;          "DONE(d)"  ; Task successfully completed
-  ;;          "KILL(k)") ; Task was cancelled, aborted or is no longer applicable
-  ;;         (sequence
-  ;;          "[ ](T)"   ; A task that needs doing
-  ;;          "[-](S)"   ; Task is in progress
-  ;;          "[?](W)"   ; Task is being held up or paused
-  ;;          "|"
-  ;;          "[X](D)")  ; Task was completed
-  ;;         (sequence
-  ;;          "|"
-  ;;          "OKAY(o)"
-  ;;          "YES(y)"
-  ;;          "NO(n)"))
-  ;;       org-todo-keyword-faces
-  ;;       '(("[-]"  . +org-todo-active)
-  ;;         ("STRT" . +org-todo-active)
-  ;;         ("[?]"  . +org-todo-onhold)
-  ;;         ("WAIT" . +org-todo-onhold)
-  ;;         ("HOLD" . +org-todo-onhold)
-  ;;         ("PROJ" . +org-todo-project)
-  ;;         ("NO"   . +org-todo-cancel)
-  ;;         ("KILL" . +org-todo-cancel)))
   (setq org-todo-keyword-faces
         '(
-          ("TODO" :background "brown1" :foreground "black" :weight bold)
-          ("DOING" :background "salmon" :foreground "black" :weight bold)
+          ("TODO" :background "indian red" :foreground "white" :weight bold)
+          ("DOING" :background "tomato" :foreground "white" :weight bold)
           ("NEXT" :background "sky blue" :foreground "black" :weight bold)
-          ("DONE" :background "green yellow" :weight bold)
-          ("ARCHIVED" :background "light slate blue" :weight bold)
-          ("BLOCKED" :background "red" :foreground "black" :weight bold)))
+          ("WAITING" :background "olive drab" :foreground "black" :weight bold)
+          ("STOPPED" :background "firebrick2" :foreground "white" :weight bold)
+          ("REVIEW" :background "cyan" :foreground "black" :weight bold)
+          ("DONE" :background "pale green" :foreground "black" :weight bold)
+          ("ARCHIVED" :background "light slate blue" :foreground "white" :weight bold)
+          ("CANCELLED" :background "dark red" :foreground "white" :weight bold)))
   (setq org-todo-keywords
-        '((sequence "TODO" "DOING" "NEXT" "|" "DONE" "ARCHIVED" "BLOCKED")))
-  ;; (setq org-todo-keyword-faces
-  ;;       '(("TODO" . (:foreground "#ff39a3" :weight bold))
-  ;;         ("DOING" . "red")
-  ;;         ("NEXT" . "blue")
-  ;;         ("BLOCKED" . (:foreground "white" :background "#4d4d4d" :weight bold))))
-  ;; ("POSTPONED" . "#008080"))
+        '((sequence "TODO(t)" "DOING(d)" "NEXT(n)" "WAITING(w)" "STOPPED(s)" "REVIEW(r)" "|" "DONE" "ARCHIVED(a)" "CANCELLED(c)")))
 
-  (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
-  (use-package org-alert)
+  (use-package org-fancy-priorities
+    :diminish
+    :demand t
+    :defines org-fancy-priorities-list
+    :hook (org-mode . org-fancy-priorities-mode)
+    :config
+    (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
+
   (use-package ob-typescript)
   (use-package ob-rust)
   (use-package ob-sql-mode)
+
   ;; Execute org src block
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -477,6 +406,11 @@
     '((t (:foreground "#71696A" :strike-through t)))
     "Face for the text part of a checked org-mode checkbox.")
 
+  (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
+  (use-package org-alert)
+  (use-package org-wild-notifier
+    :demand t)
+
   (use-package org-cliplink
     :demand t)
   ;; (use-package focus
@@ -494,8 +428,11 @@
     (setq org-recur-finish-done t
           org-recur-finish-archive t))
   (use-package org-rainbow-tags
-    :ensure t))
-
+    :ensure t)
+  (use-package org-bullets
+    ;; :custom
+    ;; (org-bullets-bullet-list '("◉" "☯" "○" "☯" "✸" "☯" "✿" "☯" "✜" "☯" "◆" "☯" "▶"))
+    :hook (org-mode . org-bullets-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;;;;;;;;;;;;; ;; ;;
@@ -506,6 +443,7 @@
 (use-package org-roam
   :custom
   (org-roam-directory (file-truename "~/Org/Org-roam"))
+  (org-roam-dailies-directory "journal/")
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
    '(
@@ -534,14 +472,15 @@
       (file+head "bibliography/references/${citekey}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Book:%^{Book type}:")
       :unnarrowed t)))
 
+  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
   (org-roam-dailies-capture-templates
    '(
-     ("m" "Morning diary" entry "* Morning (%U): %?\n\n** Что я сегодня обязан сделать?\n\n** Каковы мои ожидания от этого дня?" :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n" ))
-     ("d" "Default diary" entry "* %U: «%?»‎\n\n" :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n" ))
-     ("e" "Evening diary" entry "* Evening (%U): %?\n\n** Что я сделал за сегодня?\n\n** 3 вещи, за которые я благодарен?" :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n" ))))
+     ("m" "Morning diary" plain (file "~/Org/Templates/journal/Morning.org") :clock-in t :clock-resume t
+      :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
+     ("d" "Default diary" entry "* Default (%U): «%?»‎\n\n" :clock-in t :clock-resume t
+      :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
+     ("e" "Evening diary" plain (file "~/Org/Templates/journal/Evening.org") :clock-in t :clock-resume t
+      :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))))
 
   ;; Org-noter integration with org-roam-bibtex
   (setq orb-preformat-keywords
@@ -574,6 +513,29 @@
                  (direction . right)
                  (window-width . 0.33)
                  (window-height . fit-window-to-buffer))))
+
+(defun org-roam-create-note-from-headline ()
+  "Create an Org-roam note from the current headline and jump to it.
+
+Normally, insert the headline’s title using the ’#title:’ file-level property
+and delete the Org-mode headline. However, if the current headline has a
+Org-mode properties drawer already, keep the headline and don’t insert
+‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
+‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
+  (interactive)
+  (let ((title (nth 4 (org-heading-components)))
+        (has-properties (org-get-property-block)))
+    (org-cut-subtree)
+    (org-roam-node-find 'other-window title nil)
+    (org-paste-subtree)
+    (unless has-properties
+      (kill-line)
+      (while (outline-next-heading)
+        (org-promote)))
+    (goto-char (point-min))
+    (when has-properties
+      (kill-line)
+      (kill-line))))
 
 (use-package org-roam-ui
   :hook (after-init . org-roam-ui-mode)
@@ -613,160 +575,17 @@ Org-mode properties drawer already, keep the headline and don’t insert
   (define-key global-map (kbd "<f12>") #'org-transclusion-add)
   (define-key global-map (kbd "C-n t") #'org-transclusion-mode))
 
+(use-package org-download
+  :demand t
+  :config
+  (setq-default org-download-image-dir "./assets-org/"))
+
 (use-package org-roam-timestamps
   :after org-roam
   :demand t
   :config (org-roam-timestamps-mode))
 (setq org-roam-timestamps-parent-file t)
 (setq org-roam-timestamps-remember-timestamps t)
-
-(use-package org-download
-  :demand t
-  :config
-  (setq-default org-download-image-dir "./assets-org/"))
-
-;; (straight-use-package 'use-package)
-;; (setq straight-use-package-by-default t)
-;; (use-package org-noter)
-;; (use-package org-noter
-;;              :straight
-;;              (:repo "org-noter/org-noter"
-;;                     :host github
-;;                     :type git
-;;                     :files ("*.el" "modules/*.el")))
-
-;;;;;;;;;;;;;;;;;
-;; ;;;;;;;;;;; ;;
-;; ;; CITES ;; ;;
-;; ;;;;;;;;;;; ;;
-;;;;;;;;;;;;;;;;;
-
-;; BibLaTeX settings
-(setq bibtex-dialect 'biblatex)
-(use-package org-roam-bibtex
-  :after org-roam
-  :config
-  (setq orb-note-actions-interface 'hydra) ;
-
-  (setq orb-pdf-scrapper-export-options
-        '((org  ;; <= TYPE
-           ;;  Export to a heading in the buffer of origin
-           (heading "References (extracted by ORB PDF Scrapper)"
-                    ;; ^             ^
-                    ;; TARGET     LOCATION
-                    ;; PROPERTIES
-                    ;;    v
-                    :property-drawer ("PDF_SCRAPPER_TYPE"
-                                      "PDF_SCRAPPER_SOURCE"
-                                      "PDF_SCRAPPER_DATE")))
-          (txt
-           ;; Export to a file "references.org"
-           (path "references.org"
-                 ;; under a heading "New references"
-                 :placement
-                 (heading "New references"
-                          :property-drawer ("PDF_SCRAPPER_TYPE"
-                                            "PDF_SCRAPPER_SOURCE"
-                                            "PDF_SCRAPPER_DATE")
-                          ;; Put the new heading in front of other headings
-                          :placement prepend)))
-          (bib
-           ;; Export to a file in an existing directory.  The file name will be CITEKEY.bib
-           (path "/path/to/references-dir/"
-                 :placement prepend
-                 ;; Include only the references that are not in the target file
-                 ;; *and* the file(s) specified in bibtex-completion-bibliography
-                 :filter-bib-entries bibtex-completion-bibliography))))
-
-  (setq orb-autokey-format "%A*%y")) ;; => "DoeJohn2020"
-
-(use-package org-ref
-  :config
-  (setq bibtex-completion-bibliography '(
-					                               "~/Nextcloud/Org/Org-roam/bibliography/master.bib"
-                                         ;; "~/Nextcloud/Org/Org-roam/bibliography/references.bib"
-					                               ;; "~/Nextcloud/Org/Org-roam/bibliography/dei.bib"
-					                               ;; "~/Nextcloud/Org/Org-roam/bibliography/archive.bib"
-                                         )
-	      bibtex-completion-library-path '("~/Nextcloud/Org/Org-roam/bibliography/pdfs/")
-	      bibtex-completion-notes-path "~/Nextcloud/Org/Org-roam/bibliography/notes/"
-	      bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
-
-	      bibtex-completion-additional-search-fields '(keywords)
-	      bibtex-completion-display-formats
-	      '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
-	        (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
-	        (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
-	        (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
-	        (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
-	      bibtex-completion-pdf-open-function
-	      (lambda (fpath)
-	        (call-process "open" nil 0 nil fpath))
-        )
-
-  (require 'bibtex)
-  (setq bibtex-autokey-year-length 4
-        bibtex-autokey-name-year-separator "-"
-        bibtex-autokey-year-title-separator "-"
-        bibtex-autokey-titleword-separator "-"
-        bibtex-autokey-titlewords 2
-        bibtex-autokey-titlewords-stretch 1
-        bibtex-autokey-titleword-length 5)
-  (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
-
-  (require 'org-ref)
-  (require 'org-ref-helm)
-
-  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-  (define-key org-mode-map (kbd "H-c") org-ref-insert-cite-function)
-  (define-key org-mode-map (kbd "H-r") org-ref-insert-ref-function)
-  (define-key org-mode-map (kbd "H-l") org-ref-insert-label-function)
-                                        ;
-  ;; LaTeX/PDF export
-  (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f")))
-
-(use-package helm-bibtex
-  :config
-
-  (autoload 'helm-bibtex "helm-bibtex" "" t)
-  (setq bibtex-completion-bibliography
-				"~/Nextcloud/Org/Org-roam/bibliography/master.bib"
-        ;; '("~/Nextcloud/Org/Org-roam/bibliography/references.bib"
-				;; 	"~/Nextcloud/Org/Org-roam/bibliography/dei.bib"
-				;; "~/Nextcloud/Org/Org-roam/bibliography/archive.bib")
-        )
-  ;; PDFs
-  (setq bibtex-completion-library-path '("~/Nextcloud/Org/Org-roam/bibliography/pdfs"))
-  (setq bibtex-completion-pdf-field "File")
-
-  ;; Notes
-  (setq bibtex-completion-notes-path "~/Nextcloud/Org/Org-roam/bibliography/notes")
-
-  (setq org-cite-follow-processor 'helm-bibtex-org-cite-follow)
-
-  (setq bibtex-completion-pdf-symbol "📁")
-  (setq bibtex-completion-notes-symbol "✎"))
-
-(use-package citar
-  :custom
-  (citar-bibliography '(
-		                    "~/Nextcloud/Org/Org-roam/bibliography/master.bib"
-                        ;; "~/Nextcloud/Org/Org-roam/bibliography/references.bib"
-		                    ;; "~/Nextcloud/Org/Org-roam/bibliography/dei.bib"
-		                    ;; "~/Nextcloud/Org/Org-roam/bibliography/archive.bib")
-                        )
-                      :config
-                      (setq citar-templates
-                            '((main . "${author editor:30%sn}     ${date year issued:4}     ${title:48}")
-                              (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords:*}")
-                              (preview . "${author editor:%etal} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
-                              (note . "Notes on ${author editor:%etal}, ${title}")))
-                      (setq citar-indicators
-                            (list citar-indicator-files ; plain text
-                                  citar-indicator-notes-icons)) ; icon
-                      :hook
-                      (LaTeX-mode . citar-capf-setup)
-                      (org-mode . citar-capf-setup)))
 
 (use-package citar-embark)
 (use-package company-bibtex)
@@ -821,33 +640,11 @@ Org-mode properties drawer already, keep the headline and don’t insert
   (use-package org-super-agenda
     :demand t)
 
-  ;; (setq org-agenda-files (list "~/Org/agenda/PlanAhead.org" "~/Org/agenda/PlannedDay.org")
-  ;; org-log-done 'time)
-
   (setq org-agenda-files '("~/Org/agenda"))
-  (setq org-cycle-separator-lines 2)
   (setq org-directory "~/Org")
+  (setq org-cycle-separator-lines 2)
   ;; (setq org-agenda-include-diary t) ;; Calendar/Diary integration
   ;; (setq org-default-notes-file "~/Org/agenda/notes.org")
-
-  ;; (use-package org-agenda-property
-  ;;   :config
-  ;;   (customize-set-variable 'org-agenda-property-list
-  ;;                           '("WAITING?" "DEFERRED?" "CANCELLED?" "NOTE"))
-  ;;   (customize-set-variable 'org-agenda-property-position 'same-line))
-
-  ;; (require 'find-lisp)
-  ;; (defun who/find-org-files (directory)
-  ;;   (find-lisp-find-files directory "\.org$"))
-
-  ;; (defun who-org/agenda-files-update (&rest _)
-  ;;   (let ((todo-zettels (->> "rg --files-with-matches '(TODO)|(NEXT)|(DONE)|(REPEAT)|(DONE)|(HOLD)|(PROJ)|(WAIT)|(REVIEW)|(IDEA)|(STOP)|(EVENT)' ~/Org/Org-roam/"
-  ;;                            (shell-command-to-string)
-  ;;                            (s-lines)
-  ;;                            (-filter (lambda (line) (not (s-blank? line)))))))
-  ;;     (setq org-agenda-files (append (who/find-org-files who/org-agenda-directory)
-  ;;                                    todo-zettels))))
-  ;; (advice-add 'org-agenda :before #'who-org/agenda-files-update)
 
   ;; Set default column view headings: Task Total-Time Time-Stamp
   (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
@@ -857,7 +654,7 @@ Org-mode properties drawer already, keep the headline and don’t insert
         org-agenda-include-deadlines t
         org-agenda-block-separator #x2501
         org-agenda-compact-blocks t
-        org-agenda-start-with-log-mode t)
+        org-agenda-start-with-log-mode nil)
   ;; (with-eval-after-load 'org-journal
   ;;   (define-key org-journal-mode-map (kbd "<C-tab>") 'yas-expand))
   (setq org-agenda-clockreport-parameter-plist
@@ -877,36 +674,31 @@ Org-mode properties drawer already, keep the headline and don’t insert
         calendar-mark-holidays-flag t
         calendar-week-start-day 1)
   ;; calendar-mark-diary-entries-flag t
-
-  (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
-
   (defun my/style-org-agenda()
     ;; (my/buffer-face-mode-variable)
     (set-face-attribute 'org-agenda-date nil :height 1.1)
     (set-face-attribute 'org-agenda-date-today nil :height 1.1 :slant 'italic)
     (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
   (add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
-
   (setq org-agenda-breadcrumbs-separator " ❱ "
         org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
         org-agenda-time-grid '((weekly today require-timed)
                                (800 1000 1200 1400 1600 1800 2000)
                                "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
-        org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t%b% s")
+        org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
                                    (todo . " %i %-12:c")
                                    (tags . " %i %-12:c")
                                    (search . " %i %-12:c")))
-
   (setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
-                                                 "\n"
-                                                 (org-agenda-format-date-aligned date))))
-
+                                                      "\n"
+                                                      (org-agenda-format-date-aligned date))))
   (setq org-agenda-custom-commands
-        '(("z" "Hugo view"
+        '(
+          ("z" "Hugo view"
            ((agenda "" ((org-agenda-span 'day)
                         (org-super-agenda-groups
                          '((:name "Today"
-                                  :time-grid t
+                                  ;; :time-grid t
                                   :date today
                                   :todo "TODAY"
                                   :scheduled today
@@ -914,16 +706,12 @@ Org-mode properties drawer already, keep the headline and don’t insert
             (alltodo "" ((org-agenda-overriding-header "")
                          (org-super-agenda-groups
                           '(;; Each group has an implicit boolean OR operator between its selectors.
-                            (:name "Today"
-                                   :deadline today
-                                   :face (:background "black"))
-                            (:name "Passed deadline"
-                                   :and (:deadline past :todo ("TODO" "DOING" "BLOCKED" "REVIEW"))
-                                   :face (:background "#7f1b19"))
-                            (:name "Work important"
-                                   :and (:priority>= "B" :category "work" :todo ("TODO" "NEXT")))
-                            (:name "Work other"
-                                   :and (:category "work" :todo ("TODO" "NEXT")))
+                            ;; (:name "Work important"
+                            ;;        :and (:priority>= "B" :category "work" :todo ("TODO" "NEXT")))
+                            ;; (:name "Work other"
+                            ;;        :and (:category "work" :todo ("TODO" "NEXT")))
+                            (:name "Work"
+                                   :and (:category "work"))
                             (:name "Important"
                                    :priority "A")
                             (:priority<= "B"
@@ -931,14 +719,37 @@ Org-mode properties drawer already, keep the headline and don’t insert
                                          ;; their order is unspecified, defaulting to 0. Sections
                                          ;; are displayed lowest-number-first.
                                          :order 1)
-                            (:name "Papers"
-                                   :file-path "org/roam/notes")
+                            (:name "Deadline Future"
+                                   :deadline future)
+                            (:name "Today deadline"
+                                   :deadline today
+                                   :face (:background "black"))
+                            (:name "Passed deadline"
+                                   :and (:deadline past)
+                                   :face (:background "firebrick"))
+                            (:name "Stopped tasks"
+                                   :and (:todo "STOPPED"))
+                            ;; (:name "Papers"
+                            ;;        :file-path "~/Org/Org-roam")
                             (:name "Waiting"
                                    :todo "WAITING"
                                    :order 9)
                             (:name "On review"
                                    :todo "REVIEW"
-                                   :order 10)))))))))
+                                   :order 10)))))))
+          ("x" "Zetttel management"
+           (  (alltodo "" ((org-agenda-overriding-header "")
+                           (org-super-agenda-groups
+                            '(
+                              (:name "TODO"
+                                     :file-path "~/Org/Org-roam")
+                              (:name "Books"
+                                     :category "Book"
+                                     :file-path "~/Org/Org-roam")
+                              (:name "On review"
+                                     :todo "REVIEW"
+                                     :order 10
+                                     :file-path "~/Org/Org-roam")))))))))
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
 (setq org-capture-templates
@@ -948,18 +759,7 @@ Org-mode properties drawer already, keep the headline and don’t insert
                                    (org-datetree-find-date-create
                                     (org-date-to-gregorian (org-today)) t)
                                    (re-search-forward "^\\*.+ log" nil t)))
-         "* TODO something\n* TODO something")))
-
-;; (use-package org-caldav
-;;   :custom
-;;   (org-caldav-url "https://lunarcloud.ddns.net/remote.php/dav/calendars/ncp")
-;;   (org-caldav-calendar-id "personal")
-;;   ;; (org-caldav-calendar-id "XZRo6AtbiyiaBbpE")
-;;   (org-caldav-inbox "~/Org/agenda/calendar.org")
-;;   ;; (org-caldav-files '("~/Org/agenda/calendar.org"))
-;;   (org-icalendar-timezone "Asia/Vladivostok")
-;;   (org-caldav-delete-org-entries 'never)
-;;   (org-caldav-sync))
+         "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")))
 
 (use-package ox-hugo
   ;;Auto-install the package from Melpa
@@ -1070,95 +870,7 @@ Org-mode properties drawer already, keep the headline and don’t insert
 
 (use-package cl-lib  )
 (setq sql-sqlite-program "/usr/bin/sqlite3")
-;; (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 
-;; (use-package calibredb
-;;   :defer t
-;;   :config
-;;   (setq calibredb-root-dir "~/Calibre Library")
-;;   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-;;   (setq calibredb-library-alist '(("~/Books")))
-;;   (setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
-;;                                           ("2. Read it later" . "Readit epub")
-;;                                           ("3. Development - rust" . "rust")))
-;;   (setq calibredb-format-all-the-icons t)
-;;   (setq calibredb-format-icons-in-terminal t))
-
-;; ;; Keybindings
-;; (defvar calibredb-show-mode-map
-;;   (let ((map (make-sparse-keymap)))
-;;     (define-key map "?" #'calibredb-entry-dispatch)
-;;     (define-key map "o" #'calibredb-find-file)
-;;     (define-key map "O" #'calibredb-find-file-other-frame)
-;;     (define-key map "V" #'calibredb-open-file-with-default-tool)
-;;     (define-key map "s" #'calibredb-set-metadata-dispatch)
-;;     (define-key map "e" #'calibredb-export-dispatch)
-;;     (define-key map "q" #'calibredb-entry-quit)
-;;     (define-key map "y" #'calibredb-yank-dispatch)
-;;     (define-key map "," #'calibredb-quick-look)
-;;     (define-key map "." #'calibredb-open-dired)
-;;     (define-key map "\M-/" #'calibredb-rga)
-;;     (define-key map "\M-t" #'calibredb-set-metadata--tags)
-;;     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
-;;     (define-key map "\M-A" #'calibredb-set-metadata--authors)
-;;     (define-key map "\M-T" #'calibredb-set-metadata--title)
-;;     (define-key map "\M-c" #'calibredb-set-metadata--comments)
-;;     map)
-;;   "Keymap for `calibredb-show-mode'.")
-
-;; (defvar calibredb-search-mode-map
-;;   (let ((map (make-sparse-keymap)))
-;;     (define-key map [mouse-3] #'calibredb-search-mouse)
-;;     (define-key map (kbd "<RET>") #'calibredb-find-file)
-;;     (define-key map "?" #'calibredb-dispatch)
-;;     (define-key map "a" #'calibredb-add)
-;;     (define-key map "A" #'calibredb-add-dir)
-;;     (define-key map "c" #'calibredb-clone)
-;;     (define-key map "d" #'calibredb-remove)
-;;     (define-key map "D" #'calibredb-remove-marked-items)
-;;     (define-key map "j" #'calibredb-next-entry)
-;;     (define-key map "k" #'calibredb-previous-entry)
-;;     (define-key map "l" #'calibredb-virtual-library-list)
-;;     (define-key map "L" #'calibredb-library-list)
-;;     (define-key map "n" #'calibredb-virtual-library-next)
-;;     (define-key map "N" #'calibredb-library-next)
-;;     (define-key map "p" #'calibredb-virtual-library-previous)
-;;     (define-key map "P" #'calibredb-library-previous)
-;;     (define-key map "s" #'calibredb-set-metadata-dispatch)
-;;     (define-key map "S" #'calibredb-switch-library)
-;;     (define-key map "o" #'calibredb-find-file)
-;;     (define-key map "O" #'calibredb-find-file-other-frame)
-;;     (define-key map "v" #'calibredb-view)
-;;     (define-key map "V" #'calibredb-open-file-with-default-tool)
-;;     (define-key map "," #'calibredb-quick-look)
-;;     (define-key map "." #'calibredb-open-dired)
-;;     (define-key map "y" #'calibredb-yank-dispatch)
-;;     (define-key map "b" #'calibredb-catalog-bib-dispatch)
-;;     (define-key map "e" #'calibredb-export-dispatch)
-;;     (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
-;;     (define-key map "R" #'calibredb-search-clear-filter)
-;;     (define-key map "q" #'calibredb-search-quit)
-;;     (define-key map "m" #'calibredb-mark-and-forward)
-;;     (define-key map "f" #'calibredb-toggle-favorite-at-point)
-;;     (define-key map "x" #'calibredb-toggle-archive-at-point)
-;;     (define-key map "h" #'calibredb-toggle-highlight-at-point)
-;;     (define-key map "u" #'calibredb-unmark-and-forward)
-;;     (define-key map "i" #'calibredb-edit-annotation)
-;;     (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
-;;     (define-key map (kbd "<backtab>") #'calibredb-toggle-view)
-;;     (define-key map (kbd "TAB") #'calibredb-toggle-view-at-point)
-;;     (define-key map "\M-n" #'calibredb-show-next-entry)
-;;     (define-key map "\M-p" #'calibredb-show-previous-entry)
-;;     (define-key map "/" #'calibredb-search-live-filter)
-;;     (define-key map "\M-t" #'calibredb-set-metadata--tags)
-;;     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
-;;     (define-key map "\M-A" #'calibredb-set-metadata--authors)
-;;     (define-key map "\M-T" #'calibredb-set-metadata--title)
-;;     (define-key map "\M-c" #'calibredb-set-metadata--comments)
-;;     map)
-;;   "Keymap for `calibredb-search-mode'.")
-
-(use-package djvu)
 
 (use-package dashboard
   ;; :straight (:build t)
@@ -1174,22 +886,8 @@ Org-mode properties drawer already, keep the headline and don’t insert
         dashboard-set-heading-icons nil
         initial-buffer-choice       (lambda () (get-buffer "*dashboard*"))
         dashboard-set-file-icons    t)
-
-  ;; (setq dashboard-navigator-buttons
-  ;; 			`(;; line1
-  ;; 				((,(all-the-icons-wicon "tornado" :height 1.1 :v-adjust 0.0)
-  ;; 					"Main site"
-  ;; 					"Browse homepage"
-  ;; 					(lambda (&rest _) (browse-url "https://berezhnev.netlify.app"))
-  ;; 				  ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error)))
-  ;; 				;; line 2
-  ;; 				((,(all-the-icons-faicon "github" :height 1.1 :v-adjust 0.0)
-  ;; 					"Github"
-  ;; 					""
-  ;; 					(lambda (&rest _) (browse-url "https://github.com/tell396"))))))
-
   (setq dashboard-items '((recents  . 8)
-                          (agenda   . 14)
+                          (agenda   . 5)
                           (projects . 6)))
   (dashboard-setup-startup-hook)
   :init
@@ -1260,7 +958,6 @@ Org-mode properties drawer already, keep the headline and don’t insert
    ("M-s" . dirvish-setup-menu)
    ("M-e" . dirvish-emerge-menu)
    ("M-j" . dirvish-fd-jump)))
-
 ;; Addtional syntax highlighting for dired
 (use-package diredfl
   :hook
@@ -1269,9 +966,6 @@ Org-mode properties drawer already, keep the headline and don’t insert
    (dirvish-directory-view-mode . diredfl-mode))
   :config
   (set-face-attribute 'diredfl-dir-name nil :bold t))
-
-;; Use `all-the-icons' as Dirvish's icon backend
-;; (use-package all-the-icons)
 
 '(global-dired-hide-details-mode t)
 (use-package dired
@@ -1293,12 +987,6 @@ Org-mode properties drawer already, keep the headline and don’t insert
   (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
   ;; Drag-and-drop to `dired`
   (add-hook 'dired-mode-hook 'org-download-enable)
-
-  ;; (use-package all-the-icons-dired
-	;;   :hook (dired-mode . all-the-icons-dired-mode) ; Display icons in Dired mode
-	;;   :init
-	;;   (setq all-the-icons-dired-mode-inline-electric-icons t))) ; Show electric icons for Dired mode
-
   (use-package dired-rainbow
     :config
     (progn
@@ -1322,12 +1010,10 @@ Org-mode properties drawer already, keep the headline and don’t insert
       (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
       (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
       (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")))
-
   (use-package dired-open
     :config
     ;; Doesn't work as expected!
     (add-to-list 'dired-open-functions #'dired-open-xdg t))
-
   (use-package dired-sidebar
     :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
     :ensure t
@@ -1344,10 +1030,6 @@ Org-mode properties drawer already, keep the headline and don’t insert
     (setq dired-sidebar-theme 'vscode)
     (setq dired-sidebar-use-term-integration t)
     (setq dired-sidebar-use-custom-font t))
-
-  ;; (evil-collection-define-key 'normal 'dired-mode-map
-  ;;   "h" 'dired-single-up-directory
-  ;;   "l" 'dired-single-buffer)
   (use-package dired-single))
 
 (use-package doom-modeline
@@ -1371,12 +1053,12 @@ Org-mode properties drawer already, keep the headline and don’t insert
         doom-modeline-modal-icon t
         doom-modeline-modal t)
   :config
-  (set-face-attribute 'region nil
-                      :foreground (face-background 'doom-modeline-bar)
-                      :background (face-background 'default))
-  (set-face-attribute 'highlight nil
-                      :foreground (face-background 'doom-modeline-bar)
-                      :background (face-background 'default))
+  ;; (set-face-attribute 'region nil
+  ;;                     :foreground (face-background 'doom-modeline-bar)
+  ;;                     :background (face-background 'default))
+  ;; (set-face-attribute 'highlight nil
+  ;;                     :foreground (face-background 'doom-modeline-bar)
+  ;;                     :background (face-background 'default))
   (eval-when-compile
     'company
     (doom-modeline-def-segment company-backend
@@ -1400,15 +1082,51 @@ Org-mode properties drawer already, keep the headline and don’t insert
      (when (and doom-modeline-env-version doom-modeline-env--version)
        (propertize
         (format "%s " doom-modeline-env--version)
-        'face '(:height 0.7)))))
-  (doom-modeline-def-modeline
-    'main
-    '(bar workspace-name window-number modals matches buffer-type buffer-info remote-host)
-    '(company-backend misc-info persp-name battery debug lsp input-method buffer-encoding  process vcs checker)))
+        'face '(:height 0.7))))))
+
+(add-to-list 'load-path "~/.emacs.d/nano-emacs")
+
+;; Theme
+(require 'nano-faces)
+(require 'nano-theme)
+(require 'nano-theme-dark)
+(require 'nano-theme-light)
+
+(use-package mini-frame) ;; deps for nano-minibuffer
+(require 'nano-minibuffer)
+;; (require 'nano-command)
+;; (require 'nano-agenda)
+
+;; Theming Command line options (this will cancel warning messages)
+(add-to-list 'command-switch-alist '("-dark"   . (lambda (args))))
+(add-to-list 'command-switch-alist '("-light"  . (lambda (args))))
+(add-to-list 'command-switch-alist '("-default"  . (lambda (args))))
+(add-to-list 'command-switch-alist '("-no-splash" . (lambda (args))))
+(add-to-list 'command-switch-alist '("-no-help" . (lambda (args))))
+(add-to-list 'command-switch-alist '("-compact" . (lambda (args))))
+
+;; (use-package nano-modeline
+;;   :init
+;;   (when (member "-compact" command-line-args)
+;;     (require 'nano-compact))
+;;   :config
+;;   (add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
+;;   (add-hook 'text-mode-hook            #'nano-modeline-text-mode)
+;;   (add-hook 'org-mode-hook             #'nano-modeline-org-mode)
+;;   (add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
+;;   (add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
+;;   (add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
+;;   (add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
+;;   (add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
+;;   (add-hook 'term-mode-hook            #'nano-modeline-term-mode)
+;;   (add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
+;;   (add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
+;;   (add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
+;;   (add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode))
 
 (use-package minions
   :delight " 𝛁"
-  :hook (doom-modeline-mode . minions-mode)
+  ;; :hook (doom-modeline-mode . minions-mode)
   :config
   (minions-mode 1)
   (setq minions-mode-line-lighter "[+]"))
@@ -1416,41 +1134,41 @@ Org-mode properties drawer already, keep the headline and don’t insert
 (use-package elfeed
   :config
   ;; data is stored in ~/.elfeed
-  (setq elfeed-feeds
-        '(
-          ;; freelance
-          ;;("https://freelance.habr.com/user_rss_tasks/vsE2OtRKoyNeUnK7RGd+0w==" freelance)
-          ;;
-          ("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
-          ;; programming
-          ;;("https://news.ycombinator.com/rss" hacker)
-          ;;("https://www.reddit.com/r/programming.rss" programming)
-          ;;("https://www.reddit.com/r/emacs.rss" emacs)
-          ("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
-          ;; ("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
-          ;;("https://habr.com/ru/rss/news/?fl=ru" habr-news)
-          ("https://nuancesprog.ru/feed" nop)
-          ;;("https://dev.to/feed" dev-to)
-          ;; hobby
-          ("https://www.reddit.com/r/nasa.rss" nasa)
-          ("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
-          ;; ("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
-          ("https://nplus1.ru/rss" np1)
-          ;; programming languages
-          ("https://www.reddit.com/r/javascript.rss" javascript)
-          ("https://www.reddit.com/r/typescript.rss" typescript)
-          ("https://www.reddit.com/r/golang.rss" golang)
-          ("https://www.reddit.com/r/rust.rss" rust)
-          ;; Books
-          ;; ("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
-          ;; cloud
-          ;;("https://www.reddit.com/r/aws.rss" aws)
-          ;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
-          ;;("https://www.reddit.com/r/azure.rss" azure)
-          ;;("https://www.reddit.com/r/devops.rss" devops)
-          ;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
-          ))
-  (setq-default elfeed-search-filter "@7-days-ago +unread")
+  ;; (setq elfeed-feeds
+  ;;       '(
+  ;;         ;; freelance
+  ;;         ;;("https://freelance.habr.com/user_rss_tasks/vsE2OtRKoyNeUnK7RGd+0w==" freelance)
+  ;;         ;;
+  ;;         ("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
+  ;;         ;; programming
+  ;;         ;;("https://news.ycombinator.com/rss" hacker)
+  ;;         ;;("https://www.reddit.com/r/programming.rss" programming)
+  ;;         ;;("https://www.reddit.com/r/emacs.rss" emacs)
+  ;;         ("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
+  ;;         ;; ("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
+  ;;         ;;("https://habr.com/ru/rss/news/?fl=ru" habr-news)
+  ;;         ("https://nuancesprog.ru/feed" nop)
+  ;;         ;;("https://dev.to/feed" dev-to)
+  ;;         ;; hobby
+  ;;         ("https://www.reddit.com/r/nasa.rss" nasa)
+  ;;         ("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
+  ;;         ;; ("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
+  ;;         ("https://nplus1.ru/rss" np1)
+  ;;         ;; programming languages
+  ;;         ("https://www.reddit.com/r/javascript.rss" javascript)
+  ;;         ("https://www.reddit.com/r/typescript.rss" typescript)
+  ;;         ("https://www.reddit.com/r/golang.rss" golang)
+  ;;         ("https://www.reddit.com/r/rust.rss" rust)
+  ;;         ;; Books
+  ;;         ;; ("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
+  ;;         ;; cloud
+  ;;         ;;("https://www.reddit.com/r/aws.rss" aws)
+  ;;         ;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
+  ;;         ;;("https://www.reddit.com/r/azure.rss" azure)
+  ;;         ;;("https://www.reddit.com/r/devops.rss" devops)
+  ;;         ;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
+  ;;         ))
+  ;; (setq-default elfeed-search-filter "@7-days-ago +unread")
   (setq-default elfeed-search-title-max-width 100)
   (setq-default elfeed-search-title-min-width 100))
 
@@ -1876,10 +1594,8 @@ Org-mode properties drawer already, keep the headline and don’t insert
 
 (xterm-mouse-mode t)
 
-(setq-default tab-width 2) ; set default tab char's display width to 2 spaces
-(setq tab-width 2)         ; set current buffer's tab char's display width to 2 spaces
-
 (dolist (mode '(org-mode-hook ; Disable line numbers for some modes
+                org-mode-agenda-hook
                 term-mode-hook
                 vterm-mode-hook
                 shell-mode-hook
@@ -2086,10 +1802,10 @@ Org-mode properties drawer already, keep the headline and don’t insert
 (setq completion-cycle-threshold 3)
 
 ;; optionally if you want to use debugger
-(use-package dap-mode  )
+(use-package dap-mode)
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
-(use-package lsp-ui  )
+(use-package lsp-ui)
 
 (use-package web-mode
   :mode (("\\.js\\'" . web-mode)
@@ -2346,7 +2062,7 @@ If you experience stuttering, increase this.")
          (elfeed-show-mode  . olivetti-mode)
          (mu4e-compose-mode . olivetti-mode))
   :custom
-  (olivetti-body-width 120)
+  (olivetti-body-width 90)
   :delight " ⊗") ; Ⓐ ⊛
 
 ;;;;; hl-indent
@@ -2524,7 +2240,7 @@ If you experience stuttering, increase this.")
  ;; If there is more than one, they won't work right.
  '(helm-minibuffer-history-key "M-p")
  '(package-selected-packages
-   '(ob-sql-mode dirvish bug-hunter focus org-recur org-agenda-property zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs tide theme-changer telega solaire-mode sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters prettier-js pbcopy parrot ox-reveal ox-hugo org-transclusion org-super-agenda org-roam-ui org-roam-timestamps org-roam-bibtex org-ref org-re-reveal org-noter-pdftools org-modern org-download org-cliplink org-caldav org-appear org-alert olivetti ob-typescript ob-rust multi-vterm minions magit-todos lsp-ui ligature kind-icon json-mode js2-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp helm-bibtex gruvbox-theme go-mode git-gutter-fringe general fzf format-all flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement elfeed doom-themes doom-modeline djvu dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-bibtex company-auctex citar-org-roam citar-embark cargo blamer beacon apheleia ac-math)))
+   '(nano-modeline nano-theme nano-agenda ssh ob-sql-mode dirvish bug-hunter focus org-recur org-agenda-property zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs tide theme-changer telega solaire-mode sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters prettier-js pbcopy parrot ox-reveal ox-hugo org-transclusion org-super-agenda org-roam-ui org-roam-timestamps org-roam-bibtex org-ref org-re-reveal org-noter-pdftools org-modern org-download org-cliplink org-caldav org-appear org-alert olivetti ob-typescript ob-rust multi-vterm minions magit-todos lsp-ui ligature kind-icon json-mode js2-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp helm-bibtex gruvbox-theme go-mode git-gutter-fringe general fzf format-all flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement elfeed doom-themes doom-modeline djvu dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-bibtex company-auctex citar-org-roam citar-embark cargo blamer beacon apheleia ac-math)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
