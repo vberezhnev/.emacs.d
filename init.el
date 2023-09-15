@@ -208,11 +208,12 @@
     (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
   (display-line-numbers-scale-linum)
   (setq display-line-numbers-width 3))
+
 ;;________________________________________________________________
 ;;    Setup fonts
 ;;________________________________________________________________
 (set-face-attribute 'default t
-                    :font "Hack" ;; Terminess Nerd Font Propo, Input, Terminess Nerd Font Propo
+                    :font "Hack" ;; Iosevka, Input, Terminess, Nerd, Font Propo
                     :height 120
                     :weight 'regular)
 (set-face-attribute 'variable-pitch nil
@@ -224,17 +225,6 @@
                     :height 120
                     :weight 'medium)
 (set-frame-font "Hack" nil t)
-
-;; Makes commented text and keywords italics.
-;; This is working in emacsclient but not emacs.
-;; Your font must have an italic face available.
-(set-face-attribute 'font-lock-comment-face nil
-                    :slant 'italic)
-(set-face-attribute 'font-lock-keyword-face nil
-                    :slant 'italic)
-
-;; Uncomment the following line if line spacing needs adjusting.
-(setq-default line-spacing 0.12)
 
 ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
 (add-to-list 'default-frame-alist '(font . "Iosevka 12"))
@@ -259,7 +249,7 @@
 ;;   (doom-themes-treemacs-config)
 ;;   ;; Corrects (and improves) org-mode's native fontification.
 ;;   (doom-themes-org-config))
-(use-package nano-theme)
+(use-package modus-themes)
 
 (use-package theme-changer
   :ensure t
@@ -275,164 +265,173 @@
 ;;    Setup org-mode
 ;;________________________________________________________________
 (use-package org
+  :bind
+  (:map global-map
+        ("C-c l" . org-store-link)
+        ("C-c c" . org-capture)
+        ("M-q" . toggle-truncate-lines)
+        ;; Timer (Pomodoro)
+        ("C-c t s" . org-timer-set-timer)
+        ("C-c t SPC" . org-timer-pause-or-continue)
+        ("C-c t <deletechar>") org-timer-stop))
+:config
+(set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+(setq
+ org-ellipsis " ▾" ;; ⤵, ᗐ, ↴, ▼, ▶, ⤵, ▾
+ org-roam-v2-ack t                 ; anonying startup message
+ org-log-done 'time                ; I need to know when a task is done
+ org-hide-emphasis-markers t
+ org-hide-leading-stars t
+ org-log-into-drawer t
+ org-log-done 'time
+ org-startup-folded t
+ ;; org-odd-levels-only t
+ org-pretty-entities t
+ org-startup-indented t
+ org-adapt-indentation t
+ org-hide-leading-stars t
+ org-hide-macro-markers t
+ org-hide-block-startup nil
+ org-src-fontify-natively t
+ org-src-tab-acts-natively t
+ org-hide-emphasis-markers t
+ org-cycle-separator-lines 2
+ org-startup-folded 'content
+ org-startup-with-inline-images t
+ org-src-preserve-indentation nil
+ org-edit-src-content-indentation 2
+ org-fontify-quote-and-verse-blocks t
+ org-export-with-smart-quotes t
+ org-image-actual-width '(300))
+(with-eval-after-load 'org
+  (setq org-confirm-babel-evaluate nil)
+  (require 'org-tempo)
+  ;; Setup fonts for org-mode
+  (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
+  (add-hook 'org-babel-after-execute-hook (lambda ()
+                                            (when org-inline-image-overlays
+                                              (org-redisplay-inline-images))))
+  (add-to-list 'org-modules 'org-tempo t))
+
+(setq org-display-remote-inline-images t)
+
+(use-package org-modern
+  :hook (org-mode . org-modern-mode)
   :config
-  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
   (setq
-   org-ellipsis " ▾" ;; ⤵, ᗐ, ↴, ▼, ▶, ⤵, ▾
-   org-roam-v2-ack t                 ; anonying startup message
-   org-log-done 'time                ; I need to know when a task is done
-   org-hide-emphasis-markers t
-   org-hide-leading-stars t
-   org-log-into-drawer t
-   org-log-done 'time
-   org-startup-folded t
-   ;; org-odd-levels-only t
-   org-pretty-entities t
-   org-startup-indented t
-   org-adapt-indentation t
-   org-hide-leading-stars t
-   org-hide-macro-markers t
-   org-hide-block-startup nil
-   org-src-fontify-natively t
-   org-src-tab-acts-natively t
-   org-hide-emphasis-markers t
-   org-cycle-separator-lines 2
-   org-startup-folded 'content
-   org-startup-with-inline-images t
-   org-src-preserve-indentation nil
-   org-edit-src-content-indentation 2
-   org-fontify-quote-and-verse-blocks t
-   org-export-with-smart-quotes t
-   org-image-actual-width '(300))
-  (with-eval-after-load 'org
-    (setq org-confirm-babel-evaluate nil)
-    (require 'org-tempo)
-    ;; Setup fonts for org-mode
-    (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
-    (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-    (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-    (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-    (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
-    (add-hook 'org-babel-after-execute-hook (lambda ()
-                                              (when org-inline-image-overlays
-                                                (org-redisplay-inline-images))))
-    (add-to-list 'org-modules 'org-tempo t))
+   ;; Edit settings
+   org-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   ;; Appearance
+   org-modern-radio-target    '("❰" t "❱")
+   org-modern-internal-target '("↪ " t "")
+   org-modern-todo nil
+   org-modern-tag t
+   org-modern-timestamp t
+   org-modern-statistics t
+   org-modern-table nil
+   org-modern-priority t
+   org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
+   org-modern-hide-stars " "
+   org-modern-keyword "‣"))
 
-  (setq org-display-remote-inline-images t)
+(use-package org-appear
+  :hook
+  (org-mode . org-appear-mode)
+  :config
+  (setq org-hide-emphasis-markers t
+        org-appear-autolinks 'just-brackets))
 
-  (use-package org-modern
-    :hook (org-mode . org-modern-mode)
-    :config
-    (setq
-     ;; Edit settings
-     org-catch-invisible-edits 'show-and-error
-     org-special-ctrl-a/e t
-     ;; Appearance
-     org-modern-radio-target    '("❰" t "❱")
-     org-modern-internal-target '("↪ " t "")
-     org-modern-todo nil
-     org-modern-tag t
-     org-modern-timestamp t
-     org-modern-statistics t
-     org-modern-table nil
-     org-modern-priority t
-     org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
-     org-modern-hide-stars " "
-     org-modern-keyword "‣"))
+(with-eval-after-load 'org
+  (setq org-log-done 'time))
+(setq org-todo-keyword-faces
+      '(
+        ("TODO" :background "indian red" :foreground "white" :weight bold)
+        ("DOING" :background "tomato" :foreground "white" :weight bold)
+        ("NEXT" :background "sky blue" :foreground "black" :weight bold)
+        ("WAITING" :background "olive drab" :foreground "black" :weight bold)
+        ("STOPPED" :background "firebrick2" :foreground "white" :weight bold)
+        ("REVIEW" :background "cyan" :foreground "black" :weight bold)
+        ("DONE" :background "pale green" :foreground "black" :weight bold)
+        ("ARCHIVED" :background "light slate blue" :foreground "white" :weight bold)
+        ("CANCELLED" :background "dark red" :foreground "white" :weight bold)))
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "DOING(d)" "NEXT(n)" "WAITING(w)" "STOPPED(s)" "REVIEW(r)" "|" "DONE" "ARCHIVED(a)" "CANCELLED(c)")))
 
-  (use-package org-appear
-    :hook
-    (org-mode . org-appear-mode)
-    :config
-    (setq org-hide-emphasis-markers t
-          org-appear-autolinks 'just-brackets))
+(use-package org-fancy-priorities
+  :diminish
+  :demand t
+  :defines org-fancy-priorities-list
+  :hook (org-mode . org-fancy-priorities-mode)
+  :config
+  (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
 
-  (with-eval-after-load 'org
-    (setq org-log-done 'time))
-  (setq org-todo-keyword-faces
-        '(
-          ("TODO" :background "indian red" :foreground "white" :weight bold)
-          ("DOING" :background "tomato" :foreground "white" :weight bold)
-          ("NEXT" :background "sky blue" :foreground "black" :weight bold)
-          ("WAITING" :background "olive drab" :foreground "black" :weight bold)
-          ("STOPPED" :background "firebrick2" :foreground "white" :weight bold)
-          ("REVIEW" :background "cyan" :foreground "black" :weight bold)
-          ("DONE" :background "pale green" :foreground "black" :weight bold)
-          ("ARCHIVED" :background "light slate blue" :foreground "white" :weight bold)
-          ("CANCELLED" :background "dark red" :foreground "white" :weight bold)))
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "DOING(d)" "NEXT(n)" "WAITING(w)" "STOPPED(s)" "REVIEW(r)" "|" "DONE" "ARCHIVED(a)" "CANCELLED(c)")))
+(use-package ob-typescript)
+(use-package ob-rust)
+(use-package ob-sql-mode)
 
-  (use-package org-fancy-priorities
-    :diminish
-    :demand t
-    :defines org-fancy-priorities-list
-    :hook (org-mode . org-fancy-priorities-mode)
-    :config
-    (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
+;; Execute org src block
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (js . t)
+   (typescript . t)
+   (shell . t)
+   (python . t)
+   (rust . t)
+   (C . t)
+   (sql . t)
+   (latex . t)))
+(add-hook 'org-mode-hook (lambda ()
+                           "Beautify Org Checkbox Symbol"
+                           (push '("[ ]" .  "☐") prettify-symbols-alist)
+                           (push '("[X]" . "☑" ) prettify-symbols-alist)
+                           (push '("[-]" . "❍" ) prettify-symbols-alist)
+                           (push '("#+begin_src rust" . "🦀" ) prettify-symbols-alist)
+                           (push '("#+begin_quote" . "❝" ) prettify-symbols-alist)
+                           (push '("#+end_quote" . "❞" ) prettify-symbols-alist)
+                           (prettify-symbols-mode)))
+(defface org-checkbox-done-text
+  '((t (:foreground "#71696A" :strike-through t)))
+  "Face for the text part of a checked org-mode checkbox.")
 
-  (use-package ob-typescript)
-  (use-package ob-rust)
-  (use-package ob-sql-mode)
+(setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
+(use-package org-alert)
+(use-package org-wild-notifier
+  :demand t)
 
-  ;; Execute org src block
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (js . t)
-     (typescript . t)
-     (shell . t)
-     (python . t)
-     (rust . t)
-     (C . t)
-     (sql . t)
-     (latex . t)))
-  (add-hook 'org-mode-hook (lambda ()
-                             "Beautify Org Checkbox Symbol"
-                             (push '("[ ]" .  "☐") prettify-symbols-alist)
-                             (push '("[X]" . "☑" ) prettify-symbols-alist)
-                             (push '("[-]" . "❍" ) prettify-symbols-alist)
-                             (push '("#+begin_src rust" . "🦀" ) prettify-symbols-alist)
-                             (push '("#+begin_quote" . "❝" ) prettify-symbols-alist)
-                             (push '("#+end_quote" . "❞" ) prettify-symbols-alist)
-                             (prettify-symbols-mode)))
-  (defface org-checkbox-done-text
-    '((t (:foreground "#71696A" :strike-through t)))
-    "Face for the text part of a checked org-mode checkbox.")
-
-  (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
-  (use-package org-alert)
-  (use-package org-wild-notifier
-    :demand t)
-
-  (use-package org-cliplink
-    :demand t)
-  ;; (use-package focus
-  ;;   :demand t
-  ;;   :config
-  ;;   '((prog-mode . defun) (text-mode . sentence)))
-  (use-package org-recur
-    :hook ((org-mode . org-recur-mode)
-           (org-agenda-mode . org-recur-agenda-mode))
-    :config
-    (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
-    ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
-    (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
-    (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
-    (setq org-recur-finish-done t
-          org-recur-finish-archive t))
-  (use-package org-rainbow-tags
-    :ensure t)
-  (use-package org-bullets
-    ;; :custom
-    ;; (org-bullets-bullet-list '("◉" "☯" "○" "☯" "✸" "☯" "✿" "☯" "✜" "☯" "◆" "☯" "▶"))
-    :hook (org-mode . org-bullets-mode)))
+(use-package org-cliplink
+  :demand t)
+;; (use-package focus
+;;   :demand t
+;;   :config
+;;   '((prog-mode . defun) (text-mode . sentence)))
+(use-package org-recur
+  :hook ((org-mode . org-recur-mode)
+         (org-agenda-mode . org-recur-agenda-mode))
+  :config
+  (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+  ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
+  (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
+  (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
+  (setq org-recur-finish-done t
+        org-recur-finish-archive t))
+(use-package org-rainbow-tags
+  :ensure t)
+(use-package org-bullets
+  ;; :custom
+  ;; (org-bullets-bullet-list '("◉" "☯" "○" "☯" "✸" "☯" "✿" "☯" "✜" "☯" "◆" "☯" "▶"))
+  :hook (org-mode . org-bullets-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;;;;;;;;;;;;; ;; ;;
@@ -636,6 +635,9 @@ Org-mode properties drawer already, keep the headline and don’t insert
   :ensure nil
   :demand t
   :defer t
+  :bind
+  (:map global-map
+        ("C-c a" . org-agenda))
   :config
   (use-package org-super-agenda
     :demand t)
@@ -690,8 +692,8 @@ Org-mode properties drawer already, keep the headline and don’t insert
                                    (tags . " %i %-12:c")
                                    (search . " %i %-12:c")))
   (setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
-                                                      "\n"
-                                                      (org-agenda-format-date-aligned date))))
+                                                 "\n"
+                                                 (org-agenda-format-date-aligned date))))
   (setq org-agenda-custom-commands
         '(
           ("z" "Hugo view"
@@ -1084,46 +1086,6 @@ Org-mode properties drawer already, keep the headline and don’t insert
         (format "%s " doom-modeline-env--version)
         'face '(:height 0.7))))))
 
-(add-to-list 'load-path "~/.emacs.d/nano-emacs")
-
-;; Theme
-(require 'nano-faces)
-(require 'nano-theme)
-(require 'nano-theme-dark)
-(require 'nano-theme-light)
-
-(use-package mini-frame) ;; deps for nano-minibuffer
-(require 'nano-minibuffer)
-;; (require 'nano-command)
-;; (require 'nano-agenda)
-
-;; Theming Command line options (this will cancel warning messages)
-(add-to-list 'command-switch-alist '("-dark"   . (lambda (args))))
-(add-to-list 'command-switch-alist '("-light"  . (lambda (args))))
-(add-to-list 'command-switch-alist '("-default"  . (lambda (args))))
-(add-to-list 'command-switch-alist '("-no-splash" . (lambda (args))))
-(add-to-list 'command-switch-alist '("-no-help" . (lambda (args))))
-(add-to-list 'command-switch-alist '("-compact" . (lambda (args))))
-
-;; (use-package nano-modeline
-;;   :init
-;;   (when (member "-compact" command-line-args)
-;;     (require 'nano-compact))
-;;   :config
-;;   (add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
-;;   (add-hook 'text-mode-hook            #'nano-modeline-text-mode)
-;;   (add-hook 'org-mode-hook             #'nano-modeline-org-mode)
-;;   (add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
-;;   (add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
-;;   (add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
-;;   (add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
-;;   (add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
-;;   (add-hook 'term-mode-hook            #'nano-modeline-term-mode)
-;;   (add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
-;;   (add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
-;;   (add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
-;;   (add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode))
-
 (use-package minions
   :delight " 𝛁"
   ;; :hook (doom-modeline-mode . minions-mode)
@@ -1133,41 +1095,7 @@ Org-mode properties drawer already, keep the headline and don’t insert
 
 (use-package elfeed
   :config
-  ;; data is stored in ~/.elfeed
-  ;; (setq elfeed-feeds
-  ;;       '(
-  ;;         ;; freelance
-  ;;         ;;("https://freelance.habr.com/user_rss_tasks/vsE2OtRKoyNeUnK7RGd+0w==" freelance)
-  ;;         ;;
-  ;;         ("https://habr.com/ru/rss/feed/posts/all/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" habr-my-topics)
-  ;;         ;; programming
-  ;;         ;;("https://news.ycombinator.com/rss" hacker)
-  ;;         ;;("https://www.reddit.com/r/programming.rss" programming)
-  ;;         ;;("https://www.reddit.com/r/emacs.rss" emacs)
-  ;;         ("https://www.opennet.ru/opennews/opennews_all_utf.rss" opennet-news)
-  ;;         ;; ("https://habr.com/ru/rss/all/all/?fl=ru" habr-all)
-  ;;         ;;("https://habr.com/ru/rss/news/?fl=ru" habr-news)
-  ;;         ("https://nuancesprog.ru/feed" nop)
-  ;;         ;;("https://dev.to/feed" dev-to)
-  ;;         ;; hobby
-  ;;         ("https://www.reddit.com/r/nasa.rss" nasa)
-  ;;         ("https://habr.com/ru/rss/hub/astronomy/all/?fl=ru" habr-astronomy)
-  ;;         ;; ("https://habr.com/ru/rss/flows/popsci/all/?fl=ru" habr-popsci)
-  ;;         ("https://nplus1.ru/rss" np1)
-  ;;         ;; programming languages
-  ;;         ("https://www.reddit.com/r/javascript.rss" javascript)
-  ;;         ("https://www.reddit.com/r/typescript.rss" typescript)
-  ;;         ("https://www.reddit.com/r/golang.rss" golang)
-  ;;         ("https://www.reddit.com/r/rust.rss" rust)
-  ;;         ;; Books
-  ;;         ;; ("https://habr.com/ru/rss/hub/read/all/?fl=ru" habr-books)
-  ;;         ;; cloud
-  ;;         ;;("https://www.reddit.com/r/aws.rss" aws)
-  ;;         ;;("https://www.reddit.com/r/googlecloud.rss" googlecloud)
-  ;;         ;;("https://www.reddit.com/r/azure.rss" azure)
-  ;;         ;;("https://www.reddit.com/r/devops.rss" devops)
-  ;;         ;;("https://www.reddit.com/r/kubernetes.rss" kubernetes)
-  ;;         ))
+  (setq elfeed-feeds '( "https://nplus1.ru/rss" "https://naked-science.ru/article/category/physics/feed" "https://nuancesprog.ru/feed/" "https://dev.to/rss" "https://elementy.ru/rss/news" "https://postnauka.org/feed" "https://www.sciencedaily.com/rss/top/science.xml" "https://www.sciencedaily.com/rss/top/technology.xml" "https://www.sciencedaily.com/rss/space_time.xml" "http://www.sciencedaily.com/rss/computers_math.xml" "https://habr.com/ru/rss/feed/articles/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" "https://www.reddit.com/r/rust/.rss" "https://www.privacytools.io/guides/rss.xml" "https://stallman.org/rss/rss.xml" "http://thenewstack.io/blog/feed/" "https://habr.com/en/rss/flows/develop/articles/?fl=en" "https://thenewstack.io/frontend-development/feed/" "https://thenewstack.io/devops/feed"))
   ;; (setq-default elfeed-search-filter "@7-days-ago +unread")
   (setq-default elfeed-search-title-max-width 100)
   (setq-default elfeed-search-title-min-width 100))
@@ -1554,13 +1482,6 @@ Org-mode properties drawer already, keep the headline and don’t insert
   (if (string-match "^finished" result)
 	    (parrot-start-animation)))
 
-;; (use-package parrot
-;;   :config
-;;   (parrot-mode)
-;;   (parrot-set-parrot-type 'thumbsup)
-;;   (add-hook 'before-save-hook 'parrot-start-animation)
-;;   (add-to-list 'compilation-finish-functions 'my/parrot-animate-when-compile-success))
-
 (use-package solaire-mode
   :custom (solaire-mode-remap-fringe t)
   :config (solaire-global-mode +1)
@@ -1577,25 +1498,15 @@ Org-mode properties drawer already, keep the headline and don’t insert
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-x") 'helm-M-x)
 
-;;Org
-(global-set-key (kbd "M-q") #'toggle-truncate-lines)
-;; Org agenda
-(global-set-key (kbd "C-c l") #'org-store-link)
-(global-set-key (kbd "C-c a") #'org-agenda)
-(global-set-key (kbd "C-c c") #'org-capture)
-;; Org timer
-(global-set-key (kbd "C-c t s") #'org-timer-set-timer)
-(global-set-key (kbd "C-c t SPC") #'org-timer-pause-or-continue)
-(global-set-key (kbd "C-c t <deletechar>") #'org-timer-stop)
-
-(global-set-key (kbd "\C-c w") 'evil-window-map)
-
 (global-set-key (kbd "\C-c f") 'format-all-buffer)
 
 (xterm-mouse-mode t)
 
 (dolist (mode '(org-mode-hook ; Disable line numbers for some modes
                 org-mode-agenda-hook
+                elfeed-entry-hook
+                elfeed-new-entry-hook
+                elfeed-new-entry-parse-hook
                 term-mode-hook
                 vterm-mode-hook
                 shell-mode-hook
@@ -2238,6 +2149,8 @@ If you experience stuttering, increase this.")
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(elfeed-feeds
+   '("https://nplus1.ru/rss" "https://naked-science.ru/article/category/physics/feed" "https://nuancesprog.ru/feed/" "https://dev.to/rss" "https://elementy.ru/rss/news" "https://postnauka.org/feed" "https://www.sciencedaily.com/rss/top/science.xml" "https://www.sciencedaily.com/rss/top/technology.xml" "https://www.sciencedaily.com/rss/space_time.xml" "http://www.sciencedaily.com/rss/computers_math.xml" "https://habr.com/ru/rss/feed/articles/bd769e8234cb6e6444ae3197fd0c0d9b/?fl=ru" "https://www.reddit.com/r/rust/.rss" "https://www.privacytools.io/guides/rss.xml" "https://stallman.org/rss/rss.xml" "http://thenewstack.io/blog/feed/" "https://habr.com/en/rss/flows/develop/articles/?fl=en" "https://thenewstack.io/frontend-development/feed/" "https://thenewstack.io/devops/feed"))
  '(helm-minibuffer-history-key "M-p")
  '(package-selected-packages
    '(nano-modeline nano-theme nano-agenda ssh ob-sql-mode dirvish bug-hunter focus org-recur org-agenda-property zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs tide theme-changer telega solaire-mode sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters prettier-js pbcopy parrot ox-reveal ox-hugo org-transclusion org-super-agenda org-roam-ui org-roam-timestamps org-roam-bibtex org-ref org-re-reveal org-noter-pdftools org-modern org-download org-cliplink org-caldav org-appear org-alert olivetti ob-typescript ob-rust multi-vterm minions magit-todos lsp-ui ligature kind-icon json-mode js2-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp helm-bibtex gruvbox-theme go-mode git-gutter-fringe general fzf format-all flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement elfeed doom-themes doom-modeline djvu dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-bibtex company-auctex citar-org-roam citar-embark cargo blamer beacon apheleia ac-math)))
