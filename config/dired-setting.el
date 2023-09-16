@@ -111,3 +111,5 @@
     (setq dired-sidebar-use-term-integration t)
     (setq dired-sidebar-use-custom-font t))
   (use-package dired-single))
+
+(provide 'dired-setting)

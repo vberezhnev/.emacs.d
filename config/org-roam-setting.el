@@ -131,3 +131,5 @@ Org-mode properties drawer already, keep the headline and don’t insert
     (when has-properties
       (kill-line)
       (kill-line))))
+
+(provide 'org-roam-setting)

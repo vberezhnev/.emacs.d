@@ -298,7 +298,22 @@
         (load (file-name-sans-extension fullpath)))))))
 
 ;; Load config
-(load-directory "~/.emacs.d/config")
+;; (load-directory "~/.emacs.d/config")
+
+(add-to-list 'load-path "~/.emacs.d/config/")
+(require 'appereance-setting)
+(require 'dired-setting)
+(require 'flycheck-setting)
+(require 'formatter-setting)
+(require 'git-setting)
+(require 'keymap-setting)
+(require 'lsp-setting)
+(require 'org-roam-setting)
+(require 'org-setting)
+(require 'pdf-viewer-setting)
+(require 'socials-setting)
+(require 'spell-setting)
+(require 'ui-setting)
 
 (use-package ox-hugo
   ;;Auto-install the package from Melpa

@@ -29,3 +29,5 @@
                  (add-hook hook 'turn-on-flyspell))
                (add-hook 'prog-mode-hook 'flyspell-prog-mode))
   :delight " ⓢ")
+
+(provide 'spell-setting)

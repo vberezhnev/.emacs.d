@@ -2,6 +2,7 @@
 ;;    Setup org-mode
 ;;________________________________________________________________
 (use-package org
+  :demand t
   :bind
   (:map global-map
         ("C-c l" . org-store-link)
@@ -311,3 +312,5 @@
                                     (org-date-to-gregorian (org-today)) t)
                                    (re-search-forward "^\\*.+ log" nil t)))
          "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")))
+
+(provide 'org-setting)

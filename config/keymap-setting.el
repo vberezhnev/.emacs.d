@@ -50,3 +50,5 @@
          (cons (concat "FZF_DEFAULT_COMMAND=ag -g \"\" --ignore node_modules .git build dist")
                process-environment)))
     (fzf/start default-directory)))
+
+(provide 'keymap-setting)

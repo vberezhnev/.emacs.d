@@ -201,6 +201,12 @@
   :init
   (treemacs-load-theme "doom-colors"))
 
+(use-package lsp-treemacs
+  :after treemacs
+  :demand t
+  :config
+  (lsp-treemacs-sync-mode 1))
+
 ;;________________________________________________________________
 ;;    Projectile
 ;;________________________________________________________________
@@ -230,6 +236,7 @@
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
   (global-set-key (kbd "C-x b") 'helm-buffers-list)
   (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
+  :demand t
   :config
   ;; Оптимизация Helm для улучшения производительности
   (setq
@@ -272,3 +279,5 @@
   (dashboard-setup-startup-hook)
   :init
   (add-hook 'after-init-hook 'dashboard-refresh-buffer))
+
+(provide 'ui-setting)

@@ -12,3 +12,5 @@
 ;;    Matrix
 ;;________________________________________________________________
 (use-package ement)
+
+(provide 'socials-setting)
