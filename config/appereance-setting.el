@@ -1,8 +1,22 @@
 ;;________________________________________________________________
 ;;    Transparent Emacs
 ;;________________________________________________________________
-(set-frame-parameter (selected-frame) 'alpha '(97 .97))
-(add-to-list 'default-frame-alist '(alpha . (97 . 97)))
+;; (set-frame-parameter (selected-frame) 'alpha '(97 .97))
+;; (add-to-list 'default-frame-alist '(alpha . (97 . 97)))
+(add-to-list 'default-frame-alist '(alpha . (100 . 100)))
+
+ (defun toggle-transparency ()
+   (interactive)
+   (let ((alpha (frame-parameter nil 'alpha)))
+     (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                     ((numberp (cdr alpha)) (cdr alpha))
+                     ;; Also handle undocumented (<active> <inactive>) form.
+                     ((numberp (cadr alpha)) (cadr alpha)))
+               100)
+          '(95 . 95) '(100 . 100)))))
+ (global-set-key (kbd "C-c t") 'toggle-transparency)
 
 ;;________________________________________________________________
 ;;    Setup fonts
@@ -53,15 +67,25 @@
 ;;    Setup theme
 ;;________________________________________________________________
 (use-package doom-themes
+  :if window-system
+  :custom-face
+  (cursor ((t (:background "BlanchedAlmond"))))
   :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (doom-themes-visual-bell-config) ; Enable flashing mode-line on errors
-  (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
-  (doom-themes-treemacs-config)
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  (load-theme 'doom-gruvbox t)
+  (if (display-graphic-p)
+      (progn
+        ;; Enable custom neotree theme (all-the-icons must be installed!)
+        (doom-themes-neotree-config)
+        ;; or for treemacs users
+        (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+        (doom-themes-treemacs-config)))
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+
 (use-package gruvbox-theme)
 (use-package modus-themes)
 (use-package theme-changer
@@ -73,8 +97,10 @@
   (setq calendar-longitude 131.88))
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
-(change-theme 'doom-one-light 'doom-one)
+(change-theme 'doom-gruvbox-light 'doom-gruvbox)
 
+(use-package smooth-scrolling
+  :demand t)
 
 ;;;;; hl-indent
 (use-package highlight-indent-guides

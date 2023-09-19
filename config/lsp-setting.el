@@ -136,31 +136,35 @@
   (setq lsp-keymap-prefix "C-c l")
   (setq lsp-tex-server 'digestif)
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (go-mode . lsp)
+         (go-mode         . lsp)
+         (js-mode         . lsp)
          (javascript-mode . lsp)
          (typescript-mode . lsp)
+         (rjsx            . lsp)
+         (rust-mode       . lsp)
+         (LaTeX-mode      . lsp)
          (web-mode . lsp)
-         (rust-mode . lsp)
-         (LaTeX-mode . lsp)
          ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+         (lsp-mode        . lsp-enable-which-key-integration))
+  :commands lsp
+  :custom
+  (lsp-enable-snippet t))
 
-(add-hook 'js-mode-hook #'lsp-mode)
-(add-hook 'typescript-mode-hook #'lsp-mode) ;; for typescript support
-(add-hook 'js3-mode-hook #'lsp-mode) ;; for js3-mode support
-(add-hook 'rjsx-mode #'lsp-mode) ;; for rjsx-mode support
+;; (add-hook 'js-mode-hook #'lsp-mode)
+;; (add-hook 'typescript-mode-hook #'lsp-mode) ;; for typescript support
+;; (add-hook 'js3-mode-hook #'lsp-mode) ;; for js3-mode support
+;; (add-hook 'rjsx-mode #'lsp-mode) ;; for rjsx-mode support
 
 ;; optionally
 (use-package lsp-ui
   :commands lsp-ui-mode
   :config
-  (setq lsp-ui-doc-enable nil)
+  (setq lsp-ui-doc-enable t)
   (setq lsp-ui-doc-header t)
   (setq lsp-ui-doc-include-signature t)
   (setq lsp-ui-doc-border (face-foreground 'default))
-  (setq lsp-ui-sideline-show-code-actions t)
-  (setq lsp-ui-sideline-delay 0.05))
+  ;; (setq lsp-ui-sideline-delay 0.05)
+  (setq lsp-ui-sideline-show-code-actions t))
 
 ;; if you are helm user
 (use-package helm-lsp :commands helm-lsp-workspace-symbol)
@@ -236,23 +240,6 @@
 
 (use-package import-js)
 
-(use-package web-mode
-  :mode (("\\.js\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode)
-         ("\\.ts\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.html\\'" . web-mode)
-         ("\\.vue\\'" . web-mode)
-         ("\\.json\\'" . web-mode))
-  :commands web-mode
-  :config
-  (setq web-mode-content-types-alist
-        '(("jsx" . "\\.js[x]?\\'"))))
-
-;; JSX syntax highlighting
-(add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
-(setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
-
 (use-package js2-mode   :defer 20
   :mode
   (("\\.js\\'" . js2-mode))
@@ -279,9 +266,9 @@
 
 (use-package tide
   :after (company flycheck)
-  :hook ((typescript-ts-mode . tide-setup)
+  :hook ((typescript-mode . tide-setup)
          (tsx-ts-mode . tide-setup)
-         (typescript-ts-mode . tide-hl-identifier-mode)
+         (typescript-mode . tide-hl-identifier-mode)
          (before-save . tide-format-before-save)))
 (defun setup-tide-mode ()
   (interactive)
@@ -300,22 +287,35 @@
 ;; configure javascript-tide checker to run after your default javascript checker
 ;; (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
 
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "jsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
-
 ;; formats the buffer before saving
 (add-hook 'before-save-hook 'tide-format-before-save)
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
 
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(use-package web-mode
+  :mode (("\\.js\\'" . web-mode)
+         ("\\.jsx\\'" . web-mode)
+         ("\\.ts\\'" . web-mode)
+         ("\\.tsx\\'" . web-mode)
+         ("\\.html\\'" . web-mode)
+         ("\\.vue\\'" . web-mode)
+         ("\\.json\\'" . web-mode))
+  :commands web-mode
+  :config
+  (setq web-mode-content-types-alist
+        '(("jsx" . "\\.js[x]?\\'"))))
 
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "jsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
+;; JSX syntax highlighting
+;; (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
+;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+
+
+;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+;; (add-hook 'web-mode-hook
+;;           (lambda ()
+;;             (when (string-equal "jsx" (file-name-extension buffer-file-name))
+;;               (setup-tide-mode))))
+
 ;; configure jsx-tide checker to run after your default jsx checker
 ;; (flycheck-add-mode 'javascript-eslint 'web-mode)
 ;; (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)

@@ -2,16 +2,20 @@
 ;;    Setup org-mode
 ;;________________________________________________________________
 (use-package org
-  :demand t
-  :bind
-  (:map global-map
-        ("C-c l" . org-store-link)
-        ("C-c c" . org-capture)
-        ("M-q" . toggle-truncate-lines)
-        ;; Timer (Pomodoro)
-        ("C-c t s" . org-timer-set-timer)
-        ("C-c t SPC" . org-timer-pause-or-continue)
-        ("C-c t <deletechar>") org-timer-stop)
+  :defer t
+  :after org
+  :delight org-mode "✎"
+  :pin org
+  :hook ((org-mode . prettify-symbols-mode)
+         (org-mode . visual-line-mode)
+         (org-mode . variable-pitch-mode))
+  :bind (("C-c l" . org-store-link)
+         ("C-c c" . org-capture)
+         ("M-q" . toggle-truncate-lines)
+         ;; Timer (Pomodoro)
+         ("C-c t s" . org-timer-set-timer)
+         ("C-c t SPC" . org-timer-pause-or-continue)
+         ("C-c t <deletechar>") org-timer-stop)
   :config
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
   (setq
@@ -60,126 +64,171 @@
                                               (when org-inline-image-overlays
                                                 (org-redisplay-inline-images))))
     (add-to-list 'org-modules 'org-tempo t))
-
   (setq org-display-remote-inline-images t)
+  (setq org-modules
+	'(org-crypt
+          org-habit
+          org-bookmark
+          org-eshell
+          org-irc))
 
-  (use-package org-modern
-    :hook (org-mode . org-modern-mode)
-    :config
-    (setq
-     ;; Edit settings
-     org-catch-invisible-edits 'show-and-error
-     org-special-ctrl-a/e t
-     ;; Appearance
-     org-modern-radio-target    '("❰" t "❱")
-     org-modern-internal-target '("↪ " t "")
-     org-modern-todo nil
-     org-modern-tag t
-     org-modern-timestamp t
-     org-modern-statistics t
-     org-modern-table nil
-     org-modern-priority t
-     org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
-     org-modern-hide-stars " "
-     org-modern-keyword "‣"))
-
-  (use-package org-appear
-    :hook
-    (org-mode . org-appear-mode)
-    :config
-    (setq org-hide-emphasis-markers t
-          org-appear-autolinks 'just-brackets))
-
-  (with-eval-after-load 'org
-    (setq org-log-done 'time))
-  (setq org-todo-keyword-faces
-        '(
-          ("TODO" :background "indian red" :foreground "white" :weight bold)
-          ("DOING" :background "tomato" :foreground "white" :weight bold)
-          ("NEXT" :background "sky blue" :foreground "black" :weight bold)
-          ("WAITING" :background "olive drab" :foreground "black" :weight bold)
-          ("STOPPED" :background "firebrick2" :foreground "white" :weight bold)
-          ("REVIEW" :background "cyan" :foreground "black" :weight bold)
-          ("DONE" :background "pale green" :foreground "black" :weight bold)
-          ("ARCHIVED" :background "light slate blue" :foreground "white" :weight bold)
-          ("CANCELLED" :background "dark red" :foreground "white" :weight bold)))
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "DOING(d)" "NEXT(n)" "WAITING(w)" "STOPPED(s)" "REVIEW(r)" "|" "DONE" "ARCHIVED(a)" "CANCELLED(c)")))
-
-  (use-package org-fancy-priorities
-    :diminish
-    :demand t
-    :defines org-fancy-priorities-list
-    :hook (org-mode . org-fancy-priorities-mode)
-    :config
-    (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
-
-  (use-package ob-typescript)
-  (use-package ob-rust)
-  (use-package ob-sql-mode)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (js . t)
-     (typescript . t)
-     (shell . t)
-     (python . t)
-     (rust . t)
-     (C . t)
-     (sql . t)
-     (latex . t)))
-
-  (add-hook 'org-mode-hook (lambda ()
-                             "Beautify Org Checkbox Symbol"
-                             (push '("[ ]" .  "☐") prettify-symbols-alist)
-                             (push '("[X]" . "☑" ) prettify-symbols-alist)
-                             (push '("[-]" . "❍" ) prettify-symbols-alist)
-                             (push '("#+begin_src rust" . "🦀" ) prettify-symbols-alist)
-                             (push '("#+begin_quote" . "❝" ) prettify-symbols-alist)
-                             (push '("#+end_quote" . "❞" ) prettify-symbols-alist)
-                             (prettify-symbols-mode)))
-  (defface org-checkbox-done-text
-    '((t (:foreground "#71696A" :strike-through t)))
-    "Face for the text part of a checked org-mode checkbox.")
-
-  (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
-  (use-package org-alert)
-  (use-package org-wild-notifier
-    :demand t)
-
-  (use-package org-transclusion
-    :after org
-    :config
-    (define-key global-map (kbd "<f12>") #'org-transclusion-add)
-    (define-key global-map (kbd "C-n t") #'org-transclusion-mode))
-
-  (use-package org-download
-    :demand t
-    :config
-    (setq-default org-download-image-dir "./assets-org/"))
-
-  (use-package focus
-    :demand t
-    :config
-    '((prog-mode . defun) (text-mode . sentence)))
-  (use-package org-cliplink
-    :demand t)
-  (use-package org-recur
-    :hook ((org-mode . org-recur-mode)
-           (org-agenda-mode . org-recur-agenda-mode))
-    :config
-    (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
-    ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
-    (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
-    (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
-    (setq org-recur-finish-done t
-          org-recur-finish-archive t))
-  (use-package org-rainbow-tags
-    :ensure t)
   (use-package org-bullets
-    ;; :custom
-    ;; (org-bullets-bullet-list '("◉" "☯" "○" "☯" "✸" "☯" "✿" "☯" "✜" "☯" "◆" "☯" "▶"))
-    :hook (org-mode . org-bullets-mode)))
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○"))) ; "●" "▷" "🞛" "◈" "✖"
+
+  (use-package toc-org
+    :after org
+    :init (add-hook 'org-mode-hook #'toc-org-enable))
+
+  ;; ────────────────────────────── Prettify Symbols ─────────────────────────────
+;;; custom-function
+  ;; Beautify Org Checkbox Symbol
+  (defun ma/org-buffer-setup ()
+    "Something for like document, i guess 😕."
+    (push '("[ ]" . "☐" ) prettify-symbols-alist)
+    (push '("[X]" . "☑" ) prettify-symbols-alist)
+    (push '("[-]" . "❍" ) prettify-symbols-alist))
+  (add-hook 'org-mode-hook #'ma/org-buffer-setup)
+
+  (defun my/org-mode/load-prettify-symbols ()
+    "Looking pretty good, so i adopted it."
+    (interactive)
+    (setq prettify-symbols-alist
+          (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
+                  '(("#+begin_src" . ?)
+                    ("#+end_src" . ?)
+                    ("#+begin_example" . ?)
+                    ("#+end_example" . ?)
+                    ("#+begin_quote" . ?❝)
+                    ("#+end_quote" . ?❠) ; ❟ ―  
+                    ("#+begin_center" . "ϰ")
+                    ("#+end_center" . "ϰ")
+                    ("#+header:" . ?)
+                    ("#+name:" . ?﮸)
+                    ;; ("#+title:" . ?◈)
+                    ;; ("#+author:" . ?✒)
+                    ("#+results:" . ?)
+                    ("#+call:" . ?)
+                    (":properties:" . ?)
+                    (":logbook:" . ?)))))
+  (add-hook 'org-mode-hook #'my/org-mode/load-prettify-symbols)
+
+;;;; toggle-emphasis
+  (defun org-toggle-emphasis ()
+    "Toggle hiding/showing of org emphasis markers."
+    (interactive)
+    (if org-hide-emphasis-markers
+	(set-variable 'org-hide-emphasis-markers nil)
+      (set-variable 'org-hide-emphasis-markers t))
+    (org-mode-restart))
+  (define-key org-mode-map (kbd "C-c x") 'org-toggle-emphasis))
+
+
+
+(use-package org-modern
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq
+   ;; Edit settings
+   org-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   ;; Appearance
+   org-modern-radio-target    '("❰" t "❱")
+   org-modern-internal-target '("↪ " t "")
+   org-modern-todo nil
+   org-modern-tag t
+   org-modern-timestamp t
+   org-modern-statistics t
+   org-modern-table nil
+   org-modern-priority t
+   org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
+   org-modern-hide-stars " "
+   org-modern-keyword "‣"))
+
+(use-package org-appear
+  :hook
+  (org-mode . org-appear-mode)
+  :config
+  (setq org-hide-emphasis-markers t
+        org-appear-autolinks 'just-brackets))
+
+(with-eval-after-load 'org
+  (setq org-log-done 'time))
+(setq org-todo-keyword-faces
+      '(
+        ("TODO" :background "indian red" :foreground "white" :weight bold)
+        ("DOING" :background "tomato" :foreground "white" :weight bold)
+        ("NEXT" :background "sky blue" :foreground "black" :weight bold)
+        ("WAITING" :background "olive drab" :foreground "black" :weight bold)
+        ("STOPPED" :background "firebrick2" :foreground "white" :weight bold)
+        ("REVIEW" :background "cyan" :foreground "black" :weight bold)
+        ("DONE" :background "pale green" :foreground "black" :weight bold)
+        ("ARCHIVED" :background "light slate blue" :foreground "white" :weight bold)
+        ("CANCELLED" :background "dark red" :foreground "white" :weight bold)))
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "DOING(d)" "NEXT(n)" "WAITING(w)" "STOPPED(s)" "REVIEW(r)" "|" "DONE" "ARCHIVED(a)" "CANCELLED(c)")))
+
+(use-package org-fancy-priorities
+  :diminish
+  :demand t
+  :defines org-fancy-priorities-list
+  :hook (org-mode . org-fancy-priorities-mode)
+  :config
+  (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
+
+(use-package ob-typescript)
+(use-package ob-rust)
+(use-package ob-sql-mode)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (js . t)
+   (typescript . t)
+   (shell . t)
+   (python . t)
+   (rust . t)
+   (C . t)
+   (sql . t)
+   (latex . t)))
+
+(setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
+(use-package org-alert)
+(use-package org-wild-notifier
+  :demand t)
+
+;; (use-package org-transclusion
+;;   :after org
+;;   :config
+;;   (define-key global-map (kbd "<f12>") #'org-transclusion-add)
+;;   (define-key global-map (kbd "C-n t") #'org-transclusion-mode))
+
+(use-package org-download
+  :demand t
+  :config
+  (setq-default org-download-image-dir "./assets-org/"))
+
+(use-package focus
+  :demand t
+  :config
+  '((prog-mode . defun) (text-mode . sentence)))
+(use-package org-cliplink
+  :demand t)
+(use-package org-recur
+  :hook ((org-mode . org-recur-mode)
+         (org-agenda-mode . org-recur-agenda-mode))
+  :config
+  (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+  ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
+  (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
+  (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
+  (setq org-recur-finish-done t
+        org-recur-finish-archive t))
+(use-package org-rainbow-tags)
+
+
+
 
 (use-package org-agenda
   :ensure nil
@@ -242,8 +291,8 @@
                                    (tags . " %i %-12:c")
                                    (search . " %i %-12:c")))
   (setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
-                                                 "\n"
-                                                 (org-agenda-format-date-aligned date))))
+                                                      "\n"
+                                                      (org-agenda-format-date-aligned date))))
   (setq org-agenda-custom-commands
         '(
           ("z" "Hugo view"
