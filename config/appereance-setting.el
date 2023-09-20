@@ -22,18 +22,18 @@
 ;;    Setup fonts
 ;;________________________________________________________________
 (set-face-attribute 'default t
-                    :font "Hack" ;; Iosevka, Input, Terminess, Nerd, Font Propo
+                    :font "Iosevka" ;; Hack, Input, Terminess, Nerd, Font Propo
                     :height 120
                     :weight 'regular)
 (set-face-attribute 'variable-pitch nil
-                    :font "Hack"
+                    :font "Iosevka"
                     :height 120
                     :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
-                    :font "Hack"
+                    :font "Iosevka"
                     :height 120
                     :weight 'medium)
-(set-frame-font "Hack" nil t)
+(set-frame-font "Iosevka" nil t)
 
 ;; Setup fonts
 ;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 130)
@@ -62,7 +62,6 @@
   (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
   (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
 
-
 ;;________________________________________________________________
 ;;    Setup theme
 ;;________________________________________________________________
@@ -88,6 +87,7 @@
 
 (use-package gruvbox-theme)
 (use-package modus-themes)
+(use-package timu-rouge-theme)
 (use-package theme-changer
   :ensure t
   :demand t
@@ -97,10 +97,8 @@
   (setq calendar-longitude 131.88))
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
-(change-theme 'doom-gruvbox-light 'doom-gruvbox)
-
-(use-package smooth-scrolling
-  :demand t)
+(change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
+;;(change-theme 'doom-gruvbox-light 'timu-rogue)
 
 ;;;;; hl-indent
 (use-package highlight-indent-guides

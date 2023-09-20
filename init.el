@@ -1,34 +1,34 @@
-;; BetterGC
-(defvar better-gc-cons-threshold 134217728 ; 128mb
-  "If you experience freezing, decrease this.
-If you experience stuttering, increase this.")
+;; ;; BetterGC
+;; (defvar better-gc-cons-threshold 134217728 ; 128mb
+;;   "If you experience freezing, decrease this.
+;; If you experience stuttering, increase this.")
 
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold better-gc-cons-threshold)
-            (setq file-name-handler-alist file-name-handler-alist-original)
-            (makunbound 'file-name-handler-alist-original)))
-;; -BetterGC
+;; (add-hook 'emacs-startup-hook
+;;           (lambda ()
+;;             (setq gc-cons-threshold better-gc-cons-threshold)
+;;             (setq file-name-handler-alist file-name-handler-alist-original)
+;;             (makunbound 'file-name-handler-alist-original)))
+;; ;; -BetterGC
 
-;; AutoGC
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (if (boundp 'after-focus-change-function)
-                (add-function :after after-focus-change-function
-                              (lambda ()
-                                (unless (frame-focus-state)
-                                  (garbage-collect))))
-              (add-hook 'after-focus-change-function 'garbage-collect))
-            (defun gc-minibuffer-setup-hook ()
-              (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
+;; ;; AutoGC
+;; (add-hook 'emacs-startup-hook
+;;           (lambda ()
+;;             (if (boundp 'after-focus-change-function)
+;;                 (add-function :after after-focus-change-function
+;;                               (lambda ()
+;;                                 (unless (frame-focus-state)
+;;                                   (garbage-collect))))
+;;               (add-hook 'after-focus-change-function 'garbage-collect))
+;;             (defun gc-minibuffer-setup-hook ()
+;;               (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
 
-            (defun gc-minibuffer-exit-hook ()
-              (garbage-collect)
-              (setq gc-cons-threshold better-gc-cons-threshold))
+;;             (defun gc-minibuffer-exit-hook ()
+;;               (garbage-collect)
+;;               (setq gc-cons-threshold better-gc-cons-threshold))
 
-            (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
-            (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
-;; -AutoGC
+;;             (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+;;             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
+;; ;; -AutoGC
 
 ;; emacsclient --no-wait--alternate-editor=emacs [FILE]
 (require 'server)
@@ -108,14 +108,22 @@ If you experience stuttering, increase this.")
     (use-package-process-keywords name-symbol rest state)))
 
 ;;________________________________________________________________
+;;    Install quelpa
+;;________________________________________________________________
+(unless (package-installed-p 'quelpa)
+  (with-temp-buffer
+    (url-insert-file-contents "https://raw.githubusercontent.com/quelpa/quelpa/master/quelpa.el")
+    (eval-buffer)
+    (quelpa-self-upgrade)))
+(require 'quelpa)
+
+;;________________________________________________________________
 ;;    Setup config using org-mode
 ;;________________________________________________________________
 ;; (org-babel-load-file
 ;;  (expand-file-name
 ;;   "README.org"
 ;;   user-emacs-directory))
-
-;; (setq default-frame-alist '((undecorated . nil)))
 
 ;;;; Load custom-files
 (defun load-directory (dir)
@@ -155,7 +163,7 @@ If you experience stuttering, increase this.")
       default-buffer-file-coding-system 'utf-8
       blink-cursor-interval             0.7       ;; Little slower cursor blinking . default is 0.5
       create-lockfiles                  nil
-      idle-update-delay                 1.2    ;; Speed things up by not updating so often
+      idle-update-delay                 1.2    ;; Speed things up by not updating so often ; default is 0.5.
       read-process-output-max           (* 8 1024 1024)
       ediff-split-window-function       'split-window-horizontally
       highlight-nonselected-windows     t
@@ -163,48 +171,42 @@ If you experience stuttering, increase this.")
       ;; backup-by-copying                 t
       byte-compile-warnings             '(ck-functions)
       confirm-kill-processes            nil
-      fast-but-imprecise-scrolling      t
+      ;; fast-but-imprecise-scrolling      t ; nil
       jit-lock-defer-time               0.0
       echo-keystrokes                   0.2
       kill-buffer-query-functions       nil    ;; Dont ask for closing spawned processes
-      line-number-mode                  nil
       use-dialog-box                    nil
       load-prefer-newer                 t
       word-wrap                         nil
-      visible-bell                      nil
       bidi-display-reordering           nil
       large-file-warning-threshold nil      ;; Disable "File is large. Really open?"
       x-stretch-cursor                  t   ;; stretch cursor on tabs
-      scroll-margin                     4   ;; scroll N to screen edge
+      ;; scroll-margin                     4   ;; scroll N to screen edge
       undo-limit                        6710886400 ;; 64mb
       undo-strong-limit                 100663296 ;; x 1.5 (96mb)
       undo-outer-limit                  1006632960  ;; x 10 (960mb), (Emacs uses x100), but this seems too high.
 
       debug-on-error init-file-debug     ; Reduce debug output, well, unless we've asked for it.
       jka-compr-verbose init-file-debug
-      read-process-output-max (* 64 1024); 64kb
       ;; Emacs "updates" its ui more often than it needs to, so slow it down slightly
-      idle-update-delay 1.0              ; default is 0.5.
-      scroll-step 1                      ; scroll with less jump.
-      scroll-preserve-screen-position t
-      scroll-margin 3
-      scroll-conservatively 101
-      scroll-up-aggressively 0.01
-      scroll-down-aggressively 0.01
-      lazy-lock-defer-on-scrolling t     ; set this to make scolloing faster.
-      auto-window-vscroll nil            ; Lighten vertical scroll.
-      fast-but-imprecise-scrolling nil
-      mouse-wheel-scroll-amount '(1 ((shift) . 1))
-      mouse-wheel-progressive-speed nil
-      hscroll-step 1                     ; Horizontal Scroll.
-      hscroll-margin 1
+      ;; scroll-step 3                      ; scroll with less jump.
+      ;; scroll-preserve-screen-position t
+      ;; scroll-margin 3
+      ;; scroll-conservatively 101
+      ;; scroll-up-aggressively 0.1
+      ;; scroll-down-aggressively 0.1
+      ;; lazy-lock-defer-on-scrolling t     ; set this to make scolloing faster.
+      ;; auto-window-vscroll nil            ; Lighten vertical scroll.
+      ;; mouse-wheel-scroll-amount '(1 ((shift) . 1))
+      ;; mouse-wheel-progressive-speed nil
+      ;; hscroll-step 1                     ; Horizontal Scroll.
+      ;; hscroll-margin 1
       help-window-select t               ; select help window when opened
       redisplay-skip-fontification-on-input t
       tab-always-indent 'complete        ; smart tab behavior - indent or complete.
       visible-bell t                     ; Flash the screen on error, don't beep.
       view-read-only t					; Toggle ON or OFF with M-x view-mode (or use e to exit view-mode).
       use-dialog-box nil                 ; Don't pop up UI dialogs when prompting.
-      echo-keystrokes 0.1                ; Show Keystrokes in Progress Instantly.
       delete-auto-save-files t           ; deletes buffer's auto save file when it is saved or killed with no changes in it.
       kill-whole-line t 			        ; kills the entire line plus the newline
       save-place-forget-unreadable-files nil
@@ -212,7 +214,6 @@ If you experience stuttering, increase this.")
       next-line-add-newlines nil         ; don't automatically add new line, when scroll down at the bottom of a buffer.
       require-final-newline t            ; require final new line.
       mouse-sel-retain-highlight t       ; keep mouse high-lighted.
-      highlight-nonselected-windows nil
       transient-mark-mode t              ; highlight the stuff you are marking.
       ffap-machine-p-known 'reject       ; Don't ping things that look like domain names.
       pgtk-wait-for-event-timeout 0.001
@@ -258,7 +259,6 @@ If you experience stuttering, increase this.")
 (tooltip-mode -1)           ; Disable tooltips
 (set-fringe-mode 10)        ; Give some breathing room
 (menu-bar-mode -1)          ; Disable the menu bar
-(global-display-line-numbers-mode t)
 
 ;; Disable backup
 (setq backup-inhibited t)
@@ -382,12 +382,6 @@ If you experience stuttering, increase this.")
 
 (xterm-mouse-mode t)
 
-;; auto-format different source code files extremely intelligently
-;; https://github.com/radian-software/apheleia
-(use-package apheleia
-  :config
-  (apheleia-global-mode +1))
-
 ;; (add-hook 'prog-mode-hook 'linum-mode)
 ;; (add-hook 'prog-mode-hook 'visual-line-mode)
 ;; (add-hook 'prog-mode-hook 'show-paren-mode)
@@ -400,28 +394,28 @@ If you experience stuttering, increase this.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;________________________________________________________________
-;;;    Flycheck
+;;;    Flycheck / Flyspell
 ;;________________________________________________________________
 
-;; (use-package flycheck
-;;   :hook (prog-mode . flycheck-mode)
-;;   :diminish
-;;   :custom
-;;   (flycheck-indication-mode 'left-fringe)
-;;   (flycheck-display-errors-delay 0.2)
-;;   (flycheck-check-syntax-automatically '(save idle-change))
-;;   (flycheck-idle-change-delay 2)
-;; 	:config
-;; 	;; enable typescript-tslint checker
-;; 	(flycheck-add-mode 'typescript-tslint 'web-mode))
-;;
-;; (use-package flycheck-inline
-;;   :hook (flycheck-mode . turn-on-flycheck-inline))
-;;
-;; (use-package flycheck-rust
-;;   :config
-;;   (with-eval-after-load 'rust-mode
-;;     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+(use-package flycheck
+  :hook (prog-mode . flycheck-mode)
+  :diminish
+  :custom
+  (flycheck-indication-mode 'left-fringe)
+  (flycheck-display-errors-delay 0.2)
+  (flycheck-check-syntax-automatically '(save idle-change))
+  (flycheck-idle-change-delay 2)
+	:config
+	;; enable typescript-tslint checker
+	(flycheck-add-mode 'typescript-tslint 'web-mode))
+
+(use-package flycheck-inline
+  :hook (flycheck-mode . turn-on-flycheck-inline))
+
+(use-package flycheck-rust
+  :config
+  (with-eval-after-load 'rust-mode
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 ;;
 ;; (use-package ispell
 ;;   :bind ("<f8>" . ispell-word) ; easy spell check

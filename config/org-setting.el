@@ -10,8 +10,9 @@
          (org-mode . visual-line-mode)
          (org-mode . variable-pitch-mode))
   :bind (("C-c l" . org-store-link)
-         ("C-c c" . org-capture)
          ("M-q" . toggle-truncate-lines)
+	 :map global-map
+	 ("C-c c" . org-capture)
          ;; Timer (Pomodoro)
          ("C-c t s" . org-timer-set-timer)
          ("C-c t SPC" . org-timer-pause-or-continue)
@@ -146,6 +147,10 @@
    org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
    org-modern-hide-stars " "
    org-modern-keyword "‣"))
+
+(use-package org-books
+  :config
+  (setq org-books-file "~/Org/Reading-list.org"))
 
 (use-package org-appear
   :hook
@@ -360,6 +365,9 @@
                                    (org-datetree-find-date-create
                                     (org-date-to-gregorian (org-today)) t)
                                    (re-search-forward "^\\*.+ log" nil t)))
-         "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")))
+         "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")
+	("b" "Book" entry (file "~/Org/Reading-list.org")
+         "* %^{TITLE}\n:PROPERTIES:\n:ADDED: <%<%Y-%m-%d>>\n:END:%^{AUTHOR}\n%^{GOODREADS_URL}%?" :empty-lines 1)
+	))
 
 (provide 'org-setting)

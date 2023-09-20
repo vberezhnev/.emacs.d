@@ -1,13 +1,177 @@
 ;;________________________________________________________________
-;;;    Company
+;;;    LSP & Completion
+;;________________________________________________________________
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-tex-server 'digestif)
+  (setq lsp-idle-delay 0.2)
+(add-to-list 'auto-mode-alist '("\\.jsx?$" . lsp-mode)) ;; auto-enable for .js/.jsx files
+(add-to-list 'auto-mode-alist '("\\.tsx?$" . lsp-mode)) ;; auto-enable for .ts/.tsx files
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (go-mode         . lsp)
+         (rust-mode       . lsp)
+         ;; (web-mode        . lsp)
+         (js-mode         . lsp)
+         (typescript-mode . lsp)
+         (LaTeX-mode      . lsp)
+         ;; if you want which-key integration
+         (lsp-mode        . lsp-enable-which-key-integration))
+  :commands lsp
+  :custom
+  (lsp-enable-snippet t))
+
+(add-hook 'js-mode-hook #'lsp-mode)
+(add-hook 'typescript-mode-hook #'lsp-mode) ;; for typescript support
+(add-hook 'js3-mode-hook #'lsp-mode) ;; for js3-mode support
+
+;; optionally
+(use-package lsp-ui
+  :commands lsp-ui-mode
+  :config
+  (setq lsp-ui-doc-enable t)
+  (setq lsp-ui-doc-header t)
+  (setq lsp-ui-doc-include-signature t)
+  (setq lsp-ui-doc-border (face-foreground 'default))
+  (setq lsp-ui-sideline-delay 0.01)
+  (setq lsp-ui-sideline-show-code-actions t))
+
+;; if you are helm user
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;; Symbol highlighting
+(setq lsp-enable-symbol-highlighting nil)
+
+;; Need for LSP
+(use-package sideline
+  :init
+  (setq sideline-backends-skip-current-line t  ; don't display on current line
+        sideline-order-left 'down              ; or 'up
+        sideline-order-right 'up               ; or 'down
+        sideline-format-left "%s   "           ; format for left aligment
+        sideline-format-right "   %s"          ; format for right aligment
+        sideline-priority 100                  ; overlays' priority
+        sideline-display-backend-name t))      ; display the backend name
+
+(use-package sideline-flycheck
+  :hook (flycheck-mode . sideline-flycheck-setup))
+
+(setq tab-always-indent 'complete)
+;; (setq completion-cycle-threshold 3)
+
+(use-package tree-sitter
+  :config
+  ;; activate tree-sitter on any buffer containing code for which it has a parser available
+  (global-tree-sitter-mode)
+  ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
+  ;; by switching on and off
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+(use-package tree-sitter-langs
+  :after tree-sitter)
+
+;;________________________________________________________________
+;;;    Golang
 ;;________________________________________________________________
 
-(use-package company
-  :hook (after-init . global-company-mode)
+(use-package go-mode)
+(add-hook 'go-mode-hook 'lsp-go-install-save-hooks)
+
+;; Set up before-save hooks to format buffer and add/delete imports.
+;; Make sure you don't have other gofmt/goimports hooks enabled.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook 'lsp-format-buffer t t)
+  (add-hook 'before-save-hook 'lsp-organize-imports t t))
+
+;; (lsp-register-custom-settings
+;; 		'(("gopls.completeUnimported" t t)
+;; 		("gopls.staticcheck" t t)))
+
+;;________________________________________________________________
+;;;    JavaScript / TypeScript
+;;________________________________________________________________
+
+(use-package import-js)
+
+(use-package typescript-mode
+  :after tree-sitter
   :config
-  ;; Оптимизация компании для ускорения загрузки
+  ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
+  ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
+  (define-derived-mode typescriptreact-mode typescript-mode
+    "TypeScript TSX")
+
+  ;; use our derived mode for tsx files
+  (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
+  ;; by default, typescript-mode is mapped to the treesitter typescript parser
+  ;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
+  (add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
+
+(use-package tide
+  :after (company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (tsx-ts-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save)))
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+(setq tide-format-options '(:tabSize 2 :indentSize 2 ))
+;; TSX with treesitter
+(add-hook 'tsx-ts-mode-hook #'setup-tide-mode)
+(add-hook 'js2-mode-hook #'setup-tide-mode)
+
+;; formats the buffer before saving
+(add-hook 'before-save-hook 'tide-format-before-save)
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+
+(add-hook 'web-mode-hook
+          (lambda ()
+            (when (string-equal "jsx" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+
+(use-package json-mode   :defer 20
+  :custom
+  (json-reformat:indent-width 2)
+  :mode (("\\.bowerrc$"     . json-mode)
+	 ("\\.jshintrc$"    . json-mode)
+	 ("\\.json_schema$" . json-mode)
+	 ("\\.json\\'" . json-mode))
+  :bind (:package json-mode-map
+		  :map json-mode-map
+		  ("C-c <tab>" . json-mode-beautify)))
+
+;;________________________________________________________________
+;;;    Rust
+;;________________________________________________________________
+(use-package rust-playground  )
+
+(use-package rust-mode
+  :if (executable-find "rustc"))
+
+(use-package cargo
+  :if (executable-find "cargo")
+  :after rust-mode
+  :bind (:map cargo-minor-mode-map
+              ("C-c C-t" . cargo-process-test)
+              ("C-c C-b" . cargo-process-build)
+              ("C-c C-c" . cargo-process-run))
+  :config
+  (add-hook 'rust-mode-hook 'cargo-minor-mode))
+(add-hook 'rust-mode-hook 'lsp-deferred)
+
+;;________________________________________________________________
+;;;    Company
+;;________________________________________________________________
+(use-package company
+  :config
   (setq company-minimum-prefix-length 3
-        ;; company-idle-delay 0.2
+        company-idle-delay 0
         company-tooltip-limit 10
         company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil
@@ -21,55 +185,12 @@
         company-backends '((company-capf :with company-yasnippet)
                            company-files
                            (company-dabbrev-code company-gtags company-keywords)
-                           company-dabbrev)))
+                           company-dabbrev))
+  (setq lsp-prefer-capf t))
 
 (use-package company-box
   :hook (company-mode . company-box-mode)
   :config
-  (setq company-box-show-single-candidate t
-        company-box-backends-colors nil
-        company-box-max-candidates 50
-        company-box-icons-alist 'company-box-icons-all-the-icons
-        ;; Move company-box-icons--elisp to the end, because it has a catch-all
-        ;; clause that ruins icons from other backends in elisp buffers.
-        company-box-icons-functions
-        (cons #'+company-box-icons--elisp-fn
-              (delq 'company-box-icons--elisp
-                    company-box-icons-functions))
-        company-box-icons-all-the-icons
-        (let ((all-the-icons-scale-factor 0.8))
-          `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
-            (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
-            (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
-            (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-            (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
-            (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
-            (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
-            (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
-            (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
-            (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
-            (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
-            (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
-            (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
-            (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
-            (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
-            (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
-            (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
-            (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
-            (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
-            (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
-            (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
-            (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-            (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))
-            (ElispFunction . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-            (ElispVariable . ,(all-the-icons-material "check_circle"             :face 'all-the-icons-blue))
-            (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
-            (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink)))))
-
   ;; HACK Fix oversized scrollbar in some odd cases
   ;; REVIEW `resize-mode' is deprecated and may stop working in the future.
   ;; TODO PR me upstream?
@@ -84,6 +205,16 @@
               ((boundp sym)   'ElispVariable)
               ((featurep sym) 'ElispFeature)
               ((facep sym)    'ElispFace))))))
+
+(use-package company-org-block
+  :custom
+  (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
+  :hook ((org-mode . (lambda ()
+                       (setq-local company-backends '(company-org-block))
+                       (company-mode +1)))))
+
+;; aligns annotation to the right hand side
+(setq company-tooltip-align-annotations t)
 
 (use-package company-auctex
 	:after (latex)
@@ -117,238 +248,46 @@
   (use-package ac-math))
 (company-auctex-init)
 
-(use-package company-org-block
-  :custom
-  (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
-  :hook ((org-mode . (lambda ()
-                       (setq-local company-backends '(company-org-block))
-                       (company-mode +1)))))
-
-;; aligns annotation to the right hand side
-(setq company-tooltip-align-annotations t)
-
 ;;________________________________________________________________
-;;;    LSP & Completion
+;;;    Corfu
 ;;________________________________________________________________
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-tex-server 'digestif)
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (go-mode         . lsp)
-         (js-mode         . lsp)
-         (javascript-mode . lsp)
-         (typescript-mode . lsp)
-         (rjsx            . lsp)
-         (rust-mode       . lsp)
-         (LaTeX-mode      . lsp)
-         (web-mode . lsp)
-         ;; if you want which-key integration
-         (lsp-mode        . lsp-enable-which-key-integration))
-  :commands lsp
-  :custom
-  (lsp-enable-snippet t))
+;; (use-package corfu
+;;   ;; Optional customizations
+;;   :custom
+;;   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+;;   ;; (corfu-auto t)                 ;; Enable auto completion
+;;   ;; (corfu-separator ?\s)          ;; Orderless field separator
+;;   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+;;   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+;;   ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+;;   ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+;;   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+;;   (corfu-scroll-margin 5)        ;; Use scroll margin
 
-;; (add-hook 'js-mode-hook #'lsp-mode)
-;; (add-hook 'typescript-mode-hook #'lsp-mode) ;; for typescript support
-;; (add-hook 'js3-mode-hook #'lsp-mode) ;; for js3-mode support
-;; (add-hook 'rjsx-mode #'lsp-mode) ;; for rjsx-mode support
+;;   ;; Enable Corfu only for certain modes.
+;;   :hook ((prog-mode . corfu-mode)
+;;          (shell-mode . corfu-mode)
+;;          (eshell-mode . corfu-mode))
 
-;; optionally
-(use-package lsp-ui
-  :commands lsp-ui-mode
-  :config
-  (setq lsp-ui-doc-enable t)
-  (setq lsp-ui-doc-header t)
-  (setq lsp-ui-doc-include-signature t)
-  (setq lsp-ui-doc-border (face-foreground 'default))
-  ;; (setq lsp-ui-sideline-delay 0.05)
-  (setq lsp-ui-sideline-show-code-actions t))
+;;   ;; Recommended: Enable Corfu globally.
+;;   ;; This is recommended since Dabbrev can be used globally (M-/).
+;;   ;; See also `global-corfu-modes'.
+;;   :init
+;;   (global-corfu-mode))
 
-;; if you are helm user
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-;; Symbol highlighting
-(setq lsp-enable-symbol-highlighting nil)
+;; ;; A few more useful configurations...
+;; (use-package emacs
+;;   :init
+;;   ;; TAB cycle if there are only few candidates
+;;   (setq completion-cycle-threshold 3)
 
-;; Need for LSP
-(use-package sideline
-  :init
-  (setq sideline-backends-skip-current-line t  ; don't display on current line
-        sideline-order-left 'down              ; or 'up
-        sideline-order-right 'up               ; or 'down
-        sideline-format-left "%s   "           ; format for left aligment
-        sideline-format-right "   %s"          ; format for right aligment
-        sideline-priority 100                  ; overlays' priority
-        sideline-display-backend-name t))      ; display the backend name
+;;   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
+;;   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+;;   (setq read-extended-command-predicate
+;;         #'command-completion-default-include-p)
 
-(use-package sideline-flycheck
-  :hook (flycheck-mode . sideline-flycheck-setup))
-
-;; Completion
-(use-package corfu
-  :config
-  (defun corfu-enable-in-minibuffer ()
-    "Enable Corfu in the minibuffer if `completion-at-point' is bound."
-    (when (where-is-internal #'completion-at-point (list (current-local-map)))
-      ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
-      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-                  corfu-popupinfo-delay nil)
-      (corfu-mode 1)))
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer))
-
-(setq tab-always-indent 'complete)
-(setq completion-cycle-threshold 3)
-
-;; optionally if you want to use debugger
-;; (use-package dap-LANGUAGE) to load the dap adapter for your language
-(use-package dap-mode)
-
-(use-package tree-sitter
-  :config
-  ;; activate tree-sitter on any buffer containing code for which it has a parser available
-  (global-tree-sitter-mode)
-  ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
-  ;; by switching on and off
-  (add-hook 'tree-sitter-after-on-hook 'tree-sitter-hl-mode))
-
-
-(use-package tree-sitter-langs
-  :after tree-sitter)
-
-;;________________________________________________________________
-;;;    Golang
-;;________________________________________________________________
-
-(use-package go-mode)
-(add-hook 'go-mode-hook 'lsp-go-install-save-hooks)
-
-;; Set up before-save hooks to format buffer and add/delete imports.
-;; Make sure you don't have other gofmt/goimports hooks enabled.
-(defun lsp-go-install-save-hooks ()
-  (add-hook 'before-save-hook 'lsp-format-buffer t t)
-  (add-hook 'before-save-hook 'lsp-organize-imports t t))
-
-
-;; (lsp-register-custom-settings
-;; 		'(("gopls.completeUnimported" t t)
-;; 		("gopls.staticcheck" t t)))
-
-;;________________________________________________________________
-;;;    JavaScript / TypeScript
-;;________________________________________________________________
-
-(use-package import-js)
-
-(use-package js2-mode   :defer 20
-  :mode
-  (("\\.js\\'" . js2-mode))
-  :custom
-  (js2-include-node-externs t)
-  ;;(js2-global-externs '("customElements"))
-  (js2-highlight-level 3)
-  (js2r-prefer-let-over-var t)
-  (js2r-prefered-quote-type 2)
-  (js-indent-align-list-continuation t)
-  (global-auto-highlight-symbol-mode t)
-  :config
-  (setq js-indent-level 2)
-  ;; patch in basic private field support
-  (advice-add #'js2-identifier-start-p
-              :after-until
-              (lambda (c) (eq c ?#))))
-
-(use-package typescript-mode
-  :mode "\\.ts\\'"
-  :hook (typescript-mode . lsp-deferred)
-  :config
-  (setq typescript-indent-level 2))
-
-(use-package tide
-  :after (company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (tsx-ts-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save)))
-(defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  (company-mode +1))
-
-(setq tide-format-options '(:tabSize 2 :indentSize 2 ))
-;; TSX with treesitter
-(add-hook 'tsx-ts-mode-hook #'setup-tide-mode)
-
-(add-hook 'js2-mode-hook #'setup-tide-mode)
-;; configure javascript-tide checker to run after your default javascript checker
-;; (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
-
-;; formats the buffer before saving
-(add-hook 'before-save-hook 'tide-format-before-save)
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
-
-(use-package web-mode
-  :mode (("\\.js\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode)
-         ("\\.ts\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.html\\'" . web-mode)
-         ("\\.vue\\'" . web-mode)
-         ("\\.json\\'" . web-mode))
-  :commands web-mode
-  :config
-  (setq web-mode-content-types-alist
-        '(("jsx" . "\\.js[x]?\\'"))))
-
-;; JSX syntax highlighting
-;; (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
-;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
-
-
-;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-;; (add-hook 'web-mode-hook
-;;           (lambda ()
-;;             (when (string-equal "jsx" (file-name-extension buffer-file-name))
-;;               (setup-tide-mode))))
-
-;; configure jsx-tide checker to run after your default jsx checker
-;; (flycheck-add-mode 'javascript-eslint 'web-mode)
-;; (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-
-(use-package json-mode   :defer 20
-  :custom
-  (json-reformat:indent-width 2)
-  :mode (("\\.bowerrc$"     . json-mode)
-		     ("\\.jshintrc$"    . json-mode)
-		     ("\\.json_schema$" . json-mode)
-		     ("\\.json\\'" . json-mode))
-  :bind (:package json-mode-map
-				          :map json-mode-map
-				          ("C-c <tab>" . json-mode-beautify)))
-
-;;________________________________________________________________
-;;;    Rust
-;;________________________________________________________________
-
-(use-package rust-playground  )
-
-(use-package rust-mode
-  :if (executable-find "rustc"))
-
-(use-package cargo
-  :if (executable-find "cargo")
-  :after rust-mode
-  :bind (:map cargo-minor-mode-map
-              ("C-c C-t" . cargo-process-test)
-              ("C-c C-b" . cargo-process-build)
-              ("C-c C-c" . cargo-process-run))
-  :config
-  (add-hook 'rust-mode-hook 'cargo-minor-mode))
-(add-hook 'rust-mode-hook 'lsp-deferred)
+;;   ;; Enable indentation+completion using the TAB key.
+;;   ;; `completion-at-point' is often bound to M-TAB.
+;;   (setq tab-always-indent 'complete))
 
 (provide 'lsp-setting)
