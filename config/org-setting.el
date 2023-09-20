@@ -367,7 +367,6 @@
                                    (re-search-forward "^\\*.+ log" nil t)))
          "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")
 	("b" "Book" entry (file "~/Org/Reading-list.org")
-         "* %^{TITLE}\n:PROPERTIES:\n:ADDED: <%<%Y-%m-%d>>\n:END:%^{AUTHOR}\n%^{GOODREADS_URL}%?" :empty-lines 1)
-	))
+         "* %^{TITLE}\n:PROPERTIES:\n:ADDED: <%<%Y-%m-%d>>\n:END:%^{AUTHOR}\n%^{GOODREADS_URL}%?" :empty-lines 1)))
 
 (provide 'org-setting)

@@ -46,18 +46,18 @@
       (file+head "bibliography/references/${citekey}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Book:%^{Book type}:")
       :unnarrowed t)))
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-  (org-roam-dailies-capture-templates
-   '(
-     ("m" "Morning diary №1" plain (file "~/Org/Templates/journal/Morning.org") :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
-     ("m" "Morning diary №2" entry "* Default (%U): «%?»‎\n\n#+begin_quote\n%^{Quote}\n#+end_quote" :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
+  ;; (org-roam-dailies-capture-templates
+  ;;  '(
+  ;;    ("m" "Morning diary №1" plain (file "~/Org/Templates/journal/Morning.org") :clock-in t :clock-resume t
+  ;;     :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
+  ;;    ("m" "Morning diary №2" entry "* Default (%U): «%?»‎\n\n#+begin_quote\n%^{Quote}\n#+end_quote" :clock-in t :clock-resume t
+  ;;     :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
      
-     ("d" "Default diary" entry "* Default (%U): «%?»‎\n\n" :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
+  ;;    ("d" "Default diary" entry "* Default (%U): «%?»‎\n\n" :clock-in t :clock-resume t
+  ;;     :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
      
-     ("e" "Evening diary" plain (file "~/Org/Templates/journal/Evening.org") :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))))
+  ;;    ("e" "Evening diary" plain (file "~/Org/Templates/journal/Evening.org") :clock-in t :clock-resume t
+  ;;     :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))))
   ;; Org-noter integration with org-roam-bibtex
   (setq orb-preformat-keywords
         '("citekey" "title" "url" "author-or-editor" "keywords" "file")

@@ -85,7 +85,7 @@
   :custom
   (use-package-verbose t)
   (use-package-always-ensure t)  ; :ensure t by default
-  (use-package-always-defer nil) ; :defer t by default
+  (use-package-always-defer t) ; :defer t by default
   (use-package-expand-minimally t)
   (use-package-enable-imenu-support t))
 
@@ -124,15 +124,6 @@
 ;;  (expand-file-name
 ;;   "README.org"
 ;;   user-emacs-directory))
-
-;;;; Load custom-files
-(defun load-directory (dir)
-  "Load all *.el files in a directory."
-  (let ((load-it (lambda (f)
-                   (load-file (concat (file-name-as-directory dir) f)))))
-    (mapc load-it (directory-files dir nil "\\.el$"))))
-
-(load-directory "~/.emacs.d/config") ; load my configuration of packages
 
 ;;________________________________________________________________
 ;;    Base settings of Emacs
@@ -392,7 +383,6 @@
 ;; ;;      SPELLING       ;; ;;
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;; ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;;________________________________________________________________
 ;;;    Flycheck / Flyspell
 ;;________________________________________________________________
@@ -506,83 +496,6 @@
 	;; (evil-set-initial-state 'dired-mode 'emacs)
 	(evil-set-initial-state 'sunrise-mode 'emacs)
   (evil-collection-init))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
-;; ;;     APPEREANCE     ;; ;;
-;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;________________________________________________________________
-;;    Modeline
-;;________________________________________________________________
-
-(use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
-  :init
-  (setq doom-modeline-bar-width 5
-        doom-modeline-buffer-file-name-style 'truncate-except-project
-        doom-modeline-lsp t
-        doom-modeline-env-version t
-        doom-modeline-indent-info t
-        doom-modeline-buffer-encoding nil
-        doom-modeline-enable-word-count t
-        doom-modeline-vcs-max-length 20
-        doom-modeline-major-mode-color-icon t
-        doom-modeline-time-icon t
-        doom-modeline-battery t
-        doom-modeline-time t
-        doom-modeline-workspace-name t
-        doom-modeline-env-version t
-        doom-modeline-modal-modern-icon t
-        doom-modeline-modal-icon t
-        doom-modeline-modal t)
-  :config
-  (eval-when-compile
-    'company
-    (doom-modeline-def-segment company-backend
-      "Display the current company backend. `company-backend'."
-      (when (company--active-p)
-        (format "%s"
-                (--map (s-replace "company-" "" (format "%s" it))
-                       (if (listp company-backend) company-backend (list company-backend)))))))
-  (doom-modeline-def-segment
-    buffer-info
-    "Overwrite of buffer info to not include the icon"
-    (concat
-     (doom-modeline--buffer-state-icon)
-     (doom-modeline--buffer-name)))
-  (doom-modeline-def-segment
-    buffer-type
-    "Buffer icon and version if it exists"
-    (concat
-     (doom-modeline-spc)
-     (doom-modeline--buffer-mode-icon)
-     (when (and doom-modeline-env-version doom-modeline-env--version)
-       (propertize
-        (format "%s " doom-modeline-env--version)
-        'face '(:height 0.7))))))
-
-(use-package minions
-  :delight " 𝛁"
-  :hook (doom-modeline-mode . minions-mode)
-  :config
-  (minions-mode 1)
-  (setq minions-mode-line-lighter "[+]"))
-
-;;;; Modeline
-(setq frame-title-format
-      '(""
-        (:eval
-         (if (s-contains-p org-roam-directory (or buffer-file-name ""))
-             (replace-regexp-in-string
-              ".*/[0-9]*-?" "☰ "
-              (subst-char-in-string ?_ ?  buffer-file-name))
-           "%b"))
-        (:eval
-         (let ((project-name (projectile-project-name)))
-           (unless (string= "-" project-name)
-             (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
-
 ;;________________________________________________________________
 ;;    Treemacs
 ;;________________________________________________________________
@@ -692,22 +605,8 @@
   :demand t
   :ensure t)
 
-(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
-  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
-  :ensure t
-  :demand t
-  :config (treemacs-set-scope-type 'Perspectives))
-
-(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
-  :after (treemacs)
-  :ensure t
-  :demand t
-  :config (treemacs-set-scope-type 'Tabs))
-
 (use-package treemacs-all-the-icons
-  :after (treemacs all-the-icons)
-  :init
-  (treemacs-load-theme "doom-colors"))
+  :after (treemacs all-the-icons))
 
 (use-package lsp-treemacs
   :after treemacs
@@ -740,17 +639,12 @@
 
 (use-package helm
   :init
-  ;; Настройка сочетаний клавиш для Helm
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
   (global-set-key (kbd "C-x b") 'helm-buffers-list)
   (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
   :demand t
   :config
-  ;; Оптимизация Helm для улучшения производительности
   (setq
-   ;; helm-candidate-number-limit 500
-   ;;      helm-idle-delay 0.0
-   ;;      helm-input-idle-delay 0.01
    helm-quick-update t
    helm-M-x-fuzzy-match t
    helm-buffers-fuzzy-matching t
@@ -911,13 +805,13 @@
 ;;________________________________________________________________
 ;;;;    Fancy pkg
 ;;________________________________________________________________
-(use-package fancy-battery
-  :config
-  (setq fancy-battery-show-percentage t)
-  (setq battery-update-interval 15)
-  (if window-system
-      (fancy-battery-mode)
-    (display-battery-mode)))
+;; (use-package fancy-battery
+;;   :config
+;;   (setq fancy-battery-show-percentage t)
+;;   (setq battery-update-interval 15)
+;;   (if window-system
+;;       (fancy-battery-mode)
+;;     (display-battery-mode)))
 
 ;;;;; beacon
 (use-package beacon
@@ -937,3 +831,28 @@
    beacon-color "#50D050"
    beacon-size 20)
   :delight)
+
+;;;; Load custom-files
+(defun load-directory (dir)
+  "Load all *.el files in a directory."
+  (let ((load-it (lambda (f)
+                   (load-file (concat (file-name-as-directory dir) f)))))
+    (mapc load-it (directory-files dir nil "\\.el$"))))
+
+(load-directory "~/.emacs.d/config") ; load my configuration of packages
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-minibuffer-history-key "M-p")
+ '(org-agenda-files
+   '("/home/chopin/Org/agenda/PlanAhead.org" "/home/chopin/Org/agenda/PlannedDay.org" "/home/chopin/Nextcloud/Org/journal/20230921.gpg"))
+ '(package-selected-packages
+   '(org-journal zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs timu-rouge-theme tide theme-changer telega solaire-mode smooth-scrolling sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters quelpa prettier-js pbcopy org-wild-notifier org-super-agenda org-roam-ui org-roam-timestamps org-recur org-rainbow-tags org-noter-pdftools org-modern org-fancy-priorities org-download org-cliplink org-books org-appear org-alert olivetti ob-typescript ob-sql-mode ob-rust multi-vterm modus-themes minions magit-todos lsp-ui ligature kind-icon json-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp gruvbox-theme go-mode git-gutter-fringe general format-all focus flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement eglot doom-themes doom-modeline dirvish diredfl dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-auctex cargo bug-hunter blamer beacon apheleia ac-math)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

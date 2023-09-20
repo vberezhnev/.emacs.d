@@ -1,3 +1,9 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
+;; ;;     APPEREANCE     ;; ;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;________________________________________________________________
 ;;    Transparent Emacs
 ;;________________________________________________________________
@@ -140,9 +146,9 @@
   :commands (display-line-numbers-scale-linum)
   :hook ((prog-mode . display-line-numbers-mode))
   :config
-  (defun display-line-numbers-scale-linum ()
-    (set-face-attribute 'line-number nil :height 0.6 :background (face-background 'solaire-default-face))
-    (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
+  ;; (defun display-line-numbers-scale-linum ()
+  ;;   (set-face-attribute 'line-number nil :height 0.6 :background (face-background 'solaire-default-face))
+  ;;   (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
   (display-line-numbers-scale-linum)
   (setq display-line-numbers-width 3))
 
@@ -187,5 +193,76 @@
                 ;; pdf-view-mode-hook
                 treemacs-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+;;________________________________________________________________
+;;    Modeline
+;;________________________________________________________________
+(use-package doom-modeline
+  :hook (after-init . doom-modeline-mode)
+  :init
+  (setq doom-modeline-bar-width 5
+        doom-modeline-buffer-file-name-style 'truncate-except-project
+        doom-modeline-lsp t
+        doom-modeline-env-version t
+        doom-modeline-indent-info t
+        doom-modeline-buffer-encoding nil
+        doom-modeline-enable-word-count t
+        doom-modeline-vcs-max-length 20
+        doom-modeline-major-mode-color-icon t
+        doom-modeline-time-icon t
+        doom-modeline-battery t
+        doom-modeline-time t
+        doom-modeline-workspace-name t
+        doom-modeline-env-version t
+        doom-modeline-modal-modern-icon t
+        doom-modeline-modal-icon t
+        doom-modeline-modal t)
+  :config
+  (eval-when-compile
+    'company
+    (doom-modeline-def-segment company-backend
+      "Display the current company backend. `company-backend'."
+      (when (company--active-p)
+        (format "%s"
+                (--map (s-replace "company-" "" (format "%s" it))
+                       (if (listp company-backend) company-backend (list company-backend)))))))
+  (doom-modeline-def-segment
+    buffer-info
+    "Overwrite of buffer info to not include the icon"
+    (concat
+     (doom-modeline--buffer-state-icon)
+     (doom-modeline--buffer-name)))
+  (doom-modeline-def-segment
+    buffer-type
+    "Buffer icon and version if it exists"
+    (concat
+     (doom-modeline-spc)
+     (doom-modeline--buffer-mode-icon)
+     (when (and doom-modeline-env-version doom-modeline-env--version)
+       (propertize
+        (format "%s " doom-modeline-env--version)
+        'face '(:height 0.7))))))
+
+;; (use-package minions
+;;   :delight " 𝛁"
+;;   :hook (doom-modeline-mode . minions-mode)
+;;   :config
+;;   (minions-mode 1)
+;;   (setq minions-mode-line-lighter "[+]"))
+
+;; ;;;; Modeline
+;; (setq frame-title-format
+;;       '(""
+;;         (:eval
+;;          (if (s-contains-p org-roam-directory (or buffer-file-name ""))
+;;              (replace-regexp-in-string
+;;               ".*/[0-9]*-?" "☰ "
+;;               (subst-char-in-string ?_ ?  buffer-file-name))
+;;            "%b"))
+;;         (:eval
+;;          (let ((project-name (projectile-project-name)))
+;;            (unless (string= "-" project-name)
+;;              (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
+
 
 (provide 'appereance-setting)
