@@ -1,34 +1,34 @@
-;; ;; BetterGC
-;; (defvar better-gc-cons-threshold 134217728 ; 128mb
-;;   "If you experience freezing, decrease this.
-;; If you experience stuttering, increase this.")
+;; BetterGC
+(defvar better-gc-cons-threshold 134217728 ; 128mb
+  "If you experience freezing, decrease this.
+If you experience stuttering, increase this.")
 
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (setq gc-cons-threshold better-gc-cons-threshold)
-;;             (setq file-name-handler-alist file-name-handler-alist-original)
-;;             (makunbound 'file-name-handler-alist-original)))
-;; ;; -BetterGC
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold better-gc-cons-threshold)
+            (setq file-name-handler-alist file-name-handler-alist-original)
+            (makunbound 'file-name-handler-alist-original)))
+;; -BetterGC
 
-;; ;; AutoGC
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (if (boundp 'after-focus-change-function)
-;;                 (add-function :after after-focus-change-function
-;;                               (lambda ()
-;;                                 (unless (frame-focus-state)
-;;                                   (garbage-collect))))
-;;               (add-hook 'after-focus-change-function 'garbage-collect))
-;;             (defun gc-minibuffer-setup-hook ()
-;;               (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
+;; AutoGC
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (if (boundp 'after-focus-change-function)
+                (add-function :after after-focus-change-function
+                              (lambda ()
+                                (unless (frame-focus-state)
+                                  (garbage-collect))))
+              (add-hook 'after-focus-change-function 'garbage-collect))
+            (defun gc-minibuffer-setup-hook ()
+              (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
 
-;;             (defun gc-minibuffer-exit-hook ()
-;;               (garbage-collect)
-;;               (setq gc-cons-threshold better-gc-cons-threshold))
+            (defun gc-minibuffer-exit-hook ()
+              (garbage-collect)
+              (setq gc-cons-threshold better-gc-cons-threshold))
 
-;;             (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
-;;             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
-;; ;; -AutoGC
+            (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+            (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
+;; -AutoGC
 
 ;; emacsclient --no-wait--alternate-editor=emacs [FILE]
 (require 'server)
@@ -392,9 +392,9 @@
   :diminish
   :custom
   (flycheck-indication-mode 'left-fringe)
-  (flycheck-display-errors-delay 0.2)
+  (flycheck-display-errors-delay 0.5)
   (flycheck-check-syntax-automatically '(save idle-change))
-  (flycheck-idle-change-delay 2)
+  (flycheck-idle-change-delay 0.5)
 	:config
 	;; enable typescript-tslint checker
 	(flycheck-add-mode 'typescript-tslint 'web-mode))
@@ -847,7 +847,7 @@
  ;; If there is more than one, they won't work right.
  '(helm-minibuffer-history-key "M-p")
  '(org-agenda-files
-   '("/home/chopin/Org/agenda/PlanAhead.org" "/home/chopin/Org/agenda/PlannedDay.org" "/home/chopin/Nextcloud/Org/journal/20230921.gpg"))
+   '("/home/chopin/Org/agenda/PlanAhead.org" "/home/chopin/Org/agenda/PlannedDay.org"))
  '(package-selected-packages
    '(org-journal zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs timu-rouge-theme tide theme-changer telega solaire-mode smooth-scrolling sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters quelpa prettier-js pbcopy org-wild-notifier org-super-agenda org-roam-ui org-roam-timestamps org-recur org-rainbow-tags org-noter-pdftools org-modern org-fancy-priorities org-download org-cliplink org-books org-appear org-alert olivetti ob-typescript ob-sql-mode ob-rust multi-vterm modus-themes minions magit-todos lsp-ui ligature kind-icon json-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp gruvbox-theme go-mode git-gutter-fringe general format-all focus flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement eglot doom-themes doom-modeline dirvish diredfl dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-auctex cargo bug-hunter blamer beacon apheleia ac-math)))
 (custom-set-faces

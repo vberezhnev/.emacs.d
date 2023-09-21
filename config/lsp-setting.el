@@ -6,15 +6,18 @@
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
   (setq lsp-tex-server 'digestif)
-  (setq lsp-idle-delay 0.2)
-(add-to-list 'auto-mode-alist '("\\.jsx?$" . lsp-mode)) ;; auto-enable for .js/.jsx files
-(add-to-list 'auto-mode-alist '("\\.tsx?$" . lsp-mode)) ;; auto-enable for .ts/.tsx files
+  (setq lsp-idle-delay 0.500)
+  (setq lsp-enable-semantic-highlighting nil)
+  (setq lsp-log-io nil) ; if set to true can cause a performance hit
+  (setq read-process-output-max (* 1024 1024 1024))
+  (add-to-list 'auto-mode-alist '("\\.jsx?$" . lsp-mode)) ;; auto-enable for .js/.jsx files
+  (add-to-list 'auto-mode-alist '("\\.tsx?$" . lsp-mode)) ;; auto-enable for .ts/.tsx files
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
          (go-mode         . lsp)
          (rust-mode       . lsp)
-         ;; (web-mode        . lsp)
-         (js-mode         . lsp)
-         (typescript-mode . lsp)
+         (web-mode        . lsp)
+         ;; (js-mode         . lsp)
+         ;; (typescript-mode . lsp)
          (LaTeX-mode      . lsp)
          ;; if you want which-key integration
          (lsp-mode        . lsp-enable-which-key-integration))
@@ -93,19 +96,22 @@
 
 (use-package import-js)
 
-(use-package typescript-mode
-  :after tree-sitter
-  :config
-  ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
-  ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
-  (define-derived-mode typescriptreact-mode typescript-mode
-    "TypeScript TSX")
 
-  ;; use our derived mode for tsx files
-  (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescript-mode))
-  ;; by default, typescript-mode is mapped to the treesitter typescript parser
-  ;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
-  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-mode . tsx)))
+;; use our derived mode for tsx files
+(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescript-mode))
+;; by default, typescript-mode is mapped to the treesitter typescript parser
+;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
+;; (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-mode . tsx))
+
+;; (use-package typescript-mode
+;;   ;; :after tree-sitter
+;;   :mode (("\\.ts\\'" . typescript-mode)
+;;          ("\\.tsx\\'" . typescript-mode))
+;;   :config
+;;   ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
+;;   ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
+;;   (define-derived-mode typescriptreact-mode typescript-mode
+;;     "TypeScript TSX"))
 
 (use-package tide
   :after (company flycheck)
@@ -134,6 +140,32 @@
           (lambda ()
             (when (string-equal "jsx" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
+
+(use-package web-mode
+  :mode (("\\.js\\'" . web-mode)
+         ("\\.jsx\\'" . web-mode)
+         ("\\.ts\\'" . web-mode)
+         ("\\.tsx\\'" . web-mode)
+         ("\\.html\\'" . web-mode)
+         ("\\.vue\\'" . web-mode)
+         ("\\.json\\'" . web-mode))
+  :commands web-mode
+  :config
+  (setq web-mode-content-types-alist
+        '(("jsx" . "\\.js[x]?\\'"))))
+
+;; JSX syntax highlighting
+;; (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
+;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
+
+
+;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+;; (add-hook 'web-mode-hook
+;;           (lambda ()
+;;             (when (string-equal "jsx" (file-name-extension buffer-file-name))
+;;               (setup-tide-mode))))
+
 
 (use-package json-mode   :defer 20
   :custom
@@ -169,24 +201,16 @@
 ;;;    Company
 ;;________________________________________________________________
 (use-package company
-  :config
-  (setq company-minimum-prefix-length 3
-        company-idle-delay 0
-        company-tooltip-limit 10
-        company-dabbrev-downcase nil
-        company-dabbrev-ignore-case nil
-        company-dabbrev-code-other-buffers t
-        company-dabbrev-code-everywhere t
-        company-dabbrev-code-ignore-case nil
-        company-etags-ignore-case nil
-        company-etags-file-name-prefix ""
-        company-global-modes '(not eshell-mode comint-mode erc-mode message-mode help-mode gud-mode)
-        company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend)
-        company-backends '((company-capf :with company-yasnippet)
-                           company-files
-                           (company-dabbrev-code company-gtags company-keywords)
-                           company-dabbrev))
-  (setq lsp-prefer-capf t))
+  :ensure
+  :custom
+  ;; (company-idle-delay 0.5) ;; how long to wait until popup
+  ;; (company-begin-commands nil) ;; uncomment to disable popup
+  :bind
+  (:map company-active-map
+	("C-n". company-select-next)
+	("C-p". company-select-previous)
+	("M-<". company-select-first)
+	("M->". company-select-last)))
 
 (use-package company-box
   :hook (company-mode . company-box-mode)
@@ -217,7 +241,7 @@
 (setq company-tooltip-align-annotations t)
 
 (use-package company-auctex
-	:after (latex)
+  :after (latex)
   :config
   ;; Set up default LaTeX preview configuration
   ;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 2))
@@ -289,5 +313,27 @@
 ;;   ;; Enable indentation+completion using the TAB key.
 ;;   ;; `completion-at-point' is often bound to M-TAB.
 ;;   (setq tab-always-indent 'complete))
+
+;;;;;;;;; Optimizations ;;;;;;;;;;;;;;;;;
+(require 'cl-lib)
+(cl-declaim (optimize (speed 3) (safety 0)))
+(cl-defstruct my/struct counter)
+
+(define-inline test-counter-inc (self)
+  (inline-letevals (self)
+    (inline-quote
+     (setf (my/struct-counter ,self) (1+ (my/struct-counter ,self))))))
+
+(require 'cl-lib)
+(cl-declaim (optimize (speed 3) (safety 0)))
+(cl-defstruct my/struct counter)
+
+(define-inline test-counter-inc (self)
+  (inline-letevals (self)
+    (inline-quote
+     (setf (my/struct-counter ,self) (1+ (my/struct-counter ,self))))))
+
+(setq read-process-output-max (* 1024 1024))
+
 
 (provide 'lsp-setting)
