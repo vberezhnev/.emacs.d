@@ -9,14 +9,14 @@
   :hook ((org-mode . prettify-symbols-mode)
          (org-mode . visual-line-mode)
          (org-mode . variable-pitch-mode))
-  :bind (("C-c l" . org-store-link)
-         ("M-q" . toggle-truncate-lines)
-	 :map global-map
-	 ("C-c c" . org-capture)
-         ;; Timer (Pomodoro)
-         ("C-c t s" . org-timer-set-timer)
-         ("C-c t SPC" . org-timer-pause-or-continue)
-         ("C-c t <deletechar>") org-timer-stop)
+  ;; :bind (("C-c l" . org-store-link)
+  ;;        ("M-q" . toggle-truncate-lines)
+  ;; 	 :map global-map
+  ;; 	 ("C-c c" . org-capture)
+  ;;        ;; Timer (Pomodoro)
+  ;;        ("C-c t s" . org-timer-set-timer)
+  ;;        ("C-c t SPC" . org-timer-pause-or-continue)
+  ;;        ("C-c t <deletechar>") org-timer-stop)
   :config
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
   (setq
@@ -76,13 +76,16 @@
   (use-package org-bullets
     :after org
     :hook (org-mode . org-bullets-mode)
-    :custom
-    (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○"))) ; "●" "▷" "🞛" "◈" "✖"
+    ;; :custom
+    ;; (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○"))
+    ) ; "●" "▷" "🞛" "◈" "✖"
 
   (use-package toc-org
     :after org
     :init (add-hook 'org-mode-hook #'toc-org-enable))
 
+
+  
   ;; ────────────────────────────── Prettify Symbols ─────────────────────────────
 ;;; custom-function
   ;; Beautify Org Checkbox Symbol
@@ -233,7 +236,35 @@
 (use-package org-rainbow-tags)
 
 
+;; Increase the size of various headings
+(set-face-attribute 'org-document-title nil :font "Iosevka" :weight 'bold :height 1.5)
+(dolist (face '((org-level-1 . 1.2)
+                (org-level-2 . 1.1)
+                (org-level-3 . 1.05)
+                (org-level-4 . 1.0)
+                (org-level-5 . 1.1)
+                (org-level-6 . 1.1)
+                (org-level-7 . 1.1)
+                (org-level-8 . 1.1)))
+  (set-face-attribute (car face) nil :font "Iosevka" :weight 'medium :height (cdr face)))
 
+;; Make sure org-indent face is available
+(require 'org-indent)
+
+;; Ensure that anything that should be fixed-pitch in Org files appears that way
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+;; Get rid of the background on column views
+(set-face-attribute 'org-column nil :background nil)
+(set-face-attribute 'org-column-title nil :background nil)
 
 (use-package org-agenda
   :ensure nil
