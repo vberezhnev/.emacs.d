@@ -3,13 +3,22 @@
 ;;________________________________________________________________
 (use-package lsp-mode
   :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-tex-server 'digestif)
-  (setq lsp-idle-delay 0.500)
-  (setq lsp-enable-semantic-highlighting nil)
-  (setq lsp-log-io nil) ; if set to true can cause a performance hit
-  (setq read-process-output-max (* 1024 1024 1024))
+  ;; Don't auto-kill LSP server after last workspace buffer is killed, because I
+  ;; will do it for you, after `+lsp-defer-shutdown' seconds.
+  (setq lsp-keep-workspace-alive nil)
+
+  ;; NOTE I tweak LSP's defaults in order to make its more expensive or imposing
+  ;;      features opt-in. Some servers implement these poorly and, in most
+  ;;      cases, it's safer to rely on Emacs' native mechanisms (eldoc vs
+  ;;      lsp-ui-doc, open in popup vs sideline, etc).
+
+  ;; Disable features that have great potential to be slow.
+  (setq lsp-enable-folding nil
+        lsp-enable-text-document-color nil)
+  ;; Reduce unexpected modifications to code
+  (setq lsp-enable-on-type-formatting nil)
+  ;; Make breadcrumbs opt-in; they're redundant with the modeline and imenu
+  (setq lsp-headerline-breadcrumb-enable nil)
   (add-to-list 'auto-mode-alist '("\\.jsx?$" . lsp-mode)) ;; auto-enable for .js/.jsx files
   (add-to-list 'auto-mode-alist '("\\.tsx?$" . lsp-mode)) ;; auto-enable for .ts/.tsx files
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
@@ -31,14 +40,29 @@
 
 ;; optionally
 (use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
   :commands lsp-ui-mode
   :config
-  (setq lsp-ui-doc-enable t)
-  (setq lsp-ui-doc-header t)
-  (setq lsp-ui-doc-include-signature t)
-  (setq lsp-ui-doc-border (face-foreground 'default))
-  (setq lsp-ui-sideline-delay 0.01)
-  (setq lsp-ui-sideline-show-code-actions t))
+  ;; (setq lsp-ui-doc-enable t)
+  ;; (setq lsp-ui-doc-header t)
+  ;; (setq lsp-ui-doc-include-signature t)
+  ;; (setq lsp-ui-doc-border (face-foreground 'default))
+  ;; (setq lsp-ui-sideline-delay 0.01)
+  ;; (setq lsp-ui-sideline-show-code-actions t)
+  (setq lsp-ui-doc-max-height 8
+        lsp-ui-doc-max-width 72         ; 150 (default) is too wide
+        lsp-ui-doc-delay 0.75           ; 0.2 (default) is too naggy
+        lsp-ui-doc-show-with-mouse nil  ; don't disappear on mouseover
+        lsp-ui-doc-position 'at-point
+        lsp-ui-sideline-ignore-duplicate t
+        ;; Don't show symbol definitions in the sideline. They are pretty noisy,
+        ;; and there is a bug preventing Flycheck errors from being shown (the
+        ;; errors flash briefly and then disappear).
+        lsp-ui-sideline-show-hover nil
+        ;; Re-enable icon scaling (it's disabled by default upstream for Emacs
+        ;; 26.x compatibility; see emacs-lsp/lsp-ui#573)
+        lsp-ui-sideline-actions-icon lsp-ui-sideline-actions-icon-default)
+  )
 
 ;; if you are helm user
 (use-package helm-lsp :commands helm-lsp-workspace-symbol)
@@ -158,9 +182,6 @@
 ;; (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
 ;; (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
 
-
-;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
 ;; (add-hook 'web-mode-hook
 ;;           (lambda ()
 ;;             (when (string-equal "jsx" (file-name-extension buffer-file-name))
@@ -201,9 +222,41 @@
 ;;;    Company
 ;;________________________________________________________________
 (use-package company
-  :ensure
+  :init
+  (setq company-minimum-prefix-length 2
+        company-tooltip-limit 14
+        company-tooltip-align-annotations t
+        company-require-match 'never
+        company-global-modes
+        '(not erc-mode
+              circe-mode
+              message-mode
+              help-mode
+              gud-mode
+              vterm-mode)
+        company-frontends
+        '(company-pseudo-tooltip-frontend  ; always show candidates in overlay tooltip
+          company-echo-metadata-frontend)  ; show selected candidate docs in echo area
+
+        ;; Buffer-local backends will be computed when loading a major mode, so
+        ;; only specify a global default here.
+        company-backends '(company-capf)
+
+        ;; These auto-complete the current selection when
+        ;; `company-auto-commit-chars' is typed. This is too magical. We
+        ;; already have the much more explicit RET and TAB.
+        company-auto-commit nil
+
+        ;; Only search the current buffer for `company-dabbrev' (a backend that
+        ;; suggests text your open buffers). This prevents Company from causing
+        ;; lag once you have a lot of buffers open.
+        company-dabbrev-other-buffers nil
+        ;; Make `company-dabbrev' fully case-sensitive, to improve UX with
+        ;; domain-specific words with particular casing.
+        company-dabbrev-ignore-case nil
+        company-dabbrev-downcase nil)
   :custom
-  ;; (company-idle-delay 0.5) ;; how long to wait until popup
+  (company-idle-delay 0.5) ;; how long to wait until popup
   ;; (company-begin-commands nil) ;; uncomment to disable popup
   :bind
   (:map company-active-map
@@ -215,20 +268,18 @@
 (use-package company-box
   :hook (company-mode . company-box-mode)
   :config
+  (setq company-box-show-single-candidate t
+        company-box-backends-colors nil
+        company-box-tooltip-limit 50)
+
   ;; HACK Fix oversized scrollbar in some odd cases
   ;; REVIEW `resize-mode' is deprecated and may stop working in the future.
   ;; TODO PR me upstream?
   (setq x-gtk-resize-child-frames 'resize-mode)
+
   ;; Disable tab-bar in company-box child frames
   ;; TODO PR me upstream!
-  (add-to-list 'company-box-frame-parameters '(tab-bar-lines . 0))
-  (defun +company-box-icons--elisp-fn (candidate)
-    (when (derived-mode-p 'emacs-lisp-mode)
-      (let ((sym (intern candidate)))
-        (cond ((fboundp sym)  'ElispFunction)
-              ((boundp sym)   'ElispVariable)
-              ((featurep sym) 'ElispFeature)
-              ((facep sym)    'ElispFace))))))
+  (add-to-list 'company-box-frame-parameters '(tab-bar-lines . 0)))
 
 (use-package company-org-block
   :custom
@@ -313,27 +364,5 @@
 ;;   ;; Enable indentation+completion using the TAB key.
 ;;   ;; `completion-at-point' is often bound to M-TAB.
 ;;   (setq tab-always-indent 'complete))
-
-;;;;;;;;; Optimizations ;;;;;;;;;;;;;;;;;
-(require 'cl-lib)
-(cl-declaim (optimize (speed 3) (safety 0)))
-(cl-defstruct my/struct counter)
-
-(define-inline test-counter-inc (self)
-  (inline-letevals (self)
-    (inline-quote
-     (setf (my/struct-counter ,self) (1+ (my/struct-counter ,self))))))
-
-(require 'cl-lib)
-(cl-declaim (optimize (speed 3) (safety 0)))
-(cl-defstruct my/struct counter)
-
-(define-inline test-counter-inc (self)
-  (inline-letevals (self)
-    (inline-quote
-     (setf (my/struct-counter ,self) (1+ (my/struct-counter ,self))))))
-
-(setq read-process-output-max (* 1024 1024))
-
 
 (provide 'lsp-setting)

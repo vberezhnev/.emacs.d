@@ -7,22 +7,20 @@
 ;;________________________________________________________________
 ;;    Transparent Emacs
 ;;________________________________________________________________
-;; (set-frame-parameter (selected-frame) 'alpha '(97 .97))
-;; (add-to-list 'default-frame-alist '(alpha . (97 . 97)))
 (add-to-list 'default-frame-alist '(alpha . (100 . 100)))
 
- (defun toggle-transparency ()
-   (interactive)
-   (let ((alpha (frame-parameter nil 'alpha)))
-     (set-frame-parameter
-      nil 'alpha
-      (if (eql (cond ((numberp alpha) alpha)
-                     ((numberp (cdr alpha)) (cdr alpha))
-                     ;; Also handle undocumented (<active> <inactive>) form.
-                     ((numberp (cadr alpha)) (cadr alpha)))
-               100)
-          '(95 . 95) '(100 . 100)))))
- (global-set-key (kbd "C-c t") 'toggle-transparency)
+(defun toggle-transparency ()
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha)))
+    (set-frame-parameter
+     nil 'alpha
+     (if (eql (cond ((numberp alpha) alpha)
+                    ((numberp (cdr alpha)) (cdr alpha))
+                    ;; Also handle undocumented (<active> <inactive>) form.
+                    ((numberp (cadr alpha)) (cadr alpha)))
+              100)
+         '(95 . 95) '(100 . 100)))))
+(global-set-key (kbd "C-c t") 'toggle-transparency)
 
 ;;________________________________________________________________
 ;;    Setup fonts
@@ -40,11 +38,6 @@
                     :height 120
                     :weight 'medium)
 (set-frame-font "Iosevka" nil t)
-
-;; Setup fonts
-;; (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font Mono" :height 130)
-;; (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font Mono")
-;; (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 150)
 
 ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
 (add-to-list 'default-frame-alist '(font . "Iosevka 12"))
@@ -91,9 +84,9 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-(use-package gruvbox-theme)
-(use-package modus-themes)
-(use-package timu-rouge-theme)
+;; (use-package gruvbox-theme)
+;; (use-package modus-themes)
+;; (use-package timu-rouge-theme)
 (use-package theme-changer
   :ensure t
   :demand t
@@ -103,11 +96,13 @@
   (setq calendar-longitude 131.88))
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
-(change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
-;;(change-theme 'doom-gruvbox-light 'timu-rogue)
+;; (change-theme 'doom-gruvbox-light 'timu-rogue)
+;; (change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
+(change-theme 'doom-one 'gruvbox-one-light)
 
 ;;;;; hl-indent
 (use-package highlight-indent-guides
+  :demand t
   :custom
   (highlight-indent-guides-delay 0)
   (highlight-indent-guides-responsive t)
@@ -125,21 +120,38 @@
   :hook (after-init . volatile-highlights-mode)
   :custom-face
   (vhl/default-face ((nil (:foreground "#FF3333" :background "BlanchedAlmond"))))) ; "#FFCDCD"
-;; (set-face-background 'highlight "#3e4446") ; also try: "#3e4446"/"#gray6"
-;; (set-face-foreground 'highlight nil)
-;; (set-face-underline-p 'highlight "#ff0000")
 
 ;;;;; hl-numbers
-(use-package highlight-numbers
-  :hook (prog-mode . highlight-numbers-mode))
+;; (use-package highlight-numbers
+;;   :hook (prog-mode . highlight-numbers-mode))
 
 ;;;;; hl-todo
 (use-package hl-todo
+  :hook (prog-mode . hl-todo-mode)
+  :hook (yaml-mode . hl-todo-mode)
   :config
-  (hl-todo-mode t))
-
-
-
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces
+        '(;; For reminders to change or add something at a later date.
+          ("TODO" warning bold)
+          ;; For code (or code paths) that are broken, unimplemented, or slow,
+          ;; and may become bigger problems later.
+          ("FIXME" error bold)
+          ;; For code that needs to be revisited later, either to upstream it,
+          ;; improve it, or address non-critical issues.
+          ("REVIEW" font-lock-keyword-face bold)
+          ;; For code smells where questionable practices are used
+          ;; intentionally, and/or is likely to break in a future update.
+          ("HACK" font-lock-constant-face bold)
+          ;; For sections of code that just gotta go, and will be gone soon.
+          ;; Specifically, this means the code is deprecated, not necessarily
+          ;; the feature it enables.
+          ("DEPRECATED" font-lock-doc-face bold)
+          ;; Extra keywords commonly found in the wild, whose meaning may vary
+          ;; from project to project.
+          ("NOTE" success bold)
+          ("BUG" error bold)
+          ("XXX" font-lock-constant-face bold))))
 
 (use-package display-line-numbers
   :ensure nil
@@ -199,9 +211,25 @@
 ;;________________________________________________________________
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
+  :hook (doom-modeline-mode . size-indication-mode) ; filesize in modeline
+  ;; :hook (doom-modeline-mode . column-number-mode)   ; cursor column in modeline
   :init
-  (setq doom-modeline-bar-width 5
-        doom-modeline-buffer-file-name-style 'truncate-except-project
+  ;; We display project info in the modeline ourselves
+  (setq projectile-dynamic-mode-line nil)
+  ;; Set these early so they don't trigger variable watchers
+  ;; (setq doom-modeline-bar-width 3
+  ;;       doom-modeline-github nil
+  ;;       doom-modeline-mu4e nil
+  ;;       doom-modeline-persp-name nil
+  ;;       doom-modeline-minor-modes nil
+  ;;       doom-modeline-major-mode-icon nil
+  ;;       doom-modeline-buffer-file-name-style 'relative-from-project
+  ;;       ;; Only show file encoding if it's non-UTF-8 and different line endings
+  ;;       ;; than the current OSes preference
+  ;;       doom-modeline-buffer-encoding 'nondefault
+  ;;       doom-modeline-default-eol-type)
+  (setq doom-modeline-buffer-file-name-style 'truncate-except-project
+        ;; doom-modeline-bar-width 5
         doom-modeline-lsp t
         doom-modeline-env-version t
         doom-modeline-indent-info t
@@ -218,51 +246,19 @@
         doom-modeline-modal-icon t
         doom-modeline-modal t)
   :config
-  (eval-when-compile
-    'company
-    (doom-modeline-def-segment company-backend
-      "Display the current company backend. `company-backend'."
-      (when (company--active-p)
-        (format "%s"
-                (--map (s-replace "company-" "" (format "%s" it))
-                       (if (listp company-backend) company-backend (list company-backend)))))))
-  (doom-modeline-def-segment
-    buffer-info
-    "Overwrite of buffer info to not include the icon"
-    (concat
-     (doom-modeline--buffer-state-icon)
-     (doom-modeline--buffer-name)))
-  (doom-modeline-def-segment
-    buffer-type
-    "Buffer icon and version if it exists"
-    (concat
-     (doom-modeline-spc)
-     (doom-modeline--buffer-mode-icon)
-     (when (and doom-modeline-env-version doom-modeline-env--version)
-       (propertize
-        (format "%s " doom-modeline-env--version)
-        'face '(:height 0.7))))))
+  ;; Fix an issue where these two variables aren't defined in TTY Emacs on MacOS
+  (defvar mouse-wheel-down-event nil)
+  (defvar mouse-wheel-up-event nil)
 
-;; (use-package minions
-;;   :delight " 𝛁"
-;;   :hook (doom-modeline-mode . minions-mode)
-;;   :config
-;;   (minions-mode 1)
-;;   (setq minions-mode-line-lighter "[+]"))
+  (add-hook 'after-setting-font-hook #'+modeline-resize-for-font-h)
+  (add-hook 'doom-load-theme-hook #'doom-modeline-refresh-bars)
 
-;; ;;;; Modeline
-;; (setq frame-title-format
-;;       '(""
-;;         (:eval
-;;          (if (s-contains-p org-roam-directory (or buffer-file-name ""))
-;;              (replace-regexp-in-string
-;;               ".*/[0-9]*-?" "☰ "
-;;               (subst-char-in-string ?_ ?  buffer-file-name))
-;;            "%b"))
-;;         (:eval
-;;          (let ((project-name (projectile-project-name)))
-;;            (unless (string= "-" project-name)
-;;              (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
-
+  (add-to-list 'doom-modeline-mode-alist '(+doom-dashboard-mode . dashboard))
+  (add-hook 'magit-mode-hook
+	     (defun +modeline-hide-in-non-status-buffer-h ()
+	       "Show minimal modeline in magit-status buffer, no modeline elsewhere."
+	       (if (eq major-mode 'magit-status-mode)
+		   (doom-modeline-set-modeline 'magit)
+		 (hide-mode-line-mode)))))
 
 (provide 'appereance-setting)

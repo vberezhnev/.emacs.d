@@ -1,84 +1,43 @@
-;; BetterGC
-(defvar better-gc-cons-threshold 134217728 ; 128mb
-  "If you experience freezing, decrease this.
-If you experience stuttering, increase this.")
-
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold better-gc-cons-threshold)
-            (setq file-name-handler-alist file-name-handler-alist-original)
-            (makunbound 'file-name-handler-alist-original)))
-;; -BetterGC
-
-;; AutoGC
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (if (boundp 'after-focus-change-function)
-                (add-function :after after-focus-change-function
-                              (lambda ()
-                                (unless (frame-focus-state)
-                                  (garbage-collect))))
-              (add-hook 'after-focus-change-function 'garbage-collect))
-            (defun gc-minibuffer-setup-hook ()
-              (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
-
-            (defun gc-minibuffer-exit-hook ()
-              (garbage-collect)
-              (setq gc-cons-threshold better-gc-cons-threshold))
-
-            (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
-            (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
-;; -AutoGC
-
 ;; emacsclient --no-wait--alternate-editor=emacs [FILE]
 (require 'server)
 (unless (server-running-p)
   (server-start))
 
-;;; Generic packages
-(require 'package)
-;; Select the folder to store packages
-;; Comment / Uncomment to use desired sites
-(setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
-      package-archives
-      '(("gnu"   . "https://elpa.gnu.org/packages/")
-        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-        ("melpa-stable" . "https://stable.melpa.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")
-        ("org" . "https://orgmode.org/elpa/"))
-      package-quickstart nil)
-;; ("cselpa" . "https://elpa.thecybershadow.net/packages/")
-;; ("melpa-cn" . "http://mirrors.cloud.tencent.com/elpa/melpa/")
-;; ("gnu-cn"   . "http://mirrors.cloud.tencent.com/elpa/gnu/"))
+;;________________________________________________________________
+;;    Install straight
+;;________________________________________________________________
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(setq package-archive-priorities
-      '(("melpa" .  4)
-        ("melpa-stable" . 3)
-        ("org" . 2)
-        ("gnu" . 1)))
+(setq straight-check-for-modifications '(check-on-save find-when-checking))
+(setq vc-follow-symlinks t)
 
-;; Configure Package Manager
-;; (unless (bound-and-true-p package--initialized)
-;;   (setq package-enable-at-startup nil) ; To prevent initializing twice
-;;   (package-initialize))
+;;________________________________________________________________
+;;    Install use-package (straight integration)
+;;________________________________________________________________
+;; Install `use-package'.
+(straight-use-package 'use-package)
 
-;; set use-package-verbose to t for interpreted .emacs,
-;; and to nil for byte-compiled .emacs.elc.
-(eval-and-compile
-  (setq use-package-verbose (not (bound-and-true-p byte-compile-current-file))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Install packages in `use-package' forms with `straight'. (not the built-in
+;; package.el)
+(setq straight-use-package-by-default t)
 
-;;; use-package
-;; Install use-package if not installed
-(eval-and-compile
-  (unless (and (fboundp 'package-installed-p)
-               (package-installed-p 'use-package))
-    (package-refresh-contents) ; update archives
-    (package-install 'use-package)) ; grab the newest use-package
-  (if init-file-debug
-      (setq use-package-compute-statistics t)
-    (setq use-package-compute-statistics nil))
-  (require 'use-package))
+;; Key Chord functionality in use-package
+(use-package use-package-chords
+  :config (key-chord-mode 1))
+
+;; Diminish functionality
+(use-package diminish)
 
 ;; Configure use-package
 (use-package use-package
@@ -106,16 +65,6 @@ If you experience stuttering, increase this.")
 
     ;; just process the next keywords
     (use-package-process-keywords name-symbol rest state)))
-
-;;________________________________________________________________
-;;    Install quelpa
-;;________________________________________________________________
-;; (unless (package-installed-p 'quelpa)
-;;   (with-temp-buffer
-;;     (url-insert-file-contents "https://raw.githubusercontent.com/quelpa/quelpa/master/quelpa.el")
-;;     (eval-buffer)
-;;     (quelpa-self-upgrade)))
-;; (require 'quelpa)
 
 ;;________________________________________________________________
 ;;    Setup config using org-mode
@@ -261,69 +210,6 @@ If you experience stuttering, increase this.")
   (toggle-frame-maximized))
 
 
-
-
-
-
-;;
-;;; Reasonable defaults for interactive sessions
-
-;;; Runtime optimizations
-;; PERF: A second, case-insensitive pass over `auto-mode-alist' is time wasted.
-(setq auto-mode-case-fold nil)
-
-;; PERF: Disable bidirectional text scanning for a modest performance boost.
-;;   I've set this to `nil' in the past, but the `bidi-display-reordering's docs
-;;   say that is an undefined state and suggest this to be just as good:
-(setq-default bidi-display-reordering 'left-to-right
-              bidi-paragraph-direction 'left-to-right)
-
-;; PERF: Disabling BPA makes redisplay faster, but might produce incorrect
-;;   reordering of bidirectional text with embedded parentheses (and other
-;;   bracket characters whose 'paired-bracket' Unicode property is non-nil).
-(setq bidi-inhibit-bpa t)  ; Emacs 27+ only
-
-;; Reduce rendering/line scan work for Emacs by not rendering cursors or regions
-;; in non-focused windows.
-(setq-default cursor-in-non-selected-windows nil)
-(setq highlight-nonselected-windows nil)
-
-;; More performant rapid scrolling over unfontified regions. May cause brief
-;; spells of inaccurate syntax highlighting right after scrolling, which should
-;; quickly self-correct.
-(setq fast-but-imprecise-scrolling t)
-
-;; Don't ping things that look like domain names.
-(setq ffap-machine-p-known 'reject)
-
-;; Emacs "updates" its ui more often than it needs to, so slow it down slightly
-(setq idle-update-delay 1.0)  ; default is 0.5
-
-;; Font compacting can be terribly expensive, especially for rendering icon
-;; fonts on Windows. Whether disabling it has a notable affect on Linux and Mac
-;; hasn't been determined, but do it anyway, just in case. This increases memory
-;; usage, however!
-(setq inhibit-compacting-font-caches t)
-
-;; Increase how much is read from processes in a single chunk (default is 4kb).
-;; This is further increased elsewhere, where needed (like our LSP module).
-(setq read-process-output-max (* 64 1024))  ; 64kb
-
-;; Introduced in Emacs HEAD (b2f8c9f), this inhibits fontification while
-;; receiving input, which should help a little with scrolling performance.
-(setq redisplay-skip-fontification-on-input t)
-
-;; The GC introduces annoying pauses and stuttering into our Emacs experience,
-;; so we use `gcmh' to stave off the GC while we're using Emacs, and provoke it
-;; when it's idle. However, if the idle delay is too long, we run the risk of
-;; runaway memory usage in busy sessions. If it's too low, then we may as well
-;; not be using gcmh at all.
-(setq gcmh-idle-delay 'auto  ; default is 15s
-      gcmh-auto-idle-delay-factor 10
-      gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
-(add-hook 'doom-first-buffer-hook #'gcmh-mode)
-
-
 ;;; Disable UI elements early
 ;; PERF,UI: Doom strives to be keyboard-centric, so I consider these UI elements
 ;;   clutter. Initializing them also costs a morsel of startup time. Whats more,
@@ -343,14 +229,6 @@ If you experience stuttering, increase this.")
       scroll-bar-mode nil)
 
 
-
-
-
-
-
-
-
-
 ;; (use-package ox-hugo
 ;;   ;;Auto-install the package from Melpa
 ;;   :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
@@ -359,9 +237,6 @@ If you experience stuttering, increase this.")
 ;;   (use-package org-re-reveal  )
 ;;   (use-package ox-reveal  )
 ;;   (setq org-reveal-root "file:~/Org/Presentations/reveal.js/"))
-
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(add-hook 'org-mode-hook 'flyspell-mode)
 
 (use-package kind-icon
   :after corfu
@@ -486,9 +361,9 @@ If you experience stuttering, increase this.")
   (flycheck-display-errors-delay 0.5)
   (flycheck-check-syntax-automatically '(save idle-change))
   (flycheck-idle-change-delay 0.5)
-	:config
-	;; enable typescript-tslint checker
-	(flycheck-add-mode 'typescript-tslint 'web-mode))
+  :config
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'org-mode-hook 'flyspell-mode))
 
 (use-package flycheck-inline
   :hook (flycheck-mode . turn-on-flycheck-inline))
@@ -497,38 +372,38 @@ If you experience stuttering, increase this.")
   :config
   (with-eval-after-load 'rust-mode
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
-;;
-;; (use-package ispell
-;;   :bind ("<f8>" . ispell-word) ; easy spell check
-;;   :custom
-;;   (ispell-program-name "hunspell") ; require Hunspell
-;;   (ispell-dictionary "en_US,en_GB,ru_RU")
-;;   (ispell-personal-dictionary "~/.emacs.d/.hunspell_personal")
-;;   :config
-;;   ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
-;;   ;; dictionary' even though multiple dictionaries will be configured
-;;   ;; in next line.
-;;   (setenv "LANG" "en_US.UTF-8")
-;;   ;; ispell-set-spellchecker-params has to be called
-;;   ;; before ispell-hunspell-add-multi-dic will work
-;;   (ispell-set-spellchecker-params)
-;;   (ispell-hunspell-add-multi-dic ispell-dictionary)
-;;   (unless (file-exists-p ispell-personal-dictionary)
-;;     (write-region "" nil ispell-personal-dictionary nil 0)))
-;;
-;; (use-package flyspell
-;;   :bind (:map flyspell-mode-map
-;;               ("C-;"        . nil)
-;;               ("C-,"        . nil)
-;;               ("C-."        . nil)
-;;               ("M-TAB"      . nil)
-;;               ("C-x M-$"    . flyspell-buffer)
-;;               ("C-<f7>"     . flyspell-auto-correct-word)
-;;               ("C-<f12>"    . flyspell-auto-correct-previous-word))
-;;   :init (progn (dolist (hook '(org-mode-hook text-mode-hook message-mode-hook))
-;;                  (add-hook hook 'turn-on-flyspell)))
-;;                ;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-;;   :delight " ⓢ")
+
+(use-package ispell
+  :bind ("<f8>" . ispell-word) ; easy spell check
+  :custom
+  (ispell-program-name "hunspell") ; require Hunspell
+  (ispell-dictionary "en_US,en_GB,ru_RU")
+  (ispell-personal-dictionary "~/.emacs.d/.hunspell_personal")
+  :config
+  ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
+  ;; dictionary' even though multiple dictionaries will be configured
+  ;; in next line.
+  (setenv "LANG" "ru_RU.UTF-8")
+  ;; ispell-set-spellchecker-params has to be called
+  ;; before ispell-hunspell-add-multi-dic will work
+  (ispell-set-spellchecker-params)
+  (ispell-hunspell-add-multi-dic ispell-dictionary)
+  (unless (file-exists-p ispell-personal-dictionary)
+    (write-region "" nil ispell-personal-dictionary nil 0)))
+
+(use-package flyspell
+  :bind (:map flyspell-mode-map
+              ("C-;"        . nil)
+              ("C-,"        . nil)
+              ("C-."        . nil)
+              ("M-TAB"      . nil)
+              ("C-x M-$"    . flyspell-buffer)
+              ("C-<f7>"     . flyspell-auto-correct-word)
+              ("C-<f12>"    . flyspell-auto-correct-previous-word))
+  :init (progn (dolist (hook '(org-mode-hook text-mode-hook message-mode-hook))
+                 (add-hook hook 'turn-on-flyspell)))
+               ;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  :delight " ⓢ")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
@@ -539,18 +414,17 @@ If you experience stuttering, increase this.")
 ;;________________________________________________________________
 ;;    Telega.el
 ;;________________________________________________________________
-(use-package telega
-  :config
-  (setq telega-use-docker t)
-  (add-hook 'telega-load-hook 'telega-notifications-mode)
-  (add-hook 'telega-load-hook 'telega-appindicator-mode)
-  (add-hook 'telega-load-hook 'global-telega-url-shorten-mode))
+;; (use-package telega
+;;   :config
+;;   (setq telega-use-docker t)
+;;   (add-hook 'telega-load-hook 'telega-notifications-mode)
+;;   (add-hook 'telega-load-hook 'telega-appindicator-mode)
+;;   (add-hook 'telega-load-hook 'global-telega-url-shorten-mode))
 
 ;;________________________________________________________________
 ;;    Matrix
 ;;________________________________________________________________
-(use-package ement)
-
+;; (use-package ement)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
@@ -586,7 +460,8 @@ If you experience stuttering, increase this.")
 	(evil-set-initial-state 'calibredb-mode 'normal)
 	;; (evil-set-initial-state 'dired-mode 'emacs)
 	(evil-set-initial-state 'sunrise-mode 'emacs)
-  (evil-collection-init))
+	(evil-collection-init))
+
 ;;________________________________________________________________
 ;;    Treemacs
 ;;________________________________________________________________
@@ -727,7 +602,6 @@ If you experience stuttering, increase this.")
 ;;________________________________________________________________
 ;;    Helm
 ;;________________________________________________________________
-
 (use-package helm
   :init
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
@@ -779,7 +653,6 @@ If you experience stuttering, increase this.")
 ;; ;;     PDF READER     ;; ;;
 ;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (use-package pdf-tools
   :defer t
   ;; :mode (("\\.pdf\\'" . pdf-view-mode))
@@ -810,7 +683,6 @@ If you experience stuttering, increase this.")
               ("s"  . pdf-occur)
               ("b"  . pdf-view-set-slice-from-bounding-box)
               ("r"  . pdf-view-reset-slice)))
-
 (defhydra hydra-pdftools (:color blue :hint nil)
   "
                                                                       ╭───────────┐
@@ -896,32 +768,23 @@ If you experience stuttering, increase this.")
 ;;________________________________________________________________
 ;;;;    Fancy pkg
 ;;________________________________________________________________
-;; (use-package fancy-battery
+;; (use-package beacon
+;;   :commands beacon-mode
+;;   :init (beacon-mode t)
+;;   :bind ("C-S-l" . 'beacon-blink)
 ;;   :config
-;;   (setq fancy-battery-show-percentage t)
-;;   (setq battery-update-interval 15)
-;;   (if window-system
-;;       (fancy-battery-mode)
-;;     (display-battery-mode)))
-
-;;;;; beacon
-(use-package beacon
-  :commands beacon-mode
-  :init (beacon-mode t)
-  :bind ("C-S-l" . 'beacon-blink)
-  :config
-  (setq
-   beacon-blink-when-window-changes t  ; only flash on window/buffer changes...
-   beacon-blink-when-window-scrolls nil
-   beacon-blink-when-point-moves nil
-   beacon-dont-blink-commands nil
-   beacon-blink-when-focused t
-   beacon-blink-duration .5
-   beacon-blink-delay .5
-   beacon-push-mark 1
-   beacon-color "#50D050"
-   beacon-size 20)
-  :delight)
+;;   (setq
+;;    beacon-blink-when-window-changes t  ; only flash on window/buffer changes...
+;;    beacon-blink-when-window-scrolls nil
+;;    beacon-blink-when-point-moves nil
+;;    beacon-dont-blink-commands nil
+;;    beacon-blink-when-focused t
+;;    beacon-blink-duration .5
+;;    beacon-blink-delay .5
+;;    beacon-push-mark 1
+;;    beacon-color "#50D050"
+;;    beacon-size 20)
+;;   :delight)
 
 ;;;; Load custom-files
 (defun load-directory (dir)
@@ -929,18 +792,16 @@ If you experience stuttering, increase this.")
   (let ((load-it (lambda (f)
                    (load-file (concat (file-name-as-directory dir) f)))))
     (mapc load-it (directory-files dir nil "\\.el$"))))
-
 (load-directory "~/.emacs.d/config") ; load my configuration of packages
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(helm-minibuffer-history-key "M-p")
- '(org-agenda-files
-   '("/home/chopin/Org/agenda/PlanAhead.org" "/home/chopin/Org/agenda/PlannedDay.org"))
  '(package-selected-packages
-   '(org-journal zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs timu-rouge-theme tide theme-changer telega solaire-mode smooth-scrolling sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters quelpa prettier-js pbcopy org-wild-notifier org-super-agenda org-roam-ui org-roam-timestamps org-recur org-rainbow-tags org-noter-pdftools org-modern org-fancy-priorities org-download org-cliplink org-books org-appear org-alert olivetti ob-typescript ob-sql-mode ob-rust multi-vterm modus-themes minions magit-todos lsp-ui ligature kind-icon json-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp gruvbox-theme go-mode git-gutter-fringe general format-all focus flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement eglot doom-themes doom-modeline dirvish diredfl dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-auctex cargo bug-hunter blamer beacon apheleia ac-math)))
+   '(cl-lib zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs toc-org timu-rouge-theme tide theme-changer telega solaire-mode smooth-scrolling sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters quelpa prettier-js pbcopy org-wild-notifier org-super-agenda org-roam-ui org-roam-timestamps org-recur org-rainbow-tags org-noter-pdftools org-modern org-journal org-fancy-priorities org-download org-cliplink org-bullets org-books org-appear org-alert olivetti ob-typescript ob-sql-mode ob-rust multi-vterm modus-themes minions magit-todos lsp-ui ligature kind-icon json-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp gruvbox-theme go-mode git-gutter-fringe general format-all focus flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement eglot doom-themes doom-modeline dirvish diredfl dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-auctex cargo bug-hunter blamer beacon apheleia ac-math)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

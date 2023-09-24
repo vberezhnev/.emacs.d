@@ -48,9 +48,9 @@
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
   (org-roam-dailies-capture-templates
    '(
-     ("m" "Morning diary №1" plain (file "~/Org/Templates/journal/Morning.org") :clock-in t :clock-resume t
+     ("1" "Morning diary №1" plain (file "~/Org/Templates/journal/Morning.org") :clock-in t :clock-resume t
       :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
-     ("m" "Morning diary №2" entry "* Default (%U): «%?»‎\n\n#+begin_quote\n%^{Quote}\n#+end_quote" :clock-in t :clock-resume t
+     ("2" "Morning diary №2" entry "* Default (%U): «%?»‎\n\n#+begin_quote\n%^{Quote}\n#+end_quote" :clock-in t :clock-resume t
       :if-new (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %U\n\n" ))
      
      ("d" "Default diary" entry "* Default (%U): «%?»‎\n\n" :clock-in t :clock-resume t

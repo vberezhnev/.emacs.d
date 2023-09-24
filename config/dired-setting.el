@@ -47,12 +47,33 @@
   :config
   (set-face-attribute 'diredfl-dir-name nil :bold t))
 
-'(global-dired-hide-details-mode t)
+;; '(global-dired-hide-details-mode t)
 (use-package dired
   :ensure nil
   :demand t
+   :init
+  (setq dired-dwim-target t  ; suggest a target for moving/copying intelligently
+        dired-hide-details-hide-symlink-targets nil
+        ;; don't prompt to revert, just do it
+        dired-auto-revert-buffer #'dired-buffer-stale-p
+        ;; Always copy/delete recursively
+        dired-recursive-copies  'always
+        dired-recursive-deletes 'top
+        ;; Ask whether destination dirs should get created when copying/removing files.
+        dired-create-destination-dirs 'ask
+        ;; Where to store image caches
+        ;; image-dired-dir (concat doom-cache-dir "image-dired/")
+        image-dired-db-file (concat image-dired-dir "db.el")
+        image-dired-gallery-dir (concat image-dired-dir "gallery/")
+        image-dired-temp-image-file (concat image-dired-dir "temp-image")
+        image-dired-temp-rotate-image-file (concat image-dired-dir "temp-rotate-image")
+        ;; Screens are larger nowadays, we can afford slightly larger thumbnails
+        image-dired-thumb-size 150)
   :defer t
   :config
+  ;; (set-popup-rule! "^\\*image-dired"
+  ;;   :slot 20 :size 0.8 :select t :quit nil :ttl 0)
+  ;; (set-evil-initial-state! 'image-dired-display-image-mode 'emacs)
   (setq dired-dwim-target t) ; Dired tries to guess the target directory
   (setq dired-recursive-deletes 'always) ; Allow deleting directories recursively
   (setq dired-listing-switches "-alh --group-directories-first") ; Use human-readable file sizes and group directories first
