@@ -84,9 +84,9 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-;; (use-package gruvbox-theme)
 ;; (use-package modus-themes)
 ;; (use-package timu-rouge-theme)
+(use-package gruvbox-theme)
 (use-package theme-changer
   :ensure t
   :demand t
@@ -97,8 +97,8 @@
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
 ;; (change-theme 'doom-gruvbox-light 'timu-rogue)
-;; (change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
-(change-theme 'doom-one 'gruvbox-one-light)
+(change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
+;; (change-theme 'doom-one-light 'doom-one)
 
 ;;;;; hl-indent
 (use-package highlight-indent-guides
@@ -121,7 +121,7 @@
   :custom-face
   (vhl/default-face ((nil (:foreground "#FF3333" :background "BlanchedAlmond"))))) ; "#FFCDCD"
 
-;;;;; hl-numbers
+;; ;; hl-numbers
 ;; (use-package highlight-numbers
 ;;   :hook (prog-mode . highlight-numbers-mode))
 
@@ -156,13 +156,29 @@
 (use-package display-line-numbers
   :ensure nil
   :commands (display-line-numbers-scale-linum)
-  :hook ((prog-mode . display-line-numbers-mode))
-  :config
+  :hook ((prog-mode . display-line-numbers-mode)))
+  ;; :config
   ;; (defun display-line-numbers-scale-linum ()
   ;;   (set-face-attribute 'line-number nil :height 0.6 :background (face-background 'solaire-default-face))
   ;;   (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
-  (display-line-numbers-scale-linum)
-  (setq display-line-numbers-width 3))
+  ;; (display-line-numbers-scale-linum)
+  ;; (setq display-line-numbers-width 3)
+
+(dolist (mode '(org-mode-hook ; Disable line numbers for some modes
+                org-mode-agenda-hook
+                elfeed-entry-hook
+                elfeed-new-entry-hook
+                elfeed-new-entry-parse-hook
+                term-mode-hook
+                vterm-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook
+                nov-mode-hook
+                neotree-mode-hook
+                ;; pdf-view-mode-hook
+                treemacs-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (use-package rainbow-delimiters
   :hook
@@ -190,75 +206,40 @@
   (olivetti-body-width 90)
   :delight " ⊗") ; Ⓐ ⊛
 
-(dolist (mode '(org-mode-hook ; Disable line numbers for some modes
-                org-mode-agenda-hook
-                elfeed-entry-hook
-                elfeed-new-entry-hook
-                elfeed-new-entry-parse-hook
-                term-mode-hook
-                vterm-mode-hook
-                shell-mode-hook
-                treemacs-mode-hook
-                eshell-mode-hook
-                nov-mode-hook
-                neotree-mode-hook
-                ;; pdf-view-mode-hook
-                treemacs-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
-
 ;;________________________________________________________________
 ;;    Modeline
 ;;________________________________________________________________
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
   :hook (doom-modeline-mode . size-indication-mode) ; filesize in modeline
-  ;; :hook (doom-modeline-mode . column-number-mode)   ; cursor column in modeline
+  :hook (doom-modeline-mode . column-number-mode)   ; cursor column in modeline
   :init
   ;; We display project info in the modeline ourselves
   (setq projectile-dynamic-mode-line nil)
   ;; Set these early so they don't trigger variable watchers
-  ;; (setq doom-modeline-bar-width 3
-  ;;       doom-modeline-github nil
-  ;;       doom-modeline-mu4e nil
-  ;;       doom-modeline-persp-name nil
-  ;;       doom-modeline-minor-modes nil
-  ;;       doom-modeline-major-mode-icon nil
-  ;;       doom-modeline-buffer-file-name-style 'relative-from-project
-  ;;       ;; Only show file encoding if it's non-UTF-8 and different line endings
-  ;;       ;; than the current OSes preference
-  ;;       doom-modeline-buffer-encoding 'nondefault
-  ;;       doom-modeline-default-eol-type)
-  (setq doom-modeline-buffer-file-name-style 'truncate-except-project
-        ;; doom-modeline-bar-width 5
-        doom-modeline-lsp t
-        doom-modeline-env-version t
-        doom-modeline-indent-info t
-        doom-modeline-buffer-encoding nil
-        doom-modeline-enable-word-count t
-        doom-modeline-vcs-max-length 20
-        doom-modeline-major-mode-color-icon t
-        doom-modeline-time-icon t
-        doom-modeline-battery t
-        doom-modeline-time t
-        doom-modeline-workspace-name t
-        doom-modeline-env-version t
-        doom-modeline-modal-modern-icon t
-        doom-modeline-modal-icon t
-        doom-modeline-modal t)
+  (setq doom-modeline-major-mode-color-icon nil
+        doom-modeline-major-mode-icon nil
+        doom-modeline-time-icon nil
+        doom-modeline-battery nil
+        doom-modeline-time nil
+        doom-modeline-modal nil)
   :config
   ;; Fix an issue where these two variables aren't defined in TTY Emacs on MacOS
   (defvar mouse-wheel-down-event nil)
-  (defvar mouse-wheel-up-event nil)
+  (defvar mouse-wheel-up-event nil))
 
-  (add-hook 'after-setting-font-hook #'+modeline-resize-for-font-h)
-  (add-hook 'doom-load-theme-hook #'doom-modeline-refresh-bars)
+;;   (set-face-attribute 'mode-line nil
+;;                     :background "#353644"
+;;                     :foreground "white"
+;;                     :box '(:line-width 8 :color "#353644")
+;;                     :overline nil
+;;                     :underline nil)
 
-  (add-to-list 'doom-modeline-mode-alist '(+doom-dashboard-mode . dashboard))
-  (add-hook 'magit-mode-hook
-	     (defun +modeline-hide-in-non-status-buffer-h ()
-	       "Show minimal modeline in magit-status buffer, no modeline elsewhere."
-	       (if (eq major-mode 'magit-status-mode)
-		   (doom-modeline-set-modeline 'magit)
-		 (hide-mode-line-mode)))))
+;; (set-face-attribute 'mode-line-inactive nil
+;;                     :background "#565063"
+;;                     :foreground "white"
+;;                     :box '(:line-width 8 :color "#565063")
+;;                     :overline nil
+;;                     :underline nil)
 
 (provide 'appereance-setting)

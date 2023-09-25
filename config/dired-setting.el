@@ -50,8 +50,9 @@
 ;; '(global-dired-hide-details-mode t)
 (use-package dired
   :ensure nil
+  :straight (:type built-in)
   :demand t
-   :init
+  :init
   (setq dired-dwim-target t  ; suggest a target for moving/copying intelligently
         dired-hide-details-hide-symlink-targets nil
         ;; don't prompt to revert, just do it

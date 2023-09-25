@@ -21,6 +21,7 @@
 
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
 (setq vc-follow-symlinks t)
+(setq straight-pull-recipe-repositories t)
 
 ;;________________________________________________________________
 ;;    Install use-package (straight integration)
@@ -44,7 +45,7 @@
   :custom
   (use-package-verbose t)
   (use-package-always-ensure t)  ; :ensure t by default
-  (use-package-always-defer t) ; :defer t by default
+  (use-package-always-defer nil) ; :defer t by default
   (use-package-expand-minimally t)
   (use-package-enable-imenu-support t))
 
@@ -74,14 +75,14 @@
 ;;   "README.org"
 ;;   user-emacs-directory))
 
+(use-package bug-hunter)
+
 ;;________________________________________________________________
 ;;    Base settings of Emacs
 ;;________________________________________________________________
 (eval-when-compile (defvar display-time-24hr-format t))
 (eval-when-compile (defvar display-time-default-load-average nil))
 
-(display-battery-mode t)		  ; Show battery.
-(display-time-mode t)			  ; Show time.
 (set-fringe-mode 1)               ; Give us some space.
 (delete-selection-mode nil)		  ; Use a more sane delete mode than evil.
 (fset 'yes-or-no-p 'y-or-n-p)     ; Set yes or no to y/n
@@ -228,7 +229,6 @@
       tool-bar-mode nil
       scroll-bar-mode nil)
 
-
 ;; (use-package ox-hugo
 ;;   ;;Auto-install the package from Melpa
 ;;   :pin melpa  ;`package-archives' should already have ("melpa" . "https://melpa.org/packages/")
@@ -312,6 +312,7 @@
   (setq emojify-emoji-styles '(unicode))
   (bind-key* (kbd "C-c e") #'emojify-insert-emoji)) ; override binding in any mode
 
+(xterm-mouse-mode t)
 (use-package pbcopy)
 
 (use-package zygospore
@@ -337,7 +338,6 @@
 
 (global-set-key (kbd "\C-c f") 'format-all-buffer)
 
-(xterm-mouse-mode t)
 
 ;; (add-hook 'prog-mode-hook 'linum-mode)
 ;; (add-hook 'prog-mode-hook 'visual-line-mode)
@@ -373,37 +373,37 @@
   (with-eval-after-load 'rust-mode
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 
-(use-package ispell
-  :bind ("<f8>" . ispell-word) ; easy spell check
-  :custom
-  (ispell-program-name "hunspell") ; require Hunspell
-  (ispell-dictionary "en_US,en_GB,ru_RU")
-  (ispell-personal-dictionary "~/.emacs.d/.hunspell_personal")
-  :config
-  ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
-  ;; dictionary' even though multiple dictionaries will be configured
-  ;; in next line.
-  (setenv "LANG" "ru_RU.UTF-8")
-  ;; ispell-set-spellchecker-params has to be called
-  ;; before ispell-hunspell-add-multi-dic will work
-  (ispell-set-spellchecker-params)
-  (ispell-hunspell-add-multi-dic ispell-dictionary)
-  (unless (file-exists-p ispell-personal-dictionary)
-    (write-region "" nil ispell-personal-dictionary nil 0)))
+;; (use-package ispell
+;;   :bind ("<f8>" . ispell-word) ; easy spell check
+;;   :custom
+;;   (ispell-program-name "hunspell") ; require Hunspell
+;;   (ispell-dictionary "en_US,en_GB,ru_RU")
+;;   (ispell-personal-dictionary "~/.emacs.d/.hunspell_personal")
+;;   :config
+;;   ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
+;;   ;; dictionary' even though multiple dictionaries will be configured
+;;   ;; in next line.
+;;   (setenv "LANG" "ru_RU.UTF-8")
+;;   ;; ispell-set-spellchecker-params has to be called
+;;   ;; before ispell-hunspell-add-multi-dic will work
+;;   (ispell-set-spellchecker-params)
+;;   (ispell-hunspell-add-multi-dic ispell-dictionary)
+;;   (unless (file-exists-p ispell-personal-dictionary)
+;;     (write-region "" nil ispell-personal-dictionary nil 0)))
 
-(use-package flyspell
-  :bind (:map flyspell-mode-map
-              ("C-;"        . nil)
-              ("C-,"        . nil)
-              ("C-."        . nil)
-              ("M-TAB"      . nil)
-              ("C-x M-$"    . flyspell-buffer)
-              ("C-<f7>"     . flyspell-auto-correct-word)
-              ("C-<f12>"    . flyspell-auto-correct-previous-word))
-  :init (progn (dolist (hook '(org-mode-hook text-mode-hook message-mode-hook))
-                 (add-hook hook 'turn-on-flyspell)))
-               ;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-  :delight " ⓢ")
+;; (use-package flyspell
+;;   :bind (:map flyspell-mode-map
+;;               ("C-;"        . nil)
+;;               ("C-,"        . nil)
+;;               ("C-."        . nil)
+;;               ("M-TAB"      . nil)
+;;               ("C-x M-$"    . flyspell-buffer)
+;;               ("C-<f7>"     . flyspell-auto-correct-word)
+;;               ("C-<f12>"    . flyspell-auto-correct-previous-word))
+;;   :init (progn (dolist (hook '(org-mode-hook text-mode-hook message-mode-hook))
+;;                  (add-hook hook 'turn-on-flyspell)))
+;;                ;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+;;   :delight " ⓢ")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;

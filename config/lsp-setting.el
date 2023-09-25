@@ -61,8 +61,7 @@
         lsp-ui-sideline-show-hover nil
         ;; Re-enable icon scaling (it's disabled by default upstream for Emacs
         ;; 26.x compatibility; see emacs-lsp/lsp-ui#573)
-        lsp-ui-sideline-actions-icon lsp-ui-sideline-actions-icon-default)
-  )
+        lsp-ui-sideline-actions-icon lsp-ui-sideline-actions-icon-default))
 
 ;; if you are helm user
 (use-package helm-lsp :commands helm-lsp-workspace-symbol)
@@ -119,7 +118,6 @@
 ;;________________________________________________________________
 
 (use-package import-js)
-
 
 ;; use our derived mode for tsx files
 (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescript-mode))
@@ -186,7 +184,6 @@
 ;;           (lambda ()
 ;;             (when (string-equal "jsx" (file-name-extension buffer-file-name))
 ;;               (setup-tide-mode))))
-
 
 (use-package json-mode   :defer 20
   :custom

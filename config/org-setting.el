@@ -2,23 +2,21 @@
 ;;    Setup org-mode
 ;;________________________________________________________________
 (use-package org
+  :straight (:type built-in)
   :ensure nil
-  :defer t
-  :after org
   :delight org-mode "✎"
-  :pin org
   :hook ((org-mode . prettify-symbols-mode)
          (org-mode . visual-line-mode)
          (org-mode . variable-pitch-mode))
-  :bind (("C-c l" . org-store-link)
-         ("M-q" . toggle-truncate-lines)
-	 :map global-map
-	 ("C-c c" . org-capture)
-	 ("С-c a" . org-agenda)
-         ;; Timer (Pomodoro)
-         ("C-c t s" . org-timer-set-timer)
-         ("C-c t SPC" . org-timer-pause-or-continue)
-         ("C-c t <deletechar>") org-timer-stop)
+  ;; :bind (("C-c l" . org-store-link)
+  ;;        ("M-q" . toggle-truncate-lines)
+  ;; 	 :map global-map
+  ;; 	 ("C-c c" . org-capture)
+  ;; 	 ("С-c a" . org-agenda)
+  ;;        ;; Timer (Pomodoro)
+  ;;        ("C-c t s" . org-timer-set-timer)
+  ;;        ("C-c t SPC" . org-timer-pause-or-continue)
+  ;;        ("C-c t <deletechar>") org-timer-stop)
   :config
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
   (setq
@@ -50,6 +48,31 @@
    org-image-actual-width '(300))
 
   (with-eval-after-load 'org
+    (setq org-log-done 'time))
+  (setq org-todo-keyword-faces
+	'(
+          ("TODO" :background "indian red" :foreground "white" :weight bold)
+          ("DOING" :background "tomato" :foreground "white" :weight bold)
+          ("NEXT" :background "sky blue" :foreground "black" :weight bold)
+          ("WAITING" :background "olive drab" :foreground "black" :weight bold)
+          ("STOPPED" :background "firebrick2" :foreground "white" :weight bold)
+          ("REVIEW" :background "cyan" :foreground "black" :weight bold)
+          ("DONE" :background "pale green" :foreground "black" :weight bold)
+          ("ARCHIVED" :background "light slate blue" :foreground "white" :weight bold)
+          ("CANCELLED" :background "dark red" :foreground "white" :weight bold)))
+  (setq org-todo-keywords
+	'((sequence "TODO(t)" "DOING(d)" "NEXT(n)" "WAITING(w)" "STOPPED(s)" "REVIEW(r)" "|" "DONE" "ARCHIVED(a)" "CANCELLED(c)")))
+
+  (use-package org-fancy-priorities
+    :diminish
+    :demand t
+    :defines org-fancy-priorities-list
+    :hook (org-mode . org-fancy-priorities-mode)
+    :config
+    (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
+
+
+  (with-eval-after-load 'org
     (setq org-confirm-babel-evaluate nil)
     (require 'org-tempo)
     ;; Setup fonts for org-mode
@@ -75,35 +98,24 @@
           org-eshell
           org-irc))
 
-  ;;; Ugly org hooks
-  (defun nicer-org ()
-    (progn
-      (+org-pretty-mode 1)
-      (mixed-pitch-mode 1)
-      (hl-line-mode -1)
-      (display-line-numbers-mode -1)
-      (olivetti-mode 1)
-					;(org-num-mode 1)
-      (org-superstar-mode -1)
-      (org-indent-mode -1)))
-
-  (add-hook 'org-mode-hook  #'nicer-org)
-
   (use-package org-habit
     :after org
     :ensure nil
+    :straight (:type built-in)
     :init
     (add-to-list 'org-modules 'org-habit)
     :config
     (setq org-habit-following-days 7
-          org-habit-preceding-days 35
+          org-habit-preceding-days 7
           org-habit-show-habits t
-	  org-habit-graph-column 120))
+	  org-habit-graph-column 70))
 
   (use-package focus
     :demand t
     :config
     (add-to-list 'focus-mode-to-thing '(org-mode . paragraph)))
+
+  (use-package darkroom)
 
   (use-package org-bullets
     :after org
@@ -146,7 +158,7 @@
                     ("#+call:" . ?)
                     (":properties:" . ?)
                     (":logbook:" . ?)))))
-  (add-hook 'org-mode-hook #'my/org-mode/load-prettify-symbols)
+  (add-hook 'org-mode-hook 'my/org-mode/load-prettify-symbols)
 
 ;;;; toggle-emphasis
   (defun org-toggle-emphasis ()
@@ -190,30 +202,6 @@
   :config
   (setq org-hide-emphasis-markers t
         org-appear-autolinks 'just-brackets))
-
-(with-eval-after-load 'org
-  (setq org-log-done 'time))
-(setq org-todo-keyword-faces
-      '(
-        ("TODO" :background "indian red" :foreground "white" :weight bold)
-        ("DOING" :background "tomato" :foreground "white" :weight bold)
-        ("NEXT" :background "sky blue" :foreground "black" :weight bold)
-        ("WAITING" :background "olive drab" :foreground "black" :weight bold)
-        ("STOPPED" :background "firebrick2" :foreground "white" :weight bold)
-        ("REVIEW" :background "cyan" :foreground "black" :weight bold)
-        ("DONE" :background "pale green" :foreground "black" :weight bold)
-        ("ARCHIVED" :background "light slate blue" :foreground "white" :weight bold)
-        ("CANCELLED" :background "dark red" :foreground "white" :weight bold)))
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "DOING(d)" "NEXT(n)" "WAITING(w)" "STOPPED(s)" "REVIEW(r)" "|" "DONE" "ARCHIVED(a)" "CANCELLED(c)")))
-
-(use-package org-fancy-priorities
-  :diminish
-  :demand t
-  :defines org-fancy-priorities-list
-  :hook (org-mode . org-fancy-priorities-mode)
-  :config
-  (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
 
 (use-package ob-typescript)
 (use-package ob-rust)
@@ -297,8 +285,7 @@
 
 (use-package org-agenda
   :ensure nil
-  :demand t
-  :defer t
+  :straight (:type built-in)
   :bind
   (:map global-map
         ("C-c a" . org-agenda))
@@ -362,7 +349,7 @@
                                                       (org-agenda-format-date-aligned date))))
   (setq org-agenda-custom-commands
         '(
-          ("z" "Hugo view"
+	  ("z" "Hugo view"
            ((agenda "" ((org-agenda-span 'day)
                         (org-super-agenda-groups
                          '((:name "Today"
@@ -409,30 +396,26 @@
                             (:name "On review"
                                    :todo "REVIEW"
                                    :order 10)))))))
-          ("x" "Zetttel management"
-           (  (alltodo "" ((org-agenda-overriding-header "")
-                           (org-super-agenda-groups
-                            '(
-                              (:name "TODO"
-                                     :file-path "~/Org/Org-roam")
-                              (:name "Books"
-                                     :category "Book"
-                                     :file-path "~/Org/Org-roam")
-                              (:name "On review"
-                                     :todo "REVIEW"
-                                     :order 10
-                                     :file-path "~/Org/Org-roam")))))))))
+
+          ("x" "Habits view"
+           ((agenda "" ((org-agenda-span 'day)
+                        (org-super-agenda-groups
+			 '((:name "Habits"
+				  ;; :time-grid t
+				  ;; :scheduled today
+				  :date today
+				  :habit t)))))))))
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
 (setq org-capture-templates
       '(("d" "Daily task" entry (file+function
-                                 "~/Org/agenda/PlannedDay.org"
-                                 (lambda ()
-                                   (org-datetree-find-date-create
-                                    (org-date-to-gregorian (org-today)) t)
-                                   (re-search-forward "^\\*.+ log" nil t)))
-         "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")
+				 "~/Org/agenda/PlannedDay.org"
+				 (lambda ()
+				   (org-datetree-find-date-create
+				    (org-date-to-gregorian (org-today)) t)
+				   (re-search-forward "^\\*.+ log" nil t)))
+	 "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")
 	("b" "Book" entry (file "~/Org/Reading-list.org")
-         "* %^{TITLE}\n:PROPERTIES:\n:ADDED: <%<%Y-%m-%d>>\n:END:%^{AUTHOR}\n%^{GOODREADS_URL}%?" :empty-lines 1)))
+	 "* %^{TITLE}\n:PROPERTIES:\n:ADDED: <%<%Y-%m-%d>>\n:END:%^{AUTHOR}\n%^{GOODREADS_URL}%?" :empty-lines 1)))
 
 (provide 'org-setting)
