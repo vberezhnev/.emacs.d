@@ -107,8 +107,132 @@
     :config
     (setq org-habit-following-days 7
           org-habit-preceding-days 7
+	  org-habit-show-all-today t
           org-habit-show-habits t
 	  org-habit-graph-column 70))
+
+  (defvar ol/habit-report-defaultday 30
+    "The default range of days from today, when no time is specified.")
+
+  (defun ol/get-org-habit-string (&optional block starttime endtime)
+    ;; check if starttime and endtime is specified
+    (or starttime (setq starttime (format-time-string "%a %b %e %H:%M:%S %G" (time-subtract (current-time) (days-to-time ol/habit-report-defaultday)))))
+    (or endtime (setq endtime (current-time-string)))
+
+    ;; when block is specified set starttime and endtime
+    (when block
+      (progn
+	(setq cc (org-clock-special-range block nil t)
+	      starttime (car cc)
+	      endtime (nth 1 cc))))
+
+    ;; build the habit graph
+    (list (org-habit-build-graph
+	   (org-habit-parse-todo)
+           ;; time from
+	   (org-time-subtract (date-to-time starttime) (* 3600 org-extend-today-until))
+           ;; today
+	   (date-to-time endtime)
+           ;; time to
+	   (date-to-time endtime)) starttime endtime))
+
+  (defun ol/habit-report (&optional params)
+    (save-excursion
+      (org-back-to-heading t)
+      (print (ol/get-org-habit-string (plist-get params :block) (plist-get params :tstart) (plist-get params :tend)))
+      (let* ((habit-data (ol/get-org-habit-string (plist-get params :block) (plist-get params :tstart) (plist-get params :tend)))
+             (habit-str (car habit-data))
+             (face-counts (list (cons 'org-habit-clear-future-face  0)
+				(cons 'org-habit-ready-face  0)
+				(cons 'org-habit-ready-future-face  0)
+				(cons 'org-habit-alert-future-face  0)
+				(cons 'org-habit-overdue-face  0)))
+             (habit-stats (list (cons :org-heading  (org-get-heading t t t t))
+				(cons :habit-done  0)
+				(cons :habit-missed  0)
+				(cons :habit-last-missed  nil)
+				(cons :longest-day-streak  0)
+				(cons :longest-done-streak  0)
+				(cons :current-longest-done-streak  nil)
+				(cons :starttime (car (cdr habit-data)))
+				(cons :endtime (car (cdr(cdr habit-data))))))
+             (cur-day-streak 0)
+             (cur-done-streak 0))
+
+	;; iterate over string
+	(dotimes (i (length habit-str))
+
+          ;; sum up all faces
+          (when (alist-get (get-text-property i 'face habit-str) face-counts)
+            (setf (alist-get (get-text-property i 'face habit-str) face-counts) (+ (alist-get (get-text-property i 'face habit-str) face-counts) 1)))
+
+          ;; if face is overdue of alert and has no complete-glyp
+          (if (and (or (eq (get-text-property i 'face habit-str)
+                           'org-habit-overdue-face)
+                       (eq (get-text-property i 'face habit-str)
+                           'org-habit-alert-future-face))
+                   (not
+                    (string= (string (aref habit-str i))
+                             (string org-habit-completed-glyph))))
+
+              (progn
+		(setf (alist-get :habit-last-missed habit-stats) (get-text-property i 'help-echo habit-str))
+		(when (> cur-day-streak (alist-get :longest-day-streak habit-stats))
+                  (setf (alist-get :longest-day-streak habit-stats) cur-day-streak)
+                  (setq cur-day-streak 0))
+		(when (> cur-done-streak (alist-get :longest-done-streak habit-stats))
+                  (setf (alist-get :longest-done-streak habit-stats) cur-done-streak)
+                  (setq cur-done-streak 0)))
+            (progn
+              (setf cur-day-streak (+ 1 cur-day-streak))
+              (when (eq (get-text-property i 'face habit-str)
+			'org-habit-ready-face)
+		(setf cur-done-streak (+ 1 cur-done-streak))))
+            )
+          (if (string= (string (aref habit-str i))
+                       (string org-habit-completed-glyph))
+              (setf (alist-get :habit-done habit-stats) (+ 1 (alist-get :habit-done habit-stats))))
+          ) ;; string iteration done
+
+	;; when last streak bigger then last streak
+	(when (> cur-day-streak (alist-get :longest-day-streak habit-stats))
+          (setf (alist-get :longest-day-streak habit-stats) cur-day-streak))
+	(when (> cur-done-streak (alist-get :longest-done-streak habit-stats))
+          (setf (alist-get :longest-done-streak habit-stats) cur-done-streak)
+          (setf (alist-get :current-longest-done-streak habit-stats) t))
+
+	;; set missed habit count
+	(setf (alist-get :habit-missed habit-stats) (alist-get 'org-habit-overdue-face face-counts))
+
+	habit-stats)))
+
+  (defun ol/habit-print-header (st et)
+    (format "#+CAPTION: Habit report from %s to %s
+| Heading | Done Count | Missed Count | Last Missed | Longest Streak (days) | Longest Streak (done) | Currently longest |
+|-- |" st et))
+
+  (defun ol/habit-stats-to-string (org-habits)
+    (concat (ol/habit-print-header
+             (format-time-string "%d-%m-%y" (date-to-time (alist-get :starttime (car org-habits))))
+             (format-time-string "%d-%m-%y" (date-to-time (alist-get :endtime (car org-habits)))))
+            (let ((result ""))(dolist (org-habit org-habits result)
+				(setq result (concat result (format "\n|%s| %S | %s | %s | %s | %s | %s |"
+                                                                    (alist-get :org-heading org-habit)
+                                                                    (alist-get :habit-done org-habit)
+                                                                    (alist-get :habit-missed org-habit)
+                                                                    (alist-get :habit-last-missed org-habit)
+                                                                    (alist-get :longest-day-streak org-habit)
+                                                                    (alist-get :longest-done-streak org-habit)
+                                                                    (alist-get :current-longest-done-streak org-habit))))))))
+
+  (defun org-dblock-write:ol/habit-report (params)
+    (if (plist-get params :scope)
+	(setq ol/scope (plist-get params :scope))
+      (setq ol/scope 'tree))
+    (insert (ol/habit-stats-to-string
+             (org-map-entries (lambda () (ol/habit-report params)) "STYLE=\"habit\"" ol/scope)))
+    (org-table-align))
+
 
   (use-package focus
     :demand t
@@ -125,7 +249,7 @@
 
   (use-package toc-org
     :after org
-    :init (add-hook 'org-mode-hook #'toc-org-enable))
+    :init (add-hook 'org-mode-hook 'toc-org-enable))
 
   ;; ────────────────────────────── Prettify Symbols ─────────────────────────────
 ;;; custom-function
@@ -137,28 +261,28 @@
     (push '("[-]" . "❍" ) prettify-symbols-alist))
   (add-hook 'org-mode-hook #'ma/org-buffer-setup)
 
-  (defun my/org-mode/load-prettify-symbols ()
-    "Looking pretty good, so i adopted it."
-    (interactive)
-    (setq prettify-symbols-alist
-          (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
-                  '(("#+begin_src" . ?)
-                    ("#+end_src" . ?)
-                    ("#+begin_example" . ?)
-                    ("#+end_example" . ?)
-                    ("#+begin_quote" . ?❝)
-                    ("#+end_quote" . ?❠) ; ❟ ―  
-                    ("#+begin_center" . "ϰ")
-                    ("#+end_center" . "ϰ")
-                    ("#+header:" . ?)
-                    ("#+name:" . ?﮸)
-                    ;; ("#+title:" . ?◈)
-                    ;; ("#+author:" . ?✒)
-                    ("#+results:" . ?)
-                    ("#+call:" . ?)
-                    (":properties:" . ?)
-                    (":logbook:" . ?)))))
-  (add-hook 'org-mode-hook 'my/org-mode/load-prettify-symbols)
+  ;; (defun my/org-mode/load-prettify-symbols ()
+  ;;   "Looking pretty good, so i adopted it."
+  ;;   (interactive)
+  ;;   (setq prettify-symbols-alist
+  ;;         (mapcan (lambda (x) (list x (cons (upcase (car x)) (cdr x))))
+  ;;                 '(("#+begin_src" . ?)
+  ;;                   ("#+end_src" . ?)
+  ;;                   ("#+begin_example" . ?)
+  ;;                   ("#+end_example" . ?)
+  ;;                   ("#+begin_quote" . ?❝)
+  ;;                   ("#+end_quote" . ?❠) ; ❟ ―  
+  ;;                   ("#+begin_center" . "ϰ")
+  ;;                   ("#+end_center" . "ϰ")
+  ;;                   ("#+header:" . ?)
+  ;;                   ("#+name:" . ?﮸)
+  ;;                   ;; ("#+title:" . ?◈)
+  ;;                   ;; ("#+author:" . ?✒)
+  ;;                   ("#+results:" . ?)
+  ;;                   ("#+call:" . ?)
+  ;;                   (":properties:" . ?)
+  ;;                   (":logbook:" . ?)))))
+  ;; (add-hook 'org-mode-hook 'my/org-mode/load-prettify-symbols)
 
 ;;;; toggle-emphasis
   (defun org-toggle-emphasis ()
@@ -192,9 +316,9 @@
    org-modern-hide-stars " "
    org-modern-keyword "‣"))
 
-(use-package org-books
-  :config
-  (setq org-books-file "~/Org/Reading-list.org"))
+;; (use-package org-books
+;;   :config
+;;   (setq org-books-file "~/Org/Reading-list.org"))
 
 (use-package org-appear
   :hook
@@ -229,10 +353,10 @@
 ;;   (define-key global-map (kbd "<f12>") #'org-transclusion-add)
 ;;   (define-key global-map (kbd "C-n t") #'org-transclusion-mode))
 
-(use-package org-download
-  :demand t
-  :config
-  (setq-default org-download-image-dir "./assets-org/"))
+;; (use-package org-download
+;;   :demand t
+;;   :config
+;;   (setq-default org-download-image-dir "./assets-org/"))
 
 (use-package focus
   :demand t
@@ -353,10 +477,10 @@
            ((agenda "" ((org-agenda-span 'day)
                         (org-super-agenda-groups
                          '((:name "Today"
-                                  ;; :time-grid t
+                                  :time-grid t
                                   :date today
                                   :scheduled today
-				  :not (:habit nil)
+				  :not (:tag "habits")
                                   :order 1)))))
             (alltodo "" ((org-agenda-overriding-header "")
                          (org-super-agenda-groups
@@ -400,11 +524,30 @@
           ("x" "Habits view"
            ((agenda "" ((org-agenda-span 'day)
                         (org-super-agenda-groups
-			 '((:name "Habits"
+			 '((:name "Everytime habits"
 				  ;; :time-grid t
 				  ;; :scheduled today
-				  :date today
-				  :habit t)))))))))
+				  ;; :date today
+				  ;; :habit t
+				  :and (:tag "habits" :tag "everytime"))
+			   (:name "Morning habits"
+				  ;; :time-grid t
+				  ;; :scheduled today
+				  ;; :date today
+				  ;; :habit t
+				  :and (:tag "habits" :tag "morning"))
+			   (:name "Day habits"
+				  ;; :time-grid t
+				  ;; :scheduled today
+				  ;; :date today
+				  ;; :habit t
+				  :and (:tag "habits" :tag "day"))
+			   (:name "Evening habits"
+				  ;; :time-grid t
+				  ;; :scheduled today
+				  ;; :date today
+				  ;; :habit t
+				  :and (:tag "habits" :tag "evening"))))))))))
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
 (setq org-capture-templates

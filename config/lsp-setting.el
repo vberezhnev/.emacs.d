@@ -288,37 +288,37 @@
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 
-(use-package company-auctex
-  :after (latex)
-  :config
-  ;; Set up default LaTeX preview configuration
-  ;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 2))
-  (setq org-latex-create-formula-image-program 'imagemagick)
-  (setq org-preview-latex-default-process 'imagemagick) ; or 'dvisvgm
-  (setq org-preview-latex-process-alist
-        '((imagemagick :programs ("latex" "convert")
-                       :description "imagemagick"
-                       :message "You need to install the programs: latex and imagemagick."
-                       :image-input-type "pdf"
-                       :image-output-type "png"
-                       :image-size-adjust (1.0 . 1.0)
-                       :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
-                       :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))
-          (dvisvgm :programs ("latex" "dvisvgm")
-                   :description "dvisvgm"
-                   :message "You need to install the programs: latex and dvisvgm."
-                   :image-input-type "xdv"
-                   :image-output-type "svg"
-                   :image-size-adjust (1.7 . 1.5)
-                   :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
-                   :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))))
-  ;; Enable inline LaTeX previews in org-mode
-  (add-hook 'org-mode-hook 'org-toggle-latex-fragment)
-  ;; Display images in org-mode buffers
-  (setq org-image-actual-width nil) ; adjust to your liking
-  (setq org-startup-with-inline-images t)
-  (use-package ac-math))
-(company-auctex-init)
+;; (use-package company-auctex
+;;   :after (latex)
+;;   :config
+;;   ;; Set up default LaTeX preview configuration
+;;   ;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 2))
+;;   (setq org-latex-create-formula-image-program 'imagemagick)
+;;   (setq org-preview-latex-default-process 'imagemagick) ; or 'dvisvgm
+;;   (setq org-preview-latex-process-alist
+;;         '((imagemagick :programs ("latex" "convert")
+;;                        :description "imagemagick"
+;;                        :message "You need to install the programs: latex and imagemagick."
+;;                        :image-input-type "pdf"
+;;                        :image-output-type "png"
+;;                        :image-size-adjust (1.0 . 1.0)
+;;                        :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
+;;                        :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))
+;;           (dvisvgm :programs ("latex" "dvisvgm")
+;;                    :description "dvisvgm"
+;;                    :message "You need to install the programs: latex and dvisvgm."
+;;                    :image-input-type "xdv"
+;;                    :image-output-type "svg"
+;;                    :image-size-adjust (1.7 . 1.5)
+;;                    :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
+;;                    :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))))
+;;   ;; Enable inline LaTeX previews in org-mode
+;;   (add-hook 'org-mode-hook 'org-toggle-latex-fragment)
+;;   ;; Display images in org-mode buffers
+;;   (setq org-image-actual-width nil) ; adjust to your liking
+;;   (setq org-startup-with-inline-images t)
+;;   (use-package ac-math))
+;; (company-auctex-init)
 
 ;;________________________________________________________________
 ;;;    Corfu

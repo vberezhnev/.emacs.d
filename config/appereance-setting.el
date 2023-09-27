@@ -27,23 +27,23 @@
 ;;________________________________________________________________
 (set-face-attribute 'default t
                     :font "Iosevka" ;; Hack, Input, Terminess, Nerd, Font Propo
-                    :height 120
+                    :height 130
                     :weight 'regular)
 (set-face-attribute 'variable-pitch nil
                     :font "Iosevka"
-                    :height 120
+                    :height 130
                     :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
                     :font "Iosevka"
-                    :height 120
+                    :height 130
                     :weight 'medium)
 (set-frame-font "Iosevka" nil t)
 
 ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-(add-to-list 'default-frame-alist '(font . "Iosevka 12"))
+(add-to-list 'default-frame-alist '(font . "Iosevka 13"))
 (add-to-list 'default-frame-alist
-             '(font . "Iosevka 12"))
-(add-to-list 'default-frame-alist '(font . "Iosevka 12"))
+             '(font . "Iosevka 13"))
+(add-to-list 'default-frame-alist '(font . "Iosevka 13"))
 
 ;; Changes certain keywords to symbols, such as lamda
 (setq global-prettify-symbols-mode t)
@@ -66,8 +66,8 @@
 ;;________________________________________________________________
 (use-package doom-themes
   :if window-system
-  :custom-face
-  (cursor ((t (:background "BlanchedAlmond"))))
+  ;; :custom-face
+  ;; (cursor ((t (:background "BlanchedAlmond"))))
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
@@ -97,8 +97,8 @@
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
 ;; (change-theme 'doom-gruvbox-light 'timu-rogue)
-(change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
-;; (change-theme 'doom-one-light 'doom-one)
+;; (change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
+(change-theme 'doom-one-light 'doom-one)
 
 ;;;;; hl-indent
 (use-package highlight-indent-guides
@@ -114,12 +114,12 @@
   :delight " ㄓ")
 
 ;;;;; hl-volatile
-(use-package volatile-highlights
-  :diminish
-  :commands volatile-highlights-mode
-  :hook (after-init . volatile-highlights-mode)
-  :custom-face
-  (vhl/default-face ((nil (:foreground "#FF3333" :background "BlanchedAlmond"))))) ; "#FFCDCD"
+;; (use-package volatile-highlights
+;;   :diminish
+;;   :commands volatile-highlights-mode
+;;   :hook (after-init . volatile-highlights-mode)
+;;   :custom-face
+;;   (vhl/default-face ((nil (:foreground "#FF3333" :background "BlanchedAlmond"))))) ; "#FFCDCD"
 
 ;; ;; hl-numbers
 ;; (use-package highlight-numbers

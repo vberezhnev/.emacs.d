@@ -75,19 +75,6 @@
                  (window-width . 0.33)
                  (window-height . fit-window-to-buffer))))
 
-(defun org-roam-buffer-setup ()
-  "Function to make org-roam-buffer more pretty."
-  (progn
-    (setq-local olivetti-body-width 44)
-    (variable-pitch-mode 1)
-    (olivetti-mode 1)
-    (centaur-tabs-local-mode -1)
-
-  (set-face-background 'magit-section-highlight (face-background 'default))))
-
-;; (after! org-roam
-(add-hook 'org-roam-mode-hook 'org-roam-buffer-setup)
-
 (use-package org-roam-ui
   :hook (after-init . org-roam-ui-mode)
   :config

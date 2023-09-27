@@ -77,6 +77,10 @@
 
 (use-package bug-hunter)
 
+
+;; Symbol's value as variable is void: org--inhibit-version-check
+;; (require 'org-macs)
+
 ;;________________________________________________________________
 ;;    Base settings of Emacs
 ;;________________________________________________________________
@@ -163,7 +167,7 @@
       frame-title-format '(buffer-file-name "Emacs: %b (%f)" "Emacs: %b") ; name of the file I am editing as the name of the window.
 
       cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows.
-      default-directory "~/"
+      ;;default-directory "~/"
       custom-safe-themes t
       load-prefer-newer t ; don't use the compiled code if its the older package.
       make-backup-files t               ; backup of a file the first time it is saved.
@@ -360,10 +364,10 @@
   (flycheck-indication-mode 'left-fringe)
   (flycheck-display-errors-delay 0.5)
   (flycheck-check-syntax-automatically '(save idle-change))
-  (flycheck-idle-change-delay 0.5)
+  (flycheck-idle-change-delay 0.5))
   :config
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  (add-hook 'org-mode-hook 'flyspell-mode))
+  ;;(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  ;;(add-hook 'org-mode-hook 'flyspell-mode)
 
 (use-package flycheck-inline
   :hook (flycheck-mode . turn-on-flycheck-inline))
@@ -461,6 +465,15 @@
 	;; (evil-set-initial-state 'dired-mode 'emacs)
 	(evil-set-initial-state 'sunrise-mode 'emacs)
 	(evil-collection-init))
+
+;; (use-package golden-ratio
+;;   ;; Automatic resizing of Emacs windows to the golden ratio
+;;   :init
+;;   (golden-ratio-mode 1)
+;;   :config
+;;   (setq golden-ratio-adjust-factor .8
+;; 	golden-ratio-wide-adjust-factor .8
+;; 	golden-ratio-auto-scale t))
 
 ;;________________________________________________________________
 ;;    Treemacs
@@ -732,6 +745,8 @@
   ("l" image-forward-hscroll :color red)
   ("h" image-backward-hscroll :color red))
 
+(use-package djvu)
+(use-package nov)
 (use-package org-pdftools
   :hook (org-mode . org-pdftools-setup-link))
 (use-package org-noter-pdftools
@@ -787,24 +802,11 @@
 ;;   :delight)
 
 ;;;; Load custom-files
-(defun load-directory (dir)
-  "Load all *.el files in a directory."
-  (let ((load-it (lambda (f)
-                   (load-file (concat (file-name-as-directory dir) f)))))
-    (mapc load-it (directory-files dir nil "\\.el$"))))
-(load-directory "~/.emacs.d/config") ; load my configuration of packages
+;; (defun load-directory (dir)
+;;   "Load all *.el files in a directory."
+;;   (let ((load-it (lambda (f)
+;;                    (load-file (concat (file-name-as-directory dir) f)))))
+;;     (mapc load-it (directory-files dir nil "\\.el$"))))
+;; (load-directory "~/.emacs.d/config") ; load my configuration of packages
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(helm-minibuffer-history-key "M-p")
- '(package-selected-packages
-   '(cl-lib zygospore which-key web-mode volatile-highlights use-package typescript-mode treemacs-tab-bar treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons tree-sitter-langs toc-org timu-rouge-theme tide theme-changer telega solaire-mode smooth-scrolling sideline-flycheck saveplace-pdf-view rust-playground rust-mode reverse-im rainbow-delimiters quelpa prettier-js pbcopy org-wild-notifier org-super-agenda org-roam-ui org-roam-timestamps org-recur org-rainbow-tags org-noter-pdftools org-modern org-journal org-fancy-priorities org-download org-cliplink org-bullets org-books org-appear org-alert olivetti ob-typescript ob-sql-mode ob-rust multi-vterm modus-themes minions magit-todos lsp-ui ligature kind-icon json-mode indent-guide import-js highlight-numbers highlight-indent-guides helm-lsp gruvbox-theme go-mode git-gutter-fringe general format-all focus flycheck-rust flycheck-inline fancy-battery evil-collection emojify ement eglot doom-themes doom-modeline dirvish diredfl dired-single dired-sidebar dired-rainbow dired-open dashboard dap-mode corfu company-org-block company-box company-auctex cargo bug-hunter blamer beacon apheleia ac-math)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; (load-file "~/.emacs.d/local-packages/org-habit-report.el")
