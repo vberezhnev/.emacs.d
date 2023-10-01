@@ -77,10 +77,6 @@
 
 (use-package bug-hunter)
 
-
-;; Symbol's value as variable is void: org--inhibit-version-check
-;; (require 'org-macs)
-
 ;;________________________________________________________________
 ;;    Base settings of Emacs
 ;;________________________________________________________________
@@ -463,6 +459,7 @@
 	(evil-set-initial-state 'vterm-mode 'normal)
 	(evil-set-initial-state 'calibredb-mode 'normal)
 	;; (evil-set-initial-state 'dired-mode 'emacs)
+	(evil-set-initial-state 'treemacs-mode 'emacs)
 	(evil-set-initial-state 'sunrise-mode 'emacs)
 	(evil-collection-init))
 
@@ -745,40 +742,41 @@
   ("l" image-forward-hscroll :color red)
   ("h" image-backward-hscroll :color red))
 
-(use-package djvu)
-(use-package nov)
-(use-package org-pdftools
-  :hook (org-mode . org-pdftools-setup-link))
-(use-package org-noter-pdftools
-  :after org-noter
-  :config
-  ;; Add a function to ensure precise note is inserted
-  (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
-    (interactive "P")
-    (org-noter--with-valid-session
-     (let ((org-noter-insert-note-no-questions (if toggle-no-questions
-                                                   (not org-noter-insert-note-no-questions)
-                                                 org-noter-insert-note-no-questions))
-           (org-pdftools-use-isearch-link t)
-           (org-pdftools-use-freepointer-annot t))
-       (org-noter-insert-note (org-noter--get-precise-info)))))
-  (defun org-noter-set-start-location (&optional arg)
-    "When opening a session with this document, go to the current location.
-    With a prefix ARG, remove start location."
-    (interactive "P")
-    (org-noter--with-valid-session
-     (let ((inhibit-read-only t)
-           (ast (org-noter--parse-root))
-           (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
-       (with-current-buffer (org-noter--session-notes-buffer session)
-         (org-with-wide-buffer
-          (goto-char (org-element-property :begin ast))
-          (if arg
-              (org-entry-delete nil org-noter-property-note-location)
-            (org-entry-put nil org-noter-property-note-location
-                           (org-noter--pretty-print-location location))))))))
-  (with-eval-after-load 'pdf-annot
-    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+;; (use-package djvu)
+;; (use-package nov)
+;; (use-package org-pdftools
+;;   :hook (org-mode . org-pdftools-setup-link))
+
+;; (use-package org-noter-pdftools
+;;   :after org-noter
+;;   :config
+;;   ;; Add a function to ensure precise note is inserted
+;;   (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
+;;     (interactive "P")
+;;     (org-noter--with-valid-session
+;;      (let ((org-noter-insert-note-no-questions (if toggle-no-questions
+;;                                                    (not org-noter-insert-note-no-questions)
+;;                                                  org-noter-insert-note-no-questions))
+;;            (org-pdftools-use-isearch-link t)
+;;            (org-pdftools-use-freepointer-annot t))
+;;        (org-noter-insert-note (org-noter--get-precise-info)))))
+;;   (defun org-noter-set-start-location (&optional arg)
+;;     "When opening a session with this document, go to the current location.
+;;     With a prefix ARG, remove start location."
+;;     (interactive "P")
+;;     (org-noter--with-valid-session
+;;      (let ((inhibit-read-only t)
+;;            (ast (org-noter--parse-root))
+;;            (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
+;;        (with-current-buffer (org-noter--session-notes-buffer session)
+;;          (org-with-wide-buffer
+;;           (goto-char (org-element-property :begin ast))
+;;           (if arg
+;;               (org-entry-delete nil org-noter-property-note-location)
+;;             (org-entry-put nil org-noter-property-note-location
+;;                            (org-noter--pretty-print-location location))))))))
+;;   (with-eval-after-load 'pdf-annot
+;;     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
 ;;________________________________________________________________
 ;;;;    Fancy pkg
@@ -802,11 +800,9 @@
 ;;   :delight)
 
 ;;;; Load custom-files
-;; (defun load-directory (dir)
-;;   "Load all *.el files in a directory."
-;;   (let ((load-it (lambda (f)
-;;                    (load-file (concat (file-name-as-directory dir) f)))))
-;;     (mapc load-it (directory-files dir nil "\\.el$"))))
-;; (load-directory "~/.emacs.d/config") ; load my configuration of packages
-
-;; (load-file "~/.emacs.d/local-packages/org-habit-report.el")
+(defun load-directory (dir)
+  "Load all *.el files in a directory."
+  (let ((load-it (lambda (f)
+                   (load-file (concat (file-name-as-directory dir) f)))))
+    (mapc load-it (directory-files dir nil "\\.el$"))))
+(load-directory "~/.emacs.d/config") ; load my configuration of packages
