@@ -102,7 +102,7 @@
     :config
     (setq org-habit-following-days 14
           org-habit-preceding-days 14
-	  org-habit-show-all-today t
+	  org-habit-show-all-today nil
           org-habit-show-habits t
 	  org-habit-graph-column 70))
 
@@ -398,8 +398,8 @@
   ;; Set default column view headings: Task Total-Time Time-Stamp
   (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
 
-  (setq org-agenda-skip-scheduled-if-done t
-        org-agenda-skip-deadline-if-done t
+  (setq org-agenda-skip-scheduled-if-done nil ;; changed
+        org-agenda-skip-deadline-if-done nil ;; changed
         org-agenda-include-deadlines t
         org-agenda-block-separator #x2501
         org-agenda-compact-blocks t
@@ -466,27 +466,27 @@
                             ;;        :date today
                             ;;        :scheduled today
 			    ;; 	   :habit t)
+                            ;; (:priority<= "B"
+                            ;;              ;; Show this section after "Today" and "Important", because
+                            ;;              ;; their order is unspecified, defaulting to 0. Sections
+                            ;;              ;; are displayed lowest-number-first.
+                            ;;              :order 1)
+                            ;; (:name "Papers"
+                            ;;        :file-path "~/Org/Org-roam")
                             (:name "Work"
                                    :and (:category "work"))
                             (:name "Important"
                                    :priority "A")
-                            (:priority<= "B"
-                                         ;; Show this section after "Today" and "Important", because
-                                         ;; their order is unspecified, defaulting to 0. Sections
-                                         ;; are displayed lowest-number-first.
-                                         :order 1)
-                            (:name "Deadline Future"
-                                   :deadline future)
                             (:name "Today deadline"
                                    :deadline today
                                    :face (:background "black"))
+                            (:name "Deadline Future"
+                                   :deadline future)
                             (:name "Passed deadline"
                                    :and (:deadline past)
                                    :face (:background "firebrick"))
                             (:name "Stopped tasks"
                                    :and (:todo "STOPPED"))
-                            ;; (:name "Papers"
-                            ;;        :file-path "~/Org/Org-roam")
                             (:name "Waiting"
                                    :todo "WAITING"
                                    :order 9)
