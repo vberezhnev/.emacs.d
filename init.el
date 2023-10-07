@@ -23,6 +23,9 @@
 (setq vc-follow-symlinks t)
 (setq straight-pull-recipe-repositories t)
 
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+
 ;;________________________________________________________________
 ;;    Install use-package (straight integration)
 ;;________________________________________________________________
@@ -741,63 +744,6 @@
   ("N" pdf-history-forward :color red)
   ("l" image-forward-hscroll :color red)
   ("h" image-backward-hscroll :color red))
-
-;; (use-package djvu)
-;; (use-package nov)
-;; (use-package org-pdftools
-;;   :hook (org-mode . org-pdftools-setup-link))
-
-;; (use-package org-noter-pdftools
-;;   :after org-noter
-;;   :config
-;;   ;; Add a function to ensure precise note is inserted
-;;   (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
-;;     (interactive "P")
-;;     (org-noter--with-valid-session
-;;      (let ((org-noter-insert-note-no-questions (if toggle-no-questions
-;;                                                    (not org-noter-insert-note-no-questions)
-;;                                                  org-noter-insert-note-no-questions))
-;;            (org-pdftools-use-isearch-link t)
-;;            (org-pdftools-use-freepointer-annot t))
-;;        (org-noter-insert-note (org-noter--get-precise-info)))))
-;;   (defun org-noter-set-start-location (&optional arg)
-;;     "When opening a session with this document, go to the current location.
-;;     With a prefix ARG, remove start location."
-;;     (interactive "P")
-;;     (org-noter--with-valid-session
-;;      (let ((inhibit-read-only t)
-;;            (ast (org-noter--parse-root))
-;;            (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
-;;        (with-current-buffer (org-noter--session-notes-buffer session)
-;;          (org-with-wide-buffer
-;;           (goto-char (org-element-property :begin ast))
-;;           (if arg
-;;               (org-entry-delete nil org-noter-property-note-location)
-;;             (org-entry-put nil org-noter-property-note-location
-;;                            (org-noter--pretty-print-location location))))))))
-;;   (with-eval-after-load 'pdf-annot
-;;     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
-
-;;________________________________________________________________
-;;;;    Fancy pkg
-;;________________________________________________________________
-;; (use-package beacon
-;;   :commands beacon-mode
-;;   :init (beacon-mode t)
-;;   :bind ("C-S-l" . 'beacon-blink)
-;;   :config
-;;   (setq
-;;    beacon-blink-when-window-changes t  ; only flash on window/buffer changes...
-;;    beacon-blink-when-window-scrolls nil
-;;    beacon-blink-when-point-moves nil
-;;    beacon-dont-blink-commands nil
-;;    beacon-blink-when-focused t
-;;    beacon-blink-duration .5
-;;    beacon-blink-delay .5
-;;    beacon-push-mark 1
-;;    beacon-color "#50D050"
-;;    beacon-size 20)
-;;   :delight)
 
 ;;;; Load custom-files
 (defun load-directory (dir)
