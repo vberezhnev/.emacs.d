@@ -97,8 +97,8 @@
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
 ;; (change-theme 'doom-gruvbox-light 'timu-rogue)
-;; (change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
-(change-theme 'doom-one-light 'doom-one)
+;; (change-theme 'doom-one-light 'doom-one)
+(change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
 
 ;;;;; hl-indent
 (use-package highlight-indent-guides

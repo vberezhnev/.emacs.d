@@ -13,15 +13,16 @@
          (org-mode . visual-line-mode)
          (org-mode . variable-pitch-mode)
 	 (org-mode . global-org-modern-mode))
-  ;; :bind (("C-c l" . org-store-link)
-  ;;        ("M-q" . toggle-truncate-lines)
-  ;; 	 :map global-map
-  ;; 	 ("C-c c" . org-capture)
-  ;; 	 ("С-c a" . org-agenda)
-  ;;        ;; Timer (Pomodoro)
-  ;;        ("C-c t s" . org-timer-set-timer)
-  ;;        ("C-c t SPC" . org-timer-pause-or-continue)
-  ;;        ("C-c t <deletechar>") org-timer-stop)
+  :bind (("C-c l"               . org-store-link)
+	 ("C-c c"               . org-capture)
+	 ;; ("С-c a"               . org-agenda)
+         ;; ;; Timer (Pomodoro)
+         ;; ("C-c t s"             . org-timer-set-timer)
+         ;; ("C-c t SPC"           . org-timer-pause-or-continue)
+         ;; ("C-c t <deletechar>"  . org-timer-stop)
+	 ;; :map global-map
+         ;; ("M-q"                 . toggle-truncate-lines)
+	 )
   :config
   (setq
    org-ellipsis " ▾" ;; ⤵, ᗐ, ↴, ▼, ▶, ⤵, ▾
@@ -365,7 +366,7 @@
     (setq org-recur-finish-done t
           org-recur-finish-archive t))
 
-  (use-package org-rainbow-tags)
+  ;; (use-package org-rainbow-tags)
 
   ;; (use-package darkroom)
 
@@ -377,10 +378,26 @@
   (set-face-attribute 'org-column nil :background nil)
   (set-face-attribute 'org-column-title nil :background nil))
 
-(use-package sound-wav) ;; dep for org-pomodoro
+;; First of all you sould install aplay or afplay
+(use-package sound-wav
+  :demand t) ;; dep for org-pomodoro
+(use-package powershell
+  :demand t) ;; dep for org-pomodoro
+(require 'sound-wav)
+;; (sound-wav-play "/home/chopin.emacs.d/sounds/sound.wav")
+
 (use-package org-pomodoro
   :straight (:host github :repo "marcinkoziej/org-pomodoro"
-             :branch "master"))
+		   :branch "master")
+  :config
+  (setq org-pomodoro-length 25)
+  (setq org-pomodoro-short-break-length 5)
+  (setq org-pomodoro-long-break-length 15)
+  (setq org-pomodoro-play-sounds 1)
+
+  (setq org-pomodoro-finished-sound "/home/chopin/.emacs.d/sounds/sound.wav")
+  (setq org-pomodoro-long-break-sound "/home/chopin/.emacs.d/sounds/sound.wav")
+  (setq org-pomodoro-short-break-sound "/home/chopin/.emacs.d/sounds/sound.wav"))
 
 (use-package org-agenda
   :ensure nil
@@ -393,7 +410,8 @@
     :demand t)
 
   (setq org-agenda-files
-	'("~/Org/agenda/PlanAhead.org"
+	'("~/Org/agenda/DailyPomodoro.org"
+	  "~/Org/agenda/PlanAhead.org"
 	  "~/Org/agenda/PlannedDay.org"
   	  "~/Org/agenda/Habits.org"))
   (setq org-cycle-separator-lines 2)
@@ -478,6 +496,8 @@
                             ;;              :order 1)
                             ;; (:name "Papers"
                             ;;        :file-path "~/Org/Org-roam")
+			    (:name "Pomodoro"
+				   :and (:category "pomodoro" :todo "TODO" :scheduled today :file-path "~/Org/agenda/DailyPomodoro.org"))
                             (:name "Work"
                                    :and (:category "work"))
                             (:name "Important"
@@ -512,8 +532,28 @@
 				  :and (:tag "habits" :tag "evening"))))))))))
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
+(use-package org-ql)
+
+(defun org-mode-todo-to-done ()
+  "Change all TODO keywords to DONE in the current org-mode buffer using org-ql."
+  (interactive)
+  (org-ql-select "~/Org/agenda/DailyPomodoro.org"
+                 '(ts :on today)
+                 :action
+                 '(lambda () (org-todo "DONE"))))
+
+(run-at-time "23:00" nil 'org-mode-todo-to-done)
+(global-set-key (kbd "C-c j") 'org-mode-todo-to-done)
+
 (setq org-capture-templates
-      '(("d" "Daily task" entry (file+function
+      '(("p" "Daily pomodoro" entry (file+function
+				     "~/Org/agenda/DailyPomodoro.org"
+				     (lambda ()
+				       (org-datetree-find-date-create
+					(org-date-to-gregorian (org-today)) t)
+				       (re-search-forward "^\\*.+ log" nil t)))
+	 "* TODO %?\nSCHEDULED: <%<%Y-%m-%d>>")
+	("t" "Daily task" entry (file+function
 				 "~/Org/agenda/PlannedDay.org"
 				 (lambda ()
 				   (org-datetree-find-date-create

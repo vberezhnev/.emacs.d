@@ -241,6 +241,10 @@
 ;;   (use-package ox-reveal  )
 ;;   (setq org-reveal-root "file:~/Org/Presentations/reveal.js/"))
 
+(use-package russian-holidays
+  :config
+  (setq calendar-holidays russian-holidays))
+
 (use-package kind-icon
   :after corfu
   :custom
@@ -364,9 +368,9 @@
   (flycheck-display-errors-delay 0.5)
   (flycheck-check-syntax-automatically '(save idle-change))
   (flycheck-idle-change-delay 0.5))
-  :config
-  ;;(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  ;;(add-hook 'org-mode-hook 'flyspell-mode)
+:config
+;;(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+;;(add-hook 'org-mode-hook 'flyspell-mode)
 
 (use-package flycheck-inline
   :hook (flycheck-mode . turn-on-flycheck-inline))
@@ -420,9 +424,16 @@
 ;; (use-package telega
 ;;   :config
 ;;   (setq telega-use-docker t)
-;;   (add-hook 'telega-load-hook 'telega-notifications-mode)
-;;   (add-hook 'telega-load-hook 'telega-appindicator-mode)
-;;   (add-hook 'telega-load-hook 'global-telega-url-shorten-mode))
+;; (add-hook 'telega-load-hook 'telega-notifications-mode)
+;; (add-hook 'telega-load-hook 'telega-appindicator-mode)
+;; (add-hook 'telega-load-hook 'global-telega-url-shorten-mode)
+;; (telega-autoplay-mode 1)
+;; (telega-notifications-mode 1)
+;; (telega-appindicator-mode 1)
+;; (telega-auto-download-mode 1))
+
+;; (require 'telega-dashboard)
+;; (add-to-list 'dashboard-items '(telega-chats . 5))
 
 ;;________________________________________________________________
 ;;    Matrix
@@ -457,14 +468,14 @@
   (setq evil-insert-state-cursor '("#E82424" bar))
   (setq evil-replace-state-cursor '("#FF9E3B" hbar))
   (setq evil-operator-state-cursor '("#7E9CD8" hollow))
-	(evil-set-initial-state 'ibuffer-mode 'normal)
-	(evil-set-initial-state 'bookmark-bmenu-mode 'normal)
-	(evil-set-initial-state 'vterm-mode 'normal)
-	(evil-set-initial-state 'calibredb-mode 'normal)
-	;; (evil-set-initial-state 'dired-mode 'emacs)
-	(evil-set-initial-state 'treemacs-mode 'emacs)
-	(evil-set-initial-state 'sunrise-mode 'emacs)
-	(evil-collection-init))
+  (evil-set-initial-state 'ibuffer-mode 'normal)
+  (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+  (evil-set-initial-state 'vterm-mode 'normal)
+  (evil-set-initial-state 'calibredb-mode 'normal)
+  ;; (evil-set-initial-state 'dired-mode 'emacs)
+  (evil-set-initial-state 'treemacs-mode 'emacs)
+  (evil-set-initial-state 'sunrise-mode 'emacs)
+  (evil-collection-init))
 
 ;; (use-package golden-ratio
 ;;   ;; Automatic resizing of Emacs windows to the golden ratio
@@ -745,6 +756,13 @@
   ("l" image-forward-hscroll :color red)
   ("h" image-backward-hscroll :color red))
 
+(straight-use-package
+ '(org-ai :type git :host github :repo "rksm/org-ai"
+          :local-repo "org-ai"
+          :files ("*.el" "README.md" "snippets")))
+;; (setq org-ai-openai-api-token "<ENTER YOUR API TOKEN HERE>") ;; кто сопрёт мой ключ -- тот лох
+
+
 ;;;; Load custom-files
 (defun load-directory (dir)
   "Load all *.el files in a directory."
@@ -752,3 +770,18 @@
                    (load-file (concat (file-name-as-directory dir) f)))))
     (mapc load-it (directory-files dir nil "\\.el$"))))
 (load-directory "~/.emacs.d/config") ; load my configuration of packages
+(put 'dired-find-alternate-file 'disabled nil)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(calendar-christian-all-holidays-flag t)
+ '(calendar-view-holidays-initially-flag t)
+ '(helm-minibuffer-history-key "M-p"))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

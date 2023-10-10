@@ -14,7 +14,7 @@
         '(:left (sort symlink) :right (omit yank index)))
   (setq dirvish-hide-details-mode nil)
   (setq dirvish-attributes
-        '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+        '(file-time file-size collapse subtree-state vc-state git-msg)) ;; all-the-icons 
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches
         "-l --almost-all --human-readable --group-directories-first --no-group")
