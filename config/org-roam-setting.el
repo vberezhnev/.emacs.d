@@ -45,95 +45,96 @@
       :target
       (file+head "bibliography/references/${citekey}.org" "#+title: ${title}\n#+date: %U\n#+filetags: :Book:%^{Book type}:")
       :unnarrowed t)))
-  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-  (org-roam-dailies-capture-templates
-   '(
-     ("m" "Morning diary" plain (file "~/Org/Templates/journal/Morning.org") :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n"))
-     ("q" "Quotetions diary" entry "* Quotation of the day (%U)‎\n\n#+begin_quote\n%^{Quote}\n#+end_quote\n+ Author: *%^{Author of quote}*\n\n* Reflections about this quote" :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>-quote.org" "#+title: %U\n\n"))
-     
-     ("d" "Default diary" entry "* Default (%U): «%?»‎\n\n" :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n"))
-     
-     ("e" "Evening diary" plain (file "~/Org/Templates/journal/Evening.org") :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %U\n\n"))))
-  ;; Org-noter integration with org-roam-bibtex
-  (setq orb-preformat-keywords
-        '("citekey" "title" "url" "author-or-editor" "keywords" "file")
-        orb-process-file-keyword t
-        orb-attached-file-extensions '("pdf"))
-  :config
-  (setq org-roam-completion-everywhere t)
-  (org-roam-db-autosync-mode)
-  (require 'org-roam-protocol)
-  ;; Customize the org-roam buffer
-  (add-to-list 'display-buffer-alist
-               '("\\*org-roam\\*"
-                 (display-buffer-in-direction)
-                 (direction . right)
-                 (window-width . 0.33)
-                 (window-height . fit-window-to-buffer))))
+   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+   (org-roam-dailies-capture-templates
+    '(
+      ("m" "Morning diary" plain (file "~/Org/Templates/journal/Morning.org") :clock-in t :clock-resume t
+       :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))
+      ("q" "Quotetions diary" entry "** Quotation of the day (%U)‎\n\n#+begin_quote\n%^{Quote}\n#+end_quote\n+ Author: *%^{Author of quote}*\n\n* Reflections about this quote" :clock-in t :clock-resume t
+       :if-new (file+head "%<%Y-%m-%d>-quote.org" "#+title: %U\n\n"))
 
-(use-package org-roam-ui
-  :hook (after-init . org-roam-ui-mode)
-  :config
-  (setq orui-sync-theme nil
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start nil ))
+      ("d" "Default diary" entry "** Default (%U): «%?»‎\n\n" :clock-in t :clock-resume t
+       :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))
 
-(use-package org-roam-timestamps
-  :after org-roam
-  :demand t
-  :config (org-roam-timestamps-mode))
-(setq org-roam-timestamps-parent-file t)
-(setq org-roam-timestamps-remember-timestamps t)
+      ("e" "Evening diary" plain (file "~/Org/Templates/journal/Evening.org") :clock-in t :clock-resume t
+       :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))))
+   ;; Org-noter integration with org-roam-bibtex
+   (setq orb-preformat-keywords
+         '("citekey" "title" "url" "author-or-editor" "keywords" "file")
+         orb-process-file-keyword t
+         orb-attached-file-extensions '("pdf"))
+   :config
+   (setq org-roam-completion-everywhere t)
+   (org-roam-db-autosync-mode)
+   (require 'org-roam-protocol)
+   ;; Customize the org-roam buffer
+   (add-to-list 'display-buffer-alist
+		'("\\*org-roam\\*"
+                  (display-buffer-in-direction)
+                  (direction . right)
+                  (window-width . 0.33)
+                  (window-height . fit-window-to-buffer))))
 
-(defun org-roam-create-note-from-headline ()
-  "Create an Org-roam note from the current headline and jump to it.
+  (use-package org-roam-ui
+    :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq orui-sync-theme nil
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start nil ))
 
-Normally, insert the headline’s title using the ’#title:’ file-level property
-and delete the Org-mode headline. However, if the current headline has a
-Org-mode properties drawer already, keep the headline and don’t insert
-‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
-‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
-  (interactive)
-  (let ((title (nth 4 (org-heading-components)))
-        (has-properties (org-get-property-block)))
-    (org-cut-subtree)
-    (org-roam-node-find 'other-window title nil)
-    (org-paste-subtree)
-    (unless has-properties
-      (kill-line)
-      (while (outline-next-heading)
-        (org-promote)))
-    (goto-char (point-min))
-    (when has-properties
-      (kill-line)
-      (kill-line))))
+  (use-package org-roam-timestamps
+    :after org-roam
+    :demand t
+    :config (org-roam-timestamps-mode))
+  (setq org-roam-timestamps-parent-file t)
+  (setq org-roam-timestamps-remember-timestamps t)
 
-(defun org-roam-insert-note-from-headline ()
-  "Create an Org-roam note from the current headline and jump to it.
+  (defun org-roam-create-note-from-headline ()
+    "Create an Org-roam note from the current headline and jump to it.
 
 Normally, insert the headline’s title using the ’#title:’ file-level property
 and delete the Org-mode headline. However, if the current headline has a
 Org-mode properties drawer already, keep the headline and don’t insert
 ‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
 ‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
-  (interactive)
-  (let ((title (nth 4 (org-heading-components)))
-        (has-properties (org-get-property-block)))
-    (org-cut-subtree)
-    (org-roam-node-find 'other-window title nil)
-    (org-paste-subtree)
-    (unless has-properties
-      (kill-line)
-      (while (outline-next-heading)
-        (org-promote)))
-    (goto-char (point-min))
-    (when has-properties
-      (kill-line)
-      (kill-line))))
+    (interactive)
+    (let ((title (nth 4 (org-heading-components)))
+          (has-properties (org-get-property-block)))
+      (org-cut-subtree)
+      (org-roam-node-find 'other-window title nil)
+      (org-paste-subtree)
+      (unless has-properties
+	(kill-line)
+	(while (outline-next-heading)
+          (org-promote)))
+      (goto-char (point-min))
+      (when has-properties
+	(kill-line)
+	(kill-line))))
 
-(provide 'org-roam-setting)
+  (defun org-roam-insert-note-from-headline ()
+    "Create an Org-roam note from the current headline and jump to it.
+
+Normally, insert the headline’s title using the ’#title:’ file-level property
+and delete the Org-mode headline. However, if the current headline has a
+Org-mode properties drawer already, keep the headline and don’t insert
+‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
+‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
+    (interactive)
+    (let ((title (nth 4 (org-heading-components)))
+          (has-properties (org-get-property-block)))
+      (org-cut-subtree)
+      (org-roam-node-find 'other-window title nil)
+      (org-paste-subtree)
+      (unless has-properties
+	(kill-line)
+	(while (outline-next-heading)
+          (org-promote)))
+      (goto-char (point-min))
+      (when has-properties
+	(kill-line)
+	(kill-line))))
+
+
+  (provide 'org-roam-setting)

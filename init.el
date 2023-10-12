@@ -380,23 +380,24 @@
   (with-eval-after-load 'rust-mode
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 
-;; (use-package ispell
-;;   :bind ("<f8>" . ispell-word) ; easy spell check
-;;   :custom
-;;   (ispell-program-name "hunspell") ; require Hunspell
-;;   (ispell-dictionary "en_US,en_GB,ru_RU")
-;;   (ispell-personal-dictionary "~/.emacs.d/.hunspell_personal")
-;;   :config
-;;   ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
-;;   ;; dictionary' even though multiple dictionaries will be configured
-;;   ;; in next line.
-;;   (setenv "LANG" "ru_RU.UTF-8")
-;;   ;; ispell-set-spellchecker-params has to be called
-;;   ;; before ispell-hunspell-add-multi-dic will work
-;;   (ispell-set-spellchecker-params)
-;;   (ispell-hunspell-add-multi-dic ispell-dictionary)
-;;   (unless (file-exists-p ispell-personal-dictionary)
-;;     (write-region "" nil ispell-personal-dictionary nil 0)))
+(use-package ispell
+  :bind ("<f8>" . ispell-word) ; easy spell check
+  ;; :custom
+  ;; (ispell-program-name "hunspell") ; require Hunspell
+  ;; (ispell-dictionary "en_US,en_GB,ru_RU")
+  ;; (ispell-personal-dictionary "~/.emacs.d/.hunspell_personal")
+  :config
+  (setq ispell-local-dictionary "ru")
+  ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
+  ;; dictionary' even though multiple dictionaries will be configured
+  ;; in next line.
+  ;; (setenv "LANG" "ru_RU.UTF-8")
+  ;; ispell-set-spellchecker-params has to be called
+  ;; before ispell-hunspell-add-multi-dic will work
+  (ispell-set-spellchecker-params)
+  (ispell-hunspell-add-multi-dic ispell-dictionary)
+  (unless (file-exists-p ispell-personal-dictionary)
+    (write-region "" nil ispell-personal-dictionary nil 0)))
 
 ;; (use-package flyspell
 ;;   :bind (:map flyspell-mode-map

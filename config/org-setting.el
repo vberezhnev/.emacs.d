@@ -27,11 +27,11 @@
   (setq
    org-ellipsis " ▾" ;; ⤵, ᗐ, ↴, ▼, ▶, ⤵, ▾
    org-roam-v2-ack t                 ; anonying startup message
-   org-log-done 'time                ; I need to know when a task is done
+   ;; org-log-done 'time                ; I need to know when a task is done
    ;; org-hide-emphasis-markers t
    org-hide-leading-stars t
    org-log-into-drawer t
-   org-log-done 'time
+   ;; org-log-done 'time
    org-startup-folded t
    ;; org-odd-levels-only t
    org-pretty-entities t
@@ -51,8 +51,6 @@
    org-export-with-smart-quotes t
    org-image-actual-width '(300))
 
-  (with-eval-after-load 'org
-    (setq org-log-done 'time))
   (setq org-todo-keyword-faces
 	'(
           ("TODO" :background "indian red" :foreground "white" :weight bold)
@@ -101,11 +99,31 @@
     :init
     (add-to-list 'org-modules 'org-habit)
     :config
-    (setq org-habit-following-days 14
-          org-habit-preceding-days 14
-	  org-habit-show-all-today nil
+    (setq org-habit-following-days 7
+          org-habit-preceding-days 7
+	  org-habit-show-all-today t
           org-habit-show-habits t
-	  org-habit-graph-column 70))
+	  org-habit-graph-column 67))
+
+  (defun toggle-org-habit-show-all-today ()
+    "Toggle the value of `org-habit-show-all-today' between t and nil."
+    (interactive)
+    (setq org-habit-show-all-today (not org-habit-show-all-today))
+    (message "org-habit-show-all-today is now %s"
+             (if org-habit-show-all-today "t" "nil"))
+    (org-agenda-refresh))
+
+  (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today)
+
+  (use-package org-habit-stats
+    :bind (("Z"               . org-habit-stats-view-next-habit-in-agenda))
+    :config
+    (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties))
+
+  ;; (use-package  org-habit-plus
+  ;;   :straight (:host github :repo "myshevchuk/org-habit-plus" :branch "master")
+  ;;   :init
+  ;;   (add-to-list 'org-modules 'org-habit-plus))
 
   ;; Increase the size of various headings
   (set-face-attribute 'org-document-title nil :font "Iosevka" :weight 'bold :height 1.5)
@@ -190,12 +208,12 @@
           ;; if face is overdue of alert and has no complete-glyp
           (if (and (or (eq (get-text-property i 'face habit-str)
                            'org-habit-overdue-face)
-                       (eq (get-text-property i 'face habit-str)
+		       (eq (get-text-property i 'face habit-str)
                            'org-habit-alert-future-face))
                    (not
                     (string= (string (aref habit-str i))
                              (string org-habit-completed-glyph))))
-              (progn
+	      (progn
 		(setf (alist-get :habit-last-missed habit-stats) (get-text-property i 'help-echo habit-str))
 		(when (> cur-day-streak (alist-get :longest-day-streak habit-stats))
                   (setf (alist-get :longest-day-streak habit-stats) cur-day-streak)
@@ -204,14 +222,14 @@
                   (setf (alist-get :longest-done-streak habit-stats) cur-done-streak)
                   (setq cur-done-streak 0)))
             (progn
-              (setf cur-day-streak (+ 1 cur-day-streak))
-              (when (eq (get-text-property i 'face habit-str)
+	      (setf cur-day-streak (+ 1 cur-day-streak))
+	      (when (eq (get-text-property i 'face habit-str)
 			'org-habit-ready-face)
 		(setf cur-done-streak (+ 1 cur-done-streak))))
             )
           (if (string= (string (aref habit-str i))
-                       (string org-habit-completed-glyph))
-              (setf (alist-get :habit-done habit-stats) (+ 1 (alist-get :habit-done habit-stats))))
+		       (string org-habit-completed-glyph))
+	      (setf (alist-get :habit-done habit-stats) (+ 1 (alist-get :habit-done habit-stats))))
           ) ;; string iteration done
 	;; when last streak bigger then last streak
 	(when (> cur-day-streak (alist-get :longest-day-streak habit-stats))
@@ -366,6 +384,27 @@
     (setq org-recur-finish-done t
           org-recur-finish-archive t))
 
+  ;; Log time a task was set to DONE.
+  (setq org-log-done (quote time))
+
+  ;; Don't log the time a task was rescheduled or redeadlined.
+  (setq org-log-redeadline nil)
+  (setq org-log-reschedule nil)
+
+  (setq org-read-date-prefer-future 'time)
+
+  ;; Refresh org-agenda after rescheduling a task.
+  (defun org-agenda-refresh ()
+    "Refresh all `org-agenda' buffers."
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+	(when (derived-mode-p 'org-agenda-mode)
+          (org-agenda-maybe-redo)))))
+
+  (defadvice org-schedule (after refresh-agenda activate)
+    "Refresh org-agenda."
+    (org-agenda-refresh))
+
   ;; (use-package org-rainbow-tags)
 
   ;; (use-package darkroom)
@@ -457,15 +496,15 @@
   (setq org-agenda-breadcrumbs-separator " ❱ "
         org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
         org-agenda-time-grid '((weekly today require-timed)
-                               (800 1000 1200 1400 1600 1800 2000)
-                               "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
+			       (800 1000 1200 1400 1600 1800 2000)
+			       "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
         org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
                                    (todo . " %i %-12:c")
                                    (tags . " %i %-12:c")
                                    (search . " %i %-12:c")))
   (setq org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
-                                                      "\n"
-                                                      (org-agenda-format-date-aligned date))))
+						      "\n"
+						      (org-agenda-format-date-aligned date))))
 
   (setq org-agenda-custom-commands
         '(
@@ -476,7 +515,6 @@
                                   :time-grid t
                                   :date today
                                   :scheduled today
-				  :discard (:tag "habits")
                                   :order 1)))))
             (alltodo "" ((org-agenda-overriding-header "")
                          (org-super-agenda-groups
@@ -502,14 +540,14 @@
                                    :and (:category "work"))
                             (:name "Important"
                                    :priority "A")
+                            (:name "Passed deadline"
+                                   :and (:deadline past)
+                                   :face (:background "firebrick"))
                             (:name "Today deadline"
                                    :deadline today
                                    :face (:background "black"))
                             (:name "Deadline Future"
                                    :deadline future)
-                            (:name "Passed deadline"
-                                   :and (:deadline past)
-                                   :face (:background "firebrick"))
                             (:name "Stopped tasks"
                                    :and (:todo "STOPPED"))
                             (:name "Waiting"
@@ -538,9 +576,9 @@
   "Change all TODO keywords to DONE in the current org-mode buffer using org-ql."
   (interactive)
   (org-ql-select "~/Org/agenda/DailyPomodoro.org"
-                 '(ts :on today)
-                 :action
-                 '(lambda () (org-todo "DONE"))))
+    '(ts :on today)
+    :action
+    '(lambda () (org-todo "DONE"))))
 
 (run-at-time "23:00" nil 'org-mode-todo-to-done)
 (global-set-key (kbd "C-c j") 'org-mode-todo-to-done)
@@ -562,5 +600,30 @@
 	 "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")
 	("b" "Book" entry (file "~/Org/Reading-list.org")
 	 "* %^{TITLE}\n:PROPERTIES:\n:ADDED: <%<%Y-%m-%d>>\n:END:%^{AUTHOR}\n%^{GOODREADS_URL}%?" :empty-lines 1)))
+
+(defun my/org-roam-copy-todo-to-today ()
+  (interactive)
+  (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+        (org-roam-dailies-capture-templates
+         '(("t" "tasks" entry "%?"
+            :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
+        (org-after-refile-insert-hook 'save-buffer)
+        today-file
+        pos)
+    (save-window-excursion
+      (org-roam-dailies--capture (current-time) t)
+      (setq today-file (buffer-file-name))
+      (setq pos (point)))
+
+    ;; Only refile if the target file is different than the current file
+    (unless (equal (file-truename today-file)
+                   (file-truename (buffer-file-name)))
+      (org-refile nil nil (list "Tasks" today-file nil pos)))))
+
+(add-to-list 'org-after-todo-state-change-hook
+             (lambda ()
+               (when (equal org-state "DONE")
+                 (my/org-roam-copy-todo-to-today))))
+
 
 (provide 'org-setting)

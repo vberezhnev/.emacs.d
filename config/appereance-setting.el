@@ -203,7 +203,7 @@
          (elfeed-show-mode  . olivetti-mode)
          (mu4e-compose-mode . olivetti-mode))
   :custom
-  (olivetti-body-width 90)
+  (olivetti-body-width 100)
   :delight " ⊗") ; Ⓐ ⊛
 
 ;;________________________________________________________________
