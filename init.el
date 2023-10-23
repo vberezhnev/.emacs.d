@@ -1,7 +1,8 @@
 ;; emacsclient --no-wait--alternate-editor=emacs [FILE]
 (require 'server)
-(unless (server-running-p)
-  (server-start))
+(server-start)
+;; (unless (server-running-p)
+;;   (server-start))
 
 ;;________________________________________________________________
 ;;    Install straight
@@ -757,29 +758,54 @@
   ("l" image-forward-hscroll :color red)
   ("h" image-backward-hscroll :color red))
 
-(straight-use-package
- '(org-ai :type git :host github :repo "rksm/org-ai"
-          :local-repo "org-ai"
-          :files ("*.el" "README.md" "snippets")))
+;; (straight-use-package
+;;  '(org-ai :type git :host github :repo "rksm/org-ai"
+;;           :local-repo "org-ai"
+;;           :files ("*.el" "README.md" "snippets")))
 ;; (setq org-ai-openai-api-token "<ENTER YOUR API TOKEN HERE>") ;; кто сопрёт мой ключ -- тот лох
 
+;; Install Khoj Package using Straight.el
+;; (use-package khoj
+;;   :after org
+;;   :straight (khoj :type git :host github :repo "khoj-ai/khoj" :files (:defaults "src/interface/emacs/khoj.el"))
+;;   :bind ("C-c s" . 'khoj)
+;;   :config (setq khoj-org-directories '("~/Org/Org-roam")
+;;                 khoj-results-count "10"
+;;                 khoj-org-files '("~/Org/agenda/PlanAhead.org"
+;; 				 "~/Org/agenda/PlannedDay.org")
+;;                 ;; khoj-openai-api-key "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"
+;; 		khoj-chat-offline t))
 
 ;;;; Load custom-files
 (defun load-directory (dir)
   "Load all *.el files in a directory."
   (let ((load-it (lambda (f)
-                   (load-file (concat (file-name-as-directory dir) f)))))
+		   (load-file (concat (file-name-as-directory dir) f)))))
     (mapc load-it (directory-files dir nil "\\.el$"))))
 (load-directory "~/.emacs.d/config") ; load my configuration of packages
+
+(use-package ledger-mode
+  ;; :init
+  ;; (setq ledger-clear-whole-transactions 1)
+  :config
+  (add-to-list 'evil-emacs-state-modes 'ledger-report-mode)
+  ;; :mode "\\.dat\\'"
+  )
+
+(use-package sudoku)
+(use-package sudo-save)
+
 (put 'dired-find-alternate-file 'disabled nil)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(calendar-christian-all-holidays-flag t)
- '(calendar-view-holidays-initially-flag t)
- '(helm-minibuffer-history-key "M-p"))
+ '(helm-minibuffer-history-key "M-p")
+ '(org-agenda-files
+   '("/home/chopin/Org/agenda/PlanAhead.org" "/home/chopin/Org/agenda/PlannedDay.org" "/home/chopin/Org/agenda/Habits.org"))
+ '(org-pomodoro-long-break-frequency 3))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

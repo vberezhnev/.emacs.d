@@ -101,7 +101,7 @@
     :config
     (setq org-habit-following-days 7
           org-habit-preceding-days 7
-	  org-habit-show-all-today t
+	  org-habit-show-all-today nil
           org-habit-show-habits t
 	  org-habit-graph-column 67))
 
@@ -110,7 +110,7 @@
     (interactive)
     (setq org-habit-show-all-today (not org-habit-show-all-today))
     (message "org-habit-show-all-today is now %s"
-             (if org-habit-show-all-today "t" "nil"))
+             (if org-habit-show-all-today "nil" "t"))
     (org-agenda-refresh))
 
   (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today)
@@ -449,8 +449,7 @@
     :demand t)
 
   (setq org-agenda-files
-	'("~/Org/agenda/DailyPomodoro.org"
-	  "~/Org/agenda/PlanAhead.org"
+	'("~/Org/agenda/PlanAhead.org"
 	  "~/Org/agenda/PlannedDay.org"
   	  "~/Org/agenda/Habits.org"))
   (setq org-cycle-separator-lines 2)
@@ -515,31 +514,30 @@
                                   :time-grid t
                                   :date today
                                   :scheduled today
+                                  :order 1)
+			   (:name "Tomorrow"
+                                  :time-grid t
+                                  :date tomorrow
+                                  :scheduled tomorrow
                                   :order 1)))))
             (alltodo "" ((org-agenda-overriding-header "")
                          (org-super-agenda-groups
                           '(;; Each group has an implicit boolean OR operator between its selectors.
-                            ;; (:name "Work important"
-                            ;;        :and (:priority>= "B" :category "work" :todo ("TODO" "NEXT")))
-                            ;; (:name "Work other"
-                            ;;        :and (:category "work" :todo ("TODO" "NEXT")))
 			    ;; (:name "Personal"
                             ;;        :date today
                             ;;        :scheduled today
 			    ;; 	   :habit t)
-                            ;; (:priority<= "B"
-                            ;;              ;; Show this section after "Today" and "Important", because
-                            ;;              ;; their order is unspecified, defaulting to 0. Sections
-                            ;;              ;; are displayed lowest-number-first.
-                            ;;              :order 1)
                             ;; (:name "Papers"
                             ;;        :file-path "~/Org/Org-roam")
-			    (:name "Pomodoro"
-				   :and (:category "pomodoro" :todo "TODO" :scheduled today :file-path "~/Org/agenda/DailyPomodoro.org"))
-                            (:name "Work"
-                                   :and (:category "work"))
+			    ;; (:name "Pomodoro"
+			    ;; 	   :and (:category "pomodoro" :todo "TODO" :scheduled today :file-path "~/Org/agenda/DailyPomodoro.org"))
                             (:name "Important"
                                    :priority "A")
+                            (:name "Work"
+                                   :and (:category "work"))
+                            (:name "Work important"
+                                   :and (:priority>= "B" :category "work" :todo ("TODO" "NEXT")))
+			    
                             (:name "Passed deadline"
                                    :and (:deadline past)
                                    :face (:background "firebrick"))
@@ -548,6 +546,7 @@
                                    :face (:background "black"))
                             (:name "Deadline Future"
                                    :deadline future)
+			    
                             (:name "Stopped tasks"
                                    :and (:todo "STOPPED"))
                             (:name "Waiting"
@@ -571,26 +570,33 @@
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
 (use-package org-ql)
+(use-package org-anki) ;; https://github.com/eyeinsky/org-anki/
+(use-package anki-editor)  ;; https://github.com/louietan/anki-editor
+(use-package org-timeblock
+  :straight (org-timeblock :type git
+              :host github
+              :repo "ichernyshovvv/org-timeblock"))
 
-(defun org-mode-todo-to-done ()
-  "Change all TODO keywords to DONE in the current org-mode buffer using org-ql."
-  (interactive)
-  (org-ql-select "~/Org/agenda/DailyPomodoro.org"
-    '(ts :on today)
-    :action
-    '(lambda () (org-todo "DONE"))))
+;; (defun org-mode-todo-to-done ()
+;;   "Change all TODO keywords to DONE in the current org-mode buffer using org-ql."
+;;   (interactive)
+;;   (org-ql-select "~/Org/agenda/DailyPomodoro.org"
+;;     '(ts :on today)
+;;     :action
+;;     '(lambda () (org-todo "DONE"))))
 
-(run-at-time "23:00" nil 'org-mode-todo-to-done)
-(global-set-key (kbd "C-c j") 'org-mode-todo-to-done)
+;; (run-at-time "23:00" nil 'org-mode-todo-to-done)
+;; (global-set-key (kbd "C-c j") 'org-mode-todo-to-done)
 
 (setq org-capture-templates
-      '(("p" "Daily pomodoro" entry (file+function
-				     "~/Org/agenda/DailyPomodoro.org"
-				     (lambda ()
-				       (org-datetree-find-date-create
-					(org-date-to-gregorian (org-today)) t)
-				       (re-search-forward "^\\*.+ log" nil t)))
-	 "* TODO %?\nSCHEDULED: <%<%Y-%m-%d>>")
+      '(
+	;; ("p" "Daily pomodoro" entry (file+function
+	;; 			     "~/Org/agenda/DailyPomodoro.org"
+	;; 			     (lambda ()
+	;; 			       (org-datetree-find-date-create
+	;; 				(org-date-to-gregorian (org-today)) t)
+	;; 			       (re-search-forward "^\\*.+ log" nil t)))
+	;;  "* TODO %?\nSCHEDULED: <%<%Y-%m-%d>>")
 	("t" "Daily task" entry (file+function
 				 "~/Org/agenda/PlannedDay.org"
 				 (lambda ()
@@ -600,30 +606,5 @@
 	 "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")
 	("b" "Book" entry (file "~/Org/Reading-list.org")
 	 "* %^{TITLE}\n:PROPERTIES:\n:ADDED: <%<%Y-%m-%d>>\n:END:%^{AUTHOR}\n%^{GOODREADS_URL}%?" :empty-lines 1)))
-
-(defun my/org-roam-copy-todo-to-today ()
-  (interactive)
-  (let ((org-refile-keep t) ;; Set this to nil to delete the original!
-        (org-roam-dailies-capture-templates
-         '(("t" "tasks" entry "%?"
-            :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
-        (org-after-refile-insert-hook 'save-buffer)
-        today-file
-        pos)
-    (save-window-excursion
-      (org-roam-dailies--capture (current-time) t)
-      (setq today-file (buffer-file-name))
-      (setq pos (point)))
-
-    ;; Only refile if the target file is different than the current file
-    (unless (equal (file-truename today-file)
-                   (file-truename (buffer-file-name)))
-      (org-refile nil nil (list "Tasks" today-file nil pos)))))
-
-(add-to-list 'org-after-todo-state-change-hook
-             (lambda ()
-               (when (equal org-state "DONE")
-                 (my/org-roam-copy-todo-to-today))))
-
 
 (provide 'org-setting)

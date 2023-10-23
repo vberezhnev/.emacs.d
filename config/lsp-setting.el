@@ -24,7 +24,7 @@
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
          (go-mode         . lsp)
          (rust-mode       . lsp)
-         (web-mode        . lsp)
+         ;; (web-mode        . lsp)
          ;; (js-mode         . lsp)
          ;; (typescript-mode . lsp)
          (LaTeX-mode      . lsp)
@@ -158,23 +158,29 @@
 (add-hook 'before-save-hook 'tide-format-before-save)
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
 
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "jsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
+;; (add-hook 'web-mode-hook
+;;           (lambda ()
+;;             (when (string-equal "jsx" (file-name-extension buffer-file-name))
+;;               (setup-tide-mode))))
 
-(use-package web-mode
-  :mode (("\\.js\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode)
-         ("\\.ts\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.html\\'" . web-mode)
-         ("\\.vue\\'" . web-mode)
-         ("\\.json\\'" . web-mode))
-  :commands web-mode
-  :config
-  (setq web-mode-content-types-alist
-        '(("jsx" . "\\.js[x]?\\'"))))
+;; (use-package web-mode
+;;   :mode (("\\.js\\'" . web-mode)
+;;          ("\\.jsx\\'" . web-mode)
+;;          ("\\.ts\\'" . web-mode)
+;;          ("\\.tsx\\'" . web-mode)
+;;          ("\\.html\\'" . web-mode)
+;;          ("\\.vue\\'" . web-mode)
+;;          ("\\.json\\'" . web-mode))
+;;   :commands web-mode
+;;   :config
+;;   (setq web-mode-content-types-alist
+;;         '(("jsx" . "\\.js[x]?\\'"))))
+
+(use-package typescript-mode
+  :mode (rx ".ts" string-end)
+  :init
+  (define-derived-mode typescript-tsx-mode typescript-mode "typescript-tsx")
+  (add-to-list 'auto-mode-alist (cons (rx ".tsx" string-end) #'typescript-tsx-mode)))
 
 ;; JSX syntax highlighting
 ;; (add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode)) ;; auto-enable for .js/.jsx files
