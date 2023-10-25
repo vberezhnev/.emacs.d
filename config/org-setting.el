@@ -339,7 +339,7 @@
   ;;   :config
   ;;   (define-key global-map (kbd "<f12>") #'org-transclusion-add)
   ;;   (define-key global-map (kbd "C-n t") #'org-transclusion-mode))
-
+  
   (use-package org-download
     :demand t
     :config
@@ -426,8 +426,7 @@
 ;; (sound-wav-play "/home/chopin.emacs.d/sounds/sound.wav")
 
 (use-package org-pomodoro
-  :straight (:host github :repo "marcinkoziej/org-pomodoro"
-		   :branch "master")
+  :straight (:host github :repo "marcinkoziej/org-pomodoro" :branch "master")
   :config
   (setq org-pomodoro-length 25)
   (setq org-pomodoro-short-break-length 5)
@@ -437,6 +436,11 @@
   (setq org-pomodoro-finished-sound "/home/chopin/.emacs.d/sounds/sound.wav")
   (setq org-pomodoro-long-break-sound "/home/chopin/.emacs.d/sounds/sound.wav")
   (setq org-pomodoro-short-break-sound "/home/chopin/.emacs.d/sounds/sound.wav"))
+
+;; (use-package org-sidebar
+;;   :straight (:host github :repo "alphapapa/org-sidebar" :branch "master"))
+;; (use-package org-now
+;;   :straight (:host github :repo "alphapapa/org-now" :branch "master"))
 
 (use-package org-agenda
   :ensure nil
@@ -450,7 +454,6 @@
 
   (setq org-agenda-files
 	'("~/Org/agenda/PlanAhead.org"
-	  "~/Org/agenda/PlannedDay.org"
   	  "~/Org/agenda/Habits.org"))
   (setq org-cycle-separator-lines 2)
   ;; (setq org-agenda-include-diary t) ;; Calendar/Diary integration
@@ -515,10 +518,10 @@
                                   :date today
                                   :scheduled today
                                   :order 1)
-			   (:name "Tomorrow"
+			   (:name "Next days"
                                   :time-grid t
-                                  :date tomorrow
-                                  :scheduled tomorrow
+                                  ;; :date tomorrow
+                                  :scheduled future
                                   :order 1)))))
             (alltodo "" ((org-agenda-overriding-header "")
                          (org-super-agenda-groups

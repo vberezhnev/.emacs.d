@@ -132,7 +132,7 @@
 
 ;; You can hide the minibuffer and echo area when they're not used, by
 ;; uncommenting the following line.
-(setq exwm-workspace-minibuffer-position 'bottom)
+;; (setq exwm-workspace-minibuffer-position 'bottom)
 
 (defun pkill-xinit ()
   "Kill the xinit process."
@@ -152,23 +152,11 @@
         (message "system suspended."))
     (message "system not suspended.")))
 
-;; for lemonbar
-;; (defun my/exwm-workspace-list ()
-;;   "Return a lemonbar string showing workspace list."
-;;   (let* ((num (exwm-workspace--count))
-;;          (sequence (number-sequence 0 (1- num)))
-;;          (curr (exwm-workspace--position exwm-workspace--current)))
-;;     (mapconcat (lambda (i)
-;; 		   (format (if (= i curr) "[%%{F#c6a0f6}%d%%{F-}] " "%d ") i))
-;; 		 sequence "")
-;;     ))
+;; Automatically move EXWM buffer to current workspace when selected
+(setq exwm-layout-show-all-buffers t)
 
-;; (defun my/exwm-report-workspaces-to-lemonbar ()
-;;   (with-temp-file "/tmp/panel-fifo"
-;;     (insert (format "WIN%s\n" (my/exwm-workspace-list)))))
-
-;; (add-hook 'exwm-workspace-switch-hook 'my/exwm-report-workspaces-to-lemonbar)
-;; (add-hook 'exwm-init-hook 'my/exwm-report-workspaces-to-lemonbar)
+;; Display all EXWM buffers in every workspace buffer list
+(setq exwm-workspace-show-all-buffers t)
 
 ;; Do not forget to enable EXWM. It will start by itself when things are
 ;; ready.  You can put it _anywhere_ in your configuration.
@@ -187,30 +175,31 @@
 
 (exwm-enable))
 
-(defun bp/send-polybar-hook (module-name hook-index)
-  "Generic IPC hook function for communicating with Polybar"
+(server-start)
+
+(defvar efs/polybar-process nil
+  "Holds the process of the running Polybar instance, if any")
+
+(defun efs/kill-panel ()
+  (interactive)
+  (when efs/polybar-process
+    (ignore-errors
+      (kill-process efs/polybar-process)))
+  (setq efs/polybar-process nil))
+
+(defun efs/start-panel ()
+  (interactive)
+  (efs/kill-panel)
+  (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
+
+(defun efs/send-polybar-hook (module-name hook-index)
   (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
 
-(defun bp/send-polybar-exwm-ws-indicator ()
-  "Wraps the hook for the 'exwm-ws-indicator' Polybar module"
-  (bp/send-polybar-hook "exwm-ws-indicator" 1))
-
-(defun bp/polybar-exwm-ws-indicator ()
-  "Switch case to select the appropriate indicator"
-  (pcase exwm-workspace-current-index
-     (0 "                   ")
-     (1 "                   ")
-     (2 "                   ")
-     (3 "                   ")
-     (4 "                   ")
-     (5 "                   ")
-     (6 "                   ")
-     (7 "                   ")
-     (8 "                   ")
-     (9 "                   ")))
+(defun efs/send-polybar-exwm-workspace ()
+  (efs/send-polybar-hook "exwm-workspace" 1))
 
 ;; Update panel indicator when workspace changes
-(add-hook 'exwm-workspace-switch-hook 'bp/send-polybar-exwm-ws-indicator)
+(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
 
 ;; (use-package vterm
 ;;   :straight t)
