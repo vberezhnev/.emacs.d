@@ -199,7 +199,7 @@
   (efs/send-polybar-hook "exwm-workspace" 1))
 
 ;; Update panel indicator when workspace changes
-(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
+(add-hook 'exwm-workspace-switch-hook 'efs/send-polybar-exwm-workspace)
 
 ;; (use-package vterm
 ;;   :straight t)
@@ -212,12 +212,16 @@
   (desktop-environment-brightness-small-increment "5%+")
   (desktop-environment-brightness-small-decrement "5%-")
   (desktop-environment-brightness-normal-increment "5%+")
-  (desktop-environment-brightness-normal-decrement "5%-"))
+  (desktop-environment-brightness-normal-decrement "5%-")
+
+  (desktop-environment-mode))
 
 ;; (use-package browse-kill-ring
 ;;   :straight t)
 
 ;; (use-package app-launcher
 ;;   :straight '(app-launcher :host github :repo "SebastienWae/app-launcher"))
+
+(setq org-link-frame-setup '((file . find-file)))
 
 (provide 'exwm-my-own-settings)

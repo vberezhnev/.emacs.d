@@ -73,7 +73,7 @@
         doom-themes-enable-italic t)
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
-  (load-theme 'doom-gruvbox t)
+  ;; (load-theme 'doom-gruvbox t)
   (if (display-graphic-p)
       (progn
         ;; Enable custom neotree theme (all-the-icons must be installed!)
@@ -97,8 +97,8 @@
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
 ;; (change-theme 'doom-gruvbox-light 'timu-rogue)
-;; (change-theme 'doom-one-light 'doom-one)
-(change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
+(change-theme 'doom-one-light 'doom-one)
+;; (change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
 
 ;;;;; hl-indent
 (use-package highlight-indent-guides
@@ -108,7 +108,7 @@
   (highlight-indent-guides-responsive t)
   (highlight-indent-guides-method 'character)
   ;; (highlight-indent-guides-auto-enabled t)
-  ;; (highlight-indent-guides-character ?\┆) ;; Indent character samples: | ┆ ┊
+  (highlight-indent-guides-character ?\┆) ;; Indent character samples: | ┆ ┊
   :commands highlight-indent-guides-mode
   :hook (prog-mode  . highlight-indent-guides-mode)
   :delight " ㄓ")
@@ -203,7 +203,7 @@
          (elfeed-show-mode  . olivetti-mode)
          (mu4e-compose-mode . olivetti-mode))
   :custom
-  (olivetti-body-width 100)
+  (olivetti-body-width 110)
   :delight " ⊗") ; Ⓐ ⊛
 
 ;;________________________________________________________________

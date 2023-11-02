@@ -476,6 +476,7 @@
   (evil-set-initial-state 'calibredb-mode 'normal)
   ;; (evil-set-initial-state 'dired-mode 'emacs)
   (evil-set-initial-state 'treemacs-mode 'emacs)
+  (evil-set-initial-state 'xwidget-webkit-mode 'emacs)
   (evil-set-initial-state 'sunrise-mode 'emacs)
   (evil-collection-init))
 
@@ -795,20 +796,15 @@
 (use-package sudoku)
 (use-package sudo-save)
 
+;; Open file from link in the same buffer
 (put 'dired-find-alternate-file 'disabled nil)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(helm-minibuffer-history-key "M-p")
- '(org-agenda-files
-   '("/home/chopin/Org/agenda/PlanAhead.org" "/home/chopin/Org/agenda/PlannedDay.org" "/home/chopin/Org/agenda/Habits.org"))
- '(org-pomodoro-long-break-frequency 3))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(use-package calfw)
+(use-package calfw-ical)
+(cfw:open-ical-calendar "https://calendar.google.com/calendar/ical/ef4a4f61a267f40f7862ef68d12dfcb45e963d021f89abe30b8252e379dd9582%40group.calendar.google.com/private-3e75550dc234c78833c561d85d3e5ccc/basic.ics")
+
+;; (use-package org-gcal
+;;   :config
+;;   (setq org-gcal-client-id "1052885650130-aubabtcqbiimcultcgt2h31pmnl3pp2q.apps.googleusercontent.com"
+;; 	org-gcal-client-secret "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"
+;; 	org-gcal-file-alist '(("X Files" .  "~/schedule.org"))))

@@ -306,7 +306,15 @@
      org-modern-priority t
      org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
      org-modern-hide-stars " "
-     org-modern-keyword "‣"))
+     org-modern-keyword "‣")
+
+    (setq org-modern-priority-faces
+	  (quote ((?A :background "red"
+		      :foreground "black")
+		  (?B :background "dark orange"
+		      :foreground "black")
+		  (?C :background "tan"
+		      :foreground "black")))))
 
   ;; Toggle visibility of hidden Org mode element parts upon entering and leaving an element
   (use-package org-appear
@@ -316,13 +324,13 @@
     (setq org-hide-emphasis-markers t
           org-appear-autolinks 'just-brackets))
 
-  (use-package org-fancy-priorities
-    :diminish
-    :demand t
-    :defines org-fancy-priorities-list
-    :hook (org-mode . org-fancy-priorities-mode)
-    :config
-    (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
+  ;; (use-package org-fancy-priorities
+  ;;   :diminish
+  ;;   :demand t
+  ;;   :defines org-fancy-priorities-list
+  ;;   :hook (org-mode . org-fancy-priorities-mode)
+  ;;   :config
+  ;;   (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
 
   (use-package org-bullets
     :after org
@@ -339,7 +347,7 @@
   ;;   :config
   ;;   (define-key global-map (kbd "<f12>") #'org-transclusion-add)
   ;;   (define-key global-map (kbd "C-n t") #'org-transclusion-mode))
-  
+
   (use-package org-download
     :demand t
     :config
@@ -409,9 +417,9 @@
 
   ;; (use-package darkroom)
 
-  ;; (use-package org-books
-  ;;   :config
-  ;;   (setq org-books-file "~/Org/Reading-list.org"))
+  (use-package org-books
+    :config
+    (setq org-books-file "~/Org/Reading-list.org"))
 
   ;; Get rid of the background on column views
   (set-face-attribute 'org-column nil :background nil)
@@ -540,7 +548,7 @@
                                    :and (:category "work"))
                             (:name "Work important"
                                    :and (:priority>= "B" :category "work" :todo ("TODO" "NEXT")))
-			    
+
                             (:name "Passed deadline"
                                    :and (:deadline past)
                                    :face (:background "firebrick"))
@@ -549,7 +557,7 @@
                                    :face (:background "black"))
                             (:name "Deadline Future"
                                    :deadline future)
-			    
+
                             (:name "Stopped tasks"
                                    :and (:todo "STOPPED"))
                             (:name "Waiting"
@@ -569,7 +577,9 @@
 			   (:name "Day habits"
 				  :and (:tag "habits" :tag "day"))
 			   (:name "Evening habits"
-				  :and (:tag "habits" :tag "evening"))))))))))
+				  :and (:tag "habits" :tag "evening"))
+			   (:name "Challenges"
+				  :and (:tag "habits" :tag "challenge"))))))))))
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
 (use-package org-ql)
@@ -577,8 +587,8 @@
 (use-package anki-editor)  ;; https://github.com/louietan/anki-editor
 (use-package org-timeblock
   :straight (org-timeblock :type git
-              :host github
-              :repo "ichernyshovvv/org-timeblock"))
+			   :host github
+			   :repo "ichernyshovvv/org-timeblock"))
 
 ;; (defun org-mode-todo-to-done ()
 ;;   "Change all TODO keywords to DONE in the current org-mode buffer using org-ql."
