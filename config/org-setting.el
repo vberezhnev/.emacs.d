@@ -116,7 +116,9 @@
   (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today)
 
   (use-package org-habit-stats
-    :bind (("Z"               . org-habit-stats-view-next-habit-in-agenda))
+    :bind
+    (:map org-mode-map
+	  ("Z" . org-habit-stats-view-next-habit-in-agenda))
     :config
     (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties))
 
@@ -462,6 +464,7 @@
 
   (setq org-agenda-files
 	'("~/Org/agenda/PlanAhead.org"
+  	  "~/Org/agenda/PlanDay.org"
   	  "~/Org/agenda/Habits.org"))
   (setq org-cycle-separator-lines 2)
   ;; (setq org-agenda-include-diary t) ;; Calendar/Diary integration
@@ -505,9 +508,9 @@
 
   (setq org-agenda-breadcrumbs-separator " ❱ "
         org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
-        org-agenda-time-grid '((weekly today require-timed)
-			       (800 1000 1200 1400 1600 1800 2000)
-			       "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
+        ;; org-agenda-time-grid '((weekly today require-timed)
+	;; 		       (800 1000 1200 1400 1600 1800 2000)
+	;; 		       "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
         org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
                                    (todo . " %i %-12:c")
                                    (tags . " %i %-12:c")
@@ -610,12 +613,12 @@
 	;; 				(org-date-to-gregorian (org-today)) t)
 	;; 			       (re-search-forward "^\\*.+ log" nil t)))
 	;;  "* TODO %?\nSCHEDULED: <%<%Y-%m-%d>>")
-	("t" "Daily task" entry (file+function
-				 "~/Org/agenda/PlannedDay.org"
-				 (lambda ()
-				   (org-datetree-find-date-create
-				    (org-date-to-gregorian (org-today)) t)
-				   (re-search-forward "^\\*.+ log" nil t)))
+	("t" "Tasks for current day" entry (file+function
+					    "~/Org/agenda/PlanDay.org"
+					    (lambda ()
+					      (org-datetree-find-date-create
+					       (org-date-to-gregorian (org-today)) t)
+					      (re-search-forward "^\\*.+ log" nil t)))
 	 "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")
 	("b" "Book" entry (file "~/Org/Reading-list.org")
 	 "* %^{TITLE}\n:PROPERTIES:\n:ADDED: <%<%Y-%m-%d>>\n:END:%^{AUTHOR}\n%^{GOODREADS_URL}%?" :empty-lines 1)))

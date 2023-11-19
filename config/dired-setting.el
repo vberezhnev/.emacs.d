@@ -134,4 +134,9 @@
     (setq dired-sidebar-use-custom-font t))
   (use-package dired-single))
 
+;; Sort dirs first
+(require 'ls-lisp)
+(setq ls-lisp-dirs-first t)
+(setq ls-lisp-use-insert-directory-program t)
+
 (provide 'dired-setting)

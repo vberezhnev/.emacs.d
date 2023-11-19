@@ -3,7 +3,7 @@
 (use-package exwm
   :straight t
   :config
-  (setq exwm-workspace-number 4)
+  (setq exwm-workspace-number 5)
   (setq exwm-workspace-offset 20)
   ;; (setq exwm-randr-workspace-monitor-plist '(1 "HDMI-1" 9 "eDP-1"))
   
@@ -34,7 +34,9 @@
   (defun efs/configure-window-by-class ()
     (interactive)
     (pcase exwm-class-name
-      ("Brave-browser" (exwm-workspace-move-window 2))
+      ("brave-bin" (exwm-workspace-move-window 2))
+      ("firefox" (exwm-workspace-move-window 2))
+      ("konsole" (exwm-workspace-move-window 4))
       ("Sol" (exwm-workspace-move-window 3))
       ("mpv" (exwm-floating-toggle-floating)
        (exwm-layout-toggle-mode-line))))
@@ -201,9 +203,30 @@
 ;; Update panel indicator when workspace changes
 (add-hook 'exwm-workspace-switch-hook 'efs/send-polybar-exwm-workspace)
 
-;; (use-package vterm
-;;   :straight t)
 
+;; (defun bp/send-polybar-hook (module-name hook-index)
+;;   "Generic IPC hook function for communicating with Polybar"
+;;   (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
+
+;; (defun bp/send-polybar-exwm-ws-indicator ()
+;;   "Wraps the hook for the 'exwm-ws-indicator' Polybar module"
+;;   (bp/send-polybar-hook "exwm-workspace" 1))
+
+;; (defun bp/polybar-exwm-ws-indicator ()
+;;   "Switch case to select the appropriate indicator"
+;;   (pcase exwm-workspace-current-index
+;;      (0 "                   ")
+;;      (1 "                   ")
+;;      (2 "                   ")
+;;      (3 "                   ")
+;;      (4 "                   ")
+;;      (5 "                   ")
+;;      (6 "                   ")
+;;      (7 "                   ")
+;;      (8 "                   ")
+;;      (9 "                   ")))
+
+;; (add-hook 'exwm-workspace-switch-hook 'bp/send-polybar-exwm-ws-indicator)
 
 (use-package desktop-environment
   :after exwm

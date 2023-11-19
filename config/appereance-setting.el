@@ -121,9 +121,9 @@
 ;;   :custom-face
 ;;   (vhl/default-face ((nil (:foreground "#FF3333" :background "BlanchedAlmond"))))) ; "#FFCDCD"
 
-;; ;; hl-numbers
-;; (use-package highlight-numbers
-;;   :hook (prog-mode . highlight-numbers-mode))
+;; hl-numbers
+(use-package highlight-numbers
+  :hook (prog-mode . highlight-numbers-mode))
 
 ;;;;; hl-todo
 (use-package hl-todo
