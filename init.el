@@ -352,10 +352,10 @@
   (flycheck-indication-mode 'left-fringe)
   (flycheck-display-errors-delay 0.5)
   (flycheck-check-syntax-automatically '(save idle-change))
-  (flycheck-idle-change-delay 0.5))
+  (flycheck-idle-change-delay 0.5)
 :config
-;;(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-;;(add-hook 'org-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'org-mode-hook 'flyspell-mode))
 
 (use-package flycheck-inline
   :hook (flycheck-mode . turn-on-flycheck-inline))
@@ -368,18 +368,13 @@
 (use-package ispell
   ;; :bind (:map global-map
   ;; 	 ("<f8>" . ispell-word)) ; easy spell check
-  ;; :custom
+  :custom
   (ispell-program-name "hunspell") ; require Hunspell
   (ispell-dictionary "ru_RU")
   ;; (ispell-personal-dictionary "~/.emacs.d/.hunspell_personal")
-  :config
+  ;; :config
   (setq ispell-local-dictionary "ru")
-  ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
-  ;; dictionary' even though multiple dictionaries will be configured
-  ;; in next line.
   (setenv "LANG" "ru_RU.UTF-8")
-  ;; ispell-set-spellchecker-params has to be called
-  ;; before ispell-hunspell-add-multi-dic will work
   (ispell-set-spellchecker-params)
   (ispell-hunspell-add-multi-dic ispell-dictionary)
   (unless (file-exists-p ispell-personal-dictionary)
@@ -396,7 +391,7 @@
               ("C-<f12>"    . flyspell-auto-correct-previous-word))
   :init (progn (dolist (hook '(org-mode-hook text-mode-hook message-mode-hook))
                  (add-hook hook 'turn-on-flyspell)))
-  ;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
   :delight " ⓢ")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -540,54 +535,54 @@
               ("s"  . pdf-occur)
               ("b"  . pdf-view-set-slice-from-bounding-box)
               ("r"  . pdf-view-reset-slice)))
-(defhydra hydra-pdftools (:color blue :hint nil)
-  "
-                                                                      ╭───────────┐
-       Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-   ╭──────────────────────────────────────────────────────────────────┴───────────╯
-         ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-         ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-         ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-         ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-    _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-         ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-         ^^_n_^^      ^ ^  _r_eset slice box
-         ^^^↓^^^
-         ^^_G_^^
-   --------------------------------------------------------------------------------
-        "
-  ("\\" hydra-master/body "back")
-  ("<ESC>" nil "quit")
-  ("al" pdf-annot-list-annotations)
-  ("ad" pdf-annot-delete)
-  ("aa" pdf-annot-attachment-dired)
-  ("am" pdf-annot-add-markup-annotation)
-  ("at" pdf-annot-add-text-annotation)
-  ("y"  pdf-view-kill-ring-save)
-  ("+" pdf-view-enlarge :color red)
-  ("-" pdf-view-shrink :color red)
-  ("0" pdf-view-scale-reset)
-  ("H" pdf-view-fit-height-to-window)
-  ("W" pdf-view-fit-width-to-window)
-  ("P" pdf-view-fit-page-to-window)
-  ("n" pdf-view-next-page-command :color red)
-  ("p" pdf-view-previous-page-command :color red)
-  ("d" pdf-view-dark-minor-mode)
-  ("b" pdf-view-set-slice-from-bounding-box)
-  ("r" pdf-view-reset-slice)
-  ("g" pdf-view-first-page)
-  ("G" pdf-view-last-page)
-  ("e" pdf-view-goto-page)
-  ("o" pdf-outline)
-  ("s" pdf-occur)
-  ("i" pdf-misc-display-metadata)
-  ("u" pdf-view-revert-buffer)
-  ("F" pdf-links-action-perfom)
-  ("f" pdf-links-isearch-link)
-  ("B" pdf-history-backward :color red)
-  ("N" pdf-history-forward :color red)
-  ("l" image-forward-hscroll :color red)
-  ("h" image-backward-hscroll :color red))
+;; (defhydra hydra-pdftools (:color blue :hint nil)
+;;   "
+;;                                                                       ╭───────────┐
+;;        Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+;;    ╭──────────────────────────────────────────────────────────────────┴───────────╯
+;;          ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+;;          ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+;;          ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+;;          ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+;;     _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+;;          ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+;;          ^^_n_^^      ^ ^  _r_eset slice box
+;;          ^^^↓^^^
+;;          ^^_G_^^
+;;    --------------------------------------------------------------------------------
+;;         "
+;;   ("\\" hydra-master/body "back")
+;;   ("<ESC>" nil "quit")
+;;   ("al" pdf-annot-list-annotations)
+;;   ("ad" pdf-annot-delete)
+;;   ("aa" pdf-annot-attachment-dired)
+;;   ("am" pdf-annot-add-markup-annotation)
+;;   ("at" pdf-annot-add-text-annotation)
+;;   ("y"  pdf-view-kill-ring-save)
+;;   ("+" pdf-view-enlarge :color red)
+;;   ("-" pdf-view-shrink :color red)
+;;   ("0" pdf-view-scale-reset)
+;;   ("H" pdf-view-fit-height-to-window)
+;;   ("W" pdf-view-fit-width-to-window)
+;;   ("P" pdf-view-fit-page-to-window)
+;;   ("n" pdf-view-next-page-command :color red)
+;;   ("p" pdf-view-previous-page-command :color red)
+;;   ("d" pdf-view-dark-minor-mode)
+;;   ("b" pdf-view-set-slice-from-bounding-box)
+;;   ("r" pdf-view-reset-slice)
+;;   ("g" pdf-view-first-page)
+;;   ("G" pdf-view-last-page)
+;;   ("e" pdf-view-goto-page)
+;;   ("o" pdf-outline)
+;;   ("s" pdf-occur)
+;;   ("i" pdf-misc-display-metadata)
+;;   ("u" pdf-view-revert-buffer)
+;;   ("F" pdf-links-action-perfom)
+;;   ("f" pdf-links-isearch-link)
+;;   ("B" pdf-history-backward :color red)
+;;   ("N" pdf-history-forward :color red)
+;;   ("l" image-forward-hscroll :color red)
+;;   ("h" image-backward-hscroll :color red))
 
 ;;;; Load custom-files
 (defun load-directory (dir)

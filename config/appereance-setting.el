@@ -30,18 +30,18 @@
 ;; Changes certain keywords to symbols, such as lamda
 (setq global-prettify-symbols-mode t)
 
-(set-fontset-font t 'unicode "FontAwesome" nil 'prepend)
-(use-package all-the-icons
-  :demand t
-  :ensure t
-  :config
-  ;; Make sure the icon fonts are good to go
-  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
+;; (set-fontset-font t 'unicode "FontAwesome" nil 'prepend)
+;; (use-package all-the-icons
+;;   :demand t
+;;   :ensure t
+;;   :config
+;;   ;; Make sure the icon fonts are good to go
+;;   (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+;;   (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
 
 ;;________________________________________________________________
 ;;    Setup theme
@@ -55,7 +55,6 @@
         doom-themes-enable-italic t)
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
-  ;; (load-theme 'doom-gruvbox t)
   (if (display-graphic-p)
       (progn
         ;; Enable custom neotree theme (all-the-icons must be installed!)
@@ -69,6 +68,7 @@
 ;; (use-package modus-themes)
 ;; (use-package timu-rouge-theme)
 (use-package gruvbox-theme)
+
 (use-package theme-changer
   :ensure t
   :demand t
@@ -76,6 +76,7 @@
   (setq calendar-location-name "Vladivostok, RU")
   (setq calendar-latitude 43.11)
   (setq calendar-longitude 131.88))
+
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
 ;; (change-theme 'doom-gruvbox-light 'timu-rogue)
@@ -95,13 +96,18 @@
   :hook (prog-mode  . highlight-indent-guides-mode)
   :delight " ㄓ")
 
-;;;;; hl-volatile
-;; (use-package volatile-highlights
-;;   :diminish
-;;   :commands volatile-highlights-mode
-;;   :hook (after-init . volatile-highlights-mode)
-;;   :custom-face
-;;   (vhl/default-face ((nil (:foreground "#FF3333" :background "BlanchedAlmond"))))) ; "#FFCDCD"
+(use-package indent-guide
+  :config
+  (indent-guide-global-mode)
+  (setq indent-guide-char "┆"))
+
+;; hl-volatile
+(use-package volatile-highlights
+  :diminish
+  :commands volatile-highlights-mode
+  :hook (after-init . volatile-highlights-mode)
+  :custom-face
+  (vhl/default-face ((nil (:foreground "#FF3333" :background "BlanchedAlmond"))))) ; "#FFCDCD"
 
 ;; hl-numbers
 (use-package highlight-numbers
@@ -139,12 +145,12 @@
   :ensure nil
   :commands (display-line-numbers-scale-linum)
   :hook ((prog-mode . display-line-numbers-mode)))
-  ;; :config
-  ;; (defun display-line-numbers-scale-linum ()
-  ;;   (set-face-attribute 'line-number nil :height 0.6 :background (face-background 'solaire-default-face))
-  ;;   (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
-  ;; (display-line-numbers-scale-linum)
-  ;; (setq display-line-numbers-width 3)
+;; :config
+;; (defun display-line-numbers-scale-linum ()
+;;   (set-face-attribute 'line-number nil :height 0.6 :background (face-background 'solaire-default-face))
+;;   (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
+;; (display-line-numbers-scale-linum)
+;; (setq display-line-numbers-width 3)
 
 (dolist (mode '(org-mode-hook ; Disable line numbers for some modes
                 org-mode-agenda-hook
@@ -169,14 +175,10 @@
 (use-package which-key
   :config (which-key-mode))
 
-(use-package indent-guide
-  :config
-  (indent-guide-global-mode))
-
 ;;;;; olivetti
 (use-package olivetti
   :hook ((text-mode         . olivetti-mode)
-         ;; (prog-mode         . olivetti-mode)
+         (prog-mode         . olivetti-mode)
          (Info-mode         . olivetti-mode)
          (org-mode          . olivetti-mode)
          (nov-mode          . olivetti-mode)
@@ -185,7 +187,7 @@
          (elfeed-show-mode  . olivetti-mode)
          (mu4e-compose-mode . olivetti-mode))
   :custom
-  (olivetti-body-width 110)
+  (olivetti-body-width 150)
   :delight " ⊗") ; Ⓐ ⊛
 
 ;;________________________________________________________________
@@ -204,24 +206,6 @@
         doom-modeline-time-icon nil
         doom-modeline-battery nil
         doom-modeline-time nil
-        doom-modeline-modal nil)
-  :config
-  ;; Fix an issue where these two variables aren't defined in TTY Emacs on MacOS
-  (defvar mouse-wheel-down-event nil)
-  (defvar mouse-wheel-up-event nil))
-
-;;   (set-face-attribute 'mode-line nil
-;;                     :background "#353644"
-;;                     :foreground "white"
-;;                     :box '(:line-width 8 :color "#353644")
-;;                     :overline nil
-;;                     :underline nil)
-
-;; (set-face-attribute 'mode-line-inactive nil
-;;                     :background "#565063"
-;;                     :foreground "white"
-;;                     :box '(:line-width 8 :color "#565063")
-;;                     :overline nil
-;;                     :underline nil)
+        doom-modeline-modal nil))
 
 (provide 'appereance-setting)
