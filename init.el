@@ -1,8 +1,6 @@
 ;; emacsclient --no-wait--alternate-editor=emacs [FILE]
-(require 'server)
-(server-start)
-;; (unless (server-running-p)
-;;   (server-start))
+;; (require 'server)
+;; (server-start)
 
 ;;________________________________________________________________
 ;;    Install straight
@@ -26,6 +24,7 @@
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 
 ;;________________________________________________________________
 ;;    Install use-package (straight integration)
@@ -42,7 +41,7 @@
   :config (key-chord-mode 1))
 
 ;; Diminish functionality
-(use-package diminish)
+;; (use-package diminish)
 
 ;; Configure use-package
 (use-package use-package
@@ -98,6 +97,7 @@
 (save-place-mode 1)               ; when buffer is closed, save the cursor position
 (blink-cursor-mode 1)
 (variable-pitch-mode t)
+(electric-pair-mode t)            ; Close the brackets automatically
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
@@ -341,9 +341,6 @@
 ;; ;;      SPELLING       ;; ;;
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;; ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;________________________________________________________________
-;;;    Flycheck / Flyspell
-;;________________________________________________________________
 
 (use-package flycheck
   :hook (prog-mode . flycheck-mode)
@@ -353,9 +350,9 @@
   (flycheck-display-errors-delay 0.5)
   (flycheck-check-syntax-automatically '(save idle-change))
   (flycheck-idle-change-delay 0.5)
-:config
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(add-hook 'org-mode-hook 'flyspell-mode))
+  :config
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'org-mode-hook 'flyspell-mode))
 
 (use-package flycheck-inline
   :hook (flycheck-mode . turn-on-flycheck-inline))
@@ -426,6 +423,8 @@
   (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
   (evil-set-initial-state 'vterm-mode 'normal)
   (evil-set-initial-state 'calibredb-mode 'normal)
+  (evil-set-initial-state 'org-timeblock-mode 'emacs)
+  (evil-set-initial-state 'org-timeblock-list-mode 'emacs)
   ;; (evil-set-initial-state 'dired-mode 'emacs)
   (evil-set-initial-state 'treemacs-mode 'emacs)
   (evil-set-initial-state 'xwidget-webkit-mode 'emacs)
@@ -435,7 +434,6 @@
 ;;________________________________________________________________
 ;;    Projectile
 ;;________________________________________________________________
-
 (use-package projectile
   :init
   (projectile-mode +1)
@@ -459,6 +457,7 @@
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
   (global-set-key (kbd "C-x b") 'helm-buffers-list)
   (global-set-key (kbd "C-x r b") 'helm-filtered-bookmarks)
+  (helm-mode 1)
   :demand t
   :config
   (setq
@@ -474,16 +473,15 @@
    helm-scroll-amount 8
    helm-ff-file-name-history-use-recentf nil
    helm-echo-input-in-header-line nil))
-(helm-mode 1)
 
 ;;________________________________________________________________
 ;;    Dashboard
 ;;________________________________________________________________
 (use-package dashboard
   ;; :straight (:build t)
+  :after all-the-icons
   :ensure t
   :defer nil
-  :after all-the-icons
   :config
   (setq dashboard-banner-logo-title "Welcome back, Darling!"
         dashboard-startup-banner "~/.emacs.d/images/Emacs-logo.svg"
@@ -494,7 +492,7 @@
         initial-buffer-choice       (lambda () (get-buffer "*dashboard*"))
         dashboard-set-file-icons    t)
   (setq dashboard-items '((recents  . 8)
-                          (agenda   . 5)
+                          ;; (agenda   . 5)
                           (projects . 6)))
   (dashboard-setup-startup-hook)
   :init
@@ -584,6 +582,29 @@
 ;;   ("l" image-forward-hscroll :color red)
 ;;   ("h" image-backward-hscroll :color red))
 
+;; (use-package emacs-prisma-mode
+;;   :straight (:host github :repo "pimeys/emacs-prisma-mode" :branch "master"))
+
+(require 'plstore)
+(setq plstore-cache-passphrase-for-symmetric-encryption t)
+
+(add-to-list 'plstore-encrypt-to '("1E26C975819E142DA3C5C5756CD99B7103102AAC"))
+    
+(setq org-gcal-client-id "608889424823-1ieosumpjohasojr85069r5i0235dre7.apps.googleusercontent.com"
+      org-gcal-client-secret "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"
+      org-gcal-fetch-file-alist '(("vova21473@gmail.com" .  "/home/chopin/Org/agenda/gCal.org")))
+
+(use-package org-gcal
+  :config
+  (global-set-key (kbd "C-c j") 'org-gcal-sync)
+  (global-set-key (kbd "C-c h") 'org-gcal-post-at-point))
+
+(run-at-time "08:00" nil 'org-gcal-sync)
+(run-at-time "07:30" nil 'org-gcal-sync)
+(run-at-time "20:30" nil 'org-gcal-sync)
+(run-at-time "20:45" nil 'org-gcal-sync)
+
+
 ;;;; Load custom-files
 (defun load-directory (dir)
   "Load all *.el files in a directory."
@@ -592,6 +613,13 @@
     (mapc load-it (directory-files dir nil "\\.el$"))))
 (load-directory "~/.emacs.d/config") ; load my configuration of packages
 
+;; (use-package org-reveal
+;;   :ensure nil
+;;   :straight (:host github :repo "yjwen/org-reveal" :branch "master"))
+;; (require 'ox-reveal)
+
+(use-package ox-reveal)
+    
 (use-package ledger-mode
   ;; :init
   ;; (setq ledger-clear-whole-transactions 1)
@@ -599,6 +627,21 @@
   (add-to-list 'evil-emacs-state-modes 'ledger-report-mode))
 (use-package sudoku)
 (use-package sudo-save)
-
-;; Open file from link in the same buffer
-(put 'dired-find-alternate-file 'disabled nil)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-minibuffer-history-key "M-p")
+ '(org-gcal-auto-archive nil)
+ '(org-gcal-managed-update-existing-mode "gcal")
+ '(org-gcal-recurring-events-mode 'nested)
+ '(org-gcal-remove-events-with-cancelled-todo t)
+ '(org-gcal-up-days 90)
+ '(warning-suppress-log-types '((emacs))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(italic ((t (:foreground "bisque4" :slant italic)))))

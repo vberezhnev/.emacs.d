@@ -9,57 +9,50 @@
 ;;________________________________________________________________
 (set-face-attribute 'default t
                     :font "Iosevka" ;; Hack, Input, Terminess, Nerd, Font Propo
-                    :height 130
+                    :height 150
                     :weight 'regular)
 (set-face-attribute 'variable-pitch nil
                     :font "Iosevka"
-                    :height 130
+                    :height 150
                     :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
                     :font "Iosevka"
-                    :height 130
+                    :height 150
                     :weight 'medium)
-(set-frame-font "Iosevka" nil t)
+;; (set-frame-font "Iosevka" nil t)
 
 ;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
-(add-to-list 'default-frame-alist '(font . "Iosevka 13"))
+(add-to-list 'default-frame-alist '(font . "Iosevka 14"))
 (add-to-list 'default-frame-alist
-             '(font . "Iosevka 13"))
-(add-to-list 'default-frame-alist '(font . "Iosevka 13"))
+             '(font . "Iosevka 14"))
+(add-to-list 'default-frame-alist '(font . "Iosevka 14"))
 
 ;; Changes certain keywords to symbols, such as lamda
 (setq global-prettify-symbols-mode t)
 
-;; (set-fontset-font t 'unicode "FontAwesome" nil 'prepend)
-;; (use-package all-the-icons
-;;   :demand t
-;;   :ensure t
-;;   :config
-;;   ;; Make sure the icon fonts are good to go
-;;   (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
-;;   (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
-;;   (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
-;;   (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-;;   (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
-;;   (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
+(use-package all-the-icons
+  :demand t
+  :ensure t
+  :config
+  ;; Make sure the icon fonts are good to go
+  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append))
 
 ;;________________________________________________________________
 ;;    Setup theme
 ;;________________________________________________________________
 (use-package doom-themes
   :if window-system
-  ;; :custom-face
-  ;; (cursor ((t (:background "BlanchedAlmond"))))
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
+  (doom-themes-visual-bell-config) ; Enable flashing mode-line on errors
   (if (display-graphic-p)
       (progn
-        ;; Enable custom neotree theme (all-the-icons must be installed!)
-        (doom-themes-neotree-config)
-        ;; or for treemacs users
         (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
         (doom-themes-treemacs-config)))
   ;; Corrects (and improves) org-mode's native fontification.
@@ -80,8 +73,8 @@
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
 ;; (change-theme 'doom-gruvbox-light 'timu-rogue)
-(change-theme 'doom-one-light 'doom-one)
-;; (change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
+;; (change-theme 'doom-one-light 'doom-one)
+(change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
 
 ;;;;; hl-indent
 (use-package highlight-indent-guides
@@ -144,13 +137,13 @@
 (use-package display-line-numbers
   :ensure nil
   :commands (display-line-numbers-scale-linum)
-  :hook ((prog-mode . display-line-numbers-mode)))
-;; :config
+  :hook ((prog-mode . display-line-numbers-mode))
+:config
 ;; (defun display-line-numbers-scale-linum ()
 ;;   (set-face-attribute 'line-number nil :height 0.6 :background (face-background 'solaire-default-face))
 ;;   (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
-;; (display-line-numbers-scale-linum)
-;; (setq display-line-numbers-width 3)
+(display-line-numbers-scale-linum)
+(setq display-line-numbers-width 3))
 
 (dolist (mode '(org-mode-hook ; Disable line numbers for some modes
                 org-mode-agenda-hook

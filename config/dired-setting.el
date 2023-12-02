@@ -47,6 +47,12 @@
   :config
   (set-face-attribute 'diredfl-dir-name nil :bold t))
 
+(use-package dired-subtree
+  :config
+  (bind-keys :map dired-mode-map
+             ("i" . dired-subtree-insert)
+             (";" . dired-subtree-remove)))
+
 ;; '(global-dired-hide-details-mode t)
 (use-package dired
   :ensure nil

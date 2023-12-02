@@ -69,18 +69,7 @@
   (with-eval-after-load 'org
     (setq org-confirm-babel-evaluate nil)
     (require 'org-tempo)
-    ;; Setup fonts for org-mode
-    (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
-    (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-    (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-    (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-    (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
+
     (add-hook 'org-babel-after-execute-hook (lambda ()
                                               (when org-inline-image-overlays
                                                 (org-redisplay-inline-images))))
@@ -116,11 +105,17 @@
   (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today)
 
   (use-package org-habit-stats
-    :bind
-    (:map org-mode-map
-	  ("Z" . org-habit-stats-view-next-habit-in-agenda))
+    ;; :bind
+    ;; (:map org-mode-map
+    ;; 	  ("Z" . org-habit-stats-view-next-habit-in-agenda))
     :config
     (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties))
+
+  ;; (add-hook 'org-agenda-mode-map
+  ;;           (lambda () (local-set-key (kbd "Z") ')))
+
+  (add-hook 'org-agenda-mode-hook
+	    (lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda)))
 
   ;; (use-package  org-habit-plus
   ;;   :straight (:host github :repo "myshevchuk/org-habit-plus" :branch "master")
@@ -128,7 +123,7 @@
   ;;   (add-to-list 'org-modules 'org-habit-plus))
 
   ;; Increase the size of various headings
-  (set-face-attribute 'org-document-title nil :font "Iosevka" :weight 'bold :height 1.5)
+  (set-face-attribute 'org-document-title nil :font "Iosevka" :height 1.5 :weight 'bold)
   (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
                   (org-level-3 . 1.05)
@@ -143,15 +138,28 @@
   (require 'org-indent)
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+  ;; Setup fonts for org-mode
+  ;; (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
 
 
   (defvar ol/habit-report-defaultday 30
@@ -327,9 +335,7 @@
           org-appear-autolinks 'just-brackets))
 
   ;; (use-package org-fancy-priorities
-  ;;   :diminish
   ;;   :demand t
-  ;;   :defines org-fancy-priorities-list
   ;;   :hook (org-mode . org-fancy-priorities-mode)
   ;;   :config
   ;;   (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
@@ -371,86 +377,107 @@
      (latex . t)))
 
   (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
-  (use-package org-alert)
-  (use-package org-wild-notifier
-    :demand t)
-
-  (use-package focus
-    :demand t
+  (use-package org-alert
     :config
-    '((prog-mode . defun) (text-mode . sentence)))
+    (setq alert-default-style 'libnotify)
 
-  (use-package org-cliplink
-    :demand t)
+    (setq org-alert-interval 120 ; 2 mins
+	  org-alert-notify-cutoff 15 ; 15 mins remind before
+	  org-alert-notify-after-event-cutoff 20))) ; stop notifying me of the event 20 minutes after the scheduled time has passed))
 
-  (use-package org-recur
-    :hook ((org-mode . org-recur-mode)
-           (org-agenda-mode . org-recur-agenda-mode))
-    :config
-    (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
-    ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
-    (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
-    (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
-    (setq org-recur-finish-done t
-          org-recur-finish-archive t))
+(use-package org-wild-notifier
+  :demand t)
 
-  ;; Log time a task was set to DONE.
-  (setq org-log-done (quote time))
+(use-package focus
+  :demand t
+  :config
+  '((prog-mode . defun) (text-mode . sentence) (org-mode . sentence)))
 
-  ;; Don't log the time a task was rescheduled or redeadlined.
-  (setq org-log-redeadline nil)
-  (setq org-log-reschedule nil)
+(use-package org-cliplink
+  :demand t
+  :config
+  (global-set-key (kbd "C-x p i") 'org-cliplink))
 
-  (setq org-read-date-prefer-future 'time)
+(use-package org-recur
+  :hook ((org-mode . org-recur-mode)
+	 (org-agenda-mode . org-recur-agenda-mode))
+  :config
+  (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+  ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
+  (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
+  (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
+  (setq org-recur-finish-done t
+	org-recur-finish-archive t))
 
-  ;; Refresh org-agenda after rescheduling a task.
-  (defun org-agenda-refresh ()
-    "Refresh all `org-agenda' buffers."
-    (dolist (buffer (buffer-list))
-      (with-current-buffer buffer
-	(when (derived-mode-p 'org-agenda-mode)
-          (org-agenda-maybe-redo)))))
+;; Log time a task was set to DONE.
+(setq org-log-done (quote time))
 
-  (defadvice org-schedule (after refresh-agenda activate)
-    "Refresh org-agenda."
-    (org-agenda-refresh))
+;; Don't log the time a task was rescheduled or redeadlined.
+(setq org-log-redeadline nil)
+(setq org-log-reschedule nil)
 
-  ;; (use-package org-rainbow-tags)
+(setq org-read-date-prefer-future 'time)
 
-  ;; (use-package darkroom)
+;; (use-package org-rainbow-tags)
 
-  (use-package org-books
-    :config
-    (setq org-books-file "~/Org/Reading-list.org"))
+(use-package org-books
+  :config
+  (setq org-books-file "~/Org/Reading-list.org"))
 
-  ;; Get rid of the background on column views
-  (set-face-attribute 'org-column nil :background nil)
-  (set-face-attribute 'org-column-title nil :background nil))
+;; Get rid of the background on column views
+;; (set-face-attribute 'org-column nil :background nil)
+;; (set-face-attribute 'org-column-title nil :background nil))
 
 ;; First of all you sould install aplay or afplay
 (use-package sound-wav
   :demand t) ;; dep for org-pomodoro
 (use-package powershell
   :demand t) ;; dep for org-pomodoro
-(require 'sound-wav)
+;; (require 'sound-wav)
 ;; (sound-wav-play "/home/chopin.emacs.d/sounds/sound.wav")
 
 (use-package org-pomodoro
   :straight (:host github :repo "marcinkoziej/org-pomodoro" :branch "master")
+  :bind (("C-c k"               . org-pomodoro))
   :config
   (setq org-pomodoro-length 25)
   (setq org-pomodoro-short-break-length 5)
-  (setq org-pomodoro-long-break-length 15)
+  (setq org-pomodoro-long-break-length 10)
   (setq org-pomodoro-play-sounds 1)
 
   (setq org-pomodoro-finished-sound "/home/chopin/.emacs.d/sounds/sound.wav")
   (setq org-pomodoro-long-break-sound "/home/chopin/.emacs.d/sounds/sound.wav")
   (setq org-pomodoro-short-break-sound "/home/chopin/.emacs.d/sounds/sound.wav"))
 
-;; (use-package org-sidebar
-;;   :straight (:host github :repo "alphapapa/org-sidebar" :branch "master"))
-;; (use-package org-now
-;;   :straight (:host github :repo "alphapapa/org-now" :branch "master"))
+(use-package org-sidebar
+  :straight (:host github :repo "alphapapa/org-sidebar" :branch "master"))
+(use-package org-now
+  :straight (:host github :repo "alphapapa/org-now" :branch "master"))
+
+
+(use-package org-table-sticky-header
+  :straight (:host github :repo "cute-jumper/org-table-sticky-header" :branch "master")
+  :config
+  (add-hook 'org-mode-hook 'org-table-sticky-header-mode))
+
+(use-package org-sticky-header
+  :straight (:host github :repo "alphapapa/org-sticky-header" :branch "master")
+  :config
+  (add-hook 'org-mode-hook 'org-sticky-header-mode))
+
+;; (use-package org-clock-budget
+;;   :straight (:host github :repo "Fuco1/org-clock-budget" :branch "master"))
+
+;; (use-package org-timeline
+;;   :config
+;;   (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
+
+;; (use-package org-treescope
+;;   ;; :custom
+;;   ;; (org-treescope-cyclestates-todo '(nil ("TODO") ("WAITING" "DONE")))
+;;   ;; (org-treescope-cyclestates-priority '(nil ("A" "B" "C") ("D")))
+;;   :bind
+;;   (("C-c M-t" . org-treescope)))
 
 (use-package org-agenda
   :ensure nil
@@ -464,21 +491,19 @@
 
   (setq org-agenda-files
 	'("~/Org/agenda/PlanAhead.org"
-  	  "~/Org/agenda/PlanDay.org"
-  	  "~/Org/agenda/Habits.org"))
-  (setq org-cycle-separator-lines 2)
-  ;; (setq org-agenda-include-diary t) ;; Calendar/Diary integration
+	  "~/Org/agenda/gCal.org")) ; TimeBlocking.org
+  (setq org-cycle-separator-lines 3)
   ;; (setq org-default-notes-file "~/Org/agenda/notes.org")
 
   ;; Set default column view headings: Task Total-Time Time-Stamp
   (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
 
-  (setq org-agenda-skip-scheduled-if-done nil ;; changed
-        org-agenda-skip-deadline-if-done nil ;; changed
-        org-agenda-include-deadlines t
-        org-agenda-block-separator #x2501
-        org-agenda-compact-blocks t
-        org-agenda-start-with-log-mode nil)
+  ;; (setq org-agenda-skip-scheduled-if-done nil ;; changed
+  ;;       org-agenda-skip-deadline-if-done nil ;; changed
+  ;;       org-agenda-include-deadlines t
+  ;;       org-agenda-block-separator #x2501
+  ;;       org-agenda-compact-blocks t
+  ;;       org-agenda-start-with-log-mode nil)
   ;; (with-eval-after-load 'org-journal
   ;;   (define-key org-journal-mode-map (kbd "<C-tab>") 'yas-expand))
   (setq org-agenda-clockreport-parameter-plist
@@ -488,19 +513,20 @@
           (0.0    . org-upcoming-deadline)))  ; due today or later(setq-default org-icalendar-include-todo t)
   ;; (setq org-combined-agenda-icalendar-file "~/Org/calendar.ics")
   ;; (icalendar-import-file "~/Org/calendar.ics" "diary-google")
-  (setq org-icalendar-combined-name "Hugo Org")
-  (setq org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo))
-  (setq org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo))
-  (setq org-icalendar-timezone "Asia/Vladivostok")
-  (setq org-icalendar-store-UID t)
-  (setq org-icalendar-alarm-time 30)
+  ;; (setq org-icalendar-combined-name "Hugo Org")
+  ;; (setq org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo))
+  ;; (setq org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo))
+  ;; (setq org-icalendar-timezone "Asia/Vladivostok")
+  ;; (setq org-icalendar-store-UID t)
+  ;; (setq org-icalendar-alarm-time 30)
+  ;; (setq calendar-mark-diary-entries-flag t)
+  ;; (setq org-agenda-include-diary t) ;; Calendar/Diary integration
   (setq calendar-date-style 'european
         calendar-mark-holidays-flag t
         calendar-week-start-day 1)
-  calendar-mark-diary-entries-flag t
+
 
   (defun my/style-org-agenda()
-    ;; (my/buffer-face-mode-variable)
     (set-face-attribute 'org-agenda-date nil :height 1.1)
     (set-face-attribute 'org-agenda-date-today nil :height 1.1 :slant 'italic)
     (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
@@ -508,9 +534,9 @@
 
   (setq org-agenda-breadcrumbs-separator " ❱ "
         org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
-        ;; org-agenda-time-grid '((weekly today require-timed)
-	;; 		       (800 1000 1200 1400 1600 1800 2000)
-	;; 		       "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
+        org-agenda-time-grid '((weekly today require-timed)
+			       (800 1000 1200 1400 1600 1800 2000)
+			       "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
         org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
                                    (todo . " %i %-12:c")
                                    (tags . " %i %-12:c")
@@ -523,56 +549,52 @@
         '(
 	  ("z" "Hugo view"
            ((agenda "" ((org-agenda-span 'day)
-                        (org-super-agenda-groups
-                         '((:name "Today"
-                                  :time-grid t
-                                  :date today
-                                  :scheduled today
-                                  :order 1)
+			(org-agenda-files '("~/Org/agenda/PlanAhead.org"))
+			(org-super-agenda-groups
+			 '((:name "Today"
+				  :time-grid t
+				  :date today
+				  :scheduled today
+				  :order 1)
 			   (:name "Next days"
-                                  :time-grid t
-                                  ;; :date tomorrow
-                                  :scheduled future
-                                  :order 1)))))
-            (alltodo "" ((org-agenda-overriding-header "")
-                         (org-super-agenda-groups
-                          '(;; Each group has an implicit boolean OR operator between its selectors.
-			    ;; (:name "Personal"
-                            ;;        :date today
-                            ;;        :scheduled today
-			    ;; 	   :habit t)
-                            ;; (:name "Papers"
-                            ;;        :file-path "~/Org/Org-roam")
-			    ;; (:name "Pomodoro"
-			    ;; 	   :and (:category "pomodoro" :todo "TODO" :scheduled today :file-path "~/Org/agenda/DailyPomodoro.org"))
-                            (:name "Important"
-                                   :priority "A")
-                            (:name "Work"
-                                   :and (:category "work"))
-                            (:name "Work important"
-                                   :and (:priority>= "B" :category "work" :todo ("TODO" "NEXT")))
+				  :time-grid t
+				  :scheduled future
+				  :order 2)
+			   (:discard (:anything))))))
+	    (alltodo "" ((org-agenda-overriding-header "")
+			 (org-agenda-span 'day)
+			 (org-agenda-files '("~/Org/agenda/PlanAhead.org"))
+			 (org-super-agenda-groups
+			  '((:name "Important"
+				   :priority "A")
 
-                            (:name "Passed deadline"
-                                   :and (:deadline past)
-                                   :face (:background "firebrick"))
-                            (:name "Today deadline"
-                                   :deadline today
-                                   :face (:background "black"))
-                            (:name "Deadline Future"
-                                   :deadline future)
+			    (:name "Passed deadline"
+				   :and (:deadline past)
+				   :face (:background "firebrick"))
+			    (:name "Today deadline"
+				   :deadline today
+				   :face (:background "black"))
+			    (:name "Deadline Future"
+				   :deadline future)
 
-                            (:name "Stopped tasks"
-                                   :and (:todo "STOPPED"))
-                            (:name "Waiting"
-                                   :todo "WAITING"
-                                   :order 9)
-                            (:name "On review"
-                                   :todo "REVIEW"
-                                   :order 10)))))))
+			    (:name "Work"
+				   :and (:category "work"))
+			    (:name "Work important"
+				   :and (:priority>= "B" :category "work" :todo ("TODO" "NEXT")))
+
+			    (:name "Stopped tasks"
+				   :and (:todo "STOPPED"))
+			    (:name "Waiting"
+				   :todo "WAITING"
+				   :order 9)
+			    (:name "On review"
+				   :todo "REVIEW"
+				   :order 10)))))))
 
           ("x" "Habits view"
            ((agenda "" ((org-agenda-span 'day)
-                        (org-super-agenda-groups
+			(org-agenda-files '("~/Org/agenda/gCal.org"))
+			(org-super-agenda-groups
 			 '((:name "Everytime habits"
 				  :and (:tag "habits" :tag "everytime"))
 			   (:name "Morning habits"
@@ -582,37 +604,44 @@
 			   (:name "Evening habits"
 				  :and (:tag "habits" :tag "evening"))
 			   (:name "Challenges"
-				  :and (:tag "habits" :tag "challenge"))))))))))
+				  :and (:tag "habits" :tag "challenge"))
+			   (:discard (:anything))))))))))
+
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
 (use-package org-ql)
 (use-package org-anki) ;; https://github.com/eyeinsky/org-anki/
 (use-package anki-editor)  ;; https://github.com/louietan/anki-editor
+
 (use-package org-timeblock
   :straight (org-timeblock :type git
 			   :host github
-			   :repo "ichernyshovvv/org-timeblock"))
-
-;; (defun org-mode-todo-to-done ()
-;;   "Change all TODO keywords to DONE in the current org-mode buffer using org-ql."
-;;   (interactive)
-;;   (org-ql-select "~/Org/agenda/DailyPomodoro.org"
-;;     '(ts :on today)
-;;     :action
-;;     '(lambda () (org-todo "DONE"))))
-
-;; (run-at-time "23:00" nil 'org-mode-todo-to-done)
-;; (global-set-key (kbd "C-c j") 'org-mode-todo-to-done)
+			   :repo "ichernyshovvv/org-timeblock")
+  :bind
+  (:map global-map
+	("C-c s" . org-timeblock))
+  :config
+  (setq org-now-location '("~/Org/agenda/PlanAhead.org"))
+  (setq org-timeblock-inbox-file "/home/chopin/Org/agenda/gCal.org")
+  (setq org-timeblock-n-days-view 5)
+  (setq org-timeblock-tag-colors '(("school" " #ffff00" "#000000")
+				   ("english" "#ff8f88" "#000000")
+				   ("programming" "#d60000" "#000000")
+				   ("exams" "#8e24aa" "#000000")
+				   ("german" "#0b8043" "#000000")
+				   ("ananasya" "#f5511d" "#000000")
+				   ("violin" "#33b679" "#000000")
+				   ("diary" "#e67c73" "#000000")
+				   ("home" "#616161" "#000000")
+				   ("time_to_trip" "#0b8043" "#000000")
+				   ("books" "#0b8043" "#000000")
+				   ("sleep" "#8b008b" "#fff")
+				   ("sport" "#bc8f8f" "#00000")
+				   ("dopamine" "#00bfff" "#00000")
+				   ("meditation" "#7cfc00" "#00000"))))
 
 (setq org-capture-templates
       '(
-	;; ("p" "Daily pomodoro" entry (file+function
-	;; 			     "~/Org/agenda/DailyPomodoro.org"
-	;; 			     (lambda ()
-	;; 			       (org-datetree-find-date-create
-	;; 				(org-date-to-gregorian (org-today)) t)
-	;; 			       (re-search-forward "^\\*.+ log" nil t)))
-	;;  "* TODO %?\nSCHEDULED: <%<%Y-%m-%d>>")
 	("t" "Tasks for current day" entry (file+function
 					    "~/Org/agenda/PlanDay.org"
 					    (lambda ()
