@@ -160,123 +160,6 @@
   (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
   (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
 
-
-  (defvar ol/habit-report-defaultday 30
-    "The default range of days from today, when no time is specified.")
-
-  (defun ol/get-org-habit-string (&optional block starttime endtime)
-    ;; check if starttime and endtime is specified
-    (or starttime (setq starttime (format-time-string "%a %b %e %H:%M:%S %G" (time-subtract (current-time) (days-to-time ol/habit-report-defaultday)))))
-    (or endtime (setq endtime (current-time-string)))
-
-    ;; when block is specified set starttime and endtime
-    (when block
-      (progn
-	(setq cc (org-clock-special-range block nil t)
-	      starttime (car cc)
-	      endtime (nth 1 cc))))
-
-    ;; build the habit graph
-    (list (org-habit-build-graph
-	   (org-habit-parse-todo)
-           ;; time from
-	   (org-time-subtract (date-to-time starttime) (* 3600 org-extend-today-until))
-           ;; today
-	   (date-to-time endtime)
-           ;; time to
-	   (date-to-time endtime)) starttime endtime))
-
-  (defun ol/habit-report (&optional params)
-    (save-excursion
-      (org-back-to-heading t)
-      (print (ol/get-org-habit-string (plist-get params :block) (plist-get params :tstart) (plist-get params :tend)))
-      (let* ((habit-data (ol/get-org-habit-string (plist-get params :block) (plist-get params :tstart) (plist-get params :tend)))
-             (habit-str (car habit-data))
-             (face-counts (list (cons 'org-habit-clear-future-face  0)
-				(cons 'org-habit-ready-face  0)
-				(cons 'org-habit-ready-future-face  0)
-				(cons 'org-habit-alert-future-face  0)
-				(cons 'org-habit-overdue-face  0)))
-             (habit-stats (list (cons :org-heading  (org-get-heading t t t t))
-				(cons :habit-done  0)
-				(cons :habit-missed  0)
-				(cons :habit-last-missed  nil)
-				(cons :longest-day-streak  0)
-				(cons :longest-done-streak  0)
-				(cons :current-longest-done-streak  nil)
-				(cons :starttime (car (cdr habit-data)))
-				(cons :endtime (car (cdr(cdr habit-data))))))
-             (cur-day-streak 0)
-             (cur-done-streak 0))
-
-	;; iterate over string
-	(dotimes (i (length habit-str))
-          ;; sum up all faces
-          (when (alist-get (get-text-property i 'face habit-str) face-counts)
-            (setf (alist-get (get-text-property i 'face habit-str) face-counts) (+ (alist-get (get-text-property i 'face habit-str) face-counts) 1)))
-          ;; if face is overdue of alert and has no complete-glyp
-          (if (and (or (eq (get-text-property i 'face habit-str)
-                           'org-habit-overdue-face)
-		       (eq (get-text-property i 'face habit-str)
-                           'org-habit-alert-future-face))
-                   (not
-                    (string= (string (aref habit-str i))
-                             (string org-habit-completed-glyph))))
-	      (progn
-		(setf (alist-get :habit-last-missed habit-stats) (get-text-property i 'help-echo habit-str))
-		(when (> cur-day-streak (alist-get :longest-day-streak habit-stats))
-                  (setf (alist-get :longest-day-streak habit-stats) cur-day-streak)
-                  (setq cur-day-streak 0))
-		(when (> cur-done-streak (alist-get :longest-done-streak habit-stats))
-                  (setf (alist-get :longest-done-streak habit-stats) cur-done-streak)
-                  (setq cur-done-streak 0)))
-            (progn
-	      (setf cur-day-streak (+ 1 cur-day-streak))
-	      (when (eq (get-text-property i 'face habit-str)
-			'org-habit-ready-face)
-		(setf cur-done-streak (+ 1 cur-done-streak))))
-            )
-          (if (string= (string (aref habit-str i))
-		       (string org-habit-completed-glyph))
-	      (setf (alist-get :habit-done habit-stats) (+ 1 (alist-get :habit-done habit-stats))))
-          ) ;; string iteration done
-	;; when last streak bigger then last streak
-	(when (> cur-day-streak (alist-get :longest-day-streak habit-stats))
-          (setf (alist-get :longest-day-streak habit-stats) cur-day-streak))
-	(when (> cur-done-streak (alist-get :longest-done-streak habit-stats))
-          (setf (alist-get :longest-done-streak habit-stats) cur-done-streak)
-          (setf (alist-get :current-longest-done-streak habit-stats) t))
-	;; set missed habit count
-	(setf (alist-get :habit-missed habit-stats) (alist-get 'org-habit-overdue-face face-counts))
-	habit-stats)))
-
-  (defun ol/habit-print-header (st et)
-    (format "#+CAPTION: Habit report from %s to %s
-| Heading | Done Count | Missed Count | Last Missed | Longest Streak (days) | Longest Streak (done) | Currently longest |
-|-- |" st et))
-
-  (defun ol/habit-stats-to-string (org-habits)
-    (concat (ol/habit-print-header
-             (format-time-string "%d-%m-%y" (date-to-time (alist-get :starttime (car org-habits))))
-             (format-time-string "%d-%m-%y" (date-to-time (alist-get :endtime (car org-habits)))))
-            (let ((result ""))(dolist (org-habit org-habits result)
-				(setq result (concat result (format "\n|%s| %S | %s | %s | %s | %s | %s |"
-                                                                    (alist-get :org-heading org-habit)
-                                                                    (alist-get :habit-done org-habit)
-                                                                    (alist-get :habit-missed org-habit)
-                                                                    (alist-get :habit-last-missed org-habit)
-                                                                    (alist-get :longest-day-streak org-habit)
-                                                                    (alist-get :longest-done-streak org-habit)
-                                                                    (alist-get :current-longest-done-streak org-habit))))))))
-
-  (defun org-dblock-write:ol/habit-report (params)
-    (if (plist-get params :scope)
-	(setq ol/scope (plist-get params :scope))
-      (setq ol/scope 'tree))
-    (insert (ol/habit-stats-to-string
-             (org-map-entries (lambda () (ol/habit-report params)) "STYLE=\"habit\"" ol/scope)))
-    (org-table-align))
-
   ;; ────────────────────────────── Prettify Symbols ─────────────────────────────
 ;;; custom-function
   ;; Beautify Org Checkbox Symbol
@@ -286,16 +169,6 @@
     (push '("[X]" . "☑" ) prettify-symbols-alist)
     (push '("[-]" . "❍" ) prettify-symbols-alist))
   (add-hook 'org-mode-hook 'ma/org-buffer-setup)
-
-  ;; toggle-emphasis
-  ;; (defun org-toggle-emphasis ()
-  ;;   "Toggle hiding/showing of org emphasis markers."
-  ;;   (interactive)
-  ;;   (if org-hide-emphasis-markers
-  ;; 	(set-variable 'org-hide-emphasis-markers nil)
-  ;;     (set-variable 'org-hide-emphasis-markers t))
-  ;;   (org-mode-restart))
-  ;; (define-key org-mode-map (kbd "C-c x") 'org-toggle-emphasis)
 
   (use-package org-modern
     :hook (org-mode . org-modern-mode)
@@ -347,10 +220,10 @@
   ;;   (define-key global-map (kbd "<f12>") #'org-transclusion-add)
   ;;   (define-key global-map (kbd "C-n t") #'org-transclusion-mode))
 
-  ;; (use-package org-download
-  ;;   :demand t
-  ;;   :config
-  ;;   (setq-default org-download-image-dir "./assets-org/"))
+  (use-package org-download
+    :demand t
+    :config
+    (setq-default org-download-image-dir "./assets-org/"))
 
   (use-package tsc)
   (use-package ob-typescript)
@@ -376,21 +249,6 @@
   :init
   (org-notifications-start))
   ;; (setq org-notifications-notify-before-time 60)
-  
-;; (use-package org-wild-notifier
-;;   :demand t
-;;   :config
-;;   (org-wild-notifier-mode 1)
-;;   (setq org-wild-notifier-alert-time '(60 30 15 5 0))
-;;   (setq org-wild-notifier-mode t))
-
-;; (use-package org-alert
-;;     :config
-;;     (setq alert-default-style 'libnotify)
-
-;;     (setq org-alert-interval 120 ; 2 mins
-;; 	  org-alert-notify-cutoff 15 ; 15 mins remind before
-;; 	  org-alert-notify-after-event-cutoff 20))
 
 ;; (use-package focus
 ;;   :demand t
@@ -401,17 +259,6 @@
   :demand t
   :config
   (global-set-key (kbd "C-x p i") 'org-cliplink))
-
-;; (use-package org-recur
-;;   :hook ((org-mode . org-recur-mode)
-;; 	 (org-agenda-mode . org-recur-agenda-mode))
-;;   :config
-;;   (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
-;;   ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
-;;   (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
-;;   (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
-;;   (setq org-recur-finish-done t
-;; 	org-recur-finish-archive t))
 
 ;; Refresh org-agenda after rescheduling a task.
 (defun org-agenda-refresh ()
@@ -425,27 +272,9 @@
   "Refresh org-agenda."
   (org-agenda-refresh))
 
-;; (use-package org-rainbow-tags)
-
 (use-package org-books
   :config
   (setq org-books-file "~/Org/Reading-list.org"))
-
-;; Distraction-free writing
-;; (defun ews-distraction-free ()
-;;   "Distraction-free writing environment using Olivetti package."
-;;   (interactive)
-;;   (if (equal olivetti-mode nil)
-;;       (progn
-;;         (window-configuration-to-register 1)
-;;         (delete-other-windows)
-;;         (text-scale-set 2)
-;;         (olivetti-mode t))
-;;     (progn
-;;       (if (eq (length (window-list)) 1)
-;;           (jump-to-register 1))
-;;       (olivetti-mode 0)
-;;       (text-scale-set 0))))
 
 ;; Get rid of the background on column views
 (set-face-attribute 'org-column nil :background nil)
@@ -456,8 +285,6 @@
   :demand t) ;; dep for org-pomodoro
 (use-package powershell
   :demand t) ;; dep for org-pomodoro
-;; (require 'sound-wav)
-;; (sound-wav-play "/home/chopin.emacs.d/sounds/sound.wav")
 
 (use-package org-pomodoro
   :straight (:host github :repo "marcinkoziej/org-pomodoro" :branch "master")
