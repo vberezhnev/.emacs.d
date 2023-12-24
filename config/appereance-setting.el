@@ -1,8 +1,26 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
-;; ;;     APPEREANCE     ;; ;;
-;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
+;; ;; ;;     APPEREANCE     ;; ;;
+;; ;; ;;;;;;;;;;;;;;;;;;;;;;;; ;;
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(global-hl-line-mode t)
+
+;; (defun toggle-transparency ()
+;;    (interactive)
+;;    (let ((alpha-background (frame-parameter nil 'alpha-background)))
+;;      (set-frame-parameter
+;;       nil 'alpha-background
+;;       (if (eql (cond ((numberp alpha-background) alpha-background)
+;;                      ((numberp (cdr alpha-background)) (cdr alpha-background))
+;;                      ;; Also handle undocumented (<active> <inactive>) form.
+;;                      ((numberp (cadr alpha-background)) (cadr alpha-background)))
+;;                100)
+;;           '(85 . 50) '(100 . 100)))))
+;;  (global-set-key (kbd "C-c t") 'toggle-transparency)
+
+(set-frame-parameter nil 'alpha-background 96)
+(add-to-list 'default-frame-alist '(alpha-background . 96))
 
 ;;________________________________________________________________
 ;;    Setup fonts
@@ -61,6 +79,7 @@
 ;; (use-package modus-themes)
 ;; (use-package timu-rouge-theme)
 (use-package gruvbox-theme)
+(use-package ef-themes)
 
 (use-package theme-changer
   :ensure t
@@ -73,21 +92,21 @@
 (require 'theme-changer)
 ;; (change-theme 'modus-operandi 'modus-vivendi)
 ;; (change-theme 'doom-gruvbox-light 'timu-rogue)
-;; (change-theme 'doom-one-light 'doom-one)
-(change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
+(change-theme 'ef-frost 'ef-dark) ;; ef-trio-light / ef-maris-dark, ef-elea-dark, ef-dark
+;; (change-theme 'doom-gruvbox-light 'gruvbox-dark-soft)
 
 ;;;;; hl-indent
-(use-package highlight-indent-guides
-  :demand t
-  :custom
-  (highlight-indent-guides-delay 0)
-  (highlight-indent-guides-responsive t)
-  (highlight-indent-guides-method 'character)
-  ;; (highlight-indent-guides-auto-enabled t)
-  (highlight-indent-guides-character ?\┆) ;; Indent character samples: | ┆ ┊
-  :commands highlight-indent-guides-mode
-  :hook (prog-mode  . highlight-indent-guides-mode)
-  :delight " ㄓ")
+;; (use-package highlight-indent-guides
+;;   :demand t
+;;   :custom
+;;   (highlight-indent-guides-delay 0)
+;;   (highlight-indent-guides-responsive t)
+;;   (highlight-indent-guides-method 'character)
+;;   ;; (highlight-indent-guides-auto-enabled t)
+;;   (highlight-indent-guides-character ?\┆) ;; Indent character samples: | ┆ ┊
+;;   :commands highlight-indent-guides-mode
+;;   :hook (prog-mode  . highlight-indent-guides-mode)
+;;   :delight " ㄓ")
 
 (use-package indent-guide
   :config
@@ -107,43 +126,42 @@
   :hook (prog-mode . highlight-numbers-mode))
 
 ;;;;; hl-todo
-(use-package hl-todo
-  :hook (prog-mode . hl-todo-mode)
-  :hook (yaml-mode . hl-todo-mode)
-  :config
-  (setq hl-todo-highlight-punctuation ":"
-        hl-todo-keyword-faces
-        '(;; For reminders to change or add something at a later date.
-          ("TODO" warning bold)
-          ;; For code (or code paths) that are broken, unimplemented, or slow,
-          ;; and may become bigger problems later.
-          ("FIXME" error bold)
-          ;; For code that needs to be revisited later, either to upstream it,
-          ;; improve it, or address non-critical issues.
-          ("REVIEW" font-lock-keyword-face bold)
-          ;; For code smells where questionable practices are used
-          ;; intentionally, and/or is likely to break in a future update.
-          ("HACK" font-lock-constant-face bold)
-          ;; For sections of code that just gotta go, and will be gone soon.
-          ;; Specifically, this means the code is deprecated, not necessarily
-          ;; the feature it enables.
-          ("DEPRECATED" font-lock-doc-face bold)
-          ;; Extra keywords commonly found in the wild, whose meaning may vary
-          ;; from project to project.
-          ("NOTE" success bold)
-          ("BUG" error bold)
-          ("XXX" font-lock-constant-face bold))))
+;; (use-package hl-todo
+;;   :hook (prog-mode . hl-todo-mode)
+;;   :config
+;;   (setq hl-todo-highlight-punctuation ":"
+;;         hl-todo-keyword-faces
+;;         '(;; For reminders to change or add something at a later date.
+;;           ("TODO" warning bold)
+;;           ;; For code (or code paths) that are broken, unimplemented, or slow,
+;;           ;; and may become bigger problems later.
+;;           ("FIXME" error bold)
+;;           ;; For code that needs to be revisited later, either to upstream it,
+;;           ;; improve it, or address non-critical issues.
+;;           ("REVIEW" font-lock-keyword-face bold)
+;;           ;; For code smells where questionable practices are used
+;;           ;; intentionally, and/or is likely to break in a future update.
+;;           ("HACK" font-lock-constant-face bold)
+;;           ;; For sections of code that just gotta go, and will be gone soon.
+;;           ;; Specifically, this means the code is deprecated, not necessarily
+;;           ;; the feature it enables.
+;;           ("DEPRECATED" font-lock-doc-face bold)
+;;           ;; Extra keywords commonly found in the wild, whose meaning may vary
+;;           ;; from project to project.
+;;           ("NOTE" success bold)
+;;           ("BUG" error bold)
+;;           ("XXX" font-lock-constant-face bold))))
 
 (use-package display-line-numbers
   :ensure nil
-  :commands (display-line-numbers-scale-linum)
+  ;; :commands (display-line-numbers-scale-linum)
   :hook ((prog-mode . display-line-numbers-mode))
-:config
-;; (defun display-line-numbers-scale-linum ()
-;;   (set-face-attribute 'line-number nil :height 0.6 :background (face-background 'solaire-default-face))
-;;   (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
-(display-line-numbers-scale-linum)
-(setq display-line-numbers-width 3))
+  :config
+  ;; (defun display-line-numbers-scale-linum ()
+  ;;   (set-face-attribute 'line-number nil :height 0.6 :background (face-background 'solaire-default-face))
+  ;;   (set-face-attribute 'line-number-current-line nil :height 0.6 :background (face-background 'solaire-default-face)))
+  ;; (display-line-numbers-scale-linum)
+  (setq display-line-numbers-width 3))
 
 (dolist (mode '(org-mode-hook ; Disable line numbers for some modes
                 org-mode-agenda-hook
@@ -188,17 +206,27 @@
 ;;________________________________________________________________
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
-  :hook (doom-modeline-mode . size-indication-mode) ; filesize in modeline
-  :hook (doom-modeline-mode . column-number-mode)   ; cursor column in modeline
-  :init
-  ;; We display project info in the modeline ourselves
-  (setq projectile-dynamic-mode-line nil)
-  ;; Set these early so they don't trigger variable watchers
-  (setq doom-modeline-major-mode-color-icon nil
-        doom-modeline-major-mode-icon nil
-        doom-modeline-time-icon nil
-        doom-modeline-battery nil
-        doom-modeline-time nil
-        doom-modeline-modal nil))
+  :config
+  ;; (display-battery-mode 1)
+  (display-time-mode 1)
+  :custom    
+  (doom-modeline-height 25)
+  (doom-modeline-bar-width 1)
+  (doom-modeline-icon t)
+  (doom-modeline-major-mode-icon t)
+  (doom-modeline-major-mode-color-icon t)
+  (doom-modeline-buffer-file-name-style 'truncate-upto-project)
+  (doom-modeline-buffer-state-icon t)
+  (doom-modeline-buffer-modification-icon t)
+  (doom-modeline-minor-modes nil)
+  (doom-modeline-enable-word-count t)
+  (doom-modeline-buffer-encoding nil)
+  (doom-modeline-indent-info nil)
+  (doom-modeline-checker-simple-format t)
+  (doom-modeline-vcs-max-length 12)
+  (doom-modeline-env-version t)
+  (doom-modeline-irc-stylize 'identity)
+  (doom-modeline-github-timer nil)
+  (doom-modeline-gnus-timer nil))
 
-(provide 'appereance-setting)
+  ;; (provide 'appereance-setting)

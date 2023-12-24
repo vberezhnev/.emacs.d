@@ -11,15 +11,10 @@
   ;; :pin org
   :hook ((org-mode . prettify-symbols-mode)
          (org-mode . visual-line-mode)
-         (org-mode . variable-pitch-mode)
-	 (org-mode . global-org-modern-mode))
+         (org-mode . variable-pitch-mode))
   :bind (("C-c l"               . org-store-link)
 	 ("C-c c"               . org-capture)
 	 ;; ("С-c a"               . org-agenda)
-         ;; ;; Timer (Pomodoro)
-         ;; ("C-c t s"             . org-timer-set-timer)
-         ;; ("C-c t SPC"           . org-timer-pause-or-continue)
-         ;; ("C-c t <deletechar>"  . org-timer-stop)
 	 ;; :map global-map
          ;; ("M-q"                 . toggle-truncate-lines)
 	 )
@@ -49,7 +44,17 @@
    org-edit-src-content-indentation 2
    org-fontify-quote-and-verse-blocks t
    org-export-with-smart-quotes t
+   org-checkbox-hierarchical-statistics nil
    org-image-actual-width '(300))
+
+  ;; Log time a task was set to DONE.
+  (setq org-log-done (quote time))
+
+  ;; Don't log the time a task was rescheduled or redeadlined.
+  (setq org-log-redeadline nil)
+  (setq org-log-reschedule nil)
+
+  (setq org-read-date-prefer-future 'time)
 
   (setq org-todo-keyword-faces
 	'(
@@ -92,30 +97,24 @@
           org-habit-preceding-days 7
 	  org-habit-show-all-today nil
           org-habit-show-habits t
-	  org-habit-graph-column 67))
+	  org-habit-graph-column 67)
 
-  (defun toggle-org-habit-show-all-today ()
-    "Toggle the value of `org-habit-show-all-today' between t and nil."
-    (interactive)
-    (setq org-habit-show-all-today (not org-habit-show-all-today))
-    (message "org-habit-show-all-today is now %s"
-             (if org-habit-show-all-today "nil" "t"))
-    (org-agenda-refresh))
 
-  (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today)
+    (defun toggle-org-habit-show-all-today ()
+      "Toggle the value of `org-habit-show-all-today' between t and nil."
+      (interactive)
+      (setq org-habit-show-all-today (not org-habit-show-all-today))
+      (message "org-habit-show-all-today is now %s"
+               (if org-habit-show-all-today "nil" "t"))
+      (org-agenda-refresh))
 
-  (use-package org-habit-stats
-    ;; :bind
-    ;; (:map org-mode-map
-    ;; 	  ("Z" . org-habit-stats-view-next-habit-in-agenda))
-    :config
-    (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties))
+    (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today)
 
-  ;; (add-hook 'org-agenda-mode-map
-  ;;           (lambda () (local-set-key (kbd "Z") ')))
-
-  (add-hook 'org-agenda-mode-hook
-	    (lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda)))
+    (use-package org-habit-stats
+      :config
+      (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
+      (add-hook 'org-agenda-mode-hook
+		(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda)))))
 
   ;; (use-package  org-habit-plus
   ;;   :straight (:host github :repo "myshevchuk/org-habit-plus" :branch "master")
@@ -123,43 +122,43 @@
   ;;   (add-to-list 'org-modules 'org-habit-plus))
 
   ;; Increase the size of various headings
-  (set-face-attribute 'org-document-title nil :font "Iosevka" :height 1.5 :weight 'bold)
-  (dolist (face '((org-level-1 . 1.2)
-                  (org-level-2 . 1.1)
-                  (org-level-3 . 1.05)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Iosevka" :weight 'medium :height (cdr face)))
+  ;; (set-face-attribute 'org-document-title nil :font "Iosevka" :height 1.5 :weight 'bold)
+  ;; (dolist (face '((org-level-1 . 1.2)
+  ;;                 (org-level-2 . 1.1)
+  ;;                 (org-level-3 . 1.05)
+  ;;                 (org-level-4 . 1.0)
+  ;;                 (org-level-5 . 1.1)
+  ;;                 (org-level-6 . 1.1)
+  ;;                 (org-level-7 . 1.1)
+  ;;                 (org-level-8 . 1.1)))
+  ;;   (set-face-attribute (car face) nil :font "Iosevka" :weight 'medium :height (cdr face)))
 
   ;; Make sure org-indent face is available
   (require 'org-indent)
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  ;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 
   ;; Setup fonts for org-mode
-  ;; (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  ;; (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
 
 
   (defvar ol/habit-report-defaultday 30
@@ -286,9 +285,9 @@
     (push '("[ ]" . "☐" ) prettify-symbols-alist)
     (push '("[X]" . "☑" ) prettify-symbols-alist)
     (push '("[-]" . "❍" ) prettify-symbols-alist))
-  (add-hook 'org-mode-hook #'ma/org-buffer-setup)
+  (add-hook 'org-mode-hook 'ma/org-buffer-setup)
 
-;;;; toggle-emphasis
+  ;; toggle-emphasis
   ;; (defun org-toggle-emphasis ()
   ;;   "Toggle hiding/showing of org emphasis markers."
   ;;   (interactive)
@@ -308,11 +307,13 @@
      ;; Appearance
      org-modern-radio-target    '("❰" t "❱")
      org-modern-internal-target '("↪ " t "")
+     ;; org-modern-progress t
+     ;; org-modern-statistics nil
      org-modern-todo nil
      org-modern-tag t
      org-modern-timestamp t
      org-modern-statistics t
-     org-modern-table nil
+     ;; org-modern-table nil
      org-modern-priority t
      org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
      org-modern-hide-stars " "
@@ -334,21 +335,11 @@
     (setq org-hide-emphasis-markers t
           org-appear-autolinks 'just-brackets))
 
-  ;; (use-package org-fancy-priorities
-  ;;   :demand t
-  ;;   :hook (org-mode . org-fancy-priorities-mode)
-  ;;   :config
-  ;;   (setq org-fancy-priorities-list '("HIGH" "MID" "LOW" "OPTIONAL")))
-
   (use-package org-bullets
     :after org
-    ;; :custom
-    ;; (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○")) ; "●" "▷" "🞛" "◈" "✖"
+    :custom
+    (org-bullets-bullet-list '("◉" "✿" "✚" "✸" "❀" "○")) ; "●" "▷" "🞛" "◈" "✖"
     :hook (org-mode . org-bullets-mode))
-
-  (use-package toc-org
-    :after org
-    :init (add-hook 'org-mode-hook 'toc-org-enable))
 
   ;; (use-package org-transclusion
   ;;   :after org
@@ -356,67 +347,83 @@
   ;;   (define-key global-map (kbd "<f12>") #'org-transclusion-add)
   ;;   (define-key global-map (kbd "C-n t") #'org-transclusion-mode))
 
-  (use-package org-download
-    :demand t
-    :config
-    (setq-default org-download-image-dir "./assets-org/"))
+  ;; (use-package org-download
+  ;;   :demand t
+  ;;   :config
+  ;;   (setq-default org-download-image-dir "./assets-org/"))
 
+  (use-package tsc)
   (use-package ob-typescript)
   (use-package ob-rust)
+  (use-package ob-solidity)
   (use-package ob-sql-mode)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
-     (js . t)
+     (js         . t)
+     (solidity   . t)
      (typescript . t)
-     (shell . t)
-     (python . t)
-     (rust . t)
-     (C . t)
-     (sql . t)
-     (latex . t)))
+     (shell      . t)
+     (python     . t)
+     (rust       . t)
+     (C          . t)
+     (sql        . t)
+     (latex      . t)))
 
-  (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")
-  (use-package org-alert
-    :config
-    (setq alert-default-style 'libnotify)
+  (setq org-clock-sound "~/.emacs.d/sounds/sound.wav")) ; stop notifying me of the event 20 minutes after the scheduled time has passed))
 
-    (setq org-alert-interval 120 ; 2 mins
-	  org-alert-notify-cutoff 15 ; 15 mins remind before
-	  org-alert-notify-after-event-cutoff 20))) ; stop notifying me of the event 20 minutes after the scheduled time has passed))
+(use-package org-notifications
+  :init
+  (org-notifications-start))
+  ;; (setq org-notifications-notify-before-time 60)
+  
+;; (use-package org-wild-notifier
+;;   :demand t
+;;   :config
+;;   (org-wild-notifier-mode 1)
+;;   (setq org-wild-notifier-alert-time '(60 30 15 5 0))
+;;   (setq org-wild-notifier-mode t))
 
-(use-package org-wild-notifier
-  :demand t)
+;; (use-package org-alert
+;;     :config
+;;     (setq alert-default-style 'libnotify)
 
-(use-package focus
-  :demand t
-  :config
-  '((prog-mode . defun) (text-mode . sentence) (org-mode . sentence)))
+;;     (setq org-alert-interval 120 ; 2 mins
+;; 	  org-alert-notify-cutoff 15 ; 15 mins remind before
+;; 	  org-alert-notify-after-event-cutoff 20))
+
+;; (use-package focus
+;;   :demand t
+;;   :config
+;;   '((prog-mode . defun) (text-mode . sentence) (org-mode . sentence)))
 
 (use-package org-cliplink
   :demand t
   :config
   (global-set-key (kbd "C-x p i") 'org-cliplink))
 
-(use-package org-recur
-  :hook ((org-mode . org-recur-mode)
-	 (org-agenda-mode . org-recur-agenda-mode))
-  :config
-  (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
-  ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
-  (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
-  (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
-  (setq org-recur-finish-done t
-	org-recur-finish-archive t))
+;; (use-package org-recur
+;;   :hook ((org-mode . org-recur-mode)
+;; 	 (org-agenda-mode . org-recur-agenda-mode))
+;;   :config
+;;   (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+;;   ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
+;;   (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
+;;   (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
+;;   (setq org-recur-finish-done t
+;; 	org-recur-finish-archive t))
 
-;; Log time a task was set to DONE.
-(setq org-log-done (quote time))
+;; Refresh org-agenda after rescheduling a task.
+(defun org-agenda-refresh ()
+  "Refresh all `org-agenda' buffers."
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when (derived-mode-p 'org-agenda-mode)
+        (org-agenda-maybe-redo)))))
 
-;; Don't log the time a task was rescheduled or redeadlined.
-(setq org-log-redeadline nil)
-(setq org-log-reschedule nil)
-
-(setq org-read-date-prefer-future 'time)
+(defadvice org-schedule (after refresh-agenda activate)
+  "Refresh org-agenda."
+  (org-agenda-refresh))
 
 ;; (use-package org-rainbow-tags)
 
@@ -424,9 +431,25 @@
   :config
   (setq org-books-file "~/Org/Reading-list.org"))
 
+;; Distraction-free writing
+;; (defun ews-distraction-free ()
+;;   "Distraction-free writing environment using Olivetti package."
+;;   (interactive)
+;;   (if (equal olivetti-mode nil)
+;;       (progn
+;;         (window-configuration-to-register 1)
+;;         (delete-other-windows)
+;;         (text-scale-set 2)
+;;         (olivetti-mode t))
+;;     (progn
+;;       (if (eq (length (window-list)) 1)
+;;           (jump-to-register 1))
+;;       (olivetti-mode 0)
+;;       (text-scale-set 0))))
+
 ;; Get rid of the background on column views
-;; (set-face-attribute 'org-column nil :background nil)
-;; (set-face-attribute 'org-column-title nil :background nil))
+(set-face-attribute 'org-column nil :background nil)
+(set-face-attribute 'org-column-title nil :background nil)
 
 ;; First of all you sould install aplay or afplay
 (use-package sound-wav
@@ -440,9 +463,9 @@
   :straight (:host github :repo "marcinkoziej/org-pomodoro" :branch "master")
   :bind (("C-c k"               . org-pomodoro))
   :config
-  (setq org-pomodoro-length 25)
+  (setq org-pomodoro-length 35)
   (setq org-pomodoro-short-break-length 5)
-  (setq org-pomodoro-long-break-length 10)
+  (setq org-pomodoro-long-break-length 15)
   (setq org-pomodoro-play-sounds 1)
 
   (setq org-pomodoro-finished-sound "/home/chopin/.emacs.d/sounds/sound.wav")
@@ -454,16 +477,15 @@
 (use-package org-now
   :straight (:host github :repo "alphapapa/org-now" :branch "master"))
 
+;; (use-package org-table-sticky-header
+;;   :straight (:host github :repo "cute-jumper/org-table-sticky-header" :branch "master")
+;;   :config
+;;   (add-hook 'org-mode-hook 'org-table-sticky-header-mode))
 
-(use-package org-table-sticky-header
-  :straight (:host github :repo "cute-jumper/org-table-sticky-header" :branch "master")
-  :config
-  (add-hook 'org-mode-hook 'org-table-sticky-header-mode))
-
-(use-package org-sticky-header
-  :straight (:host github :repo "alphapapa/org-sticky-header" :branch "master")
-  :config
-  (add-hook 'org-mode-hook 'org-sticky-header-mode))
+;; (use-package org-sticky-header
+;;   :straight (:host github :repo "alphapapa/org-sticky-header" :branch "master")
+;;   :config
+;;   (add-hook 'org-mode-hook 'org-sticky-header-mode))
 
 ;; (use-package org-clock-budget
 ;;   :straight (:host github :repo "Fuco1/org-clock-budget" :branch "master"))
@@ -491,34 +513,29 @@
 
   (setq org-agenda-files
 	'("~/Org/agenda/PlanAhead.org"
-	  "~/Org/agenda/gCal.org")) ; TimeBlocking.org
-  (setq org-cycle-separator-lines 3)
+	  "~/Org/agenda/gCal.org"
+	  "~/Org/Reading-list.org"))
   ;; (setq org-default-notes-file "~/Org/agenda/notes.org")
 
   ;; Set default column view headings: Task Total-Time Time-Stamp
   (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
 
-  ;; (setq org-agenda-skip-scheduled-if-done nil ;; changed
-  ;;       org-agenda-skip-deadline-if-done nil ;; changed
-  ;;       org-agenda-include-deadlines t
-  ;;       org-agenda-block-separator #x2501
-  ;;       org-agenda-compact-blocks t
-  ;;       org-agenda-start-with-log-mode nil)
-  ;; (with-eval-after-load 'org-journal
-  ;;   (define-key org-journal-mode-map (kbd "<C-tab>") 'yas-expand))
+  (setq org-agenda-skip-scheduled-if-done nil ;; changed
+        org-agenda-skip-deadline-if-done nil ;; changed
+        org-agenda-include-deadlines t
+        org-agenda-block-separator #x2501
+        org-agenda-compact-blocks t
+        org-agenda-start-with-log-mode nil)
+  (with-eval-after-load 'org-journal
+    (define-key org-journal-mode-map (kbd "<C-tab>") 'yas-expand))
   (setq org-agenda-clockreport-parameter-plist
         (quote (:link t :maxlevel 5 :fileskip t :compact t :narrow 80)))
   (setq org-agenda-deadline-faces
         '((1.0001 . org-warning)              ; due yesterday or before
           (0.0    . org-upcoming-deadline)))  ; due today or later(setq-default org-icalendar-include-todo t)
-  ;; (setq org-combined-agenda-icalendar-file "~/Org/calendar.ics")
-  ;; (icalendar-import-file "~/Org/calendar.ics" "diary-google")
-  ;; (setq org-icalendar-combined-name "Hugo Org")
-  ;; (setq org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo))
-  ;; (setq org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo))
-  ;; (setq org-icalendar-timezone "Asia/Vladivostok")
-  ;; (setq org-icalendar-store-UID t)
-  ;; (setq org-icalendar-alarm-time 30)
+  (setq org-icalendar-timezone "Asia/Vladivostok")
+  (setq org-icalendar-store-UID t)
+  (setq org-icalendar-alarm-time 30)
   ;; (setq calendar-mark-diary-entries-flag t)
   ;; (setq org-agenda-include-diary t) ;; Calendar/Diary integration
   (setq calendar-date-style 'european
@@ -556,10 +573,11 @@
 				  :date today
 				  :scheduled today
 				  :order 1)
-			   (:name "Next days"
-				  :time-grid t
-				  :scheduled future
-				  :order 2)
+			   ;; (:name "Next days"
+			   ;; 	  :time-grid t
+			   ;; 	  :scheduled future
+			   ;; 	  :order 2)
+			   ;; (:auto-planning t)
 			   (:discard (:anything))))))
 	    (alltodo "" ((org-agenda-overriding-header "")
 			 (org-agenda-span 'day)
@@ -574,13 +592,13 @@
 			    (:name "Today deadline"
 				   :deadline today
 				   :face (:background "black"))
-			    (:name "Deadline Future"
-				   :deadline future)
+			    ;; (:name "Deadline Future"
+			    ;; 	   :deadline future)
 
 			    (:name "Work"
-				   :and (:category "work"))
+				   :and (:tag "work"))
 			    (:name "Work important"
-				   :and (:priority>= "B" :category "work" :todo ("TODO" "NEXT")))
+				   :and (:priority>= "B" :tag "work" :todo ("TODO" "NEXT")))
 
 			    (:name "Stopped tasks"
 				   :and (:todo "STOPPED"))
@@ -589,10 +607,72 @@
 				   :order 9)
 			    (:name "On review"
 				   :todo "REVIEW"
-				   :order 10)))))))
+				   :order 10)
 
-          ("x" "Habits view"
+			    ;; (:discard (:anything))
+			    (:auto-planning t)))))))
+
+	  ("v" "Reading view"
            ((agenda "" ((org-agenda-span 'day)
+			(org-agenda-files '("~/Org/Reading-list.org"))
+			(org-super-agenda-groups
+			 '((:name "This month"
+				  ;; :date today
+				  :scheduled today)
+			   (:name "Next days"
+				  :time-grid nil
+				  :scheduled future)))))
+
+	    (tags "" ((org-agenda-overriding-header "")
+		      (org-agenda-start-with-log-mode '(closed))
+		      (org-agenda-files '("~/Org/Reading-list.org"))
+		      (org-super-agenda-groups
+		       '((:name "In progress / Reading"
+				:todo "READING")
+
+			 (:name "Should read"
+				:and (:todo "IN-PLANS" :priority "A"))
+
+			 (:name "On Zettelkasting"
+				:todo "ZETTEL")
+
+			 (:name "Paused reading"
+				:todo "PAUSED")
+
+			 (:name "Planned to read"
+				:todo "NEXT-TO-READ")
+
+			 (:name "Today deadline"
+				:deadline today
+				:face (:background "black"))
+			 (:name "Passed deadline"
+				:and (:deadline past)
+				:face (:background "firebrick"))
+
+			 (:name "Read books"
+				:todo "READ")
+			 (:name "Dropped books"
+				:todo "DROPPED")
+			 (:name "All books"
+				:and (:tag "books" :todo "IN-PLANS"))))))))
+
+	  ("d" "Planned day"
+           ((agenda "" ((org-agenda-span 'day)
+			(org-agenda-files '("~/Org/agenda/PlanAhead.org"
+					    "~/Org/agenda/gCal.org"))
+			(org-habit-toggle-display-in-agenda t)
+			(org-super-agenda-groups
+			 '((:name "Today"
+				  :time-grid t
+				  :date today
+				  ;; :scheduled today
+				  :discard (:tag "habits")
+				  :order 1)
+			   (:discard (:anything))))))
+	    ))
+
+	  ("x" "Habits view"
+	   ((agenda "" ((org-agenda-span 'day)
 			(org-agenda-files '("~/Org/agenda/gCal.org"))
 			(org-super-agenda-groups
 			 '((:name "Everytime habits"
@@ -603,9 +683,12 @@
 				  :and (:tag "habits" :tag "day"))
 			   (:name "Evening habits"
 				  :and (:tag "habits" :tag "evening"))
+			   (:name "Sport habits"
+				  :and (:tag "habits" :tag "sport"))
 			   (:name "Challenges"
 				  :and (:tag "habits" :tag "challenge"))
-			   (:discard (:anything))))))))))
+			   (:discard (:anything))
+			   (:discard (:not (:tag "habits")))))))))))
 
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 
@@ -651,5 +734,27 @@
 	 "* TODO something\nSCHEDULED: <%<%Y-%m-%d>>")
 	("b" "Book" entry (file "~/Org/Reading-list.org")
 	 "* %^{TITLE}\n:PROPERTIES:\n:ADDED: <%<%Y-%m-%d>>\n:END:%^{AUTHOR}\n%^{GOODREADS_URL}%?" :empty-lines 1)))
+
+
+
+;; (setq org-gcal-client-id "608889424823-1ieosumpjohasojr85069r5i0235dre7.apps.googleusercontent.com"
+;;       org-gcal-client-secret "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"
+;;       org-gcal-fetch-file-alist '(("vova21473@gmail.com" .  "/home/chopin/Org/agenda/gCal.org")))
+
+;; (use-package org-gcal
+;;   :config
+;;   (global-set-key (kbd "C-c j") 'org-gcal-sync)
+;;   (global-set-key (kbd "C-c h") 'org-gcal-post-at-point)
+
+;;   (setq org-gcal-auto-archive nil)
+;;   (setq org-gcal-managed-update-existing-mode "gcal")
+;;   (setq org-gcal-recurring-events-mode 'nested)
+;;   (setq org-gcal-remove-events-with-cancelled-todo t)
+;;   (setq org-gcal-up-days 90))
+
+;; (run-at-time "08:00" nil 'org-gcal-sync)
+;; (run-at-time "07:30" nil 'org-gcal-sync)
+;; (run-at-time "20:30" nil 'org-gcal-sync)
+;; (run-at-time "20:45" nil 'org-gcal-sync)
 
 (provide 'org-setting)

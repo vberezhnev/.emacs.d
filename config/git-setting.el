@@ -8,8 +8,8 @@
   :hook (magit-mode . magit-todos-mode)
   :config
   (setq magit-todos-recursive t
-		    magit-todos-depth 4
-		    magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/" "target/"))
+	magit-todos-depth 4
+	magit-todos-exclude-globs '("*Pods*" ".git/" "*elpa*" "*var/lsp/*" "node_modules/" "target/"))
   (custom-set-variable
    '(magit-todos-keywords (list "TODO" "FIXME" "BUGFIX" "HACK"))))
 

@@ -1,10 +1,18 @@
-(use-package dmenu)
+;; (use-package dmenu)
+
+;; (defun efs/set-wallpaper ()
+;;   (interactive)
+;;   ;; NOTE: You will need to update this to a valid background path!
+;;   (start-process-shell-command
+;;    "feh" nil  "feh --bg-fill /home/chopin/Pictures/Обои/math/303155.jpg"))
 
 ;; (use-package exwm
 ;;   :straight t
 ;;   :config
-;;   (setq exwm-workspace-number 5)
+;;   (setq exwm-workspace-number 10)
 ;;   (setq exwm-workspace-offset 20)
+
+;;   (exwm-workspace-switch-create 1)
 
 ;;   (require 'exwm-systemtray)
 ;;   (exwm-systemtray-enable)
@@ -27,6 +35,8 @@
 ;;   ;; Window focus should follow the mouse pointer
 ;;   (setq mouse-autoselect-window t
 ;;         focus-follows-mouse t)
+
+;;   (efs/set-wallpaper)
 
 ;;   ;; Global keybindings can be defined with `exwm-input-global-keys'.
 ;;   ;; Here are a few examples:
@@ -61,6 +71,7 @@
 ;;                           (interactive)
 ;;                           (exwm-workspace-switch-create ,i))))
 ;;                     (number-sequence 0 9))))
+;;   (setq exwm-randr-workspace-monitor-plist '(1 "HDMI-1" 9 "eDP-1"))
 
 
 ;;   ;; Bind "s-r" to launch applications ('M-&' also works if the output
@@ -163,6 +174,6 @@
 
 ;;   (exwm-enable))
 
-(setq org-link-frame-setup '((file . find-file)))
+;; (setq org-link-frame-setup '((file . find-file)))
 
-(provide 'exwm-my-own-settings)
+;; (provide 'exwm-my-own-settings)

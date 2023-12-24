@@ -136,4 +136,11 @@ Org-mode properties drawer already, keep the headline and don’t insert
       (kill-line)
       (kill-line))))
 
+
+(use-package deft
+  :config
+  (setq deft-extensions '("org"))
+  (setq deft-directory "~/Org/Org-roam")
+  (setq deft-recursive t))
+
 (provide 'org-roam-setting)

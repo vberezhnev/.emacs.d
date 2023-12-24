@@ -7,24 +7,30 @@
 ;;________________________________________________________________
 (defvar bootstrap-version)
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
          'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(setq straight-check-for-modifications '(check-on-save find-when-checking))
-(setq vc-follow-symlinks t)
-(setq straight-pull-recipe-repositories t)
+;; (setq straight-check-for-modifications '(check-on-save find-when-checking))
+;; (setq vc-follow-symlinks t)
+;; (setq straight-pull-recipe-repositories t)
+
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
+                         ("melpa" . "http://elpa.emacs-china.org/melpa/")
+			 ("org"   . "http://mirrors.cloud.tencent.com/elpa/org/")))
 
 ;;________________________________________________________________
 ;;    Install use-package (straight integration)
@@ -35,6 +41,8 @@
 ;; Install packages in `use-package' forms with `straight'. (not the built-in
 ;; package.el)
 (setq straight-use-package-by-default t)
+
+(straight-use-package 'org)
 
 ;; Key Chord functionality in use-package
 (use-package use-package-chords
@@ -54,21 +62,21 @@
 
 ;; ─────────────────── Additional Packages and Configurations ──────────────────
 ;; Add `:doc' support for use-package so that we can use it like what a doc-strings is for
-(eval-and-compile
-  (add-to-list 'use-package-keywords :doc t)
-  (defun use-package-handler/:doc (name-symbol _keyword _docstring rest state)
-    "An identity handler for :doc.
-     Currently, the value for this keyword is being ignored.
-     This is done just to pass the compilation when :doc is
-     included Argument NAME-SYMBOL is the first argument to
-     `use-package' in a declaration.  Argument KEYWORD here is
-     simply :doc.  Argument DOCSTRING is the value supplied for
-     :doc keyword.  Argument REST is the list of rest of the
-     keywords.  Argument STATE is maintained by `use-package' as
-     it processes symbols."
+;; (eval-and-compile
+;;   (add-to-list 'use-package-keywords :doc t)
+;;   (defun use-package-handler/:doc (name-symbol _keyword _docstring rest state)
+;;     "An identity handler for :doc.
+;;      Currently, the value for this keyword is being ignored.
+;;      This is done just to pass the compilation when :doc is
+;;      included Argument NAME-SYMBOL is the first argument to
+;;      `use-package' in a declaration.  Argument KEYWORD here is
+;;      simply :doc.  Argument DOCSTRING is the value supplied for
+;;      :doc keyword.  Argument REST is the list of rest of the
+;;      keywords.  Argument STATE is maintained by `use-package' as
+;;      it processes symbols."
 
-    ;; just process the next keywords
-    (use-package-process-keywords name-symbol rest state)))
+;;     ;; just process the next keywords
+;;     (use-package-process-keywords name-symbol rest state)))
 
 ;;________________________________________________________________
 ;;    Setup config using org-mode
@@ -83,6 +91,13 @@
 ;;________________________________________________________________
 ;;    Base settings of Emacs
 ;;________________________________________________________________
+;; (require 'battery)
+
+;; (funcall battery-status-function)
+;; (funcall 'battery-linux-sysfs)
+
+;; (setq display-time-mode t)
+;; (setq display-battery-mode t)
 (eval-when-compile (defvar display-time-24hr-format t))
 (eval-when-compile (defvar display-time-default-load-average nil))
 
@@ -106,6 +121,7 @@
 
 (setq ad-redefinition-action            'accept
       default-buffer-file-coding-system 'utf-8
+      mouse-autoselect-window           t ;; Auto hover mouse
       blink-cursor-interval             0.7       ;; Little slower cursor blinking . default is 0.5
       create-lockfiles                  nil
       idle-update-delay                 1.2    ;; Speed things up by not updating so often ; default is 0.5.
@@ -585,25 +601,24 @@
 ;; (use-package emacs-prisma-mode
 ;;   :straight (:host github :repo "pimeys/emacs-prisma-mode" :branch "master"))
 
-(require 'plstore)
-(setq plstore-cache-passphrase-for-symmetric-encryption t)
+;; (use-package ox-reveal)
 
-(add-to-list 'plstore-encrypt-to '("1E26C975819E142DA3C5C5756CD99B7103102AAC"))
-    
-(setq org-gcal-client-id "608889424823-1ieosumpjohasojr85069r5i0235dre7.apps.googleusercontent.com"
-      org-gcal-client-secret "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"
-      org-gcal-fetch-file-alist '(("vova21473@gmail.com" .  "/home/chopin/Org/agenda/gCal.org")))
-
-(use-package org-gcal
+(use-package ledger-mode
+  ;; :init
+  ;; (setq ledger-clear-whole-transactions 1)
   :config
-  (global-set-key (kbd "C-c j") 'org-gcal-sync)
-  (global-set-key (kbd "C-c h") 'org-gcal-post-at-point))
+  (add-to-list 'evil-emacs-state-modes 'ledger-report-mode))
 
-(run-at-time "08:00" nil 'org-gcal-sync)
-(run-at-time "07:30" nil 'org-gcal-sync)
-(run-at-time "20:30" nil 'org-gcal-sync)
-(run-at-time "20:45" nil 'org-gcal-sync)
+(use-package sudoku)
+(use-package chess)
 
+(use-package sudo-save)
+
+(use-package offlineimap)
+(use-package notmuch)
+;; (use-package mu4e)
+
+(define-key global-map (kbd "C-c u") #'calendar)
 
 ;;;; Load custom-files
 (defun load-directory (dir)
@@ -613,31 +628,22 @@
     (mapc load-it (directory-files dir nil "\\.el$"))))
 (load-directory "~/.emacs.d/config") ; load my configuration of packages
 
-;; (use-package org-reveal
-;;   :ensure nil
-;;   :straight (:host github :repo "yjwen/org-reveal" :branch "master"))
-;; (require 'ox-reveal)
-
-(use-package ox-reveal)
-    
-(use-package ledger-mode
-  ;; :init
-  ;; (setq ledger-clear-whole-transactions 1)
-  :config
-  (add-to-list 'evil-emacs-state-modes 'ledger-report-mode))
-(use-package sudoku)
-(use-package sudo-save)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(battery-load-low 30)
  '(helm-minibuffer-history-key "M-p")
  '(org-gcal-auto-archive nil)
  '(org-gcal-managed-update-existing-mode "gcal")
  '(org-gcal-recurring-events-mode 'nested)
  '(org-gcal-remove-events-with-cancelled-todo t)
  '(org-gcal-up-days 90)
+ '(org-wild-notifier-alert-time '(60 30 15 5 0))
+ '(org-wild-notifier-mode t)
+ '(sudoku-level 'easy)
+ '(sudoku-style 'unicode)
  '(warning-suppress-log-types '((emacs))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -645,3 +651,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(italic ((t (:foreground "bisque4" :slant italic)))))
+(put 'dired-find-alternate-file 'disabled nil)

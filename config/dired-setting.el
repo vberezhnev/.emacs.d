@@ -53,6 +53,10 @@
              ("i" . dired-subtree-insert)
              (";" . dired-subtree-remove)))
 
+(use-package all-the-icons-dired
+  :config
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+
 ;; '(global-dired-hide-details-mode t)
 (use-package dired
   :ensure nil
@@ -94,7 +98,7 @@
   (define-key dired-mode-map (kbd "N") 'dired-create-file) ; Bind N to create a new file
   (define-key dired-mode-map (kbd "n") 'dired-create-directory) ; Bind n to create a new directory
   ;; Drag-and-drop to `dired`
-  (add-hook 'dired-mode-hook 'org-download-enable)
+  ;; (add-hook 'dired-mode-hook 'org-download-enable)
   (use-package dired-rainbow
     :config
     (progn
@@ -118,10 +122,10 @@
       (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
       (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
       (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")))
-  (use-package dired-open
-    :config
-    ;; Doesn't work as expected!
-    (add-to-list 'dired-open-functions #'dired-open-xdg t))
+  ;; (use-package dired-open
+  ;;   :config
+  ;;   ;; Doesn't work as expected!
+  ;;   (add-to-list 'dired-open-functions #'dired-open-xdg t))
   (use-package dired-sidebar
     :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
     :ensure t
