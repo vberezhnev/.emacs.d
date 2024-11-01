@@ -54,8 +54,6 @@
  '(sudoku-level 'easy)
  '(sudoku-style 'unicode)
  '(system-packages-package-manager 'guix)
- '(wakatime-api-key "waka_c3338a8b-0895-4798-824b-b575e9327e08")
- '(wakatime-cli-path "~/.wakatime/wakatime-cli")
  '(warning-suppress-log-types '((org-gtd) (org-gtd) (lsp-mode)))
  '(warning-suppress-types '((org-gtd) (lsp-mode))))
 (custom-set-faces
