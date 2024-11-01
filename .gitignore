@@ -18,7 +18,11 @@ multisession/
 dmenu-items
 request/  
 persist/
-  
+undo/
+devel/
+org-readwise-last-sync
+reverse-im-cache.el
+
 org-caldav*
 nov-places
 places
