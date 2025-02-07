@@ -1,3 +1,15 @@
+;; (server-mode)
+;;(setq max-lisp-eval-depth 50000)
+
+(if (and (fboundp 'native-comp-available-p)
+       (native-comp-available-p))
+  (message "Native compilation is available")
+(message "Native complation is *not* available"))
+
+(if (functionp 'json-serialize)
+  (message "Native JSON is available")
+(message "Native JSON is *not* available"))
+
 (setq gui-p         (display-graphic-p)
       cli-p         (not gui-p)
       android-p     (getenv "ANDROID_ROOT")
@@ -116,6 +128,12 @@
 (use-package system-packages
   :ensure t)
 
+(defun frostyx/guix (&key install)
+  (let ((system-packages-package-manager 'guix)
+        (system-packages-use-sudo nil))
+    (or (frostyx/rpm-query install)
+ 	  (system-packages-install install))))
+
 (defun frostyx/rpm-query (pack)
   (equal 0 (shell-command
             (concat "rpm -q " pack))))
@@ -136,7 +154,51 @@
 
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
-(pixel-scroll-precision-mode)
+(use-package all-the-icons-ibuffer
+	:ensure t
+	:config
+																				; Predicate whether the icons are able to be displayed."
+	(setq all-the-icons-ibuffer-display-predicate #'display-graphic-p)
+
+	;; Whether display the icons.
+	(setq all-the-icons-ibuffer-icon t)
+
+	;; Whether display the colorful icons.
+	;; It respects `all-the-icons-color-icons'.
+	(setq all-the-icons-ibuffer-color-icon t)
+
+	;; The default icon size in ibuffer.
+	(setq all-the-icons-ibuffer-icon-size 1.0)
+
+	;; The default vertical adjustment of the icon in ibuffer.
+	(setq all-the-icons-ibuffer-icon-v-adjust 0.0)
+
+	;; Use human readable file size in ibuffer.
+	(setq  all-the-icons-ibuffer-human-readable-size t)
+
+	;; A list of ways to display buffer lines with `all-the-icons'.
+	;; See `ibuffer-formats' for details.
+	all-the-icons-ibuffer-formats
+
+	;; Slow Rendering
+	;; If you experience a slow down in performance when rendering multiple icons simultaneously,
+	;; you can try setting the following variable
+	(setq inhibit-compacting-font-caches t)
+
+	(add-hook 'ibuffer-mode-hook 'all-the-icons-ibuffer-mode))
+
+(use-package ultra-scroll
+  :quelpa (ultra-scroll
+          :fetcher github
+          :repo "jdtsmith/ultra-scroll"
+          :branch "main")
+  :init
+  (setq scroll-conservatively 101 ; important!
+        scroll-margin 0) 
+  :config
+  (ultra-scroll-mode 1))
+
+;; (pixel-scroll-precision-mode)
 
 (general-define-key
  :states '(emacs normal insert motion)
@@ -275,6 +337,14 @@
   (kbd "C-u")     'evil-scroll-up
   (kbd "C-w C-w") 'other-window)
 
+(use-package magit
+	:ensure t)
+
+(evil-leader/set-key
+  "ga" 'magit-stage-file
+  "gc" 'magit-commit  ;; Maybe magit-commit-create
+  "gp" 'magit-push-current) ;; @TODO still asks for something, use more specific function
+
 (evil-leader/set-key
   "w" 'evil-window-vsplit)
   ;;"def" 'evil-jump-to-tag)
@@ -324,8 +394,9 @@
   (setq calendar-latitude 43.11)
   (setq calendar-longitude 131.88))
 
-;; (change-theme 'tsdh-light 'doom-xcode)
-(change-theme 'doom-one-light 'doom-xcode)
+;;(change-theme 'tsdh-light 'doom-xcode)
+;;(change-theme 'doom-one-light 'doom-outrun-electric)
+(load-theme 'doom-one-light)
 
 (use-package auto-dark
   :ensure t
@@ -372,6 +443,20 @@
           my/purple "Purple"
           my/brown "brown"))
 
+(use-package ibuffer-vc
+	:ensure t)
+
+(defun my/center (width)
+  (interactive "nBuffer width: ")
+  (let* ((adj          (- (window-text-width)
+                          width))
+         (total-margin (+ adj
+                          left-margin-width
+                          right-margin-width)))
+    (setq left-margin-width  (/ total-margin 2))
+    (setq right-margin-width (- total-margin left-margin-width)))
+  (set-window-buffer (selected-window) (current-buffer)))
+
 (use-package xclip
   :ensure t
   :config
@@ -381,6 +466,38 @@
   :ensure t)
 
 (setq gitignore-templates-api 'github)
+
+(use-package pdf-tools
+  :ensure t
+  :defer t
+  :mode (("\\.pdf\\'" . pdf-view-mode))
+  :config
+  ;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+  (use-package saveplace-pdf-view  )
+  (save-place-mode 1)
+  (setq-default pdf-view-display-size 'fit-page)
+  (pdf-tools-install)
+  :bind (:map pdf-view-mode-map
+              ("\\" . hydra-pdftools/body)
+              ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+              ("g"  . pdf-view-first-page)
+              ("G"  . pdf-view-last-page)
+              ("l"  . image-forward-hscroll)
+              ("h"  . image-backward-hscroll)
+              ("j"  . pdf-view-next-page)
+              ("k"  . pdf-view-previous-page)
+              ("e"  . pdf-view-goto-page)
+              ("u"  . pdf-view-revert-buffer)
+              ("al" . pdf-annot-list-annotations)
+              ("ad" . pdf-annot-delete)
+              ("aa" . pdf-annot-attachment-dired)
+              ("am" . pdf-annot-add-markup-annotation)
+              ("at" . pdf-annot-add-text-annotation)
+              ("y"  . pdf-view-kill-ring-save)
+              ("i"  . pdf-misc-display-metadata)
+              ("s"  . pdf-occur)
+              ("b"  . pdf-view-set-slice-from-bounding-box)
+              ("r"  . pdf-view-reset-slice)))
 
 (setq global-auto-revert-non-file-buffers t)
 (setq auto-revert-verbose nil)
@@ -452,12 +569,6 @@
            :fetcher git
            :url "https://gitlab.com/tuedachu/udiskie.el.git"))
 
-(use-package memento-mori
-  :ensure t
-  :custom (memento-mori-mementos
-           '(("%.5Y years old" :since "2007-18-09")))
-  :config (memento-mori-mode))
-
 (use-package git-gutter
 	:ensure t
   :hook (prog-mode . git-gutter-mode)
@@ -475,52 +586,10 @@
 	:ensure t)
 
 (use-package telega
-	:ensure t
+  :ensure t
+  :commands (telega)
   :config
   (setq telega-use-docker t))
-
-(use-package elfeed
-  :if workstation-p
-  :ensure t
-  :commands (elfeed)
-  :config
-  (setq-default elfeed-search-filter ""))
-
-(use-package elfeed-org
-  :if workstation-p
-  :ensure t
-  :config
-  (elfeed-org))
-
-(setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
-
-(setq elfeed-search-filter "+work")
-
-(setq my/elfeed-update-timer
-  (run-at-time nil (* 1 60 60 24) #'elfeed-update))
-
-(defun elfeed-apply-for-all (f)
-  (interactive)
-  (mark-whole-buffer)
-  (f))
-
-(defun elfeed-mark-all-as-read ()
-  (elfeed-apply-for-all elfeed-search-untag-all-unread))
-
-(with-eval-after-load "elfeed-search"
-  (evil-define-key*
-    'normal elfeed-search-mode-map
-    "RET" #'elfeed-search-show-entry
-    "o" #'elfeed-search-browse-url
-    "r" #'elfeed-search-fetch
-    "S" #'elfeed-unjam))
-
-(with-eval-after-load "elfeed-show"
-  (evil-define-key*
-    'motion elfeed-show-mode-map
-    "gb" #'elfeed-show-visit
-    "gj" #'elfeed-show-next
-    "gk" #'elfeed-show-prev))
 
 (defun elfeed-search-format-date (date)
   "")
@@ -575,45 +644,10 @@
   :keymaps 'ednc-view-mode-map
   "TAB" 'ednc-toggle-expanded-view)
 
-(notifications-notify
- :app-name "EDNC"
- :title "1st test"
- :body "hello, world"
- :urgency "normal")
-
 (defun frostyx/autoscroll ()
   (set (make-local-variable 'window-point-insertion-type) t))
 
 (add-hook 'ednc-view-mode-hook 'frostyx/autoscroll)
-
-(use-package taxy-magit-section
-	:ensure t)
-
-(use-package ement
-  :quelpa (ement :fetcher github :repo "alphapapa/ement.el"))
-
-(use-package elfeed-tube
-  :ensure t
-  :after elfeed
-  :demand t
-  :config
-  (elfeed-tube-setup)
-
-  :bind (:map elfeed-show-mode-map
-         ("F" . elfeed-tube-fetch)
-         ([remap save-buffer] . elfeed-tube-save)
-         :map elfeed-search-mode-map
-         ("F" . elfeed-tube-fetch)
-         ([remap save-buffer] . elfeed-tube-save)))
-
-(use-package elfeed-web
-  :ensure t)
-
-(setq httpd-port 8090)
-(setq httpd-host "0.0.0.0")
-
-(ignore-error
-  (elfeed-web-start))
 
 ;; Needed for `:after char-fold' to work
 ;; (use-package char-fold
@@ -636,6 +670,11 @@
   (reverse-im-input-methods '("ukrainian-computer"))
   :config
   (reverse-im-mode t)) ; turn the mode on
+
+(use-package projectile
+  :ensure t
+  :config
+  (setq projectile-project-search-path '("~/Templates/")))
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -739,83 +778,6 @@
 
 (use-package nerd-icons
   :ensure)
-
-(use-package org-ql
-    :ensure t)
-
-(if (and workstation-p (fboundp #'circe-tracking-get-face))
-	(progn
-	  (setq tracking-get-face-function #'circe-tracking-get-face)
-	  (set-face-attribute 'circe-tracking-channel-face nil :foreground my/white)
-	  (set-face-attribute 'circe-tracking-query-face nil :foreground my/blue)))
-
-  (defun doom-modeline--frostyx-org-agenda-update ()
-    (when doom-modeline-frostyx-org-agenda
-      (let ((inbox-count (length (org-ql-select (org-agenda-files)
-                                   '(todo "IN-PROGRESS")
-                                   :action #'org-get-heading)))
-            (soon-count (length (org-ql-select (org-agenda-files)
-                    '(todo "NEXT")
-                    :action #'org-get-heading))))
-        (setq doom-modeline--frostyx-org-agenda-count
-              (format " DOING: %s |  NEXT: %s"
-                      ;; TODO Don't abuse circe face here
-                      (propertize (number-to-string inbox-count)
-                                  'face `(:foreground "purple"))
-                      (propertize (number-to-string soon-count)
-                                  'face `(:foreground "purple")))))))
-
-  (defvar doom-modeline--frostyx-org-agenda-count "")
-  (doom-modeline-def-segment frostyx-org-agenda-count
-    ;; (when (equal major-mode 'org-agenda-mode)
-    ;;   (if (string= doom-modeline--frostyx-org-agenda-count "")
-    ;;       (doom-modeline--frostyx-org-agenda-update))
-    ;;   (format-mode-line doom-modeline--frostyx-org-agenda-count))
-    (format-mode-line doom-modeline--frostyx-org-agenda-count))
-
-
-  (defvar doom-modeline--frostyx-org-agenda-timer nil)
-  (doom-modeline-add-variable-watcher
-   'doom-modeline-frostyx-org-agenda
-   (lambda (_sym val op _where)
-     (when (eq op 'set)
-       (setq doom-modeline-frostyx-org-agenda val)
-       (doom-modeline-frostyx-org-agenda-timer))))
-
-
-  (defvar doom-modeline--frostyx-org-agenda-timer nil)
-  (defun doom-modeline-frostyx-org-agenda-timer ()
-    (if (timerp doom-modeline--frostyx-org-agenda-timer)
-        (cancel-timer doom-modeline--frostyx-org-agenda-timer))
-    (setq doom-modeline--frostyx-org-agenda-timer
-          (and doom-modeline-frostyx-org-agenda
-               (run-with-idle-timer
-                10 10 #'doom-modeline--frostyx-org-agenda-update))))
-
-  (defvar doom-modeline-frostyx-org-agenda t)
-  (doom-modeline-frostyx-org-agenda-timer)
-
-  (doom-modeline-def-segment circe-lagmon t)
-  (doom-modeline-def-segment circe-track t)
-  (doom-modeline-def-segment frostyx-org-agenda-count t)
-
-  (setq frostyx/doom-modeline-middle-segments
-        '(workspace-name window-number modals matches follow buffer-info-simple
-  											 major-mode remote-host word-count parrot selection-info
-  											 ))
-
-  (setq frostyx/doom-modeline-right-segments
-        '(frostyx-org-agenda-count compilation objed-state persp-name battery grip gnus
-  										github debug repl lsp minor-modes input-method indent-info
-  										buffer-encoding process vcs time circe-lagmon circe-track
-  										buffer-position))
-  (doom-modeline-def-modeline 'main
-    frostyx/doom-modeline-middle-segments
-    frostyx/doom-modeline-right-segments)
-
-(doom-modeline-def-modeline 'helm
-  '(helm-buffer-id helm-number helm-follow helm-prefix-argument)
-  '(helm-help time))
 
 (setq doom-modeline-mode-alist '())
 
@@ -1172,6 +1134,7 @@
 
 (use-package org
   :straight (:type built-in)
+  :bind (("C-c C-x C-j" . org-clock-goto))
   :ensure nil
   ;; :defer t
   ;; :after org
@@ -1181,7 +1144,7 @@
   ;;        (org-mode . visual-line-mode)
   ;;        (org-mode . variable-pitch-mode))
   :bind (("C-c l"               . org-store-link)
-         ("C-c c"               . org-capture)
+         ;; ("C-c c"               . org-capture)
          ("C-c f"               . org-footnote-new)))
 ;;   :config
 
@@ -1331,16 +1294,16 @@
  org-log-done (quote time)
  ;; Don't log the time a task was rescheduled or redeadlined.
  org-log-redeadline t ; changed
- org-log-reschedule t
+ org-log-reschedule t)
  org-todo-keyword-faces
- '(
-   ("TODO" :background "indian red" :foreground "white" :weight bold)
-   ("NEXT" :background "sky blue" :foreground "black" :weight bold)
-   ("WAIT" :background "olive drab" :foreground "black" :weight bold)
-   ("DONE" :background "pale green" :foreground "black" :weight bold)
-   ("CNCL" :background "dark red" :foreground "white" :weight bold))
-org-todo-keywords
-'((sequence "NEXT(n)" "TODO(t)" "WAIT(w)" "|" "DONE(d)" "CNCL(c)"))) ; changed
+ ;; '(
+ ;;   ("TODO" :background "indian red" :foreground "white" :weight bold)
+ ;;   ("NEXT" :background "sky blue" :foreground "black" :weight bold)
+ ;;   ("WAIT" :background "olive drab" :foreground "black" :weight bold)
+ ;;   ("DONE" :background "pale green" :foreground "black" :weight bold)
+ ;;   ("CNCL" :background "dark red" :foreground "white" :weight bold))
+;; org-todo-keywords
+;; '((sequence "NEXT(n)" "TODO(t)" "WAIT(w)" "|" "DONE(d)" "CNCL(c)")) ; changed
 
 ;; ("DOING" :background "tomato" :foreground "white" :weight bold)
 ;; ("STOPPED" :background "firebrick2" :foreground "white" :weight bold)
@@ -1360,6 +1323,28 @@ org-todo-keywords
                                               (org-redisplay-inline-images))))
   (add-to-list 'org-modules 'org-tempo t))
 
+(evil-leader/set-key
+        "z" '(org-agenda nil "z"))
+
+(global-set-key (kbd "C-c C-x o") 'org-clock-out)
+(global-set-key (kbd "C-c C-x j") 'org-clock-go-to)
+
+;; (defun my-org-clock-in-with-sound ()
+;;   "Clock in to an org item, play a sound notification, and truncate the task name if it's too long."
+;;   (interactive)
+;;   (org-clock-in)  ;; Start the clock
+;;   (play-sound-file "~/path/to/sound.wav")  ;; Play the sound
+
+;;   ;; Check and truncate the clocked-in task name if needed
+;;   (when (org-clock-is-active)
+;;     (let* ((task-name (substring-no-properties (org-clock-get-clock-string)))
+;;            (truncated-task-name (if (> (length task-name) 25)
+;;                                     (concat (substring task-name 0 22) "...")
+;;                                   task-name)))
+;;       (message "Clocked in: %s" truncated-task-name))))
+
+;; (global-set-key (kbd "C-c k") 'my-org-clock-in-with-sound)
+
 (use-package org-agenda
   :ensure nil
   :straight (:type built-in)
@@ -1367,153 +1352,140 @@ org-todo-keywords
   (:map global-map
         ("C-c a" . org-agenda))
   :config
-  (setq org-agenda-skip-scheduled-if-done nil ; changed
-        org-agenda-skip-deadline-if-done nil ; changed
+  (setq org-agenda-start-on-weekday 0
+        org-agenda-skip-scheduled-if-done t ; changed
+        org-agenda-skip-deadline-if-done t ; changed
         org-agenda-include-deadlines t
         org-agenda-block-separator #x2501
         org-agenda-compact-blocks t ; changed
         org-agenda-start-with-log-mode nil
-				org-agenda-deadline-faces
+  			org-agenda-deadline-faces
         '((1.0001 . org-warning)              ; due yesterday or before
           (0.0    . org-upcoming-deadline))   ; due today or later
-				org-icalendar-combined-name "Hugo Org"
-				org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo)
-				org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo)
-				org-icalendar-timezone "Asia/Vladivostok"
-				org-icalendar-store-UID t
-				org-icalendar-alarm-time 30
-				calendar-date-style 'european
-				calendar-week-start-day 0
+  			org-icalendar-combined-name "Hugo Org"
+  			org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo)
+  			org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo)
+  			org-icalendar-timezone "Asia/Vladivostok"
+  			org-icalendar-store-UID t
+  			org-icalendar-alarm-time 30
+  			calendar-date-style 'european
+  			calendar-week-start-day 0
         calendar-mark-holidays-flag t
         calendar-mark-diary-entries-flag nil
 																				; (setq-default org-icalendar-include-todo t)
-				org-agenda-breadcrumbs-separator " ❱ "
+  			org-agenda-breadcrumbs-separator " ❱ "
         org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
         org-agenda-time-grid '((weekly today require-timed)
-                               (800 1000 1200 1400 1600 1800 2000)
+                               (500 800 1000 1200 1400 1600 1800 2000)
                                "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
         ;; org-agenda-time-grid (quote ((daily today remove-match)
         ;; 			     (800 1200 1600 2000)
         ;; 			     "......" "----------------"))
-        org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
-                                   (todo . " %i %-12:c")
-                                   (tags . " %i %-12:c")
-                                   (search . " %i %-12:c"))
-				org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
+        ;; org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
+        ;;                            (todo . " %i %-12:c")
+        ;;                            (tags . " %i %-12:c")
+        ;;                            (search . " %i %-12:c"))
+        org-agenda-prefix-format
+        '((agenda . " %i %-12:c%?-12t% s")
+          (todo . " %i %-12:c")
+          (tags . " %i %-12:c")
+          (search . " %i %-12:c"))
+  			org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
                                                       "\n"
                                                       (org-agenda-format-date-aligned date)))
-				org-default-notes-file "~/Org/agenda/Notes.org"
-				org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
-													 )) ;; "~/Org/agenda/Calendar.org"
+  			org-default-notes-file "~/Org/agenda/Notes.org"
+  			org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/Calendar.org"
 
   ;; (setq org-agenda-clockreport-parameter-plist
   ;;       (quote (:link t :maxlevel 5 :fileskip t :compact t :narrow 80)))
 
   (defun my/style-org-agenda()
-    (set-face-attribute 'org-agenda-date nil :height 1.1)
-    (set-face-attribute 'org-agenda-date-today nil :height 1.1 :slant 'italic)
-    (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
+    (set-face-attribute 'org-agenda-date nil :height 1.3)
+    (set-face-attribute 'org-agenda-date-today nil :height 1.3 :slant 'italic)
+    (set-face-attribute 'org-agenda-date-weekend nil :height 1.3))
   (add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
 
   (setq org-agenda-custom-commands
-        '(("z" "Getting Things Done (GTD)"
+        '(("c" "Getting Things Done (GTD)"
            ((agenda "" ((org-agenda-span 'day)
-                        (org-agenda-skip-scheduled-if-done t)
-                        (org-agenda-skip-deadline-if-done t)
-                        (org-agenda-include-deadlines nil)
-                        (org-agenda-prefix-format '((agenda . "%i %?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
-                                                    (todo . " %i %-12:c")
-                                                    (tags . " %i %-12:c")
-                                                    (search . " %i %-12:c")))
+                        (org-agenda-skip-scheduled-if-done nil)
+                        (org-agenda-skip-deadline-if-done nil)
+                        (org-agenda-clockreport-mode t)
+                        (org-agenda-remove-tags t)
+                        (org-agenda-sorting-strategy '(habit-down time-up priority-down category-keep user-defined-up))
+                        (org-time-budgets-in-agenda-maybe)
+                        (org-agenda-include-deadlines t)
+                        ;; (org-agenda-prefix-format '((agenda . "%i %?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
+                        ;;                             (todo . " %i %с %-12:c")
+                        ;;                             (tags . " %i %-12:c")
+                        ;;                             (search . " %i %-12:c")))
+												(org-agenda-prefix-format
+												 '((agenda . "%t %-10c | %s")
+													 (todo . "%t %-10c | %s")
+													 (tags . "%t %-10c | %s")
+													 (search . "%c %t %s")))
 
                         (org-agenda-files '("~/Org/agenda/PlanAhead.org" "~/Org/agenda/GTD/org-gtd-tasks.org"))
                         (org-super-agenda-groups
                          '((:name "Schedule"
-																	:time-grid t)
-                           (:name "School / exams"
-																	:and (:tag "school" :deadline future)
-																	:face (:background "yellow" :foreground "black"))
+  																:time-grid t)
+                           ;; (:name "School / exams"
+  												 ;;  			:and (:tag "school" :deadline future)
+  												 ;;  			:face (:background "yellow" :foreground "black"))
                            (:name "Today"
-																	:scheduled today
-																	:face (:background "medium sea green" :foreground "white"))
+  																:scheduled today
+  																:face (:background "medium sea green" :foreground "white"))
                            (:name "Deadline today"
-																	:deadline today
-																	:face (:background "black" :foreground "white"))
+  																:deadline today
+  																:face (:background "black" :foreground "white"))
                            (:name "Passed deadline"
-																	:deadline past
-																	:face (:background "firebrick"))
+  																:deadline past
+                                  :scheduled past
+  																:face (:background "salmon"))
                            (:name "Future deadline"
-																	:deadline future
-																	:face (:background "dark slate blue"))))))
+  																:deadline future
+  																:face (:background "dark slate blue"))))))
 
-            (alltodo "" ((org-agenda-overriding-header "")
-                         (org-agenda-prefix-format "  %?-12t% s")
-                         (org-agenda-entry-text-mode t)
-                         (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/GTD/Projects.org"
-                         (org-super-agenda-groups
-                          '((:name "Tasks ready to actions"
-																	 :children t
-																	 :todo "NEXT")))))
+            ;; (alltodo "" ((org-agenda-overriding-header "")
+            ;;              (org-agenda-prefix-format "  %?-12t% s")
+            ;;              (org-agenda-entry-text-mode t)
+            ;;              (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/GTD/Projects.org"
+            ;;              (org-super-agenda-groups
+            ;;               '((:name "Tasks ready to actions"
+  					;; 											 :children t
+  					;; 											 :todo "NEXT")))))
 
             (tags "CLOSED>=\"<today>\""
                   ((org-agenda-overriding-header "\nCompleted today\n")))))
-
-          ("v" "Reading view (by tags)"
-           ((todo "" ((org-agenda-overriding-header "")
-                      (org-agenda-start-with-log-mode '(closed))
-                      (org-agenda-files '("~/Org/agenda/ReadAhead.org" "~/Org/agenda/Reading-list.org"))
-                      (org-super-agenda-groups
-                       '((:name "In progress / Reading"
-																:face (:background "dark slate blue")
-																:todo ("READING" "TODO")))
-
-                       (:name "Should read"
-															:and (:todo "IN-PLANS"))
-
-                       (:name "On Zettelkasting"
-															:todo "ZETTEL")
-
-                       (:name "Paused reading"
-															:todo "PAUSED")
-
-                       (:name "Planned to read"
-															:todo "NEXT-TO-READ")
-
-                       (:name "Today deadline"
-															:deadline today
-															:face (:background "black"))
-                       (:name "Passed deadline"
-															:and (:deadline past)
-															:face (:background "firebrick"))
-
-                       (:name "Read books"
-															:todo "READ")
-                       (:name "Dropped books"
-															:todo "DROPPED")
-                       (:name "All books"
-															:and (:tag "books" :todo "IN-PLANS")))))))
-
           ("x" "Habits view"
            ((agenda "" ((org-agenda-span 'day)
+                        (org-habit-show-habits t)
+                        (org-agenda-remove-tags t)
                         (org-agenda-prefix-format "  ∘ %t %s")
-                        (org-agenda-files '("~/Org/agenda/Habits.org" "~/Org/agenda/GTD/org-gtd-tasks.org"))
+                        (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
                         (org-super-agenda-groups
                          '((:name "Everytime habits"
-																	:tag "everytime")
-													 (:name "Morning habits"
-																	:tag "morning")
-													 (:name "Day habits"
-																	:tag "day")
-													 (:name "Evening habits"
-																	:tag "evening")
-													 (:name "Sport habits"
-																	:tag "sport")
-													 (:name "Challenges"
-																	:tag "challenge")
-													 (:discard (:anything))
-													 (:discard (:not (:tag "habits")))))))))))
+  																:tag ("everytime"))
+  												 (:name "Morning habits"
+  													  		:tag ("morning"))
+  												 (:name "Day habits"
+  													  		:tag ("day"))
+  												 (:name "Evening habits"
+  													  		:tag ("evening"))
+  												 ;; (:name "Sport habits"
+  												 ;;  			:tag "sport")
+  												 ;; (:name "Challenges"
+  												 ;;  			:tag "challenge")
+  												 (:discard (:anything))
+  												 (:discard (:not (:tag "habit")))
+                           ))))))))
 
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
+
+(use-package org-timeline
+	:ensure t
+	:config
+	(add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
 
 (use-package org-ref
 	:quelpa (org-ref
@@ -1558,6 +1530,11 @@ org-todo-keywords
   ;;:config
   ;;(require 'org-ref) ; optional: if using Org-ref v2 or v3 citation links
 
+(defun my-org-zotero-open (path _)
+  (call-process "xdg-open" nil nil nil (concat "zotero:" path)))
+
+(org-link-set-parameters "zotero" :follow 'my-org-zotero-open)
+
 (use-package citar
 	:quelpa (citar
        :fetcher github
@@ -1597,6 +1574,8 @@ org-todo-keywords
 	:ensure t)
 (use-package ob-restclient
   :ensure t)
+(use-package gnuplot
+  :ensure t)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -1609,77 +1588,142 @@ org-todo-keywords
    (rust       . t)
    (C          . t)
    (sql        . t)
-   (latex      . t)))
+   (latex      . t)
+   (restclient . t)
+   (gnuplot    . t)))
 
 (setq org-tag-alist
-      '(
-				("@article" . ?a)
-        ("@personal" . ?P)
-        ("@programming" . ?p)
-        ("@mathematics" . ?m)
-        ("@english" . ?e)
-				("@work" . ?w)))
+        '(
+  				("@article" . ?a)
+          ("@personal" . ?P)
+          ("@coding" . ?p)
+          ("@mathematics" . ?m)
+  				("@school" . ?s)
+          ("@english" . ?e)
+  				("@work" . ?w)
+          ("@zettelkasten" . ?z)
+  				("@idea" . ?i)))
 
-(use-package org-modern
-  :hook (org-mode . org-modern-mode)
-  :ensure t
-  :config
-  (setq
-   ;; Edit settings
-   org-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   ;; Appearance
-   org-modern-radio-target    '("❰" t "❱")
-   org-modern-internal-target '("↪ " t "")
-   org-modern-block-name
-	 '((t . t)
-	   ("src" "ϰ" "ϰ"))
-   org-modern-progress t
-   org-modern-statistics nil
-   org-modern-todo t
-   org-modern-todo-faces (quote (("TODO" :background "indian red" :foreground "white" :weight bold)
-																 ("NEXT" :background "sky blue" :foreground "black" :weight bold)
-																 ("WAIT" :background "olive drab" :foreground "black" :weight bold)
-																 ("DONE" :background "pale green" :foreground "black" :weight bold)
-																 ("CNCL" :background "dark red" :foreground "white" :weight bold)))
-   org-modern-priority t
-   org-modern-priority-faces (quote ((?A :background "red"
-																				 :foreground "black")
-																		 (?B :background "dark orange"
-																				 :foreground "black")
-																		 (?C :background "tan"
-																				 :foreground "black")))
-   org-modern-tag t
-   org-modern-timestamp t
-   org-modern-statistics t
-   ;; org-modern-table t
-   org-modern-tag-faces (quote (("@programming" :background "#d60000" :foreground "#000000")
-																("@personal" :background "#e67c73" :foreground "#000000")
-																("@article" :background "#0b8043" :foreground "#000000")
-																("@mathematics" :background "#bc8f8f" :foreground "#000000")
-                                ("blockchain" :background "#f5511d" "#000000")
-																("solana" :background "#DC1FFF" :foreground "#000000")
-																("rust" :background "#CE412B" :foreground "#000000")
-																("go" :background "#00bfff" :foreground "#00000")
-																("exams" :background "#8e24aa" :foreground "#000000")))
-   org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
-   org-modern-hide-stars " "
-   org-modern-keyword "‣"))
+  (use-package org-modern
+    :hook (org-mode . org-modern-mode)
+    :ensure t
+    :config
+    (setq
+     ;; Edit settings
+     org-catch-invisible-edits 'show-and-error
+     org-special-ctrl-a/e t
+     ;; Appearance
+     org-modern-radio-target    '("❰" t "❱")
+     org-modern-internal-target '("↪ " t "")
+     org-modern-block-name
+  	 '((t . t)
+  	   ("src" "ϰ" "ϰ"))
+     org-modern-progress t
+     org-modern-statistics nil
+     org-modern-todo t
+     org-modern-todo-faces (quote (("TODO" :background "indian red" :foreground "white" :weight bold)
+  																 ("NEXT" :background "sky blue" :foreground "black" :weight bold)
+  																 ("WAIT" :background "olive drab" :foreground "black" :weight bold)
+  																 ("DONE" :background "pale green" :foreground "black" :weight bold)
+  																 ("CNCL" :background "dark red" :foreground "white" :weight bold)))
+     org-modern-priority t
+     org-modern-priority-faces (quote ((?A :background "red"
+  																				 :foreground "black")
+  																		 (?B :background "dark orange"
+  																				 :foreground "black")
+  																		 (?C :background "tan"
+  																				 :foreground "black")))
+     org-modern-tag t
+     org-modern-timestamp nil
+     org-modern-statistics t
+     ;; org-modern-table t
+     org-modern-tag-faces (quote (("@coding" :background "#d60000" :foreground "#000000")
+  																("@personal" :background "#e67c73" :foreground "#000000")
+  																("@article" :background "#0b8043" :foreground "#000000")
+  																("@mathematics" :background "#bc8f8f" :foreground "#000000")
+                                  ("blockchain" :background "#f5511d" "#000000")
+  																("solana" :background "#DC1FFF" :foreground "#000000")
+  																("rust" :background "#CE412B" :foreground "#000000")
+  																("go" :background "#00bfff" :foreground "#00000")
+  																("exams" :background "#8e24aa" :foreground "#000000")))
+     org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
+     org-modern-hide-stars " "
+     org-modern-keyword "‣"
+     org-modern-table t))
+(global-org-modern-mode t)
 
 (use-package org-habit
   :after org
   :ensure nil
   :straight (:type built-in)
   :init
-  (add-to-list 'org-modules 'org-habit)
-  :config
-  (setq org-habit-following-days 7
-        org-habit-preceding-days 7
-        org-habit-show-all-today nil
-        org-habit-show-habits t
-        org-habit-graph-column 67)
+  ;;(add-to-list 'org-modules 'org-habit)
+	(progn
+		(custom-set-faces
+		 '(org-habit-clear-face
+			 ((t (:background "pale green"
+						:foreground "white"
+						:width expanded
+						:height 1.0
+						:box (:line-width (1 . 1) :color "white")))))
 
-  (defun toggle-org-habit-show-all-today ()
+		 '(org-habit-clear-future-face
+			 ((t (:background "gray"
+						:foreground "white"
+						:width expanded
+						:height 1.0
+						:box (:line-width (1 . 1) :color "white")))))
+		 '(org-habit-alert-future-face
+			 ((t (:background "light coral"
+						:foreground "white"
+						:width expanded
+						:height 1.0
+						:box (:line-width (1 . 1) :color "white")))))
+		 '(org-habit-alert-face
+			 ((t (:background "light coral"
+						:foreground "white"
+						:width expanded
+						:height 1.0
+						:box (:line-width (1 . 1) :color "white")))))
+		 '(org-habit-overdue-face
+			 ((t (:background "light coral"
+						:foreground "white"
+						:width expanded
+						:height 1.0
+						:box (:line-width (1 . 1) :color "white")))))
+		 '(org-habit-overdue-future-face
+			 ((t (:background "gray"
+						:foreground "white"
+						:width expanded
+						:height 1.0
+						:box (:line-width (1 . 1) :color "white")))))
+		 '(org-habit-ready-face
+			 ((t (:background "pale green"
+						:foreground "white"
+						:width expanded
+						:height 1.0
+						:box (:line-width (1 . 1) :color "white")))))
+		 '(org-habit-ready-future-face
+			 ((t (;;:background "white"
+						:foreground "white"
+						:width expanded
+						:height 1.0
+						:box (:line-width (1 . 1) :color "white")))))
+		 ))
+	:config
+  (load "~/.emacs.d/lisp/my-org-habit")
+	(setq org-habit-following-days 1
+				org-habit-preceding-days 7
+				org-habit-show-habits nil
+				org-habit-show-all-today t
+				org-habit-graph-column 57
+				org-habit-overdue-glyph ?○
+				org-habit-alert-glyph ?○
+				org-habit-today-glyph ?○
+				org-habit-completed-glyph ?●
+				org-habit-show-done-always-green t)
+
+	(defun toggle-org-habit-show-all-today ()
 		"Toggle the value of `org-habit-show-all-today' between t and nil."
 		(interactive)
 		(setq org-habit-show-all-today (not org-habit-show-all-today))
@@ -1687,13 +1731,24 @@ org-todo-keywords
 						 (if org-habit-show-all-today "nil" "t"))
 		(org-agenda-refresh))
 
-  (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
+	(define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
 
-;;   (use-package org-habit-stats
-;;     :config
-;; (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
-;; (add-hook 'org-agenda-mode-hook
-;;               (lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda)))))
+(use-package org-habit-stats
+	:ensure t
+	:config
+	(add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
+	(add-hook 'org-agenda-mode-hook
+						(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
+
+;;(frostyx/guix :install "alsa-utils")
+  
+(use-package sound-wav
+          :ensure t
+          :demand t) ;; dep for org-pomodoro
+
+(use-package powershell
+  :ensure t
+  :demand t) ;; dep for org-pomodoro
 
 (use-package org-pomodoro
   :ensure t)
@@ -1725,6 +1780,22 @@ org-todo-keywords
   (interactive)
   (org-pomodoro '(4)))
 
+(use-package org-timed-alerts
+  :straight (:host github
+             :repo "legalnonsense/org-timed-alerts"
+             :branch "master" :files ("*.el" "out"))
+  :after (org)
+  :custom
+  (org-timed-alerts-alert-function #'alert)
+  (org-timed-alerts-tag-exclusions nil)
+  (org-timed-alerts-default-alert-props nil)
+  (org-timed-alerts-warning-times '(-30 -15 -5))
+  (org-timed-alerts-agenda-hook-p t)
+  (org-timed-alert-final-alert-string "IT IS %alert-time\n\n%todo %headline")
+  (org-timed-alert-warning-string (concat "%todo %headline\n at %alert-time"))
+  :config
+  (add-hook 'org-mode-hook #'org-timed-alerts-mode))
+
 ;; ────────────────────────────── Prettify Symbols ─────────────────────────────
 ;; Beautify Org Checkbox Symbol
 (defun ma/org-buffer-setup ()
@@ -1746,7 +1817,13 @@ org-todo-keywords
 	"nt" 'org-roam-tag-add
 	"nr" 'org-roam-ref-add
 	"nj" 'org-roam-dailies-capture-today
-	"ng" 'org-id-get-create)
+	"ng" 'org-id-get-create
+  "nb" 'orb-insert-link)
+
+(use-package sqlite3
+  :ensure t)
+(use-package emacsql
+  :ensure t)
 
 (use-package org-roam
   :ensure t
@@ -1758,6 +1835,7 @@ org-todo-keywords
          ("C-c n r" . org-roam-ref-add)
          ("C-c g" . org-id-get-create)
          ("C-c n j" . org-roam-dailies-capture-today)
+         ("C-c n b" . orb-insert-link)
          :map org-mode-map
          ("C-M-i"    . completion-at-point))
   :custom
@@ -1768,16 +1846,9 @@ org-todo-keywords
       :if-new
       (file+head "%<%Y-%m-%d-%H:%M>--${slug}.org" "#+startup: latexpreview\n#+date: %U\n#+title: ${title}\n")
       :unnarrowed t)
-     ("t" "Thought" plain "%?"
-      :if-new (file+head "thoughts/%<%Y-%m-%d-%H:%M>--thought-${slug}.org" "#+title: ${title}\n#+filetags: :Thought:\n#+date: %U\n\n\n* See also:\n+ ")
-      :unnarrowed t)
 
      ("b" "Biography (Person)" plain (file "~/Org/Templates/Person.org")
       :if-new (file+head "persons/%<%Y-%m-%d-%H:%M>--person-${slug}.org" "#+title: ${title}\n#+filetags: :Biography:\n#+date: %U\n")
-      :unnarrowed t)
-
-     ("p" "Project" plain (file "~/Org/Templates/Project.org")
-      :if-new (file+head "projects/%<%Y-%m-%d-%H:%M>--project-${slug}.org" "#+title: ${title}\n#+filetags: :Project:\n#+date: %U\n\n")
       :unnarrowed t)
 
      ("r" "Bibliography reference" plain (file "~/Org/Templates/Bibliography reference.org") ; <-- template store in a separate file
@@ -1799,57 +1870,45 @@ org-todo-keywords
       :empty-lines-before 1)))
 
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+
   (org-roam-dailies-capture-templates
-   '(
-     ("m" "Morning diary" plain (file "~/Org/Templates/journal/Morning.org")
-      :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))
-     ("u" "Quotetions diary" entry "** Quotation of the day (%U)‎\n\n#+begin_quote\n%^{Quote}\n#+end_quote\n+ Author: *%^{Author of quote}*\n\n* Reflections about this quote"
-      :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>-quote.org" "#+title: %U\n\n"))
+      '(("d" "Дневник продуктивности - утро" plain (file "~/Org/Templates/journal/Morning.org")
+        :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))
 
-     ("d" "Default diary" entry "** Default (%U): «%?»‎\n\n"
-      :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org" "** %U\n#+title: %U\n\n"))
+        ("D" "Дневник продуктивности - вечер" plain (file "~/Org/Templates/journal/Evening.org")
+        :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))
 
-     ("e" "Evening diary" plain (file "~/Org/Templates/journal/Evening.org")
-      :clock-in t :clock-resume t
-      :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))))
+        ("j" "Мысли" plain "* %U"
+         :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))))
   :config
   ;; Org-noter integration with org-roam-bibtex
-  ;; (setq orb-preformat-keywords
-  ;;       '("title" "citekey"  "url" "author-or-editor" "keywords" "file")
-  ;;       orb-process-file-keyword t)
+  (setq orb-preformat-keywords
+        '("title" "citekey"  "url" "author-or-editor" "keywords" "file")
+        orb-process-file-keyword t)
   (setq orb-preformat-keywords
         '("citekey" "title" "url" "author-or-editor" "keywords" "file")
         orb-process-file-keyword t
         orb-attached-file-extensions '("pdf"))
   (setq org-roam-dailies-directory "journal/")
   (setq org-roam-completion-everywhere t)
-  (setq org-roam-database-connector 'sqlite)
+  ;; (setq org-roam-database-connector 'sqlite)
   (org-roam-db-autosync-mode)
                                         ; Show +FILETAG in node list
                                         ; https://github.com/org-roam/org-roam/commit/6f5d65abd9e707b3fdb10092a9fef3b739e143dd
   (setq fill-prefix "")  ;; see https://emacs.stackexchange.com/a/38943/12999
   (setq org-roam-node-display-template
         (concat "${title:*} "
-                (propertize "${tags:20}" 'face 'org-tag)))
-  ;; Customize the org-roam buffer
-  ;; (add-to-list 'display-buffer-alist
-  ;;              '("\\*org-roam\\*"
-  ;;                (display-buffer-in-direction)
-  ;;                (direction . right)
-  ;;                (window-width . 0.33)
-  ;;                (window-height . fit-window-to-buffer)))
+                (propertize "${tags:60}" 'face 'org-tag)))
 
-  ;; for org-roam-buffer-toggle
-  ;; Recommendation in the official manual
+  ;;for org-roam-buffer-toggle
+  ;;Recommendation in the official manual
   (add-to-list 'display-buffer-alist
                '("\\*org-roam\\*"
                  (display-buffer-in-direction)
                  (direction . right)
                  (window-width . 0.33)
-                 (window-height . fit-window-to-buffer))))
+                 (window-height . fit-window-to-buffer)))
+  )
 
 (use-package org-roam-timestamps
   :ensure t
@@ -1927,32 +1986,8 @@ org-todo-keywords
   ;; Optionally set the debug level (0 = no debug, 1 = basic debug, 2 = detailed debug)
   (setq org-readwise-debug-level 1))
 
-(use-package deft
-  :ensure t
-  :bind ("<f9>" . deft)
-  :demand t
-  :init
-  (setq deft-directory "~/Org/Notes"
-				deft-text-mode 'org-mode
-        deft-extensions '("org" "txt" "md")
-        deft-default-extension "org"
-        deft-recursive t
-        deft-new-file-format "%Y-%m-%dT%H%M"))
-
-(evil-leader/set-key
-	"fn" 'deft-new-file
-	"fl" 'deft)
-
 (use-package restclient
   :ensure t)
-
-(use-package toc-org
-  :ensure t
-  :config
-  (if (require 'toc-org nil t)
-      (progn
-        (add-hook 'org-mode-hook 'toc-org-mode))
-    (warn "toc-org not found")))
 
 (use-package org-download
   :ensure t
@@ -1970,15 +2005,22 @@ org-todo-keywords
   (setq org-cliplink-max-length 800)
   (global-set-key (kbd "C-x p i") 'org-cliplink))
 
+;; (evil-leader/set-key
+;; "de" 'org-gtd-engage
+;; "dr" 'org-gtd-engage-grouped-by-context
+;; "dp" 'org-gtd-process-inbox
+;; "c" 'org-gtd-organize)
+
 (evil-leader/set-key
-"dc" 'org-gtd-capture
-"de" 'org-gtd-engage
-"dr" 'org-gtd-engage-grouped-by-context
-"dp" 'org-gtd-process-inbox)
+	;; "dc" 'org-gtd-capture
+  "dc" (lambda () (interactive) (org-gtd-capture nil "i"))
+	"de" 'org-gtd-engage
+	"dp" 'org-gtd-process-inbox
+	"dn" 'org-gtd-show-all-next
+	"ds" 'org-gtd-review-stuck-projects)
 
 (use-package org-gtd
   :ensure t
-  :defer t
   :straight (org-gtd :type git
                      :host github
                      :repo "trevoke/org-gtd.el")
@@ -1986,15 +2028,70 @@ org-todo-keywords
   (org-gtd-directory "~/Org/agenda/GTD/")
   ;; (org-edna-use-inheritance t)
   ;; (org-gtd-update-ack "3.0.0")
-  ;; (org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command))
+	(org-gtd-areas-of-focus '("PERSONAL" "MERITRANK" "CODING" "EGE"))
+  (org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command))
+	(org-gtd-clarify-show-horizons t)
+	(org-gtd-horizons-file "horizons.org")
   :config
   (org-edna-mode)
-  :bind (;; ("C-c d c" . org-gtd-capture)
-				 ;; ("C-c d e" . org-gtd-engage)
-				 ;; ("C-c d r" . org-gtd-engage-grouped-by-context)
-				 ;; ("C-c d p" . org-gtd-process-inbox)
+  :bind (("C-c d c" . (lambda () (interactive) (org-gtd-capture nil "i")))
+				 ("C-c d e" . org-gtd-engage)
+				 ("C-c d r" . org-gtd-engage-grouped-by-context)
+				 ("C-c d p" . org-gtd-process-inbox)
 				 :map org-gtd-clarify-map
 				 ("C-c c" . org-gtd-organize)))
+
+(use-package org-clock-budget
+    :quelpa (org-clock-budget
+        :fetcher github
+        :repo "Fuco1/org-clock-budget"
+        :branch "master")
+		:ensure t
+    :config
+    (setq org-clock-budget-daily-budgetable-hours 10)
+    (setq org-clock-budget-intervals '(("BUDGET_WEEK" org-clock-budget-interval-this-week))))
+
+(defun org-dblock-write:time-requirements (params)
+  "Generate a table showing daily time requirements and progress for categories."
+  (let* ((day-of-week (upcase (format-time-string "%^a")))
+         (required-property (concat "REQUIRED_TIME_" day-of-week))
+         (categories '("EGE" "MERITRANK" "CODING"))
+         (today-start (format-time-string "%Y-%m-%d"))
+         (today-end (format-time-string "%Y-%m-%d" (time-add (current-time) 86400))))
+    
+    ;; Создаем заголовок таблицы с фиксированной шириной столбцов
+    (insert "| Category   | Required | Actual  | Progress  |\n")
+    (insert "|------------+----------+---------+-----------|\n")
+    
+    (dolist (category categories)
+      (let ((required 0.0)
+            (actual 0.0))
+        ;; Находим требуемое время
+        (org-map-entries
+         (lambda ()
+           (let* ((cat (org-entry-get (point) "CATEGORY"))
+                  (req (org-entry-get (point) required-property)))
+             (when (and req (string= cat category))
+               (setq required (string-to-number req)))))
+         nil 'file)
+        
+        ;; Вычисляем фактическое время
+        (setq actual (/ (float (org-clock-sum today-start today-end
+                                             (lambda () 
+                                               (string= (org-entry-get nil "CATEGORY") 
+                                                      category))))
+                       60.0))
+        
+        ;; Вычисляем прогресс
+        (let ((progress (if (> required 0.0)
+                          (* 100.0 (/ actual required))
+                        0.0)))
+          ;; Используем фиксированную ширину для каждого столбца
+          (insert (format "| %-10s | %8.1f | %7.1f | %8.1f%% |\n"
+                         category required actual progress)))))
+    
+    ;; Добавляем нижний разделитель
+    (insert "|------------+----------+---------+-----------|")))
 
 (use-package org-appear
   :ensure t
@@ -2004,12 +2101,14 @@ org-todo-keywords
   (setq org-hide-emphasis-markers t
         org-appear-autolinks 'just-brackets))
 
-(use-package org-transclusion
-  :after org
-  :ensure t
-  :config
-  (define-key global-map (kbd "<f12>") #'org-transclusion-add)
-  (define-key global-map (kbd "C-c t") #'org-transclusion-mode))
+(use-package timeblock
+  :init
+  (unless (package-installed-p 'timeblock)
+    (package-vc-install
+     '(timeblock
+       :vc-backend Git
+       :url "https://github.com/ichernyshovvv/timeblock.el"
+       :branch "master"))))
 
 (use-package org-timeblock
   :straight (org-timeblock :type git
@@ -2023,6 +2122,99 @@ org-todo-keywords
   (setq org-now-location '("~/Org/agenda/Calendar.org")
         org-timeblock-inbox-file "/home/berezhnev/Org/agenda/Calendar.org"
         org-timeblock-n-days-view 3))
+
+;; -*- lexical-binding: t; -*- 
+
+(require 'org) ;; for `org-read-date'
+
+(let* ((date (parse-time-string "2024-11-08 00:00"))
+       (entries
+        (list (list
+               (cons 'start (parse-time-string "2024-11-08 10:00"))
+               (cons 'end (parse-time-string "2024-11-08 11:00"))
+               (cons 'title "Block 1"))
+              (list
+               (cons 'start (parse-time-string "2024-11-08 09:30"))
+               (cons 'end (parse-time-string "2024-11-08 11:00"))
+               (cons 'title "Block 2"))
+              (list
+               (cons 'start (parse-time-string "2024-11-08 12:00"))
+               (cons 'end (parse-time-string "2024-11-08 17:00"))
+               (cons 'title "Block 4"))
+              (list
+               (cons 'start (parse-time-string "2024-11-08"))
+               (cons 'end nil)
+               (cons 'title "All-day Block 3")))))
+  (timeblock-insert-column
+   entries date 200 350
+   :show-date t :show-all-day-entries t
+   :scope '(6 . 24)
+   :keymap (let ((map timeblock-column-map))
+             (keymap-set map "e" #'timeblock-reschedule)
+             (keymap-set map "<drag-mouse-1>" #'timeblock-drag-n-drop)
+             map)))
+ 
+(defun timeblock-reschedule ()
+  (interactive)
+  (when-let* ((svg (get-text-property (point) 'dom))
+              (entries (dom-attr svg 'entries))
+              (date (encode-time (dom-attr svg 'date)))
+              (block-id (dom-attr (timeblock-get-selected svg) 'id))
+              (entry (nth (string-to-number block-id) entries)))
+    (setf (alist-get 'start entry)
+          (decode-time (org-read-date t t nil "Start: " date)))
+    (setf (alist-get 'end entry)
+          (decode-time (org-read-date t t nil "End: " date)))
+    (timeblock-redisplay-column)))
+
+(defun timeblock-drag-n-drop (event)
+  "Draw a line from the start of EVENT to its end."
+  (interactive "e")
+  (when-let* ((start (posn-object-x-y (event-start event)))
+              (end (posn-object-x-y (event-end event)))
+              (svg (get-text-property (point) 'dom))
+              (entries (dom-attr svg 'entries))
+              (block-id
+               (dom-attr
+                (timeblock-block-at-position svg (car start) (cdr start)) 'id))
+              (entry (nth (string-to-number block-id) entries))
+              (hour (timeblock-hour-at-position svg (cdr end))))
+    (let* ((start-ts (alist-get 'start entry))
+           (end-ts (alist-get 'end entry))
+           (duration (and end-ts (timeblock-time-diff end-ts start-ts)))
+           (new-start-ts (timeblock-time-apply start-ts :hour hour :minute 0))
+           (new-end-ts (and duration
+                            (timeblock-time-inc 'minute duration new-start-ts))))
+      (setf (alist-get 'start entry) new-start-ts)
+      (setf (alist-get 'end entry) new-end-ts)
+      (timeblock-redisplay-column))))
+
+(cl-defun timeblock-time-apply (time &key second minute hour day month year)
+  "Return new timestamp based on TIME with new slot values from keys."
+  (declare (indent 1))
+  ;; This code is borrowed from `ts-apply' function which is part of ts.el
+  ;; project written by Adam Porter
+  (let ((time (copy-sequence time)))
+    (and second (setf (decoded-time-second time) second))
+    (and minute (setf (decoded-time-minute time) minute))
+    (and hour (setf (decoded-time-hour time) hour))
+    (and day (setf (decoded-time-day time) day))
+    (and month (setf (decoded-time-month time) month))
+    (and year (setf (decoded-time-year time) year))
+    time))
+
+(defun timeblock-time-diff (a b)
+  "Return difference between times A and B in minutes."
+  (when-let* ((a (encode-time a))
+              (b (encode-time b)))
+    (/ (time-convert (time-subtract a b) 'integer) 60)))
+
+(defun timeblock-time-inc (slot value time)
+  "Return a new time object based on TIME with its SLOT incremented by VALUE.
+
+SLOT should be specified as a plain symbol, not a keyword."
+  (let ((time (copy-sequence time)))
+    (decoded-time-add time (make-decoded-time (intern (format ":%s" slot)) value))) )
 
 (use-package rainbow-delimiters
   :ensure t
@@ -2052,61 +2244,24 @@ org-todo-keywords
   (define-derived-mode typescriptreact-mode typescript-mode
     "TypeScript TSX"))
 
-(use-package rustic
-  :ensure t
-  :bind (:map rustic-mode-map
-              ("M-j" . lsp-ui-imenu)
-              ("M-?" . lsp-find-references)
-              ("C-c C-c l" . flycheck-list-errors)
-              ("C-c C-c a" . lsp-execute-code-action)
-              ("C-c C-c r" . lsp-rename)
-              ("C-c C-c q" . lsp-workspace-restart)
-              ("C-c C-c Q" . lsp-workspace-shutdown)
-              ("C-c C-c s" . lsp-rust-analyzer-status))
-  :config
-  ;;(setq rustic-format-on-save t)
-  ;;(add-hook 'rustic-mode-hook 'rk/rustic-mode-hook)
-
-  (defun rk/rustic-mode-hook ()
-    ;; so that run C-c C-c C-r works without having to confirm, but don't try to
-    ;; save rust buffers that are not file visiting. Once
-    ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
-    ;; no longer be necessary.
-    (when buffer-file-name
-      (setq-local buffer-save-without-query t))
-    (add-hook 'before-save-hook 'lsp-format-buffer nil t))
-
-  (use-package rust-playground
-    :ensure t)
-  (use-package cargo
-    :ensure t
-    :if (executable-find "cargo")
-    :after rust-mode
-    :bind (:map cargo-minor-mode-map
-                ("C-c C-t" . cargo-process-test)
-                ("C-c C-b" . cargo-process-build)
-                ("C-c C-c" . cargo-process-run))
-    :config
-    (add-hook 'rust-mode-hook 'cargo-minor-mode)))
-
-(use-package graphql-mode
-		:ensure t)
-
-(use-package yaml-mode
-	:ensure t)
+(use-package go-mode
+	:ensure t
+	:config
+	(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode)))
 
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred)
   :bind (:map lsp-mode-map
-                ("C-c f" . lsp-format-buffer))
+              ("C-c f" . lsp-format-buffer))
   :hook ((go-mode         . lsp-deferred)
          (rust-mode       . lsp-deferred)
          ;; (lisp            . lsp)
+         (python-mode     . lsp-deferred)
          (c-mode          . lsp-deferred)
-         (c++-mode        . lsp-deferred)
+         ;; (c++-mode        . lsp-deferred)
          (js-mode         . lsp-deferred)
-         (solidity-mode   . lsp-deferred)
+         ;; (solidity-mode   . lsp-deferred)
          (typescript-mode . lsp-deferred)
          (lsp-mode        . lsp-enable-which-key-integration))
   :init
@@ -2115,7 +2270,7 @@ org-todo-keywords
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all t)
-  (lsp-idle-delay 0.4)
+  (lsp-idle-delay 0.2)
   ;; enable / disable the hints as you prefer:
   (lsp-inlay-hint-enable t)
   ;; These are optional configurations. See https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/#lsp-rust-analyzer-display-chaining-hints for a full list
@@ -2123,21 +2278,17 @@ org-todo-keywords
   (lsp-rust-analyzer-display-chaining-hints t)
   (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
   (lsp-rust-analyzer-display-closure-return-type-hints t)
-  (lsp-rust-analyzer-display-parameter-hints nil)
-  (lsp-rust-analyzer-display-reborrow-hints nil))
+  (lsp-rust-analyzer-display-parameter-hints t)
+  ;; (lsp-rust-analyzer-display-reborrow-hints t)
 
-(setq lsp-headerline-breadcrumb-enable nil)
-
-(setq lsp-signature-render-documentation nil)
-
-(with-eval-after-load 'lsp-mode
-  (set-face-attribute 'lsp-face-highlight-read nil :underline nil))
-
-(setq lsp-enable-snippet t) ;; nil
-
-(setq lsp-lens-enable t) ;; nil
-
-(setq lsp-diagnostic-provider :none)
+  :config
+  (setq lsp-headerline-breadcrumb-enable nil)
+	(setq lsp-signature-render-documentation nil)
+	(with-eval-after-load 'lsp-mode
+		(set-face-attribute 'lsp-face-highlight-read nil :underline nil))
+	(setq lsp-enable-snippet t) ;; nil
+	(setq lsp-lens-enable t) ;; nil
+	(setq lsp-diagnostic-provider :none))
 
 (use-package helm-lsp
   :ensure t)
@@ -2152,7 +2303,7 @@ org-todo-keywords
    lsp-ui-doc-enable t
    lsp-ui-doc-max-height 8
    lsp-ui-doc-max-width 130         ; 150 (default) is too wide
-   lsp-ui-doc-delay 0.2           ; 0.2 (default) is too naggy
+   lsp-ui-doc-delay 0.1           ; 0.2 (default) is too naggy
    lsp-ui-doc-show-with-mouse t  ; don't disappear on mouseover
    ;; lsp-ui-doc-show-with-cursor t
    lsp-ui-doc-border (face-foreground 'default)
@@ -2163,4 +2314,61 @@ org-todo-keywords
 (use-package dockerfile-mode
   :ensure t)
 
+(use-package format-all
+  :ensure t
+  :preface
+  (defun ian/format-code ()
+    "Auto-format whole buffer."
+    (interactive)
+    (if (derived-mode-p 'prolog-mode)
+        (prolog-indent-buffer)
+      (format-all-buffer)))
+  :config
+  (global-set-key (kbd "M-F") 'ian/format-code)
+  (global-set-key (kbd "C-c C-f") 'format-all-buffer)
+  (add-hook 'prog-mode-hook 'format-all-ensure-formatter))
+
 (setq display-line-numbers 'relative)
+
+(use-package direnv
+	:ensure t
+	:config
+	(direnv-mode))
+
+(use-package gptel
+  ;;:load-path "~/.emacs.d/gptel/"
+  :ensure t
+  :init
+  (setq gptel-api-key (getenv "AIML_API"))
+  (setq gptel-max-tokens 8024)
+  :config
+  (setq gptel-model 'gpt-4o
+        gptel-backend
+        (gptel-make-openai "AIMLAPI"
+          :host "api.aimlapi.com"
+          :endpoint "/chat/completions"
+          :stream t
+          :key gptel-api-key
+          :models '(gpt-4o
+                    gpt-4o-2024-08-06
+                    gpt-4-turbo
+                    chatgpt-4o-latest)))
+  :bind (("M-s M-d" . gptel-context-add)
+         ("M-s M-f" . gptel-add-file)
+         ("M-s M-a" . gptel-menu)
+         ("M-s M-r" . gptel--regenerate)
+         ("M-s M-e" . gptel-rewrite)
+         ("M-s M-s" . gptel)))
+
+(use-package whisper
+  :load-path "~/.emacs.d/lisp/whisper.el"
+  :bind ("M-s M-t" . whisper-run)
+  :config
+  (setq whisper-install-directory "/tmp/"
+        whisper-model "base"
+        ;; whisper-model "base"
+        whisper-language "ru"
+        whisper-translate nil
+        whisper-use-threads (/ (num-processors) 2)
+        whisper-enable-speed-up nil
+        whisper-recording-timeout 300))

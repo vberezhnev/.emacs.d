@@ -1,9 +1,32 @@
 #+TITLE: Berezhnev's Emacs configuration
 #+AUTHOR: Vladimir Berezhnev
 
-#+BEGIN_SRC example emacs-lisp
-  (server-mode)
+#+BEGIN_SRC emacs-lisp
+  ;; (server-mode)
+  ;;(setq max-lisp-eval-depth 50000)
 #+END_SRC
+
+#+RESULTS:
+: 50000
+
+#+begin_src emacs-lisp :lexical no
+  (if (and (fboundp 'native-comp-available-p)
+         (native-comp-available-p))
+    (message "Native compilation is available")
+  (message "Native complation is *not* available"))
+#+end_src
+
+#+RESULTS:
+: Native complation is *not* available
+
+#+begin_src emacs-lisp :lexical no
+  (if (functionp 'json-serialize)
+    (message "Native JSON is available")
+  (message "Native JSON is *not* available"))
+#+end_src
+
+#+RESULTS:
+: Native JSON is available
 
 * Oh-shit buttons
 
@@ -301,8 +324,8 @@ Emacs configuration.
 See https://gitlab.com/jabranham/system-packages
 
 #+BEGIN_SRC emacs-lisp
-(use-package system-packages
-  :ensure t)
+  (use-package system-packages
+    :ensure t)
 #+END_SRC
 
 I don't want to guess my package manager because running this
@@ -311,13 +334,16 @@ failures because of different package names. Instead, let's define
 helper functions for each package manager that we care about and
 specify packages for each package manager explicitly.
 
-#+BEGIN_SRC example
-(defun frostyx/dnf (&key install)
-  (let ((system-packages-package-manager 'guix)
-        (system-packages-use-sudo t))
-	(or (frostyx/rpm-query install)
-	  (system-packages-install install))))
+#+BEGIN_SRC emacs-lisp
+    (defun frostyx/guix (&key install)
+      (let ((system-packages-package-manager 'guix)
+            (system-packages-use-sudo nil))
+        (or (frostyx/rpm-query install)
+     	  (system-packages-install install))))
 #+END_SRC
+
+#+RESULTS:
+: frostyx/guix
 
 We need to use ~system-packages-install~ instead of
 ~system-packages-ensure~ to avoid asking for sudo password even though
@@ -411,6 +437,44 @@ See https://github.com/noctuid/general.el#vim-like-definers
 #+RESULTS:
 : ibuffer
 
+#+begin_src emacs-lisp :lexical no
+  (use-package all-the-icons-ibuffer
+  	:ensure t
+  	:config
+  																				; Predicate whether the icons are able to be displayed."
+  	(setq all-the-icons-ibuffer-display-predicate #'display-graphic-p)
+
+  	;; Whether display the icons.
+  	(setq all-the-icons-ibuffer-icon t)
+
+  	;; Whether display the colorful icons.
+  	;; It respects `all-the-icons-color-icons'.
+  	(setq all-the-icons-ibuffer-color-icon t)
+
+  	;; The default icon size in ibuffer.
+  	(setq all-the-icons-ibuffer-icon-size 1.0)
+
+  	;; The default vertical adjustment of the icon in ibuffer.
+  	(setq all-the-icons-ibuffer-icon-v-adjust 0.0)
+
+  	;; Use human readable file size in ibuffer.
+  	(setq  all-the-icons-ibuffer-human-readable-size t)
+
+  	;; A list of ways to display buffer lines with `all-the-icons'.
+  	;; See `ibuffer-formats' for details.
+  	all-the-icons-ibuffer-formats
+
+  	;; Slow Rendering
+  	;; If you experience a slow down in performance when rendering multiple icons simultaneously,
+  	;; you can try setting the following variable
+  	(setq inhibit-compacting-font-caches t)
+
+  	(add-hook 'ibuffer-mode-hook 'all-the-icons-ibuffer-mode))
+#+end_src
+
+#+RESULTS:
+: t
+
 Be consistent and map key bindings like this
 
 #+BEGIN_EXAMPLE emacs-lisp
@@ -435,8 +499,24 @@ And unbind key bindings like this (you can ommit the mode map)
 
 Smoother mouse scroll
 
+#+begin_src emacs-lisp :lexical no
+  (use-package ultra-scroll
+    :quelpa (ultra-scroll
+            :fetcher github
+            :repo "jdtsmith/ultra-scroll"
+            :branch "main")
+    :init
+    (setq scroll-conservatively 101 ; important!
+          scroll-margin 0) 
+    :config
+    (ultra-scroll-mode 1))
+#+end_src
+
+#+RESULTS:
+: t
+
 #+BEGIN_SRC emacs-lisp
-(pixel-scroll-precision-mode)
+;; (pixel-scroll-precision-mode)
 #+END_SRC
 
 Moving a hand to press mouse middle-click for every paste operation is
@@ -514,6 +594,7 @@ of ~<leader>~ key followed by one or more letters. An example can be ~\ga~ for
 For Emacs, this functionality is implemented in ~evil-leader~ package.
 
 See https://github.com/cofi/evil-leader
+
 
 According to documentation we need to enable ~evil-leader-mode~ before ~evil-mode~.
 
@@ -844,12 +925,21 @@ See https://github.com/emacs-helm/helm-ls-git
 
 TODO magit
 
-#+BEGIN_SRC example
+#+begin_src emacs-lisp :lexical no
+  (use-package magit
+  	:ensure t)
+#+end_src
+
+#+RESULTS:
+
+#+BEGIN_SRC emacs-lisp
 (evil-leader/set-key
   "ga" 'magit-stage-file
   "gc" 'magit-commit  ;; Maybe magit-commit-create
   "gp" 'magit-push-current) ;; @TODO still asks for something, use more specific function
 #+END_SRC
+
+#+RESULTS:
 
 Random garbage
 
@@ -956,21 +1046,22 @@ At this point, my whole desktop environment uses ~base16-chalk~
 
 ** Theme changer
 #+BEGIN_SRC emacs-lisp
-(use-package theme-changer
-  :ensure nil
-  :demand nil
-  :straight (:host github :repo "hadronzoo/theme-changer" :branch "master")
-  :config
-  (setq calendar-location-name "Vladivostok, RU")
-  (setq calendar-latitude 43.11)
-  (setq calendar-longitude 131.88))
+  (use-package theme-changer
+    :ensure nil
+    :demand nil
+    :straight (:host github :repo "hadronzoo/theme-changer" :branch "master")
+    :config
+    (setq calendar-location-name "Vladivostok, RU")
+    (setq calendar-latitude 43.11)
+    (setq calendar-longitude 131.88))
 
-;; (change-theme 'tsdh-light 'doom-xcode)
-(change-theme 'doom-one-light 'doom-xcode)
+  ;;(change-theme 'tsdh-light 'doom-xcode)
+  ;;(change-theme 'doom-one-light 'doom-outrun-electric)
+  (load-theme 'doom-one-light)
 #+END_SRC
 
 #+RESULTS:
-: [nil 26323 32553 0 nil change-theme (tsdh-light doom-xcode doom-xcode) nil 0 nil]
+: [nil 26501 38645 0 nil change-theme (tsdh-light doom-xcode doom-xcode) nil 0 nil]
 
 ** Auto dark
 #+BEGIN_SRC emacs-lisp
@@ -1050,6 +1141,30 @@ based on the default Emacs theme.
 : brown
 
 * Window management
+** ibuffer-vc
+#+begin_src emacs-lisp :lexical no
+  (use-package ibuffer-vc
+  	:ensure t)
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp :lexical no
+  (defun my/center (width)
+    (interactive "nBuffer width: ")
+    (let* ((adj          (- (window-text-width)
+                            width))
+           (total-margin (+ adj
+                            left-margin-width
+                            right-margin-width)))
+      (setq left-margin-width  (/ total-margin 2))
+      (setq right-margin-width (- total-margin left-margin-width)))
+    (set-window-buffer (selected-window) (current-buffer)))
+#+end_src
+
+#+RESULTS:
+: my/center
+
 ** Window rules
 
 Emacs default window management makes me want to kill myself. After six months,
@@ -1114,6 +1229,43 @@ https://github.com/github/gitignore
 #+BEGIN_SRC emacs-lisp
 (setq gitignore-templates-api 'github)
 #+END_SRC
+
+** PDF tools
+#+begin_src emacs-lisp :lexical no
+  (use-package pdf-tools
+    :ensure t
+    :defer t
+    :mode (("\\.pdf\\'" . pdf-view-mode))
+    :config
+    ;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+    (use-package saveplace-pdf-view  )
+    (save-place-mode 1)
+    (setq-default pdf-view-display-size 'fit-page)
+    (pdf-tools-install)
+    :bind (:map pdf-view-mode-map
+                ("\\" . hydra-pdftools/body)
+                ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+                ("g"  . pdf-view-first-page)
+                ("G"  . pdf-view-last-page)
+                ("l"  . image-forward-hscroll)
+                ("h"  . image-backward-hscroll)
+                ("j"  . pdf-view-next-page)
+                ("k"  . pdf-view-previous-page)
+                ("e"  . pdf-view-goto-page)
+                ("u"  . pdf-view-revert-buffer)
+                ("al" . pdf-annot-list-annotations)
+                ("ad" . pdf-annot-delete)
+                ("aa" . pdf-annot-attachment-dired)
+                ("am" . pdf-annot-add-markup-annotation)
+                ("at" . pdf-annot-add-text-annotation)
+                ("y"  . pdf-view-kill-ring-save)
+                ("i"  . pdf-misc-display-metadata)
+                ("s"  . pdf-occur)
+                ("b"  . pdf-view-set-slice-from-bounding-box)
+                ("r"  . pdf-view-reset-slice)))
+#+end_src
+
+#+RESULTS:
 
 ** File manager
 
@@ -1371,12 +1523,17 @@ And install the Emacs ~udiskie~ pacakge
              :branch "master"))
 #+end_src
 
-** CNCL Telega.el
-#+begin_src example :lexical no
-  (use-package telega
-  	:ensure t
-    :config
-    (setq telega-use-docker t))
+** Telega.el
+#+begin_src shell
+  paru -S telegram-tdlib # TDLib will be installed into /usr
+#+end_src
+
+#+begin_src emacs-lisp :lexical no
+    (use-package telega
+      :ensure t
+      :commands (telega)
+      :config
+      (setq telega-use-docker t))
 #+end_src
 
 #+RESULTS:
@@ -1389,7 +1546,7 @@ asynchronious sync, automatical refresh by using internal timers, and more.
 It provides a user-interface decoupled from the backend logic so we have an
 opportunity to implement our own views.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (use-package elfeed
   :if workstation-p
   :ensure t
@@ -1401,7 +1558,7 @@ opportunity to implement our own views.
 Managing our RSS feeds in org file is much more cool than having them in
 a list of lists.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (use-package elfeed-org
   :if workstation-p
   :ensure t
@@ -1409,7 +1566,7 @@ a list of lists.
   (elfeed-org))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
 #+END_SRC
 
@@ -1419,7 +1576,7 @@ a list of lists.
 We have so many feeds subscribed and not enough time to read them
 all. By default show only the work-related articles.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (setq elfeed-search-filter "+work")
 #+END_SRC
 
@@ -1431,7 +1588,7 @@ See:
 - https://github.com/skeeto/elfeed/issues/304
 - https://www.reddit.com/r/emacs/comments/bvbp92/is_there_a_simple_way_to_get_elfeed_to_update/
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (setq my/elfeed-update-timer
   (run-at-time nil (* 1 60 60 24) #'elfeed-update))
 #+END_SRC
@@ -1442,7 +1599,7 @@ Very likely we will need to execute operation accross every displayed article
 
 See https://emacs.stackexchange.com/a/2441
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (defun elfeed-apply-for-all (f)
   (interactive)
   (mark-whole-buffer)
@@ -1451,7 +1608,7 @@ See https://emacs.stackexchange.com/a/2441
 
 Such as marking everything as read
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (defun elfeed-mark-all-as-read ()
   (elfeed-apply-for-all elfeed-search-untag-all-unread))
 #+END_SRC
@@ -1471,7 +1628,7 @@ You will probably find these keybindings useful.
 
 Define custom key bindings for the list of articles
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (with-eval-after-load "elfeed-search"
   (evil-define-key*
     'normal elfeed-search-mode-map
@@ -1483,7 +1640,7 @@ Define custom key bindings for the list of articles
 
 Define custom key bindings for when reading an article
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (with-eval-after-load "elfeed-show"
   (evil-define-key*
     'motion elfeed-show-mode-map
@@ -1605,7 +1762,7 @@ Setup some basic key bindings
 
 For debugging, you can send a notification from Emacs like this
 
-#+BEGIN_src emacs-lisp
+#+BEGIN_src example
 (notifications-notify
  :app-name "EDNC"
  :title "1st test"
@@ -1634,7 +1791,7 @@ See https://stackoverflow.com/a/12666854/3285282
 (add-hook 'ednc-view-mode-hook 'frostyx/autoscroll)
 #+END_SRC
 ** CNCL Ement
-#+begin_src emacs-lisp :lexical no
+#+begin_src example :lexical no
   (use-package taxy-magit-section
   	:ensure t)
 
@@ -1646,7 +1803,7 @@ See https://stackoverflow.com/a/12666854/3285282
 
 See https://github.com/karthink/elfeed-tube
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (use-package elfeed-tube
   :ensure t
   :after elfeed
@@ -1666,7 +1823,7 @@ See https://github.com/karthink/elfeed-tube
 
 See https://github.com/skeeto/elfeed?tab=readme-ov-file#web-interface
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (use-package elfeed-web
   :ensure t)
 #+END_SRC
@@ -1674,7 +1831,7 @@ See https://github.com/skeeto/elfeed?tab=readme-ov-file#web-interface
 The default port is 8080 which clashes with too many projects that I
 develop.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (setq httpd-port 8090)
 (setq httpd-host "0.0.0.0")
 #+END_SRC
@@ -1682,7 +1839,7 @@ develop.
 Start the server. We need to ignore the errors because running a second Emacs
 instance would fail that the port is already used.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
 (ignore-error
   (elfeed-web-start))
 #+END_SRC
@@ -1735,7 +1892,7 @@ containing a ~.projectile~ file in it.
 
 See https://github.com/bbatsov/projectile
 
-#+BEGIN_SRC example emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (use-package projectile
   :ensure t
   :config
@@ -1895,7 +2052,15 @@ See https://github.com/domtronn/all-the-icons.el
 #+END_SRC
 
 ** Modeline
+:PROPERTIES:
+:ORDERED:  t
+:END:
 :LOGBOOK:
+CLOCK: [2024-11-14 Чт 15:06]--[2024-11-14 Чт 15:06] =>  0:00
+CLOCK: [2024-11-14 Чт 15:05]--[2024-11-14 Чт 15:05] =>  0:00
+CLOCK: [2024-11-14 Чт 15:05]--[2024-11-14 Чт 15:05] =>  0:00
+CLOCK: [2024-11-14 Чт 14:44]--[2024-11-14 Чт 15:02] =>  0:18
+CLOCK: [2024-11-14 Чт 14:44]--[2024-11-14 Чт 14:44] =>  0:00
 CLOCK: [2024-10-21 Пн 18:21]--[2024-10-21 Пн 18:21] =>  0:00
 CLOCK: [2024-08-09 Пт 01:05]--[2024-08-09 Пт 01:05] =>  0:00
 CLOCK: [2024-08-09 Пт 01:04]--[2024-08-09 Пт 01:04] =>  0:00
@@ -2040,148 +2205,9 @@ comes the configuration of the middle
         (org-file "~/Org/agenda/GTD/org-gtd-tasks.org"))
     (when (file-exists-p org-file)
       (with-current-buffer (find-file-noselect org-file)
-        (org-element-map (org-element-parse-buffer 'headline)
-            'headline
-          (lambda (hl)
-            (let ((todo-keyword (org-element-property :todo-keyword hl)))
-              (cond
-               ((string= todo-keyword "NEXT")
-                (setq next-count (1+ next-count)))
-               ((string= todo-keyword "IN-PROGRESS")
-                (setq in-progress-count (1+ in-progress-count)))))))))
-    ;; Format the result as a string and update the modeline variable
-    (setq frostyx-org-agenda-count
-          (format "NEXT: %d, IN-PROGRESS: %d" next-count in-progress-count))))
-
-    (defun frostyx-org-agenda-count-segment ()
-      "Display org agenda count in the mode line when in org-agenda-mode."
-      (when (eq major-mode 'org-agenda-mode)
-        (when (string= frostyx-org-agenda-count "")
-          (frostyx-org-agenda-count-update))
-        (format-mode-line frostyx-org-agenda-count)))
-
-    ;; Print the segment result after evaluating the function
-  (message "%s" (frostyx-org-agenda-count-update))
-#+end_src
-
-#+RESULTS:
-: NEXT: 45, IN-PROGRESS: 1
-
-#+begin_src example :lexical no
-(defvar doom-modeline--frostyx-org-agenda-count "")
-
-(defun frostyx-org-agenda-count-update ()
-  "Update the count of tasks marked as NEXT and IN-PROGRESS from the org file."
-  (let ((next-count 0)
-        (in-progress-count 0)
-        (org-file "~/Org/agenda/GTD/org-gtd-tasks.org"))
-    (when (file-exists-p org-file)
-      (with-current-buffer (find-file-noselect org-file)
-        (org-element-map (org-element-parse-buffer 'headline)
-            'headline
-          (lambda (hl)
-            (let ((todo-keyword (org-element-property :todo-keyword hl)))
-              (cond
-               ((string= todo-keyword "NEXT")
-                (setq next-count (1+ next-count)))
-               ((string= todo-keyword "IN-PROGRESS")
-                (setq in-progress-count (1+ in-progress-count)))))))))
-    ;; Format the result as a string for the modeline
-    (setq doom-modeline--frostyx-org-agenda-count
-          (format "NEXT: %d, IN-PROGRESS: %d" next-count in-progress-count))))
-
-(defun doom-modeline-frostyx-org-agenda-segment ()
-  "Display the org agenda count in the doom-modeline."
-  (when (and (equal major-mode 'org-agenda-mode)
-             (string= doom-modeline--frostyx-org-agenda-count ""))
-    (frostyx-org-agenda-count-update))
-  doom-modeline--frostyx-org-agenda-count)
-
-;; Add a doom-modeline segment
-(doom-modeline-def-segment frostyx-org-agenda-count
-  (doom-modeline-frostyx-org-agenda-segment))
-
-;; Optionally, ensure the segment is shown in the mode line
-(setq-default mode-line-format
-              (append mode-line-format '((:eval (doom-modeline-frostyx-org-agenda-segment)))))
-#+end_src
-
-#+RESULTS:
-| %e | (:eval (doom-modeline-format--main)) | (:eval (doom-modeline-frostyx-org-agenda-segment)) |
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-ql
-      :ensure t)
-
-  (if (and workstation-p (fboundp #'circe-tracking-get-face))
-  	(progn
-  	  (setq tracking-get-face-function #'circe-tracking-get-face)
-  	  (set-face-attribute 'circe-tracking-channel-face nil :foreground my/white)
-  	  (set-face-attribute 'circe-tracking-query-face nil :foreground my/blue)))
-
-    (defun doom-modeline--frostyx-org-agenda-update ()
-      (when doom-modeline-frostyx-org-agenda
-        (let ((inbox-count (length (org-ql-select (org-agenda-files)
-                                     '(todo "IN-PROGRESS")
-                                     :action #'org-get-heading)))
-              (soon-count (length (org-ql-select (org-agenda-files)
-                      '(todo "NEXT")
-                      :action #'org-get-heading))))
-          (setq doom-modeline--frostyx-org-agenda-count
-                (format " DOING: %s |  NEXT: %s"
-                        ;; TODO Don't abuse circe face here
-                        (propertize (number-to-string inbox-count)
-                                    'face `(:foreground "purple"))
-                        (propertize (number-to-string soon-count)
-                                    'face `(:foreground "purple")))))))
-
-    (defvar doom-modeline--frostyx-org-agenda-count "")
-    (doom-modeline-def-segment frostyx-org-agenda-count
-      ;; (when (equal major-mode 'org-agenda-mode)
-      ;;   (if (string= doom-modeline--frostyx-org-agenda-count "")
-      ;;       (doom-modeline--frostyx-org-agenda-update))
-      ;;   (format-mode-line doom-modeline--frostyx-org-agenda-count))
-      (format-mode-line doom-modeline--frostyx-org-agenda-count))
-
-
-    (defvar doom-modeline--frostyx-org-agenda-timer nil)
-    (doom-modeline-add-variable-watcher
-     'doom-modeline-frostyx-org-agenda
-     (lambda (_sym val op _where)
-       (when (eq op 'set)
-         (setq doom-modeline-frostyx-org-agenda val)
-         (doom-modeline-frostyx-org-agenda-timer))))
-
-
-    (defvar doom-modeline--frostyx-org-agenda-timer nil)
-    (defun doom-modeline-frostyx-org-agenda-timer ()
-      (if (timerp doom-modeline--frostyx-org-agenda-timer)
-          (cancel-timer doom-modeline--frostyx-org-agenda-timer))
-      (setq doom-modeline--frostyx-org-agenda-timer
-            (and doom-modeline-frostyx-org-agenda
-                 (run-with-idle-timer
-                  10 10 #'doom-modeline--frostyx-org-agenda-update))))
-
-    (defvar doom-modeline-frostyx-org-agenda t)
-    (doom-modeline-frostyx-org-agenda-timer)
-
-    (doom-modeline-def-segment circe-lagmon t)
-    (doom-modeline-def-segment circe-track t)
-    (doom-modeline-def-segment frostyx-org-agenda-count t)
-
-    (setq frostyx/doom-modeline-middle-segments
-          '(workspace-name window-number modals matches follow buffer-info-simple
-    											 major-mode remote-host word-count parrot selection-info
-    											 ))
-
-    (setq frostyx/doom-modeline-right-segments
-          '(frostyx-org-agenda-count compilation objed-state persp-name battery grip gnus
-    										github debug repl lsp minor-modes input-method indent-info
-    										buffer-encoding process vcs time circe-lagmon circe-track
-    										buffer-position))
-    (doom-modeline-def-modeline 'main
-      frostyx/doom-modeline-middle-segments
-      frostyx/doom-modeline-right-segments)
+        (org-eldoom-modeline-def-modeline 'main
+            frostyx/doom-modeline-middle-segments
+            frostyx/doom-modeline-right-segments)
 #+END_SRC
 
 #+RESULTS:
@@ -2189,7 +2215,7 @@ comes the configuration of the middle
 
 Define modeline for helm
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
   (doom-modeline-def-modeline 'helm
     '(helm-buffer-id helm-number helm-follow helm-prefix-argument)
     '(helm-help time))
@@ -2685,6 +2711,7 @@ See https://github.com/sebastiencs/company-box/issues/47
 
 #+RESULTS:
 | (lambda nil (setq-local company-backends '(company-org-block)) (company-mode 1)) | toc-org-mode | org-appear-mode | org-modern-mode | ma/org-buffer-setup | org-tempo-setup | olivetti-mode | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | org-eldoc-load |
+
 ** Version control
 
 Sometimes it might be useful to visualize git changes within a file
@@ -2864,6 +2891,7 @@ generally like to use the ~C-u~ prefix.
 
   (use-package org
     :straight (:type built-in)
+    :bind (("C-c C-x C-j" . org-clock-goto))
     :ensure nil
     ;; :defer t
     ;; :after org
@@ -2873,7 +2901,7 @@ generally like to use the ~C-u~ prefix.
     ;;        (org-mode . visual-line-mode)
     ;;        (org-mode . variable-pitch-mode))
     :bind (("C-c l"               . org-store-link)
-           ("C-c c"               . org-capture)
+           ;; ("C-c c"               . org-capture)
            ("C-c f"               . org-footnote-new)))
   ;;   :config
 
@@ -3029,16 +3057,16 @@ generally like to use the ~C-u~ prefix.
    org-log-done (quote time)
    ;; Don't log the time a task was rescheduled or redeadlined.
    org-log-redeadline t ; changed
-   org-log-reschedule t
+   org-log-reschedule t)
    org-todo-keyword-faces
-   '(
-     ("TODO" :background "indian red" :foreground "white" :weight bold)
-     ("NEXT" :background "sky blue" :foreground "black" :weight bold)
-     ("WAIT" :background "olive drab" :foreground "black" :weight bold)
-     ("DONE" :background "pale green" :foreground "black" :weight bold)
-     ("CNCL" :background "dark red" :foreground "white" :weight bold))
-  org-todo-keywords
-  '((sequence "NEXT(n)" "TODO(t)" "WAIT(w)" "|" "DONE(d)" "CNCL(c)"))) ; changed
+   ;; '(
+   ;;   ("TODO" :background "indian red" :foreground "white" :weight bold)
+   ;;   ("NEXT" :background "sky blue" :foreground "black" :weight bold)
+   ;;   ("WAIT" :background "olive drab" :foreground "black" :weight bold)
+   ;;   ("DONE" :background "pale green" :foreground "black" :weight bold)
+   ;;   ("CNCL" :background "dark red" :foreground "white" :weight bold))
+  ;; org-todo-keywords
+  ;; '((sequence "NEXT(n)" "TODO(t)" "WAIT(w)" "|" "DONE(d)" "CNCL(c)")) ; changed
 
   ;; ("DOING" :background "tomato" :foreground "white" :weight bold)
   ;; ("STOPPED" :background "firebrick2" :foreground "white" :weight bold)
@@ -3063,7 +3091,41 @@ generally like to use the ~C-u~ prefix.
 | org-habit | ol-doi | ol-w3m | ol-bbdb | ol-bibtex | ol-docview | ol-gnus | ol-info | ol-irc | ol-mhe | ol-rmail | ol-eww | org-tempo |
 
 **** Org-agenda
+:LOGBOOK:
+CLOCK: [2024-11-14 Чт 15:29]--[2024-11-14 Чт 15:29] =>  0:00
+CLOCK: [2024-11-14 Чт 15:12]--[2024-11-14 Чт 15:23] =>  0:11
+CLOCK: [2024-11-14 Чт 15:12]--[2024-11-14 Чт 15:12] =>  0:00
+CLOCK: [2024-11-14 Чт 15:12]--[2024-11-14 Чт 15:12] =>  0:00
+CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
+:END:
+#+begin_src emacs-lisp :lexical no
+  (evil-leader/set-key
+          "z" '(org-agenda nil "z"))
+
+  (global-set-key (kbd "C-c C-x o") 'org-clock-out)
+  (global-set-key (kbd "C-c C-x j") 'org-clock-go-to)
+#+end_src
+
+#+RESULTS:
+: org-clock-go-to
+
 #+begin_src emacs-lisp 
+  ;; (defun my-org-clock-in-with-sound ()
+  ;;   "Clock in to an org item, play a sound notification, and truncate the task name if it's too long."
+  ;;   (interactive)
+  ;;   (org-clock-in)  ;; Start the clock
+  ;;   (play-sound-file "~/path/to/sound.wav")  ;; Play the sound
+
+  ;;   ;; Check and truncate the clocked-in task name if needed
+  ;;   (when (org-clock-is-active)
+  ;;     (let* ((task-name (substring-no-properties (org-clock-get-clock-string)))
+  ;;            (truncated-task-name (if (> (length task-name) 25)
+  ;;                                     (concat (substring task-name 0 22) "...")
+  ;;                                   task-name)))
+  ;;       (message "Clocked in: %s" truncated-task-name))))
+
+  ;; (global-set-key (kbd "C-c k") 'my-org-clock-in-with-sound)
+
   (use-package org-agenda
     :ensure nil
     :straight (:type built-in)
@@ -3071,157 +3133,150 @@ generally like to use the ~C-u~ prefix.
     (:map global-map
           ("C-c a" . org-agenda))
     :config
-    (setq org-agenda-skip-scheduled-if-done nil ; changed
-          org-agenda-skip-deadline-if-done nil ; changed
+    (setq org-agenda-start-on-weekday 0
+          org-agenda-skip-scheduled-if-done t ; changed
+          org-agenda-skip-deadline-if-done t ; changed
           org-agenda-include-deadlines t
           org-agenda-block-separator #x2501
           org-agenda-compact-blocks t ; changed
           org-agenda-start-with-log-mode nil
-  				org-agenda-deadline-faces
+    			org-agenda-deadline-faces
           '((1.0001 . org-warning)              ; due yesterday or before
             (0.0    . org-upcoming-deadline))   ; due today or later
-  				org-icalendar-combined-name "Hugo Org"
-  				org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo)
-  				org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo)
-  				org-icalendar-timezone "Asia/Vladivostok"
-  				org-icalendar-store-UID t
-  				org-icalendar-alarm-time 30
-  				calendar-date-style 'european
-  				calendar-week-start-day 0
+    			org-icalendar-combined-name "Hugo Org"
+    			org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo)
+    			org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo)
+    			org-icalendar-timezone "Asia/Vladivostok"
+    			org-icalendar-store-UID t
+    			org-icalendar-alarm-time 30
+    			calendar-date-style 'european
+    			calendar-week-start-day 0
           calendar-mark-holidays-flag t
           calendar-mark-diary-entries-flag nil
   																				; (setq-default org-icalendar-include-todo t)
-  				org-agenda-breadcrumbs-separator " ❱ "
+    			org-agenda-breadcrumbs-separator " ❱ "
           org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
           org-agenda-time-grid '((weekly today require-timed)
-                                 (800 1000 1200 1400 1600 1800 2000)
+                                 (500 800 1000 1200 1400 1600 1800 2000)
                                  "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
           ;; org-agenda-time-grid (quote ((daily today remove-match)
           ;; 			     (800 1200 1600 2000)
           ;; 			     "......" "----------------"))
-          org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
-                                     (todo . " %i %-12:c")
-                                     (tags . " %i %-12:c")
-                                     (search . " %i %-12:c"))
-  				org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
+          ;; org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
+          ;;                            (todo . " %i %-12:c")
+          ;;                            (tags . " %i %-12:c")
+          ;;                            (search . " %i %-12:c"))
+          org-agenda-prefix-format
+          '((agenda . " %i %-12:c%?-12t% s")
+            (todo . " %i %-12:c")
+            (tags . " %i %-12:c")
+            (search . " %i %-12:c"))
+    			org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
                                                         "\n"
                                                         (org-agenda-format-date-aligned date)))
-  				org-default-notes-file "~/Org/agenda/Notes.org"
-  				org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
-  													 )) ;; "~/Org/agenda/Calendar.org"
+    			org-default-notes-file "~/Org/agenda/Notes.org"
+    			org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/Calendar.org"
 
     ;; (setq org-agenda-clockreport-parameter-plist
     ;;       (quote (:link t :maxlevel 5 :fileskip t :compact t :narrow 80)))
 
     (defun my/style-org-agenda()
-      (set-face-attribute 'org-agenda-date nil :height 1.1)
-      (set-face-attribute 'org-agenda-date-today nil :height 1.1 :slant 'italic)
-      (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
+      (set-face-attribute 'org-agenda-date nil :height 1.3)
+      (set-face-attribute 'org-agenda-date-today nil :height 1.3 :slant 'italic)
+      (set-face-attribute 'org-agenda-date-weekend nil :height 1.3))
     (add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
 
     (setq org-agenda-custom-commands
-          '(("z" "Getting Things Done (GTD)"
+          '(("c" "Getting Things Done (GTD)"
              ((agenda "" ((org-agenda-span 'day)
-                          (org-agenda-skip-scheduled-if-done t)
-                          (org-agenda-skip-deadline-if-done t)
-                          (org-agenda-include-deadlines nil)
-                          (org-agenda-prefix-format '((agenda . "%i %?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
-                                                      (todo . " %i %-12:c")
-                                                      (tags . " %i %-12:c")
-                                                      (search . " %i %-12:c")))
+                          (org-agenda-skip-scheduled-if-done nil)
+                          (org-agenda-skip-deadline-if-done nil)
+                          (org-agenda-clockreport-mode t)
+                          (org-agenda-remove-tags t)
+                          (org-agenda-sorting-strategy '(habit-down time-up priority-down category-keep user-defined-up))
+                          (org-time-budgets-in-agenda-maybe)
+                          (org-agenda-include-deadlines t)
+                          ;; (org-agenda-prefix-format '((agenda . "%i %?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
+                          ;;                             (todo . " %i %с %-12:c")
+                          ;;                             (tags . " %i %-12:c")
+                          ;;                             (search . " %i %-12:c")))
+  												(org-agenda-prefix-format
+  												 '((agenda . "%t %-10c | %s")
+  													 (todo . "%t %-10c | %s")
+  													 (tags . "%t %-10c | %s")
+  													 (search . "%c %t %s")))
 
                           (org-agenda-files '("~/Org/agenda/PlanAhead.org" "~/Org/agenda/GTD/org-gtd-tasks.org"))
                           (org-super-agenda-groups
                            '((:name "Schedule"
-  																	:time-grid t)
-                             (:name "School / exams"
-  																	:and (:tag "school" :deadline future)
-  																	:face (:background "yellow" :foreground "black"))
+    																:time-grid t)
+                             ;; (:name "School / exams"
+    												 ;;  			:and (:tag "school" :deadline future)
+    												 ;;  			:face (:background "yellow" :foreground "black"))
                              (:name "Today"
-  																	:scheduled today
-  																	:face (:background "medium sea green" :foreground "white"))
+    																:scheduled today
+    																:face (:background "medium sea green" :foreground "white"))
                              (:name "Deadline today"
-  																	:deadline today
-  																	:face (:background "black" :foreground "white"))
+    																:deadline today
+    																:face (:background "black" :foreground "white"))
                              (:name "Passed deadline"
-  																	:deadline past
-  																	:face (:background "firebrick"))
+    																:deadline past
+                                    :scheduled past
+    																:face (:background "salmon"))
                              (:name "Future deadline"
-  																	:deadline future
-  																	:face (:background "dark slate blue"))))))
+    																:deadline future
+    																:face (:background "dark slate blue"))))))
 
-              (alltodo "" ((org-agenda-overriding-header "")
-                           (org-agenda-prefix-format "  %?-12t% s")
-                           (org-agenda-entry-text-mode t)
-                           (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/GTD/Projects.org"
-                           (org-super-agenda-groups
-                            '((:name "Tasks ready to actions"
-  																	 :children t
-  																	 :todo "NEXT")))))
+              ;; (alltodo "" ((org-agenda-overriding-header "")
+              ;;              (org-agenda-prefix-format "  %?-12t% s")
+              ;;              (org-agenda-entry-text-mode t)
+              ;;              (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/GTD/Projects.org"
+              ;;              (org-super-agenda-groups
+              ;;               '((:name "Tasks ready to actions"
+    					;; 											 :children t
+    					;; 											 :todo "NEXT")))))
 
               (tags "CLOSED>=\"<today>\""
                     ((org-agenda-overriding-header "\nCompleted today\n")))))
-
-            ("v" "Reading view (by tags)"
-             ((todo "" ((org-agenda-overriding-header "")
-                        (org-agenda-start-with-log-mode '(closed))
-                        (org-agenda-files '("~/Org/agenda/ReadAhead.org" "~/Org/agenda/Reading-list.org"))
-                        (org-super-agenda-groups
-                         '((:name "In progress / Reading"
-  																:face (:background "dark slate blue")
-  																:todo ("READING" "TODO")))
-
-                         (:name "Should read"
-  															:and (:todo "IN-PLANS"))
-
-                         (:name "On Zettelkasting"
-  															:todo "ZETTEL")
-
-                         (:name "Paused reading"
-  															:todo "PAUSED")
-
-                         (:name "Planned to read"
-  															:todo "NEXT-TO-READ")
-
-                         (:name "Today deadline"
-  															:deadline today
-  															:face (:background "black"))
-                         (:name "Passed deadline"
-  															:and (:deadline past)
-  															:face (:background "firebrick"))
-
-                         (:name "Read books"
-  															:todo "READ")
-                         (:name "Dropped books"
-  															:todo "DROPPED")
-                         (:name "All books"
-  															:and (:tag "books" :todo "IN-PLANS")))))))
-
             ("x" "Habits view"
              ((agenda "" ((org-agenda-span 'day)
+                          (org-habit-show-habits t)
+                          (org-agenda-remove-tags t)
                           (org-agenda-prefix-format "  ∘ %t %s")
-                          (org-agenda-files '("~/Org/agenda/Habits.org" "~/Org/agenda/GTD/org-gtd-tasks.org"))
+                          (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
                           (org-super-agenda-groups
                            '((:name "Everytime habits"
-  																	:tag "everytime")
-  													 (:name "Morning habits"
-  																	:tag "morning")
-  													 (:name "Day habits"
-  																	:tag "day")
-  													 (:name "Evening habits"
-  																	:tag "evening")
-  													 (:name "Sport habits"
-  																	:tag "sport")
-  													 (:name "Challenges"
-  																	:tag "challenge")
-  													 (:discard (:anything))
-  													 (:discard (:not (:tag "habits")))))))))))
+    																:tag ("everytime"))
+    												 (:name "Morning habits"
+    													  		:tag ("morning"))
+    												 (:name "Day habits"
+    													  		:tag ("day"))
+    												 (:name "Evening habits"
+    													  		:tag ("evening"))
+    												 ;; (:name "Sport habits"
+    												 ;;  			:tag "sport")
+    												 ;; (:name "Challenges"
+    												 ;;  			:tag "challenge")
+    												 (:discard (:anything))
+    												 (:discard (:not (:tag "habit")))
+                             ))))))))
 
     (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
 #+end_src
 
 #+RESULTS:
 : org-agenda
+
+**** Org-timeline 
+#+begin_src emacs-lisp :lexical no
+  (use-package org-timeline
+  	:ensure t
+  	:config
+  	(add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
+#+end_src
+
+#+RESULTS:
+: t
 
 **** Bibliography
 ***** Org ref
@@ -3264,6 +3319,117 @@ generally like to use the ~C-u~ prefix.
 #+RESULTS:
 : t
 
+Херня. не надо использовать
+#+begin_src example
+  ;; Определяем целевые показатели времени (в часах) на неделю для каждой категории
+  (setq my-weekly-targets
+        '(("SLEEP" . 52.5)
+          ("BASIC" . 24.5)
+          ("MERITRANK" . 35.0)
+          ("CODING" . 21.0)
+          ("EGE" . 14.0)
+          ("SPORT" . 10.5)
+          ("BUFFER" . 10.5)))
+
+  ;; Функция для получения времени, затраченного на категорию за текущую неделю
+  (defun get-category-time-this-week (category)
+    "Get total clocked time for CATEGORY in the current week."
+    (let* ((today (current-time))
+           (week-start (time-subtract today
+                                    (seconds-to-time
+                                     (* 3600 24 (nth 6 (decode-time today))))))
+           (total 0.0))
+      (org-map-entries
+       (lambda ()
+         (when (string= category (org-get-category))
+           (setq total (+ total (org-clock-sum
+                                (format-time-string "%Y-%m-%d" week-start)
+                                (format-time-string "%Y-%m-%d" today))))))
+       nil 'agenda)
+      (/ total 3600.0)))
+
+  (defun create-time-tracking-report ()
+    "Create a report table showing planned vs actual time for categories."
+    (interactive)
+    (with-current-buffer (get-buffer-create "*Time Tracking Report*")
+      (erase-buffer)
+      (org-mode)
+      (insert "#+TITLE: Weekly Time Tracking Report\n\n")
+      (insert "| Category | Target (h) | Actual (h) | Target % | Actual % | Diff % |\n")
+      (insert "|----------+------------+------------+----------+-----------+--------|\n")
+      (let ((total-target 168.0)
+            (total-actual 0.0))
+        (dolist (target my-weekly-targets)
+          (let* ((category (car target))
+                 (target-hours (cdr target))
+                 (actual-hours (get-category-time-this-week category))
+                 (target-percent (round (* 100.0 (/ target-hours total-target))))
+                 (actual-percent (round (* 100.0 (/ actual-hours total-target))))
+                 (diff-percent (- actual-percent target-percent)))
+            (setq total-actual (+ total-actual actual-hours))
+            (insert (format "| %s | %.1f | %.1f | %d | %d | %d |\n"
+                           category
+                           target-hours
+                           actual-hours
+                           target-percent
+                           actual-percent
+                           diff-percent))))
+        (insert "|----------+------------+------------+----------+-----------+--------|\n")
+        (insert (format "| Total | %.1f | %.1f | %d | %d | %d |\n"
+                       total-target
+                       total-actual
+                       100
+                       (round (* 100.0 (/ total-actual total-target)))
+                       (- (round (* 100.0 (/ total-actual total-target))) 100))))
+      (org-table-align)
+      (display-buffer (current-buffer))))
+
+  ;; Функция для создания таблицы с отчётом
+  (defun create-time-tracking-report ()
+    "Create a report table showing planned vs actual time for categories."
+    (interactive)
+    (with-current-buffer (get-buffer-create "*Time Tracking Report*")
+      (erase-buffer)
+      (org-mode)
+      (insert "#+TITLE: Weekly Time Tracking Report\n\n")
+      (insert "| Category | Target (h) | Actual (h) | Target % | Actual % | Diff % |\n")
+      (insert "|----------+------------+------------+----------+-----------+--------|\n")
+      (let ((total-target 168.0)
+            (total-actual 0))
+        (dolist (target my-weekly-targets)
+          (let* ((category (car target))
+                 (target-hours (cdr target))
+                 (actual-hours (get-category-time-this-week category))
+                 (target-percent (* 100 (/ target-hours total-target)))
+                 (actual-percent (* 100 (/ actual-hours total-target)))
+                 (diff-percent (- actual-percent target-percent)))
+            (setq total-actual (+ total-actual actual-hours))
+            (insert (format "| %s | %.1f | %.1f | %.1f | %.1f | %.1f |\n"
+                           category
+                           target-hours
+                           actual-hours
+                           target-percent
+                           actual-percent
+                           diff-percent))))
+        (insert "|----------+------------+------------+----------+-----------+--------|\n")
+        (insert (format "| Total | %.1f | %.1f | 100.0 | %.1f | %.1f |\n"
+                       total-target
+                       total-actual
+                       (* 100 (/ total-actual total-target))
+                       (- (* 100 (/ total-actual total-target)) 100))))
+      (org-table-align)
+      (display-buffer (current-buffer))))
+
+  ;; Добавляем hook для автоматического обновления отчёта при clock-out
+  (add-hook 'org-clock-out-hook 'create-time-tracking-report)
+
+  ;; Создаём удобную клавиатурную комбинацию для вызова отчёта
+  (global-set-key (kbd "C-c C-x r") 'create-time-tracking-report)
+#+end_src
+
+#+RESULTS:
+: create-time-tracking-report
+
 ***** Org roam bibtex 
 #+begin_src emacs-lisp :lexical no :async
   (use-package org-roam-bibtex
@@ -3276,7 +3442,15 @@ generally like to use the ~C-u~ prefix.
     ;;(require 'org-ref) ; optional: if using Org-ref v2 or v3 citation links
 #+end_src
 
+#+begin_src emacs-lisp :lexical no
+  (defun my-org-zotero-open (path _)
+    (call-process "xdg-open" nil nil nil (concat "zotero:" path)))
+
+  (org-link-set-parameters "zotero" :follow 'my-org-zotero-open)
+#+end_src
+
 #+RESULTS:
+| :follow | my-org-zotero-open |
 
 ***** Citar
 #+begin_src emacs-lisp :lexical no :async
@@ -3335,6 +3509,8 @@ generally like to use the ~C-u~ prefix.
   	:ensure t)
   (use-package ob-restclient
     :ensure t)
+  (use-package gnuplot
+    :ensure t)
 
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -3347,71 +3523,78 @@ generally like to use the ~C-u~ prefix.
      (rust       . t)
      (C          . t)
      (sql        . t)
-     (latex      . t)))
+     (latex      . t)
+     (restclient . t)
+     (gnuplot    . t)))
 #+end_src
 
 #+RESULTS:
 
 **** Org-modern
 #+begin_src emacs-lisp
-  (setq org-tag-alist
-        '(
-  				("@article" . ?a)
-          ("@personal" . ?P)
-          ("@programming" . ?p)
-          ("@mathematics" . ?m)
-          ("@english" . ?e)
-  				("@work" . ?w)))
+    (setq org-tag-alist
+          '(
+    				("@article" . ?a)
+            ("@personal" . ?P)
+            ("@coding" . ?p)
+            ("@mathematics" . ?m)
+    				("@school" . ?s)
+            ("@english" . ?e)
+    				("@work" . ?w)
+            ("@zettelkasten" . ?z)
+    				("@idea" . ?i)))
 
-  (use-package org-modern
-    :hook (org-mode . org-modern-mode)
-    :ensure t
-    :config
-    (setq
-     ;; Edit settings
-     org-catch-invisible-edits 'show-and-error
-     org-special-ctrl-a/e t
-     ;; Appearance
-     org-modern-radio-target    '("❰" t "❱")
-     org-modern-internal-target '("↪ " t "")
-     org-modern-block-name
-  	 '((t . t)
-  	   ("src" "ϰ" "ϰ"))
-     org-modern-progress t
-     org-modern-statistics nil
-     org-modern-todo t
-     org-modern-todo-faces (quote (("TODO" :background "indian red" :foreground "white" :weight bold)
-  																 ("NEXT" :background "sky blue" :foreground "black" :weight bold)
-  																 ("WAIT" :background "olive drab" :foreground "black" :weight bold)
-  																 ("DONE" :background "pale green" :foreground "black" :weight bold)
-  																 ("CNCL" :background "dark red" :foreground "white" :weight bold)))
-     org-modern-priority t
-     org-modern-priority-faces (quote ((?A :background "red"
-  																				 :foreground "black")
-  																		 (?B :background "dark orange"
-  																				 :foreground "black")
-  																		 (?C :background "tan"
-  																				 :foreground "black")))
-     org-modern-tag t
-     org-modern-timestamp t
-     org-modern-statistics t
-     ;; org-modern-table t
-     org-modern-tag-faces (quote (("@programming" :background "#d60000" :foreground "#000000")
-  																("@personal" :background "#e67c73" :foreground "#000000")
-  																("@article" :background "#0b8043" :foreground "#000000")
-  																("@mathematics" :background "#bc8f8f" :foreground "#000000")
-                                  ("blockchain" :background "#f5511d" "#000000")
-  																("solana" :background "#DC1FFF" :foreground "#000000")
-  																("rust" :background "#CE412B" :foreground "#000000")
-  																("go" :background "#00bfff" :foreground "#00000")
-  																("exams" :background "#8e24aa" :foreground "#000000")))
-     org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
-     org-modern-hide-stars " "
-     org-modern-keyword "‣"))
+    (use-package org-modern
+      :hook (org-mode . org-modern-mode)
+      :ensure t
+      :config
+      (setq
+       ;; Edit settings
+       org-catch-invisible-edits 'show-and-error
+       org-special-ctrl-a/e t
+       ;; Appearance
+       org-modern-radio-target    '("❰" t "❱")
+       org-modern-internal-target '("↪ " t "")
+       org-modern-block-name
+    	 '((t . t)
+    	   ("src" "ϰ" "ϰ"))
+       org-modern-progress t
+       org-modern-statistics nil
+       org-modern-todo t
+       org-modern-todo-faces (quote (("TODO" :background "indian red" :foreground "white" :weight bold)
+    																 ("NEXT" :background "sky blue" :foreground "black" :weight bold)
+    																 ("WAIT" :background "olive drab" :foreground "black" :weight bold)
+    																 ("DONE" :background "pale green" :foreground "black" :weight bold)
+    																 ("CNCL" :background "dark red" :foreground "white" :weight bold)))
+       org-modern-priority t
+       org-modern-priority-faces (quote ((?A :background "red"
+    																				 :foreground "black")
+    																		 (?B :background "dark orange"
+    																				 :foreground "black")
+    																		 (?C :background "tan"
+    																				 :foreground "black")))
+       org-modern-tag t
+       org-modern-timestamp nil
+       org-modern-statistics t
+       ;; org-modern-table t
+       org-modern-tag-faces (quote (("@coding" :background "#d60000" :foreground "#000000")
+    																("@personal" :background "#e67c73" :foreground "#000000")
+    																("@article" :background "#0b8043" :foreground "#000000")
+    																("@mathematics" :background "#bc8f8f" :foreground "#000000")
+                                    ("blockchain" :background "#f5511d" "#000000")
+    																("solana" :background "#DC1FFF" :foreground "#000000")
+    																("rust" :background "#CE412B" :foreground "#000000")
+    																("go" :background "#00bfff" :foreground "#00000")
+    																("exams" :background "#8e24aa" :foreground "#000000")))
+       org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
+       org-modern-hide-stars " "
+       org-modern-keyword "‣"
+       org-modern-table t))
+  (global-org-modern-mode t)
 #+end_src
 
 #+RESULTS:
-| #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-appear-mode | toc-org-mode | prettify-symbols-mode | ma/org-buffer-setup | org-modern-mode | org-ref-org-menu | org-tempo-setup | (lambda nil (set (make-local-variable 'company-backends) '(company-org-block)) (company-mode 1)) | olivetti-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | org-eldoc-load |
+: t
 
 **** Org-habit
 #+begin_src emacs-lisp
@@ -3420,15 +3603,73 @@ generally like to use the ~C-u~ prefix.
     :ensure nil
     :straight (:type built-in)
     :init
-    (add-to-list 'org-modules 'org-habit)
-    :config
-    (setq org-habit-following-days 7
-          org-habit-preceding-days 7
-          org-habit-show-all-today nil
-          org-habit-show-habits t
-          org-habit-graph-column 67)
+    ;;(add-to-list 'org-modules 'org-habit)
+  	(progn
+  		(custom-set-faces
+  		 '(org-habit-clear-face
+  			 ((t (:background "pale green"
+  						:foreground "white"
+  						:width expanded
+  						:height 1.0
+  						:box (:line-width (1 . 1) :color "white")))))
 
-    (defun toggle-org-habit-show-all-today ()
+  		 '(org-habit-clear-future-face
+  			 ((t (:background "gray"
+  						:foreground "white"
+  						:width expanded
+  						:height 1.0
+  						:box (:line-width (1 . 1) :color "white")))))
+  		 '(org-habit-alert-future-face
+  			 ((t (:background "light coral"
+  						:foreground "white"
+  						:width expanded
+  						:height 1.0
+  						:box (:line-width (1 . 1) :color "white")))))
+  		 '(org-habit-alert-face
+  			 ((t (:background "light coral"
+  						:foreground "white"
+  						:width expanded
+  						:height 1.0
+  						:box (:line-width (1 . 1) :color "white")))))
+  		 '(org-habit-overdue-face
+  			 ((t (:background "light coral"
+  						:foreground "white"
+  						:width expanded
+  						:height 1.0
+  						:box (:line-width (1 . 1) :color "white")))))
+  		 '(org-habit-overdue-future-face
+  			 ((t (:background "gray"
+  						:foreground "white"
+  						:width expanded
+  						:height 1.0
+  						:box (:line-width (1 . 1) :color "white")))))
+  		 '(org-habit-ready-face
+  			 ((t (:background "pale green"
+  						:foreground "white"
+  						:width expanded
+  						:height 1.0
+  						:box (:line-width (1 . 1) :color "white")))))
+  		 '(org-habit-ready-future-face
+  			 ((t (;;:background "white"
+  						:foreground "white"
+  						:width expanded
+  						:height 1.0
+  						:box (:line-width (1 . 1) :color "white")))))
+  		 ))
+  	:config
+    (load "~/.emacs.d/lisp/my-org-habit")
+  	(setq org-habit-following-days 1
+  				org-habit-preceding-days 7
+  				org-habit-show-habits nil
+  				org-habit-show-all-today t
+  				org-habit-graph-column 57
+  				org-habit-overdue-glyph ?○
+  				org-habit-alert-glyph ?○
+  				org-habit-today-glyph ?○
+  				org-habit-completed-glyph ?●
+  				org-habit-show-done-always-green t)
+
+  	(defun toggle-org-habit-show-all-today ()
   		"Toggle the value of `org-habit-show-all-today' between t and nil."
   		(interactive)
   		(setq org-habit-show-all-today (not org-habit-show-all-today))
@@ -3436,16 +3677,23 @@ generally like to use the ~C-u~ prefix.
   						 (if org-habit-show-all-today "nil" "t"))
   		(org-agenda-refresh))
 
-    (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
+  	(define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
 
-  ;;   (use-package org-habit-stats
-  ;;     :config
-  ;; (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
-  ;; (add-hook 'org-agenda-mode-hook
-  ;;               (lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda)))))
+  (use-package org-habit-stats
+  	:ensure t
+  	:config
+  	(add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
+  	(add-hook 'org-agenda-mode-hook
+  						(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
 #+end_src
 
+#+RESULTS:
+: t
+
 **** Pomodoro
+:LOGBOOK:
+CLOCK: [2024-11-01 Пт 14:28]--[2024-11-01 Пт 14:58] =>  0:30
+:END:
 The Pomodoro Technique is a time management technique that uses a timer to break
 work into short intervals (typically 25 minutes of work followed by 5 minutes of
 rest).
@@ -3455,10 +3703,31 @@ See a simple pomodoro timer in the web browser https://pomofocus.io/
 
 Of course, we want to use Emacs and ~org-mode~.
 
+#+begin_src emacs-lisp :lexical no
+  ;;(frostyx/guix :install "alsa-utils")
+    
+  (use-package sound-wav
+            :ensure t
+            :demand t) ;; dep for org-pomodoro
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp :lexical no
+  (use-package powershell
+    :ensure t
+    :demand t) ;; dep for org-pomodoro
+#+end_src
+
+#+RESULTS:
+
 #+BEGIN_SRC emacs-lisp
 (use-package org-pomodoro
   :ensure t)
 #+END_SRC
+
+#+RESULTS:
 
 For some strange reason, stopping the pomodoro timer prematurely throws away the
 record about working on that, as if we did nothing. That's just wrong, we want
@@ -3547,6 +3816,28 @@ Ah, chills.
   (org-pomodoro '(4)))
 #+END_SRC
 
+**** Org timed alerts
+#+begin_src emacs-lisp :lexical no
+  (use-package org-timed-alerts
+    :straight (:host github
+               :repo "legalnonsense/org-timed-alerts"
+               :branch "master" :files ("*.el" "out"))
+    :after (org)
+    :custom
+    (org-timed-alerts-alert-function #'alert)
+    (org-timed-alerts-tag-exclusions nil)
+    (org-timed-alerts-default-alert-props nil)
+    (org-timed-alerts-warning-times '(-30 -15 -5))
+    (org-timed-alerts-agenda-hook-p t)
+    (org-timed-alert-final-alert-string "IT IS %alert-time\n\n%todo %headline")
+    (org-timed-alert-warning-string (concat "%todo %headline\n at %alert-time"))
+    :config
+    (add-hook 'org-mode-hook #'org-timed-alerts-mode))
+#+end_src
+
+#+RESULTS:
+: t
+
 **** Prettify symbols
 #+begin_src emacs-lisp :lexical no
   ;; ────────────────────────────── Prettify Symbols ─────────────────────────────
@@ -3576,169 +3867,156 @@ Ah, chills.
   	"nt" 'org-roam-tag-add
   	"nr" 'org-roam-ref-add
   	"nj" 'org-roam-dailies-capture-today
-  	"ng" 'org-id-get-create)
-
+  	"ng" 'org-id-get-create
+    "nb" 'orb-insert-link)
 #+end_src
 
 #+RESULTS:
 
 #+BEGIN_SRC emacs-lisp
-    (use-package org-roam
-      :ensure t
-      :bind (("C-c n l" . org-roam-buffer-toggle)
-             ("C-c n f" . org-roam-node-find)
-             ("C-c n i" . org-roam-node-insert)
-             ("C-c n c" . org-roam-capture)
-             ("C-c n t" . org-roam-tag-add)
-             ("C-c n r" . org-roam-ref-add)
-             ("C-c g" . org-id-get-create)
-             ("C-c n j" . org-roam-dailies-capture-today)
-             :map org-mode-map
-             ("C-M-i"    . completion-at-point))
-      :custom
-      (org-roam-directory (file-truename "~/Org/Org-roam"))
-      (org-roam-completion-everywhere t)
-      (org-roam-capture-templates
-       '(("a" "Atomic note (with source)" plain (file "~/Org/Templates/Atomic note.org")
-          :if-new
-          (file+head "%<%Y-%m-%d-%H:%M>--${slug}.org" "#+startup: latexpreview\n#+date: %U\n#+title: ${title}\n")
-          :unnarrowed t)
-         ("t" "Thought" plain "%?"
-          :if-new (file+head "thoughts/%<%Y-%m-%d-%H:%M>--thought-${slug}.org" "#+title: ${title}\n#+filetags: :Thought:\n#+date: %U\n\n\n* See also:\n+ ")
-          :unnarrowed t)
+      (use-package sqlite3
+        :ensure t)
+      (use-package emacsql
+        :ensure t)
 
-         ("b" "Biography (Person)" plain (file "~/Org/Templates/Person.org")
-          :if-new (file+head "persons/%<%Y-%m-%d-%H:%M>--person-${slug}.org" "#+title: ${title}\n#+filetags: :Biography:\n#+date: %U\n")
-          :unnarrowed t)
+      (use-package org-roam
+        :ensure t
+        :bind (("C-c n l" . org-roam-buffer-toggle)
+               ("C-c n f" . org-roam-node-find)
+               ("C-c n i" . org-roam-node-insert)
+               ("C-c n c" . org-roam-capture)
+               ("C-c n t" . org-roam-tag-add)
+               ("C-c n r" . org-roam-ref-add)
+               ("C-c g" . org-id-get-create)
+               ("C-c n j" . org-roam-dailies-capture-today)
+               ("C-c n b" . orb-insert-link)
+               :map org-mode-map
+               ("C-M-i"    . completion-at-point))
+        :custom
+        (org-roam-directory (file-truename "~/Org/Org-roam"))
+        (org-roam-completion-everywhere t)
+        (org-roam-capture-templates
+         '(("a" "Atomic note (with source)" plain (file "~/Org/Templates/Atomic note.org")
+            :if-new
+            (file+head "%<%Y-%m-%d-%H:%M>--${slug}.org" "#+startup: latexpreview\n#+date: %U\n#+title: ${title}\n")
+            :unnarrowed t)
 
-         ("p" "Project" plain (file "~/Org/Templates/Project.org")
-          :if-new (file+head "projects/%<%Y-%m-%d-%H:%M>--project-${slug}.org" "#+title: ${title}\n#+filetags: :Project:\n#+date: %U\n\n")
-          :unnarrowed t)
+           ("b" "Biography (Person)" plain (file "~/Org/Templates/Person.org")
+            :if-new (file+head "persons/%<%Y-%m-%d-%H:%M>--person-${slug}.org" "#+title: ${title}\n#+filetags: :Biography:\n#+date: %U\n")
+            :unnarrowed t)
 
-         ("r" "Bibliography reference" plain (file "~/Org/Templates/Bibliography reference.org") ; <-- template store in a separate file
-          :target
-          (file+head "bibliography/references/${citekey}.org" "#+title: ${title}\n#+date: %U")
-          :unnarrowed t)))
+           ("r" "Bibliography reference" plain (file "~/Org/Templates/Bibliography reference.org") ; <-- template store in a separate file
+            :target
+            (file+head "bibliography/references/${citekey}.org" "#+title: ${title}\n#+date: %U")
+            :unnarrowed t)))
 
-      (org-roam-capture-ref-templates
-       '(("r" "ref" plain
-          "%?"
-          :target (file+head "web/${slug}.org"
-                             "#+title: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n\n%(zp/org-protocol-insert-selection-dwim \"%i\")")
-          :unnarrowed t)
-         ("i" "incremental" plain
-          "* %?\n%(zp/org-protocol-insert-selection-dwim \"%i\")"
-          :target (file+head "web/${slug}.org"
-                             "#+title: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n\n")
-          :unnarrowed t
-          :empty-lines-before 1)))
+        (org-roam-capture-ref-templates
+         '(("r" "ref" plain
+            "%?"
+            :target (file+head "web/${slug}.org"
+                               "#+title: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n\n%(zp/org-protocol-insert-selection-dwim \"%i\")")
+            :unnarrowed t)
+           ("i" "incremental" plain
+            "* %?\n%(zp/org-protocol-insert-selection-dwim \"%i\")"
+            :target (file+head "web/${slug}.org"
+                               "#+title: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n\n")
+            :unnarrowed t
+            :empty-lines-before 1)))
 
-      (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-      (org-roam-dailies-capture-templates
-       '(
-         ("m" "Morning diary" plain (file "~/Org/Templates/journal/Morning.org")
-          :clock-in t :clock-resume t
-          :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))
-         ("u" "Quotetions diary" entry "** Quotation of the day (%U)‎\n\n#+begin_quote\n%^{Quote}\n#+end_quote\n+ Author: *%^{Author of quote}*\n\n* Reflections about this quote"
-          :clock-in t :clock-resume t
-          :if-new (file+head "%<%Y-%m-%d>-quote.org" "#+title: %U\n\n"))
+        (setq epa-file-cache-passphrase-for-symmetric-encryption t)
 
-         ("d" "Default diary" entry "** Default (%U): «%?»‎\n\n"
-          :clock-in t :clock-resume t
-          :if-new (file+head "%<%Y-%m-%d>.org" "** %U\n#+title: %U\n\n"))
+        (org-roam-dailies-capture-templates
+            '(("d" "Дневник продуктивности - утро" plain (file "~/Org/Templates/journal/Morning.org")
+              :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))
 
-         ("e" "Evening diary" plain (file "~/Org/Templates/journal/Evening.org")
-          :clock-in t :clock-resume t
-          :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))))
-      :config
-      ;; Org-noter integration with org-roam-bibtex
-      ;; (setq orb-preformat-keywords
-      ;;       '("title" "citekey"  "url" "author-or-editor" "keywords" "file")
-      ;;       orb-process-file-keyword t)
-      (setq orb-preformat-keywords
-            '("citekey" "title" "url" "author-or-editor" "keywords" "file")
-            orb-process-file-keyword t
-            orb-attached-file-extensions '("pdf"))
-      (setq org-roam-dailies-directory "journal/")
-      (setq org-roam-completion-everywhere t)
-      (setq org-roam-database-connector 'sqlite)
-      (org-roam-db-autosync-mode)
-                                            ; Show +FILETAG in node list
-                                            ; https://github.com/org-roam/org-roam/commit/6f5d65abd9e707b3fdb10092a9fef3b739e143dd
-      (setq fill-prefix "")  ;; see https://emacs.stackexchange.com/a/38943/12999
-      (setq org-roam-node-display-template
-            (concat "${title:*} "
-                    (propertize "${tags:60}" 'face 'org-tag)))
-      ;; Customize the org-roam buffer
-      ;; (add-to-list 'display-buffer-alist
-      ;;              '("\\*org-roam\\*"
-      ;;                (display-buffer-in-direction)
-      ;;                (direction . right)
-      ;;                (window-width . 0.33)
-      ;;                (window-height . fit-window-to-buffer)))
+              ("D" "Дневник продуктивности - вечер" plain (file "~/Org/Templates/journal/Evening.org")
+              :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))
 
-      ;; for org-roam-buffer-toggle
-      ;; Recommendation in the official manual
-      (add-to-list 'display-buffer-alist
-                   '("\\*org-roam\\*"
-                     (display-buffer-in-direction)
-                     (direction . right)
-                     (window-width . 0.33)
-                     (window-height . fit-window-to-buffer))))
+              ("j" "Мысли" plain "* %U"
+               :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))))
+        :config
+        ;; Org-noter integration with org-roam-bibtex
+        (setq orb-preformat-keywords
+              '("title" "citekey"  "url" "author-or-editor" "keywords" "file")
+              orb-process-file-keyword t)
+        (setq orb-preformat-keywords
+              '("citekey" "title" "url" "author-or-editor" "keywords" "file")
+              orb-process-file-keyword t
+              orb-attached-file-extensions '("pdf"))
+        (setq org-roam-dailies-directory "journal/")
+        (setq org-roam-completion-everywhere t)
+        ;; (setq org-roam-database-connector 'sqlite)
+        (org-roam-db-autosync-mode)
+                                              ; Show +FILETAG in node list
+                                              ; https://github.com/org-roam/org-roam/commit/6f5d65abd9e707b3fdb10092a9fef3b739e143dd
+        (setq fill-prefix "")  ;; see https://emacs.stackexchange.com/a/38943/12999
+        (setq org-roam-node-display-template
+              (concat "${title:*} "
+                      (propertize "${tags:60}" 'face 'org-tag)))
 
-    (use-package org-roam-timestamps
-      :ensure t
-      :after org-roam
-      :demand t
-      :config (org-roam-timestamps-mode)
-      (setq org-roam-timestamps-parent-file t)
-      (setq org-roam-timestamps-remember-timestamps t))
+        ;;for org-roam-buffer-toggle
+        ;;Recommendation in the official manual
+        (add-to-list 'display-buffer-alist
+                     '("\\*org-roam\\*"
+                       (display-buffer-in-direction)
+                       (direction . right)
+                       (window-width . 0.33)
+                       (window-height . fit-window-to-buffer)))
+        )
 
-    (defun org-roam-create-note-from-headline ()
-      "Create an Org-roam note from the current headline and jump to it.
+      (use-package org-roam-timestamps
+        :ensure t
+        :after org-roam
+        :demand t
+        :config (org-roam-timestamps-mode)
+        (setq org-roam-timestamps-parent-file t)
+        (setq org-roam-timestamps-remember-timestamps t))
 
-            Normally, insert the headline’s title using the ’#title:’ file-level property
-            and delete the Org-mode headline. However, if the current headline has a
-            Org-mode properties drawer already, keep the headline and don’t insert
-            ‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
-            ‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
-      (interactive)
-      (let ((title (nth 4 (org-heading-components)))
-            (has-properties (org-get-property-block)))
-        (org-cut-subtree)
-        (org-roam-node-find 'other-window title nil)
-        (org-paste-subtree)
-        (unless has-properties
-          (kill-line)
-          (while (outline-next-heading)
-            (org-promote)))
-        (goto-char (point-min))
-        (when has-properties
-          (kill-line)
-          (kill-line))))
+      (defun org-roam-create-note-from-headline ()
+        "Create an Org-roam note from the current headline and jump to it.
 
-    (defun org-roam-insert-note-from-headline ()
-      "Create an Org-roam note from the current headline and jump to it.
+              Normally, insert the headline’s title using the ’#title:’ file-level property
+              and delete the Org-mode headline. However, if the current headline has a
+              Org-mode properties drawer already, keep the headline and don’t insert
+              ‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
+              ‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
+        (interactive)
+        (let ((title (nth 4 (org-heading-components)))
+              (has-properties (org-get-property-block)))
+          (org-cut-subtree)
+          (org-roam-node-find 'other-window title nil)
+          (org-paste-subtree)
+          (unless has-properties
+            (kill-line)
+            (while (outline-next-heading)
+              (org-promote)))
+          (goto-char (point-min))
+          (when has-properties
+            (kill-line)
+            (kill-line))))
 
-            Normally, insert the headline’s title using the ’#title:’ file-level property
-            and delete the Org-mode headline. However, if the current headline has a
-            Org-mode properties drawer already, keep the headline and don’t insert
-            ‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
-            ‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
-      (interactive)
-      (let ((title (nth 4 (org-heading-components)))
-            (has-properties (org-get-property-block)))
-        (org-cut-subtree)
-        (org-roam-node-find 'other-window title nil)
-        (org-paste-subtree)
-        (unless has-properties
-          (kill-line)
-          (while (outline-next-heading)
-            (org-promote)))
-        (goto-char (point-min))
-        (when has-properties
-          (kill-line)
-          (kill-line))))
+      (defun org-roam-insert-note-from-headline ()
+        "Create an Org-roam note from the current headline and jump to it.
+
+              Normally, insert the headline’s title using the ’#title:’ file-level property
+              and delete the Org-mode headline. However, if the current headline has a
+              Org-mode properties drawer already, keep the headline and don’t insert
+              ‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
+              ‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
+        (interactive)
+        (let ((title (nth 4 (org-heading-components)))
+              (has-properties (org-get-property-block)))
+          (org-cut-subtree)
+          (org-roam-node-find 'other-window title nil)
+          (org-paste-subtree)
+          (unless has-properties
+            (kill-line)
+            (while (outline-next-heading)
+              (org-promote)))
+          (goto-char (point-min))
+          (when has-properties
+            (kill-line)
+            (kill-line))))
 
 #+END_SRC
 
@@ -3778,8 +4056,8 @@ Ah, chills.
 #+RESULTS:
 : t
 
-**** Deft
-#+begin_src emacs-lisp 
+**** Deft (disabled)
+#+begin_src example
   (use-package deft
     :ensure t
     :bind ("<f9>" . deft)
@@ -3796,7 +4074,7 @@ Ah, chills.
 #+RESULTS:
 : deft
 
-#+begin_src emacs-lisp :lexical no
+#+begin_src example :lexical no
   (evil-leader/set-key
   	"fn" 'deft-new-file
   	"fl" 'deft)
@@ -3812,9 +4090,11 @@ Replace Postman with org-mode!
     :ensure t)
 #+end_src
 
+#+RESULTS:
+
 **** Small packages
-***** TOC
-#+begin_src emacs-lisp 
+***** TOC (disabled)
+#+begin_src example 
   (use-package toc-org
     :ensure t
     :config
@@ -3847,20 +4127,28 @@ Replace Postman with org-mode!
 #+end_src
 
 ***** Org-gtd
-#+begin_src emacs-lisp :lexical no
-    (evil-leader/set-key
-    "dc" 'org-gtd-capture
-    "de" 'org-gtd-engage
-    "dr" 'org-gtd-engage-grouped-by-context
-    "dp" 'org-gtd-process-inbox)
-#+end_src
 
+#+begin_src emacs-lisp :lexical no
+  ;; (evil-leader/set-key
+  ;; "de" 'org-gtd-engage
+  ;; "dr" 'org-gtd-engage-grouped-by-context
+  ;; "dp" 'org-gtd-process-inbox
+  ;; "c" 'org-gtd-organize)
+
+  (evil-leader/set-key
+  	;; "dc" 'org-gtd-capture
+    "dc" (lambda () (interactive) (org-gtd-capture nil "i"))
+  	"de" 'org-gtd-engage
+  	"dp" 'org-gtd-process-inbox
+  	"dn" 'org-gtd-show-all-next
+  	"ds" 'org-gtd-review-stuck-projects)
+#+end_src
+ 
 #+RESULTS:
 
-#+begin_src emacs-lisp  
+#+begin_src emacs-lisp :lexical no
   (use-package org-gtd
     :ensure t
-    :defer t
     :straight (org-gtd :type git
                        :host github
                        :repo "trevoke/org-gtd.el")
@@ -3868,19 +4156,86 @@ Replace Postman with org-mode!
     (org-gtd-directory "~/Org/agenda/GTD/")
     ;; (org-edna-use-inheritance t)
     ;; (org-gtd-update-ack "3.0.0")
-    ;; (org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command))
+  	(org-gtd-areas-of-focus '("PERSONAL" "MERITRANK" "CODING" "EGE"))
+    (org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command))
+  	(org-gtd-clarify-show-horizons t)
+  	(org-gtd-horizons-file "horizons.org")
     :config
     (org-edna-mode)
-    :bind (;; ("C-c d c" . org-gtd-capture)
-  				 ;; ("C-c d e" . org-gtd-engage)
-  				 ;; ("C-c d r" . org-gtd-engage-grouped-by-context)
-  				 ;; ("C-c d p" . org-gtd-process-inbox)
+    :bind (("C-c d c" . (lambda () (interactive) (org-gtd-capture nil "i")))
+  				 ("C-c d e" . org-gtd-engage)
+  				 ("C-c d r" . org-gtd-engage-grouped-by-context)
+  				 ("C-c d p" . org-gtd-process-inbox)
   				 :map org-gtd-clarify-map
   				 ("C-c c" . org-gtd-organize)))
 #+end_src
 
 #+RESULTS:
 : org-gtd-organize
+
+***** Org-clock-budget
+#+begin_src emacs-lisp :lexical no
+  (use-package org-clock-budget
+      :quelpa (org-clock-budget
+          :fetcher github
+          :repo "Fuco1/org-clock-budget"
+          :branch "master")
+  		:ensure t
+      :config
+      (setq org-clock-budget-daily-budgetable-hours 10)
+      (setq org-clock-budget-intervals '(("BUDGET_WEEK" org-clock-budget-interval-this-week))))
+#+end_src
+
+#+RESULTS:
+: t
+
+***** Custom clock budget by day
+#+begin_src emacs-lisp :lexical no
+  (defun org-dblock-write:time-requirements (params)
+    "Generate a table showing daily time requirements and progress for categories."
+    (let* ((day-of-week (upcase (format-time-string "%^a")))
+           (required-property (concat "REQUIRED_TIME_" day-of-week))
+           (categories '("EGE" "MERITRANK" "CODING"))
+           (today-start (format-time-string "%Y-%m-%d"))
+           (today-end (format-time-string "%Y-%m-%d" (time-add (current-time) 86400))))
+      
+      ;; Создаем заголовок таблицы с фиксированной шириной столбцов
+      (insert "| Category   | Required | Actual  | Progress  |\n")
+      (insert "|------------+----------+---------+-----------|\n")
+      
+      (dolist (category categories)
+        (let ((required 0.0)
+              (actual 0.0))
+          ;; Находим требуемое время
+          (org-map-entries
+           (lambda ()
+             (let* ((cat (org-entry-get (point) "CATEGORY"))
+                    (req (org-entry-get (point) required-property)))
+               (when (and req (string= cat category))
+                 (setq required (string-to-number req)))))
+           nil 'file)
+          
+          ;; Вычисляем фактическое время
+          (setq actual (/ (float (org-clock-sum today-start today-end
+                                               (lambda () 
+                                                 (string= (org-entry-get nil "CATEGORY") 
+                                                        category))))
+                         60.0))
+          
+          ;; Вычисляем прогресс
+          (let ((progress (if (> required 0.0)
+                            (* 100.0 (/ actual required))
+                          0.0)))
+            ;; Используем фиксированную ширину для каждого столбца
+            (insert (format "| %-10s | %8.1f | %7.1f | %8.1f%% |\n"
+                           category required actual progress)))))
+      
+      ;; Добавляем нижний разделитель
+      (insert "|------------+----------+---------+-----------|")))
+#+end_src
+
+#+RESULTS:
+: org-dblock-write:time-requirements
 
 ***** Org-appear
 Toggle visibility of hidden Org mode element parts upon entering and leaving an element
@@ -3894,8 +4249,8 @@ Toggle visibility of hidden Org mode element parts upon entering and leaving an 
           org-appear-autolinks 'just-brackets))
 #+end_src
 
-***** Org-transclusion
-#+begin_src emacs-lisp 
+***** Org-transclusion (disabled)
+#+begin_src example 
   (use-package org-transclusion
     :after org
     :ensure t
@@ -3905,6 +4260,19 @@ Toggle visibility of hidden Org mode element parts upon entering and leaving an 
 #+end_src
 
 ***** Org-timeblock
+#+begin_src emacs-lisp 
+  (use-package timeblock
+    :init
+    (unless (package-installed-p 'timeblock)
+      (package-vc-install
+       '(timeblock
+         :vc-backend Git
+         :url "https://github.com/ichernyshovvv/timeblock.el"
+         :branch "master"))))
+#+end_src
+
+#+RESULTS:
+
 #+begin_src emacs-lisp :lexical no
   (use-package org-timeblock
     :straight (org-timeblock :type git
@@ -3922,6 +4290,106 @@ Toggle visibility of hidden Org mode element parts upon entering and leaving an 
 
 #+RESULTS:
 : org-timeblock
+
+****** Example
+#+begin_src emacs-lisp :lexical no
+
+  ;; -*- lexical-binding: t; -*- 
+
+  (require 'org) ;; for `org-read-date'
+
+  (let* ((date (parse-time-string "2024-11-08 00:00"))
+         (entries
+          (list (list
+                 (cons 'start (parse-time-string "2024-11-08 10:00"))
+                 (cons 'end (parse-time-string "2024-11-08 11:00"))
+                 (cons 'title "Block 1"))
+                (list
+                 (cons 'start (parse-time-string "2024-11-08 09:30"))
+                 (cons 'end (parse-time-string "2024-11-08 11:00"))
+                 (cons 'title "Block 2"))
+                (list
+                 (cons 'start (parse-time-string "2024-11-08 12:00"))
+                 (cons 'end (parse-time-string "2024-11-08 17:00"))
+                 (cons 'title "Block 4"))
+                (list
+                 (cons 'start (parse-time-string "2024-11-08"))
+                 (cons 'end nil)
+                 (cons 'title "All-day Block 3")))))
+    (timeblock-insert-column
+     entries date 200 350
+     :show-date t :show-all-day-entries t
+     :scope '(6 . 24)
+     :keymap (let ((map timeblock-column-map))
+               (keymap-set map "e" #'timeblock-reschedule)
+               (keymap-set map "<drag-mouse-1>" #'timeblock-drag-n-drop)
+               map)))
+   
+  (defun timeblock-reschedule ()
+    (interactive)
+    (when-let* ((svg (get-text-property (point) 'dom))
+                (entries (dom-attr svg 'entries))
+                (date (encode-time (dom-attr svg 'date)))
+                (block-id (dom-attr (timeblock-get-selected svg) 'id))
+                (entry (nth (string-to-number block-id) entries)))
+      (setf (alist-get 'start entry)
+            (decode-time (org-read-date t t nil "Start: " date)))
+      (setf (alist-get 'end entry)
+            (decode-time (org-read-date t t nil "End: " date)))
+      (timeblock-redisplay-column)))
+
+  (defun timeblock-drag-n-drop (event)
+    "Draw a line from the start of EVENT to its end."
+    (interactive "e")
+    (when-let* ((start (posn-object-x-y (event-start event)))
+                (end (posn-object-x-y (event-end event)))
+                (svg (get-text-property (point) 'dom))
+                (entries (dom-attr svg 'entries))
+                (block-id
+                 (dom-attr
+                  (timeblock-block-at-position svg (car start) (cdr start)) 'id))
+                (entry (nth (string-to-number block-id) entries))
+                (hour (timeblock-hour-at-position svg (cdr end))))
+      (let* ((start-ts (alist-get 'start entry))
+             (end-ts (alist-get 'end entry))
+             (duration (and end-ts (timeblock-time-diff end-ts start-ts)))
+             (new-start-ts (timeblock-time-apply start-ts :hour hour :minute 0))
+             (new-end-ts (and duration
+                              (timeblock-time-inc 'minute duration new-start-ts))))
+        (setf (alist-get 'start entry) new-start-ts)
+        (setf (alist-get 'end entry) new-end-ts)
+        (timeblock-redisplay-column))))
+
+  (cl-defun timeblock-time-apply (time &key second minute hour day month year)
+    "Return new timestamp based on TIME with new slot values from keys."
+    (declare (indent 1))
+    ;; This code is borrowed from `ts-apply' function which is part of ts.el
+    ;; project written by Adam Porter
+    (let ((time (copy-sequence time)))
+      (and second (setf (decoded-time-second time) second))
+      (and minute (setf (decoded-time-minute time) minute))
+      (and hour (setf (decoded-time-hour time) hour))
+      (and day (setf (decoded-time-day time) day))
+      (and month (setf (decoded-time-month time) month))
+      (and year (setf (decoded-time-year time) year))
+      time))
+
+  (defun timeblock-time-diff (a b)
+    "Return difference between times A and B in minutes."
+    (when-let* ((a (encode-time a))
+                (b (encode-time b)))
+      (/ (time-convert (time-subtract a b) 'integer) 60)))
+
+  (defun timeblock-time-inc (slot value time)
+    "Return a new time object based on TIME with its SLOT incremented by VALUE.
+
+  SLOT should be specified as a plain symbol, not a keyword."
+    (let ((time (copy-sequence time)))
+      (decoded-time-add time (make-decoded-time (intern (format ":%s" slot)) value))) )
+#+end_src
+
+#+RESULTS:
+: timeblock-time-inc
 
 *** Lisp
 
@@ -3965,8 +4433,6 @@ See https://github.com/purcell/package-lint
 #+RESULTS:
 
 *** TypeScript
-
-
 Add support of ~.ts~ and ~.tsx~ files
 #+BEGIN_SRC emacs-lisp
 (use-package typescript-mode
@@ -3982,7 +4448,7 @@ Add support of ~.ts~ and ~.tsx~ files
 
 *** Rust
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC example
   (use-package rustic
     :ensure t
     :bind (:map rustic-mode-map
@@ -4009,36 +4475,47 @@ Add support of ~.ts~ and ~.tsx~ files
 
     (use-package rust-playground
       :ensure t)
-    (use-package cargo
-      :ensure t
-      :if (executable-find "cargo")
-      :after rust-mode
-      :bind (:map cargo-minor-mode-map
-                  ("C-c C-t" . cargo-process-test)
-                  ("C-c C-b" . cargo-process-build)
-                  ("C-c C-c" . cargo-process-run))
-      :config
-      (add-hook 'rust-mode-hook 'cargo-minor-mode)))
+
+    ;; (use-package cargo
+    ;;   :ensure t
+    ;;   :if (executable-find "cargo")
+    ;;   :after rust-mode
+    ;;   :bind (:map cargo-minor-mode-map
+    ;;               ("C-c C-t" . cargo-process-test)
+    ;;               ("C-c C-b" . cargo-process-build)
+    ;;               ("C-c C-c" . cargo-process-run))
+    ;;   :config
+    ;;   (add-hook 'rust-mode-hook 'cargo-minor-mode))
+    )
 #+END_SRC
 
 #+RESULTS:
 : lsp-rust-analyzer-status
 
-*** GraphQL
+*** Go
 #+begin_src emacs-lisp :lexical no
+  (use-package go-mode
+  	:ensure t
+  	:config
+  	(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode)))
+#+end_src
+
+#+RESULTS:
+: t
+
+*** GraphQL (disabled)
+#+begin_src example :lexical no
     (use-package graphql-mode
   		:ensure t)
 #+end_src
 
 #+RESULTS:
 
-*** Yaml
-#+begin_src emacs-lisp :lexical no
+*** Yaml (disabled)
+#+begin_src example :lexical no
   (use-package yaml-mode
   	:ensure t)
 #+end_src
-
-#+RESULTS:
 
 ** LSP
 
@@ -4049,14 +4526,15 @@ See https://emacs-lsp.github.io/lsp-mode/
     :ensure t
     :commands (lsp lsp-deferred)
     :bind (:map lsp-mode-map
-                  ("C-c f" . lsp-format-buffer))
+                ("C-c f" . lsp-format-buffer))
     :hook ((go-mode         . lsp-deferred)
            (rust-mode       . lsp-deferred)
            ;; (lisp            . lsp)
+           (python-mode     . lsp-deferred)
            (c-mode          . lsp-deferred)
-           (c++-mode        . lsp-deferred)
+           ;; (c++-mode        . lsp-deferred)
            (js-mode         . lsp-deferred)
-           (solidity-mode   . lsp-deferred)
+           ;; (solidity-mode   . lsp-deferred)
            (typescript-mode . lsp-deferred)
            (lsp-mode        . lsp-enable-which-key-integration))
     :init
@@ -4065,7 +4543,7 @@ See https://emacs-lsp.github.io/lsp-mode/
     ;; what to use when checking on-save. "check" is default, I prefer clippy
     (lsp-rust-analyzer-cargo-watch-command "clippy")
     (lsp-eldoc-render-all t)
-    (lsp-idle-delay 0.4)
+    (lsp-idle-delay 0.2)
     ;; enable / disable the hints as you prefer:
     (lsp-inlay-hint-enable t)
     ;; These are optional configurations. See https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/#lsp-rust-analyzer-display-chaining-hints for a full list
@@ -4073,65 +4551,21 @@ See https://emacs-lsp.github.io/lsp-mode/
     (lsp-rust-analyzer-display-chaining-hints t)
     (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
     (lsp-rust-analyzer-display-closure-return-type-hints t)
-    (lsp-rust-analyzer-display-parameter-hints nil)
-    (lsp-rust-analyzer-display-reborrow-hints nil))
+    (lsp-rust-analyzer-display-parameter-hints t)
+    ;; (lsp-rust-analyzer-display-reborrow-hints t)
+
+    :config
+    (setq lsp-headerline-breadcrumb-enable nil)
+  	(setq lsp-signature-render-documentation nil)
+  	(with-eval-after-load 'lsp-mode
+  		(set-face-attribute 'lsp-face-highlight-read nil :underline nil))
+  	(setq lsp-enable-snippet t) ;; nil
+  	(setq lsp-lens-enable t) ;; nil
+  	(setq lsp-diagnostic-provider :none))
 #+END_SRC
 
 #+RESULTS:
 : lsp-format-buffer
-
-Hide the ugly header navigation that comes with the default ~lsp-mode~
-package.
-
-#+BEGIN_SRC emacs-lisp
-(setq lsp-headerline-breadcrumb-enable nil)
-#+END_SRC
-
-The documentation pop-ups at the bottom are too annoying, disable them. Don't
-worry, this will still show single line with signatures below the modeline.
-
-#+BEGIN_SRC emacs-lisp
-(setq lsp-signature-render-documentation nil)
-#+END_SRC
-
-Highlighting all occurences of thing under cursor is useful but
-please, do not underline it.
-
-#+BEGIN_SRC emacs-lisp
-(with-eval-after-load 'lsp-mode
-  (set-face-attribute 'lsp-face-highlight-read nil :underline nil))
-#+END_SRC
-
-Don't auto-complete function arguments in Company. Its implemented via
-snippets and therefore takes over and provides jumping between
-arguments and stuff. It's too annoying.
-The problem with disabling this feature is that (at least in
-combination with ~company-tng-mode~ it now auto-completes functions
-without parentheses. Therefore, after selecting the correct function
-using ~C-n~ and ~C-p~, the next pressed key must be opening bracket
-~(~ instead of ~SPC~, ~TAB~, ~RET~, or whatever.
-
-#+BEGIN_SRC emacs-lisp
-(setq lsp-enable-snippet t) ;; nil
-#+END_SRC
-
-#+RESULTS:
-: t
-
-Please don't put any layer with text over my code
-
-#+BEGIN_SRC emacs-lisp
-(setq lsp-lens-enable t) ;; nil
-#+END_SRC
-
-#+RESULTS:
-: t
-
-Don't just randomly pop flycheck buffer into my windows
-
-#+BEGIN_SRC emacs-lisp
-(setq lsp-diagnostic-provider :none)
-#+END_SRC
 
 See https://github.com/emacs-lsp/helm-lsp
 
@@ -4152,7 +4586,7 @@ See https://github.com/emacs-lsp/helm-lsp
      lsp-ui-doc-enable t
      lsp-ui-doc-max-height 8
      lsp-ui-doc-max-width 130         ; 150 (default) is too wide
-     lsp-ui-doc-delay 0.2           ; 0.2 (default) is too naggy
+     lsp-ui-doc-delay 0.1           ; 0.2 (default) is too naggy
      lsp-ui-doc-show-with-mouse t  ; don't disappear on mouseover
      ;; lsp-ui-doc-show-with-cursor t
      lsp-ui-doc-border (face-foreground 'default)
@@ -4175,7 +4609,7 @@ Install syntax highlighting for dockerfiles
 #+END_SRC
 
 ** Formatting
-#+BEGIN_SRC example
+#+BEGIN_SRC emacs-lisp
 (use-package format-all
   :ensure t
   :preface
@@ -4200,3 +4634,68 @@ Install syntax highlighting for dockerfiles
 
 #+RESULTS:
 : relative
+
+** DirEnv
+#+begin_src emacs-lisp :lexical no
+  (use-package direnv
+  	:ensure t
+  	:config
+  	(direnv-mode))
+#+end_src
+
+#+RESULTS:
+: t
+
+** GPTel
+:PROPERTIES:
+:ID:       7820f2fc-8be2-496c-8d03-b76ba53254b1
+:END:
+
+#+begin_src emacs-lisp
+  (use-package gptel
+    ;;:load-path "~/.emacs.d/gptel/"
+    :ensure t
+    :init
+    (setq gptel-api-key (getenv "AIML_API"))
+    (setq gptel-max-tokens 8024)
+    :config
+    (setq gptel-model 'gpt-4o
+          gptel-backend
+          (gptel-make-openai "AIMLAPI"
+            :host "api.aimlapi.com"
+            :endpoint "/chat/completions"
+            :stream t
+            :key gptel-api-key
+            :models '(gpt-4o
+                      gpt-4o-2024-08-06
+                      gpt-4-turbo
+                      chatgpt-4o-latest)))
+    :bind (("M-s M-d" . gptel-context-add)
+           ("M-s M-f" . gptel-add-file)
+           ("M-s M-a" . gptel-menu)
+           ("M-s M-r" . gptel--regenerate)
+           ("M-s M-e" . gptel-rewrite)
+           ("M-s M-s" . gptel)))
+#+end_src
+
+#+RESULTS:
+: gptel
+
+** Whisper.el
+#+begin_src emacs-lisp :lexical no
+  (use-package whisper
+    :load-path "~/.emacs.d/lisp/whisper.el"
+    :bind ("M-s M-t" . whisper-run)
+    :config
+    (setq whisper-install-directory "/tmp/"
+          whisper-model "base"
+          ;; whisper-model "base"
+          whisper-language "ru"
+          whisper-translate nil
+          whisper-use-threads (/ (num-processors) 2)
+          whisper-enable-speed-up nil
+          whisper-recording-timeout 300))
+#+end_src
+
+#+RESULTS:
+: whisper-run

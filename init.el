@@ -46,3 +46,4 @@
 ;; Tangle configuration
 (org-babel-load-file (expand-file-name "berezhnev.org" user-emacs-directory))
 (put 'dired-find-alternate-file 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
