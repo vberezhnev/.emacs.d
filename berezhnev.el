@@ -1684,11 +1684,11 @@
     										:height 1.0
     										:box (:line-width (1 . 1) :color "white")))))
      '(org-habit-ready-future-face
-    	 ((t (;;:background "white"
-    				:foreground "white"
-    				:width expanded
-    				:height 1.0
-    				:box (:line-width (1 . 1) :color "white")))))
+    	 ((t (:background "gray"
+    										:foreground "white"
+    										:width expanded
+    										:height 1.0
+    										:box (:line-width (1 . 1) :color "white")))))
      ))
   :config
   (load "~/.emacs.d/lisp/my-org-habit")
@@ -1701,6 +1701,7 @@
     		org-habit-alert-glyph ?○
     		org-habit-today-glyph ?○
     		org-habit-completed-glyph ?●
+              org-habit-ready-future-glyph ?⬡
     		org-habit-show-done-always-green t)
 
   (defun toggle-org-habit-show-all-today ()
