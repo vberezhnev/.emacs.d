@@ -1030,9 +1030,24 @@
 (setq python-indent-offset 2)
 
 (use-package company
-  :ensure t
-  :hook
-  (company-mode . frostyx/company-mode-hook))
+    :ensure t
+    :hook
+    (company-mode . frostyx/company-mode-hook)
+    :config
+;; Company mode
+(setq company-idle-delay 0)
+(setq company-minimum-prefix-length 1)
+
+;; Go - lsp-mode
+;; Set up before-save hooks to format buffer and add/delete imports.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+;; Start LSP Mode and YASnippet mode
+(add-hook 'go-mode-hook #'lsp-deferred)
+(add-hook 'go-mode-hook #'yas-minor-mode))
 
 (defun frostyx/company-mode-hook ()
   (setq-local evil-complete-next-func 'frostyx/company-complete))
@@ -1146,63 +1161,8 @@
   :bind (("C-c l"               . org-store-link)
          ;; ("C-c c"               . org-capture)
          ("C-c f"               . org-footnote-new)))
-;;   :config
-
-;; (setq org-modules
-;; 	'(org-crypt
-;;         org-bookmark
-;;         org-eshell
-;;         org-irc))
-
-;; Ensure that anything that should be fixed-pitch in Org files appears that way
-;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-;; (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-;; (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
-
-;; Setup fonts for org-mode
-;; (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
-;; (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-;; (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-;; (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-;; (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-;; (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-;; (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
 
 (define-key global-map (kbd "C-c u") #'calendar)
-
-;; (use-package org-pomodoro
-;;   :straight (:host github :repo "marcinkoziej/org-pomodoro" :branch "master")
-;;   :bind (("C-c k"               . org-pomodoro))
-;;   :config
-;;   ;; First of all you sould install aplay or afplay
-;;   (use-package sound-wav
-;;     :ensure t
-;;     :demand t) ;; dep for org-pomodoro
-;;   (use-package powershell
-;;     :ensure t
-;;     :demand t) ;; dep for org-pomodoro
-;;   (setq org-pomodoro-length 35
-;;         org-pomodoro-short-break-length 5
-;;         org-pomodoro-long-break-length 15
-;;         org-pomodoro-long-break-frequency 4
-;;         org-pomodoro-play-sounds 1
-
-;;         org-pomodoro-finished-sound "/home/berezhnev/.emacs.d/sounds/sound.wav"
-;;         org-pomodoro-long-break-sound "/home/berezhnev/.emacs.d/sounds/sound.wav"
-;;         org-pomodoro-short-break-sound "/home/berezhnev/.emacs.d/sounds/sound.wav"))
-
-
-
 
 (setq-default org-reverse-datetree-level-formats
               '("Week №%W {%B-%Y}"))
@@ -1232,35 +1192,6 @@
     (with-current-buffer buffer
       (when (derived-mode-p 'org-agenda-mode)
         (org-agenda-maybe-redo)))))
-
-;; https://orgmode.org/worg/org-hacks.html
-;; work with org-agenda dispatcher [c] "Today Clocked Tasks" to view today's clocked tasks.
-;; (defun org-agenda-log-mode-colorize-block ()
-;;   "Set different line spacing based on clock time duration."
-;;   (save-excursion
-;;     (let* ((colors (cl-case (alist-get 'background-mode (frame-parameters))
-;;                                  ('light
-;;                                   (list "#F6B1C3" "#FFFF9D" "#BEEB9F" "#ADD5F7"))
-;;                                  ('dark
-;;                                   (list "#aa557f" "DarkGreen" "DarkSlateGray" "DarkSlateBlue"))))
-;;            pos
-;;            duration)
-;;       (nconc colors colors)
-;;       (goto-char (point-min))
-;;       (while (setq pos (next-single-property-change (point) 'duration))
-;;         (goto-char pos)
-;;         (when (and (not (equal pos (point-at-eol)))
-;;                    (setq duration (org-get-at-bol 'duration)))
-;;           ;; larger duration bar height
-;;           (let ((line-height (if (< duration 15) 1.0 (+ 0.5 (/ duration 30))))
-;;                 (ov (make-overlay (point-at-bol) (1+ (point-at-eol)))))
-;;             (overlay-put ov 'face `(:background ,(car colors) :foreground "black"))
-;;             (setq colors (cdr colors))
-;;             (overlay-put ov 'line-height line-height)
-;;             (overlay-put ov 'line-spacing (1- line-height))))))))
-
-;; (add-hook 'org-agenda-finalize-hook #'org-agenda-log-mode-colorize-block)
-;; )
 
 (setq
  org-ellipsis " ⤵" ;; ⤵, ᗐ, ↴, ▼, ▶, ⤵, ▾
@@ -1352,6 +1283,12 @@
   (:map global-map
         ("C-c a" . org-agenda))
   :config
+  ;; Function to be run when org-agenda is opened
+
+  ;; Adds hook to org agenda mode, making follow mode active in org agenda
+  ;;(add-hook 'org-agenda-mode-hook 'org-agenda-open-hook)
+  ;;(add-hook 'org-agenda-mode-hook 'toggle-truncate-lines)
+
   (setq org-agenda-start-on-weekday 0
         org-agenda-skip-scheduled-if-done t ; changed
         org-agenda-skip-deadline-if-done t ; changed
@@ -1359,42 +1296,51 @@
         org-agenda-block-separator #x2501
         org-agenda-compact-blocks t ; changed
         org-agenda-start-with-log-mode nil
-  			org-agenda-deadline-faces
+    		org-agenda-deadline-faces
         '((1.0001 . org-warning)              ; due yesterday or before
           (0.0    . org-upcoming-deadline))   ; due today or later
-  			org-icalendar-combined-name "Hugo Org"
-  			org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo)
-  			org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo)
-  			org-icalendar-timezone "Asia/Vladivostok"
-  			org-icalendar-store-UID t
-  			org-icalendar-alarm-time 30
-  			calendar-date-style 'european
-  			calendar-week-start-day 0
+    		org-icalendar-combined-name "Hugo Org"
+    		org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo)
+    		org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo)
+    		org-icalendar-timezone "Asia/Vladivostok"
+    		org-icalendar-store-UID t
+    		org-icalendar-alarm-time 30
+    		calendar-date-style 'european
+    		calendar-week-start-day 0
         calendar-mark-holidays-flag t
         calendar-mark-diary-entries-flag nil
-																				; (setq-default org-icalendar-include-todo t)
-  			org-agenda-breadcrumbs-separator " ❱ "
+  			;; (setq-default org-icalendar-include-todo t)
+    		org-agenda-breadcrumbs-separator " ❱ "
         org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
-        org-agenda-time-grid '((weekly today require-timed)
+        org-agenda-time-grid '((today require-timed remove-match)
                                (500 800 1000 1200 1400 1600 1800 2000)
-                               "---" "┈┈┈┈┈┈┈┈┈┈┈┈┈")
-        ;; org-agenda-time-grid (quote ((daily today remove-match)
-        ;; 			     (800 1200 1600 2000)
-        ;; 			     "......" "----------------"))
-        ;; org-agenda-prefix-format '((agenda . "%i %-12:c%?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
-        ;;                            (todo . " %i %-12:c")
-        ;;                            (tags . " %i %-12:c")
-        ;;                            (search . " %i %-12:c"))
+                               ":  " "┈┈┈┈┈┈┈┈┈┈┈┈┈")
         org-agenda-prefix-format
-        '((agenda . " %i %-12:c%?-12t% s")
-          (todo . " %i %-12:c")
-          (tags . " %i %-12:c")
-          (search . " %i %-12:c"))
-  			org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
+  			'((agenda . "%-10c | %?-12t% s")
+  				(todo . "%-10s")
+  				(tags . "%t %-10c | %s")
+  				(search . "%c %t %s"))
+        org-agenda-clockreport-parameter-plist
+        (quote (:maxlevel 5 :compact t :wstart 0 :link nil :formula % :tags nil :properties ("CATEGORY" "EFFORT") :narrow 80 :fileskip0 t))
+        org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:")
+        org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:")
+    		org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
                                                       "\n"
                                                       (org-agenda-format-date-aligned date)))
-  			org-default-notes-file "~/Org/agenda/Notes.org"
-  			org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/Calendar.org"
+    		org-default-notes-file "~/Org/agenda/Notes.org"
+    		org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/Calendar.org"
+
+  (setq mixed-pitch-fixed-pitch-faces
+				(quote (line-number-current-line line-number font-lock-comment-face org-done org-todo org-todo-keyword-outd org-todo-keyword-kill org-todo-keyword-wait org-todo-keyword-done org-todo-keyword-habt org-todo-keyword-todo org-tag org-ref-cite-face org-property-value org-special-keyword org-date diff-added org-drawer diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-block-begin-line org-block-end-line org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-table org-verbatim)))
+
+	;; Hide duplicates of the same todo item
+	;; If it has more than one of timestamp, scheduled,
+	;; or deadline information
+  (setq org-agenda-skip-timestamp-if-done t
+				org-agenda-skip-deadline-if-done t
+				org-agenda-skip-scheduled-if-done t
+				org-agenda-skip-scheduled-if-deadline-is-shown t
+				org-agenda-skip-timestamp-if-deadline-is-shown t)
 
   ;; (setq org-agenda-clockreport-parameter-plist
   ;;       (quote (:link t :maxlevel 5 :fileskip t :compact t :narrow 80)))
@@ -1415,36 +1361,25 @@
                         (org-agenda-sorting-strategy '(habit-down time-up priority-down category-keep user-defined-up))
                         (org-time-budgets-in-agenda-maybe)
                         (org-agenda-include-deadlines t)
-                        ;; (org-agenda-prefix-format '((agenda . "%i %?-12t% s") ;; use "%i %-12:c%?-12t%b% s" to display path
-                        ;;                             (todo . " %i %с %-12:c")
-                        ;;                             (tags . " %i %-12:c")
-                        ;;                             (search . " %i %-12:c")))
-												(org-agenda-prefix-format
-												 '((agenda . "%t %-10c | %s")
-													 (todo . "%t %-10c | %s")
-													 (tags . "%t %-10c | %s")
-													 (search . "%c %t %s")))
 
                         (org-agenda-files '("~/Org/agenda/PlanAhead.org" "~/Org/agenda/GTD/org-gtd-tasks.org"))
                         (org-super-agenda-groups
                          '((:name "Schedule"
-  																:time-grid t)
-                           ;; (:name "School / exams"
-  												 ;;  			:and (:tag "school" :deadline future)
-  												 ;;  			:face (:background "yellow" :foreground "black"))
+    															:time-grid t)
                            (:name "Today"
-  																:scheduled today
-  																:face (:background "medium sea green" :foreground "white"))
-                           (:name "Deadline today"
-  																:deadline today
-  																:face (:background "black" :foreground "white"))
-                           (:name "Passed deadline"
-  																:deadline past
-                                  :scheduled past
-  																:face (:background "salmon"))
+    															:scheduled today
+    															:face (:background "medium sea green" :foreground "white")
+                                  :face 'warning)
                            (:name "Future deadline"
-  																:deadline future
-  																:face (:background "dark slate blue"))))))
+    															:deadline future
+    															:face (:background "deep sky blue"))
+                           (:name "Deadline today"
+    															:deadline today
+    															:face (:background "black" :foreground "white"))
+                           (:name "Passed deadline"
+    															:deadline past
+                                  :scheduled past
+    															:face (:background "salmon"))))))
 
             ;; (alltodo "" ((org-agenda-overriding-header "")
             ;;              (org-agenda-prefix-format "  %?-12t% s")
@@ -1452,8 +1387,8 @@
             ;;              (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/GTD/Projects.org"
             ;;              (org-super-agenda-groups
             ;;               '((:name "Tasks ready to actions"
-  					;; 											 :children t
-  					;; 											 :todo "NEXT")))))
+    				;; 											 :children t
+    				;; 											 :todo "NEXT")))))
 
             (tags "CLOSED>=\"<today>\""
                   ((org-agenda-overriding-header "\nCompleted today\n")))))
@@ -1464,28 +1399,73 @@
                         (org-agenda-prefix-format "  ∘ %t %s")
                         (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
                         (org-super-agenda-groups
-                         '((:name "Everytime habits"
-  																:tag ("everytime"))
-  												 (:name "Morning habits"
-  													  		:tag ("morning"))
-  												 (:name "Day habits"
-  													  		:tag ("day"))
-  												 (:name "Evening habits"
-  													  		:tag ("evening"))
-  												 ;; (:name "Sport habits"
-  												 ;;  			:tag "sport")
-  												 ;; (:name "Challenges"
-  												 ;;  			:tag "challenge")
-  												 (:discard (:anything))
-  												 (:discard (:not (:tag "habit")))
-                           ))))))))
+                         '((:name "Everytime"
+    															:tag ("everytime"))
+    											 (:name "Morning"
+    													  	:tag ("morning"))
+    											 (:name "Day"
+    													  	:tag ("day"))
+    											 (:name "Evening"
+    													  	:tag ("evening"))
+    											 ;; (:name "Challenges"
+    											 ;;  			:tag "challenge")
+    											 (:discard (:anything))
+    											 (:discard (:not (:tag "habit")))))))))
+          ("p" "Private counter"
+           ((agenda "" ((org-agenda-span 'day)
+                        (org-habit-show-habits t)
+                        (org-agenda-remove-tags t)
+                        (org-agenda-prefix-format "  ∘ %t %s")
+                        (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
+                        (org-super-agenda-groups
+                         '((:name "===== Other ====="
+    												      :tag "other"
+                                  :face (:background "red" :foreground "white" :weight "bold"))
+    											 (:discard (:anything))
+    											 (:discard (:not (:tag "habit")))))))))
+
+          ("d" "Day results"
+					 ((agenda ""
+										((org-agenda-span 'day)
+										 (org-agenda-overriding-header "\n === TIME REPORT ===")
+										 (org-agenda-skip-scheduled-if-done nil)
+										 (org-log-done 'time)
+										 (org-log-into-drawer t)
+										 (org-agenda-skip-deadline-if-done nil)
+										 (org-agenda-clockreport-mode t)
+										 (org-agenda-remove-tags t)
+										 (org-agenda-sorting-strategy '(habit-down time-up priority-down category-keep user-defined-up))
+										 (org-time-budgets-in-agenda-maybe)
+										 (org-agenda-include-deadlines t)
+										 (org-agenda-clockreport-parameter-plist
+											'(:scope ("~/Org/agenda/GTD/org-gtd-tasks.org"
+																"~/Org/agenda/GTD/gtd_archive_2025"
+																"~/Org/agenda/GTD/gtd_archive_2024"
+																"~/Org/agenda/GTD/org-gtd-tasks.org_archive")
+															 :maxlevel 5
+															 :emphasize t
+															 :block day
+															 :compact t
+															 :wstart 0
+															 :link nil
+															 :formula %
+															 :tags nil
+															 :properties ("CATEGORY" "EFFORT")
+															 :fileskip0 t))
+										 (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
+																				 "~/Org/agenda/GTD/gtd_archive_2025"
+																				 "~/Org/agenda/GTD/gtd_archive_2024"
+																				 "~/Org/agenda/GTD/org-gtd-tasks.org_archive"))
+										 (org-super-agenda-groups '((:discard (:anything))))))
+
+						(tags "CLOSED>=\"<today>\""
+									((org-agenda-overriding-header "\n === COMPLETED TASKS ===")))
+
+						(tags "+STYLE=\"habit\"+CLOSED>=\"<today>\""
+									((org-agenda-overriding-header "\n === COMPLETED HABITS ===")))))
+					))
 
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
-
-(use-package org-timeline
-	:ensure t
-	:config
-	(add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
 
 (use-package org-ref
 	:quelpa (org-ref
@@ -1658,123 +1638,155 @@
   :straight (:type built-in)
   :init
   ;;(add-to-list 'org-modules 'org-habit)
-	(progn
-		(custom-set-faces
-		 '(org-habit-clear-face
-			 ((t (:background "pale green"
-						:foreground "white"
-						:width expanded
-						:height 1.0
-						:box (:line-width (1 . 1) :color "white")))))
+  (progn
+    (custom-set-faces
+     '(org-habit-clear-face
+    	 ((t (:background "pale green"
+    										:foreground "white"
+    										:width expanded
+    										:height 1.0
+    										:box (:line-width (1 . 1) :color "white")))))
 
-		 '(org-habit-clear-future-face
-			 ((t (:background "gray"
-						:foreground "white"
-						:width expanded
-						:height 1.0
-						:box (:line-width (1 . 1) :color "white")))))
-		 '(org-habit-alert-future-face
-			 ((t (:background "light coral"
-						:foreground "white"
-						:width expanded
-						:height 1.0
-						:box (:line-width (1 . 1) :color "white")))))
-		 '(org-habit-alert-face
-			 ((t (:background "light coral"
-						:foreground "white"
-						:width expanded
-						:height 1.0
-						:box (:line-width (1 . 1) :color "white")))))
-		 '(org-habit-overdue-face
-			 ((t (:background "light coral"
-						:foreground "white"
-						:width expanded
-						:height 1.0
-						:box (:line-width (1 . 1) :color "white")))))
-		 '(org-habit-overdue-future-face
-			 ((t (:background "gray"
-						:foreground "white"
-						:width expanded
-						:height 1.0
-						:box (:line-width (1 . 1) :color "white")))))
-		 '(org-habit-ready-face
-			 ((t (:background "pale green"
-						:foreground "white"
-						:width expanded
-						:height 1.0
-						:box (:line-width (1 . 1) :color "white")))))
-		 '(org-habit-ready-future-face
-			 ((t (;;:background "white"
-						:foreground "white"
-						:width expanded
-						:height 1.0
-						:box (:line-width (1 . 1) :color "white")))))
-		 ))
-	:config
+     '(org-habit-clear-future-face
+    	 ((t (:background "gray"
+    										:foreground "white"
+    										:width expanded
+    										:height 1.0
+    										:box (:line-width (1 . 1) :color "white")))))
+     '(org-habit-alert-future-face
+    	 ((t (:background "light coral"
+    										:foreground "white"
+    										:width expanded
+    										:height 1.0
+    										:box (:line-width (1 . 1) :color "white")))))
+     '(org-habit-alert-face
+    	 ((t (:background "light coral"
+    										:foreground "white"
+    										:width expanded
+    										:height 1.0
+    										:box (:line-width (1 . 1) :color "white")))))
+     '(org-habit-overdue-face
+    	 ((t (:background "light coral"
+    										:foreground "white"
+    										:width expanded
+    										:height 1.0
+    										:box (:line-width (1 . 1) :color "white")))))
+     '(org-habit-overdue-future-face
+    	 ((t (:background "gray"
+    										:foreground "white"
+    										:width expanded
+    										:height 1.0
+    										:box (:line-width (1 . 1) :color "white")))))
+     '(org-habit-ready-face
+    	 ((t (:background "pale green"
+    										:foreground "white"
+    										:width expanded
+    										:height 1.0
+    										:box (:line-width (1 . 1) :color "white")))))
+     '(org-habit-ready-future-face
+    	 ((t (;;:background "white"
+    				:foreground "white"
+    				:width expanded
+    				:height 1.0
+    				:box (:line-width (1 . 1) :color "white")))))
+     ))
+  :config
   (load "~/.emacs.d/lisp/my-org-habit")
-	(setq org-habit-following-days 1
-				org-habit-preceding-days 7
-				org-habit-show-habits nil
-				org-habit-show-all-today t
-				org-habit-graph-column 57
-				org-habit-overdue-glyph ?○
-				org-habit-alert-glyph ?○
-				org-habit-today-glyph ?○
-				org-habit-completed-glyph ?●
-				org-habit-show-done-always-green t)
+  (setq org-habit-following-days 1
+    		org-habit-preceding-days 7
+    		org-habit-show-habits nil
+    		org-habit-show-all-today t
+    		org-habit-graph-column 67
+    		org-habit-overdue-glyph ?○
+    		org-habit-alert-glyph ?○
+    		org-habit-today-glyph ?○
+    		org-habit-completed-glyph ?●
+    		org-habit-show-done-always-green t)
 
-	(defun toggle-org-habit-show-all-today ()
-		"Toggle the value of `org-habit-show-all-today' between t and nil."
-		(interactive)
-		(setq org-habit-show-all-today (not org-habit-show-all-today))
-		(message "org-habit-show-all-today is now %s"
-						 (if org-habit-show-all-today "nil" "t"))
-		(org-agenda-refresh))
+  (defun toggle-org-habit-show-all-today ()
+    "Toggle the value of `org-habit-show-all-today' between t and nil."
+    (interactive)
+    (setq org-habit-show-all-today (not org-habit-show-all-today))
+    (message "org-habit-show-all-today is now %s"
+    				 (if org-habit-show-all-today "nil" "t"))
+    (org-agenda-refresh))
 
-	(define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
+  (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
 
 (use-package org-habit-stats
-	:ensure t
-	:config
-	(add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
-	(add-hook 'org-agenda-mode-hook
-						(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
+  :ensure t
+  :config
+  (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
+  (add-hook 'org-agenda-mode-hook
+    				(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
+
+(defun org-habit-streak-count ()
+  (goto-char (point-min))
+  (while (not (eobp))
+    (when (get-text-property (point) 'org-habit-p)
+      (let ((streak 0)
+            (counter (+ org-habit-graph-column org-habit-preceding-days)))
+        (move-to-column counter)
+        (while (and (>= counter org-habit-graph-column)
+                    (= (char-after (point)) org-habit-completed-glyph))
+          (setq streak (1+ streak))
+          (setq counter (1- counter))
+          (backward-char 1))
+        (end-of-line)
+        (insert (format "[🔥 %d]" streak))))
+    (forward-line 1)))
+
+(add-hook 'org-agenda-finalize-hook 'org-habit-streak-count)
 
 ;;(frostyx/guix :install "alsa-utils")
   
 (use-package sound-wav
-          :ensure t
-          :demand t) ;; dep for org-pomodoro
+  :ensure t
+  :demand t) ;; dep for org-pomodoro
 
 (use-package powershell
   :ensure t
   :demand t) ;; dep for org-pomodoro
 
 (use-package org-pomodoro
-  :ensure t)
+  :ensure t
+	:bind (("C-c k" . my/org-pomodoro))
+	:config
+	(setq org-pomodoro-audio-player (or (executable-find "aplay") (executable-find "afplay"))
+        org-pomodoro-play-sounds t           ; Determines whether soudns are played or not
+				org-pomodoro-keep-killed-pomodoro-time t
+				org-pomodoro-format " %s"
+				org-pomodoro-short-break-format " Short Break %s"
+				org-pomodoro-long-break-format  " Long Break %s"
+				;; org-pomodoro-finished-sound-p t
+        ;; org-pomodoro-start-sound "/home/vberezhnev/.emacs.d/sounds/bell.mp3"
 
-(setq org-pomodoro-keep-killed-pomodoro-time t)
+        org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
+        org-pomodoro-start-sound (expand-file-name "sounds/bell.wav" user-emacs-directory)
+        org-pomodoro-length 40                ; The length of a pomodoro in minutes
 
-(setq org-pomodoro-format " %s")
-(setq org-pomodoro-short-break-format " Short Break %s")
-(setq org-pomodoro-long-break-format " Long Break %s")
+        org-pomodoro-finished-sound-p t      ; Determines whether to play a sound when a pomodoro finished
+        org-pomodoro-finished-sound (expand-file-name "sounds/bell.wav" user-emacs-directory)
+
+        org-pomodoro-manual-break t          ; Whether the user needs to exit manually from a running pomodoro to enter a break
+        org-pomodoro-overtime-sound-p t      ; Determines whether to play a sound when a pomodoro starts to run overtime
+        org-pomodoro-overtime-sound (expand-file-name "sounds/bell.wav" user-emacs-directory)
+
+				org-pomodoro-length 40
+				org-pomodoro-short-break-length 5
+				org-pomodoro-long-break-length 15
+				org-pomodoro-long-break-frequency 3
+				;;org-pomodoro-expiry-time 30
+        ;;org-pomodoro-clock-break t           ; Whether to clock time during breaks
+				))
 
 (defun my/org-clock-get-clock-string ()
   (concat " " org-clock-heading))
 
 (setq spaceline-org-clock-format-function 'my/org-clock-get-clock-string)
 
-(setq org-pomodoro-start-sound-p t)
-(setq org-pomodoro-finished-sound-p t)
-
-(setq org-pomodoro-short-break-sound-p nil)
-(setq org-pomodoro-long-break-sound-p nil)
-
-(setq org-pomodoro-length 30)
-(setq org-pomodoro-short-break-length 0)
-(setq org-pomodoro-long-break-length 0)
-(setq org-pomodoro-long-break-frequency 1)
-(setq org-pomodoro-expiry-time 30)
+;; (set-face-attribute 'org-pomodoro-mode-line nil :foreground my/green)
+;; (set-face-attribute 'org-pomodoro-mode-line-overtime nil :foreground my/red)
 
 (defun my/org-pomodoro ()
   (interactive)
@@ -2244,17 +2256,73 @@ SLOT should be specified as a plain symbol, not a keyword."
   (define-derived-mode typescriptreact-mode typescript-mode
     "TypeScript TSX"))
 
+(use-package rustic
+  :ensure t
+  :bind (:map rustic-mode-map
+              ("M-j" . lsp-ui-imenu)
+              ("M-?" . lsp-find-references)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c a" . lsp-execute-code-action)
+              ("C-c C-c r" . lsp-rename)
+              ("C-c C-c q" . lsp-workspace-restart)
+              ("C-c C-c Q" . lsp-workspace-shutdown)
+              ("C-c C-c s" . lsp-rust-analyzer-status))
+  :config
+  ;;(setq rustic-format-on-save t)
+  ;;(add-hook 'rustic-mode-hook 'rk/rustic-mode-hook)
+
+  (defun rk/rustic-mode-hook ()
+    ;; so that run C-c C-c C-r works without having to confirm, but don't try to
+    ;; save rust buffers that are not file visiting. Once
+    ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
+    ;; no longer be necessary.
+    (when buffer-file-name
+      (setq-local buffer-save-without-query t))
+    (add-hook 'before-save-hook 'lsp-format-buffer nil t))
+
+  (use-package rust-playground
+    :ensure t)
+
+  ;; (use-package cargo
+  ;;   :ensure t
+  ;;   :if (executable-find "cargo")
+  ;;   :after rust-mode
+  ;;   :bind (:map cargo-minor-mode-map
+  ;;               ("C-c C-t" . cargo-process-test)
+  ;;               ("C-c C-b" . cargo-process-build)
+  ;;               ("C-c C-c" . cargo-process-run))
+  ;;   :config
+  ;;   (add-hook 'rust-mode-hook 'cargo-minor-mode))
+  )
+
 (use-package go-mode
+  :straight t
 	:ensure t
-	:config
-	(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode)))
+  :mode ("\\.go\\'" . go-mode)
+  :config
+  (defun my-go-mode-hook ()
+    (setq tab-width 2)
+    (setq gofmt-command "goimports")
+    (set (make-local-variable 'company-backends) '(company-go))
+    (company-mode))
+  (add-hook 'go-mode-hook 'my-go-mode-hook))
+
+(use-package company-go
+  :after (company go-mode)
+	:ensure t
+  :straight t)
+
+(use-package go-errcheck
+  :after go-mode
+	:ensure t
+  :straight t)
 
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred)
   :bind (:map lsp-mode-map
               ("C-c f" . lsp-format-buffer))
-  :hook ((go-mode         . lsp-deferred)
+  :hook (;;(go-mode         . lsp-deferred)
          (rust-mode       . lsp-deferred)
          ;; (lisp            . lsp)
          (python-mode     . lsp-deferred)
@@ -2270,7 +2338,7 @@ SLOT should be specified as a plain symbol, not a keyword."
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all t)
-  (lsp-idle-delay 0.2)
+  (lsp-idle-delay 0) ;; BEFORE: 0.2
   ;; enable / disable the hints as you prefer:
   (lsp-inlay-hint-enable t)
   ;; These are optional configurations. See https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/#lsp-rust-analyzer-display-chaining-hints for a full list
