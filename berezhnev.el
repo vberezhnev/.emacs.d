@@ -1302,20 +1302,33 @@
               '()))
 
 (defun my/time-tracking-view (&optional arg)
-  "Create a dedicated time tracking view with statistics."
+  "Create a dedicated time tracking view with colorful styling."
   (let* ((day-of-week (upcase (format-time-string "%^a")))
          (required-property (concat "REQUIRED_TIME_" day-of-week))
          (categories '("EGE" "MERITRANK" "CODING" "PERSONAL"))
-         (main-categories '("EGE" "MERITRANK" "CODING")) ; отдельный список для основных категорий
+         (main-categories '("EGE" "MERITRANK" "CODING"))
          (today-start (format-time-string "%Y-%m-%d"))
          (today-end (format-time-string "%Y-%m-%d" (time-add (current-time) 86400))))
 
     ;; Очищаем буфер и устанавливаем заголовок
     (org-agenda-prepare "Time Tracking")
     
-    ;;(insert "\n\n")
-    (insert "\n────────── === TIME REQUIREMENTS === ──────────\n")
-    ;;(insert "──────────────────────────────────────────────\n")
+    ;; Красочный разделитель
+    (insert 
+     (propertize "============================\n" 
+                 'face '(:foreground "#4A90E2")))
+    
+    ;; Заголовок с цветом и стилем
+    (insert 
+     (propertize "🕰️ TIME TRACKING DASHBOARD 🕰️\n" 
+                 'face '(:foreground "#4A90E2" 
+                         :weight bold 
+                         :height 1.2)))
+    
+    ;; Дата с цветовым оформлением
+    (insert 
+     (propertize (format-time-string "📅 Date: %Y-%m-%d\n\n")
+                 'face '(:foreground "#2196F3")))
     
     (let ((total-time 0.0)
           (category-data '())
@@ -1368,7 +1381,13 @@
 
           (push (list category actual required tasks) category-data)))
 
-      ;; Основная таблица
+      ;; Заголовок категорий с цветом
+      (insert 
+       (propertize "📊 Time Breakdown\n" 
+                   'face '(:foreground "#2196F3" 
+                           :weight bold)))
+      
+      ;; Основная таблица с цветным оформлением
       (insert "| Category   | Required | Actual  | Progress  |\n")
       (insert "|------------+----------+---------+-----------|\n")
 
@@ -1381,35 +1400,64 @@
                               category "---" actual "---"))
             (let ((progress (if (> required 0.0)
                                 (* 100.0 (/ actual required))
-                              0.0)))
-              (insert (format "| %-10s | %8.1f | %7.1f | %8.1f%% |\n"
-                              category required actual progress))))))
+                              0.0))
+                  (cat-color 
+                   (cond 
+                    ((string= category "EGE") "#FF6B6B")
+                    ((string= category "MERITRANK") "#4CAF50")
+                    ((string= category "CODING") "#2196F3")
+                    (t "#333333"))))
+              (insert 
+               (format "| %s | %8.1f | %7.1f | %8.1f%% |\n"
+                       (propertize (format "%-10s" category)
+                                   'face `(:foreground ,cat-color 
+                                           :weight bold))
+                       required actual progress))))))
 
-      ;; (insert "|------------+----------+---------+-----------|\n")
-
-      ;; Добавляем график бюджета времени
-      (insert "\n────────────────── === TIME BUDGET GRAPH === ──────────────────────\n")
+      ;; График бюджета времени
+      (insert "\n")
+      (insert 
+       (propertize "📅 Time Budget Graph\n" 
+                   'face '(:foreground "#2196F3" 
+                           :weight bold)))
+      
       (insert (save-window-excursion
                 (with-temp-buffer
                   (org-clock-budget-report)
                   (buffer-string))))
 
-      ;; Расширенная статистика (без PERSONAL)
-      ;; (insert "\n=== Productivity Statistics ===\n")
-      ;; (insert "──────────────────────────────────────────────\n")
+      ;; Расширенная статистика
       (insert "\n")
+      (insert 
+       (propertize "📈 Productivity Statistics\n" 
+                   'face '(:foreground "#2196F3" 
+                           :weight bold)))
       
-      (insert (format "Most productive category: %s (%.1f hours)\n" most-active-cat most-active-hours))
+      ;; Статистика с цветовым оформлением
+      (when most-active-cat
+        (insert 
+         (propertize (format "🏆 Most productive category: %s (%.1f hours)\n" 
+                             most-active-cat most-active-hours)
+                     'face '(:foreground "#4CAF50"))))
+      
       (when (> total-tasks 0)
-        (insert (format "Average time per task: %.1f minutes\n"
-                        (/ (* total-time 60) total-tasks))))
+        (insert 
+         (propertize (format "⏱️ Average time per task: %.1f minutes\n"
+                             (/ (* total-time 60) total-tasks))
+                     'face '(:foreground "#FF9800"))))
 
-      ;; Общий прогресс
+      ;; Общий прогресс с цветовым оформлением
       (let ((total-progress (if (> total-required 0)
                                 (* 100.0 (/ total-time total-required))
                               0)))
-        (insert (format "Overall progress: %.1f%% (%.1f/%.1f hours)\n"
-                        total-progress total-time total-required))))))
+        (insert 
+         (propertize (format "📊 Overall progress: %.1f%% (%.1f/%.1f hours)\n" 
+                             total-progress total-time total-required)
+                     'face `(:foreground 
+                             ,(cond 
+                               ((>= total-progress 80) "#4CAF50")
+                               ((>= total-progress 50) "#FF9800")
+                               (t "#FF5722")))))))))
 
 (evil-leader/set-key
         "z" '(org-agenda nil "z")
