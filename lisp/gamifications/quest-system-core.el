@@ -2,6 +2,9 @@
 (defvar hq-level 1 "Уровень персонажа")
 (defvar hq-gold 0 "Золото персонажа")
 
+(defvar hq-inventory '() 
+  "Предметы в инвентаре игрока.")
+
 (defun hq-save-data ()
   "Сохранить данные квестовой системы"
   (with-temp-file "~/.emacs.d/quest-system-data.el"

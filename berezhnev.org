@@ -3581,6 +3581,7 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
 **** Org gamifications
 #+begin_src emacs-lisp :lexical no
   (load "~/.emacs.d/lisp/gamifications/quest-system-core")
+  (load "~/.emacs.d/lisp/gamifications/market")
   (load "~/.emacs.d/lisp/gamifications/habit-quest")
   (load "~/.emacs.d/lisp/gamifications/tasks-quest")
 #+end_src

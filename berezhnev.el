@@ -1769,6 +1769,7 @@
 (add-hook 'org-agenda-finalize-hook 'org-habit-streak-count)
 
 (load "~/.emacs.d/lisp/gamifications/quest-system-core")
+(load "~/.emacs.d/lisp/gamifications/market")
 (load "~/.emacs.d/lisp/gamifications/habit-quest")
 (load "~/.emacs.d/lisp/gamifications/tasks-quest")
 
