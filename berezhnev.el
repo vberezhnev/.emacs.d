@@ -1312,10 +1312,11 @@
 
     ;; Очищаем буфер и устанавливаем заголовок
     (org-agenda-prepare "Time Tracking")
-
-    (insert "\n === TIME REQUIREMENTS ===\n")
-    (insert "──────────────────────────────────────────────\n\n")
-
+    
+    ;;(insert "\n\n")
+    (insert "\n────────── === TIME REQUIREMENTS === ──────────\n")
+    ;;(insert "──────────────────────────────────────────────\n")
+    
     (let ((total-time 0.0)
           (category-data '())
           (most-active-cat nil)
@@ -1345,7 +1346,7 @@
               (org-clock-sum today-start today-end
                              (lambda ()
                                (string= (org-entry-get nil "CATEGORY")
-																				category)))
+                                        category)))
               (setq actual (+ actual (/ (float org-clock-file-total-minutes) 60.0)))
 
               ;; Подсчёт задач (кроме PERSONAL)
@@ -1376,19 +1377,28 @@
                (actual (nth 1 data))
                (required (nth 2 data)))
           (if (string= category "PERSONAL")
-              (insert (format "| %-10s | %8s | %7.1f | %8s |\n"
-                              category "(none)" actual "---"))
+              (insert (format "| %-10s | %8s | %7.1f | %9s |\n"
+                              category "---" actual "---"))
             (let ((progress (if (> required 0.0)
                                 (* 100.0 (/ actual required))
                               0.0)))
               (insert (format "| %-10s | %8.1f | %7.1f | %8.1f%% |\n"
                               category required actual progress))))))
 
-      (insert "|------------+----------+---------+-----------|\n\n")
+      ;; (insert "|------------+----------+---------+-----------|\n")
+
+      ;; Добавляем график бюджета времени
+      (insert "\n────────────────── === TIME BUDGET GRAPH === ──────────────────────\n")
+      (insert (save-window-excursion
+                (with-temp-buffer
+                  (org-clock-budget-report)
+                  (buffer-string))))
 
       ;; Расширенная статистика (без PERSONAL)
-      (insert "=== Productivity Statistics ===\n")
-      (insert "──────────────────────────────────────────────\n")
+      ;; (insert "\n=== Productivity Statistics ===\n")
+      ;; (insert "──────────────────────────────────────────────\n")
+      (insert "\n")
+      
       (insert (format "Most productive category: %s (%.1f hours)\n" most-active-cat most-active-hours))
       (when (> total-tasks 0)
         (insert (format "Average time per task: %.1f minutes\n"
@@ -1402,7 +1412,10 @@
                         total-progress total-time total-required))))))
 
 (evil-leader/set-key
-        "z" '(org-agenda nil "z"))
+        "z" '(org-agenda nil "z")
+        "qs" 'hq-shop
+        "qb" 'hq-buy-item
+        "qu" 'hq-use-item)
 
 (global-set-key (kbd "C-c C-x o") 'org-clock-out)
 (global-set-key (kbd "C-c C-x j") 'org-clock-go-to)
@@ -1421,51 +1434,51 @@
         org-agenda-block-separator #x2501
         org-agenda-compact-blocks t ; changed
         org-agenda-start-with-log-mode nil
-      	org-agenda-deadline-faces
+       	org-agenda-deadline-faces
         '((1.0001 . org-warning)              ; due yesterday or before
           (0.0    . org-upcoming-deadline))   ; due today or later
-      	org-icalendar-combined-name "Hugo Org"
-      	org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo)
-      	org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo)
-      	org-icalendar-timezone "Asia/Vladivostok"
-      	org-icalendar-store-UID t
-      	org-icalendar-alarm-time 30
-      	calendar-date-style 'european
-      	calendar-week-start-day 0
+       	org-icalendar-combined-name "Hugo Org"
+       	org-icalendar-use-scheduled '(todo-start event-if-todo event-if-not-todo)
+       	org-icalendar-use-deadline '(todo-due event-if-todo event-if-not-todo)
+       	org-icalendar-timezone "Asia/Vladivostok"
+       	org-icalendar-store-UID t
+       	org-icalendar-alarm-time 30
+       	calendar-date-style 'european
+       	calendar-week-start-day 0
         calendar-mark-holidays-flag t
         calendar-mark-diary-entries-flag nil
-    		;; (setq-default org-icalendar-include-todo t)
-      	org-agenda-breadcrumbs-separator " ❱ "
+     		;; (setq-default org-icalendar-include-todo t)
+       	org-agenda-breadcrumbs-separator " ❱ "
         org-agenda-current-time-string "⏰ ┈┈┈┈┈┈┈┈┈┈┈ now"
         org-agenda-time-grid '((today require-timed remove-match)
                                (500 800 1000 1200 1400 1600 1800 2000)
                                ":  " "┈┈┈┈┈┈┈┈┈┈┈┈┈")
         org-agenda-prefix-format
-    		'((agenda . "%-10c | %?-12t% s")
-    			(todo . "%-10s")
-    			(tags . "%t %-10c | %s")
-    			(search . "%c %t %s"))
+     		'((agenda . "%-10c | %?-12t% s")
+     			(todo . "%-10s")
+     			(tags . "%t %-10c | %s")
+     			(search . "%c %t %s"))
         org-agenda-clockreport-parameter-plist
-        (quote (:maxlevel 5 :compact t :wstart 0 :link nil :formula % :tags nil :properties ("CATEGORY" "EFFORT") :narrow 80 :fileskip0 t))
+        (quote (:maxlevel 5 :compact t :wstart 0 :link nil :formula % :tags nil :properties ("CATEGORY" "EFFORT" "File") :narrow 80 :fileskip0 t))
         org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:")
         org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:")
-      	org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
+       	org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
                                                       "\n"
                                                       (org-agenda-format-date-aligned date)))
-      	org-default-notes-file "~/Org/agenda/Notes.org"
-      	org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/Calendar.org"
+       	org-default-notes-file "~/Org/agenda/Notes.org"
+       	org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/Calendar.org"
 
   (setq mixed-pitch-fixed-pitch-faces
-  			(quote (line-number-current-line line-number font-lock-comment-face org-done org-todo org-todo-keyword-outd org-todo-keyword-kill org-todo-keyword-wait org-todo-keyword-done org-todo-keyword-habt org-todo-keyword-todo org-tag org-ref-cite-face org-property-value org-special-keyword org-date diff-added org-drawer diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-block-begin-line org-block-end-line org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-table org-verbatim)))
+   			(quote (line-number-current-line line-number font-lock-comment-face org-done org-todo org-todo-keyword-outd org-todo-keyword-kill org-todo-keyword-wait org-todo-keyword-done org-todo-keyword-habt org-todo-keyword-todo org-tag org-ref-cite-face org-property-value org-special-keyword org-date diff-added org-drawer diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-block-begin-line org-block-end-line org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-table org-verbatim)))
 
   ;; Hide duplicates of the same todo item
   ;; If it has more than one of timestamp, scheduled,
   ;; or deadline information
   (setq org-agenda-skip-timestamp-if-done t
-  			org-agenda-skip-deadline-if-done t
-  			org-agenda-skip-scheduled-if-done t
-  			org-agenda-skip-scheduled-if-deadline-is-shown t
-  			org-agenda-skip-timestamp-if-deadline-is-shown t)
+   			org-agenda-skip-deadline-if-done t
+   			org-agenda-skip-scheduled-if-done t
+   			org-agenda-skip-scheduled-if-deadline-is-shown t
+   			org-agenda-skip-timestamp-if-deadline-is-shown t)
 
   ;; (setq org-agenda-clockreport-parameter-plist
   ;;       (quote (:link t :maxlevel 5 :fileskip t :compact t :narrow 80)))
@@ -1479,63 +1492,60 @@
   (setq org-agenda-custom-commands
         '(("c" "Getting Things Done (GTD)"
            ((agenda "" ((org-agenda-span 'day)
-                        (org-agenda-skip-scheduled-if-done nil)
-                        (org-agenda-skip-deadline-if-done nil)
-                        (org-agenda-clockreport-mode t)
-                        (org-agenda-remove-tags t)
-                        (org-agenda-sorting-strategy '(habit-down time-up priority-down category-keep user-defined-up))
-                        (org-time-budgets-in-agenda-maybe)
-                        (org-agenda-include-deadlines t)
+ 												(org-agenda-skip-scheduled-if-done nil)
+ 												(org-agenda-skip-deadline-if-done nil)
+ 												(org-agenda-clockreport-mode t)
+ 												(org-agenda-remove-tags t)
+ 												(org-agenda-sorting-strategy '(habit-down time-up priority-down category-keep user-defined-up))
+ 												(org-time-budgets-in-agenda-maybe)
+ 												(org-agenda-include-deadlines t)
 
-                        (org-agenda-files '("~/Org/agenda/PlanAhead.org" "~/Org/agenda/GTD/org-gtd-tasks.org"))
-                        (org-super-agenda-groups
-                         '((:name "Schedule"
-      														:time-grid t)
-                           (:name "Today"
-      														:scheduled today
-      														:face (:background "medium sea green" :foreground "white")
-                                  :face 'warning)
-                           (:name "Future deadline"
-      														:deadline future
-      														:face (:background "deep sky blue"))
-                           (:name "Deadline today"
-      														:deadline today
-      														:face (:background "black" :foreground "white"))
-                           (:name "Passed deadline"
-      														:deadline past
-                                  :scheduled past
-      														:face (:background "salmon"))))))
+ 												(org-agenda-files '("~/Org/agenda/PlanAhead.org" "~/Org/agenda/GTD/org-gtd-tasks.org"))
+ 												(org-super-agenda-groups
+ 												 '((:name "Schedule"
+       														:time-grid t)
+ 													 (:name "Today"
+       														:scheduled today
+       														:face (:background "medium sea green" :foreground "white")
+ 																	:face 'warning)
+ 													 (:name "Future deadline"
+       														:deadline future
+       														:face (:background "deep sky blue"))
+ 													 (:name "Deadline today"
+       														:deadline today
+       														:face (:background "black" :foreground "white"))
+ 													 (:name "Passed deadline"
+       														:deadline past
+ 																	:scheduled past
+       														:face (:background "salmon"))))))
 
-            ;; (alltodo "" ((org-agenda-overriding-header "")
-            ;;              (org-agenda-prefix-format "  %?-12t% s")
-            ;;              (org-agenda-entry-text-mode t)
-            ;;              (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")) ;; "~/Org/agenda/GTD/Projects.org"
-            ;;              (org-super-agenda-groups
-            ;;               '((:name "Tasks ready to actions"
-      			;; 											 :children t
-      			;; 											 :todo "NEXT")))))
-
-            (tags "CLOSED>=\"<today>\""
-                  ((org-agenda-overriding-header "\nCompleted today\n")))))
+ 						(tags "CLOSED>=\"<today>\""
+ 									((org-agenda-overriding-header "\nCompleted today\n")))
+            
+            (gtd-add-progress-info-to-agenda "")))
+          
           ("x" "Habits view"
            ((agenda "" ((org-agenda-span 'day)
                         (org-habit-show-habits t)
                         (org-agenda-remove-tags t)
                         (org-agenda-prefix-format "  ∘ %t %s")
                         (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
+                        (org-agenda-finalize-hook '(hq-add-quest-info-to-agenda))
                         (org-super-agenda-groups
                          '((:name "Everytime"
-      														:tag ("everytime"))
-      										 (:name "Morning"
-      													  :tag ("morning"))
-      										 (:name "Day"
-      													  :tag ("day"))
-      										 (:name "Evening"
-      													  :tag ("evening"))
-      										 ;; (:name "Challenges"
-      										 ;;  			:tag "challenge")
-      										 (:discard (:anything))
-      										 (:discard (:not (:tag "habit")))))))))
+       														:tag ("everytime"))
+       										 (:name "Morning"
+       													  :tag ("morning"))
+       										 (:name "Day"
+       													  :tag ("day"))
+       										 (:name "Evening"
+       													  :tag ("evening"))
+       										 ;; (:name "Challenges"
+       										 ;;  			:tag "challenge")
+       										 (:discard (:anything))
+       										 (:discard (:not (:tag "habit")))))))
+            (hq-add-quest-info-to-agenda "")))
+          
           ("p" "Private counter"
            ((agenda "" ((org-agenda-span 'day)
                         (org-habit-show-habits t)
@@ -1544,54 +1554,194 @@
                         (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
                         (org-super-agenda-groups
                          '((:name "===== Other ====="
-      												    :tag "other"
+       												    :tag "other"
                                   :face (:background "red" :foreground "white" :weight "bold"))
-      										 (:discard (:anything))
-      										 (:discard (:not (:tag "habit")))))))))
+       										 (:discard (:anything))
+       										 (:discard (:not (:tag "habit")))))))))
 
-  				;; ("k" "Time Tracking Overview"
+   				;; ("k" "Time Tracking Overview"
           ;;  my/time-tracking-view)
 
           ("d" "Day results"
-         ((agenda ""
-                  ((org-agenda-span 'day)
-                   (org-agenda-overriding-header "\n === TIME REPORT ===")
-                   (org-agenda-skip-scheduled-if-done nil)
-                   (org-log-done 'time)
-                   (org-log-into-drawer nil)
-                   (org-agenda-skip-deadline-if-done nil)
-                   (org-agenda-block-separator ?k)
-                   (org-agenda-clockreport-mode t)
-                   (org-agenda-remove-tags t)
-                   (org-agenda-sorting-strategy '(habit-down time-up priority-down category-keep user-defined-up))
-                   (org-time-budgets-in-agenda-maybe)
-                   (org-agenda-include-deadlines t)
-                   (org-agenda-clockreport-parameter-plist
-                    '(:scope ("~/Org/agenda/GTD/org-gtd-tasks.org"
-                             "~/Org/agenda/GTD/gtd_archive_2025"
-                             "~/Org/agenda/GTD/gtd_archive_2024"
-                             "~/Org/agenda/GTD/org-gtd-tasks.org_archive")
-                            :maxlevel 5
-                            :emphasize t
-                            :block day
-                            :compact t
-                            :wstart 0
-                            :link nil
-                            :formula %
-                            :tags nil
-                            :properties ("CATEGORY" "EFFORT")
-                            :fileskip0 t))
-                   (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
-                                     "~/Org/agenda/GTD/gtd_archive_2025"
-                                     "~/Org/agenda/GTD/gtd_archive_2024"
-                                     "~/Org/agenda/GTD/org-gtd-tasks.org_archive"))
-                   (org-super-agenda-groups '((:discard (:anything))))))
-          (my/time-tracking-view "")
-            (tags "CLOSED>=\"<today>\""
-                  ((org-agenda-overriding-header "\n === COMPLETED TASKS ===")))))
-  				))
+           ((agenda ""
+                    ((org-agenda-span 'day)
+ 										 (org-agenda-overriding-header "\n === TIME REPORT ===")
+ 										 (org-agenda-skip-scheduled-if-done nil)
+ 										 (org-log-done 'time)
+ 										 (org-log-into-drawer nil)
+ 										 (org-agenda-skip-deadline-if-done nil)
+ 										 ;;(org-agenda-block-separator nil)
+ 										 (org-agenda-clockreport-mode t)
+ 										 (org-agenda-remove-tags t)
+ 										 (org-agenda-sorting-strategy '(habit-down time-up priority-down category-keep user-defined-up))
+ 										 (org-time-budgets-in-agenda-maybe)
+ 										 (org-agenda-include-deadlines t)
+ 										 (org-agenda-clockreport-parameter-plist
+ 											'(:scope ("~/Org/agenda/GTD/org-gtd-tasks.org"
+ 																"~/Org/agenda/GTD/gtd_archive_2025"
+ 																"~/Org/agenda/GTD/gtd_archive_2024"
+ 																"~/Org/agenda/GTD/org-gtd-tasks.org_archive")
+ 															 :maxlevel 5
+ 															 :emphasize t
+ 															 :block day
+ 															 :compact t
+ 															 :wstart 0
+ 															 :link nil
+ 															 :formula %
+ 															 :tags nil
+															 :hidefiles t
+ 															 :properties ("CATEGORY" "EFFORT")))
+ 										 (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
+ 																				 "~/Org/agenda/GTD/gtd_archive_2025"
+ 																				 "~/Org/agenda/GTD/gtd_archive_2024"
+ 																				 "~/Org/agenda/GTD/org-gtd-tasks.org_archive"))
+ 										 (org-super-agenda-groups '((:discard (:anything))))))
+ 						(my/time-tracking-view "")
+ 						(tags "CLOSED>=\"<today>\""
+ 									((org-agenda-overriding-header "\n === COMPLETED TASKS ===")
+ 									 (org-agenda-remove-tags t)))))))
 
   (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
+
+(use-package org-habit
+    :after org
+    :ensure nil
+    :straight (:type built-in)
+    :init
+    ;;(add-to-list 'org-modules 'org-habit)
+    (progn
+      (custom-set-faces
+       '(org-habit-clear-face
+         ((t (:background "pale green"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+
+       '(org-habit-clear-future-face
+         ((t (:background "gray"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-alert-future-face
+         ((t (:background "light coral"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-alert-face
+         ((t (:background "light coral"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-overdue-face
+         ((t (:background "light coral"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-overdue-future-face
+         ((t (:background "gray"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-ready-face
+         ((t (:background "pale green"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-ready-future-face
+         ((t (:background "gray"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       ))
+    :config
+    (load "~/.emacs.d/lisp/my-org-habit")
+    (setq org-habit-following-days 1
+          org-habit-preceding-days 9
+          org-habit-show-habits nil
+          org-habit-show-all-today t
+          org-habit-graph-column 60
+          org-habit-overdue-glyph ?○
+          org-habit-alert-glyph ?○
+          org-habit-ready-future-glyph ?○ ;;⬡
+          org-habit-today-glyph ?◎
+          org-habit-completed-glyph ?●
+          org-habit-show-done-always-green t)
+
+    (defun toggle-org-habit-show-all-today ()
+      "Toggle the value of `org-habit-show-all-today' between t and nil."
+      (interactive)
+      (setq org-habit-show-all-today (not org-habit-show-all-today))
+      (message "org-habit-show-all-today is now %s"
+          		 (if org-habit-show-all-today "nil" "t"))
+      (org-agenda-refresh))
+
+    (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
+
+  (use-package org-habit-stats
+    :ensure t
+    :config
+    (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
+    (add-hook 'org-agenda-mode-hook
+          		(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
+
+(defun org-habit-count-last-streak (state-str)
+  "Подсчитывает количество последних подряд идущих ● в строке состояния."
+  (let ((streak 0))
+    (cl-loop for i from (1- (length state-str)) downto 0
+             while (= (aref state-str i) ?●)
+             do (setq streak (1+ streak)))
+    streak))
+
+(defun org-habit-streak-count ()
+  "Подсчитывает и отображает текущий стрик для каждой привычки в org-agenda."
+  (goto-char (point-min))
+  (while (not (eobp))
+    (when (get-text-property (point) 'org-habit-p)
+      (let ((streak 0))
+        ;; Ищем строку состояния привычки (○●◎)
+        (save-excursion
+          (when (re-search-forward "\\([○●◎]\\)+" (line-end-position) t)
+            (let ((state-str (match-string 0)))
+              ;; Если последний символ ●, считаем стрик
+              (when (= (aref state-str (1- (length state-str))) ?●)
+                (setq streak (org-habit-count-last-streak state-str))))))
+        
+        (end-of-line)
+        (insert (format " [🔥 %d]" streak))))
+    (forward-line 1)))
+
+(add-hook 'org-agenda-finalize-hook 'org-habit-streak-count)
+
+(load "~/.emacs.d/lisp/gamifications/quest-system-core")
+(load "~/.emacs.d/lisp/gamifications/habit-quest")
+(load "~/.emacs.d/lisp/gamifications/tasks-quest")
+
+(defun my/insert-daily-reports ()
+  "Вставить отчеты habits и day results в текущий буфер с измененными параметрами отображения."
+  (interactive)
+  (let ((original-habit-column org-habit-graph-column))
+    (setq org-habit-graph-column 38)
+    (let* ((habits-report (save-window-excursion
+                           (with-temp-buffer
+                             (org-agenda nil "x")
+                             (buffer-string))))
+           (day-results (save-window-excursion
+                         (with-temp-buffer 
+                           (org-agenda nil "d")
+                           (buffer-string))))
+           ;; Удаляем разделители из обоих отчетов
+           (habits-clean (replace-regexp-in-string "^─+\n" "" habits-report))
+           (day-clean (replace-regexp-in-string "^─+\n" "" day-results)))
+      (setq org-habit-graph-column original-habit-column)
+      (insert "** Habits report" habits-clean "\n\n** Day results" day-clean))))
 
 (use-package org-ref
 	:quelpa (org-ref
@@ -1757,122 +1907,6 @@
      org-modern-keyword "‣"
      org-modern-table t))
 (global-org-modern-mode t)
-
-(use-package org-habit
-  :after org
-  :ensure nil
-  :straight (:type built-in)
-  :init
-  ;;(add-to-list 'org-modules 'org-habit)
-  (progn
-    (custom-set-faces
-     '(org-habit-clear-face
-       ((t (:background "pale green"
-        								:foreground "white"
-        								:width expanded
-        								:height 1.0
-        								:box (:line-width (1 . 1) :color "white")))))
-
-     '(org-habit-clear-future-face
-       ((t (:background "gray"
-        								:foreground "white"
-        								:width expanded
-        								:height 1.0
-        								:box (:line-width (1 . 1) :color "white")))))
-     '(org-habit-alert-future-face
-       ((t (:background "light coral"
-        								:foreground "white"
-        								:width expanded
-        								:height 1.0
-        								:box (:line-width (1 . 1) :color "white")))))
-     '(org-habit-alert-face
-       ((t (:background "light coral"
-        								:foreground "white"
-        								:width expanded
-        								:height 1.0
-        								:box (:line-width (1 . 1) :color "white")))))
-     '(org-habit-overdue-face
-       ((t (:background "light coral"
-        								:foreground "white"
-        								:width expanded
-        								:height 1.0
-        								:box (:line-width (1 . 1) :color "white")))))
-     '(org-habit-overdue-future-face
-       ((t (:background "gray"
-        								:foreground "white"
-        								:width expanded
-        								:height 1.0
-        								:box (:line-width (1 . 1) :color "white")))))
-     '(org-habit-ready-face
-       ((t (:background "pale green"
-        								:foreground "white"
-        								:width expanded
-        								:height 1.0
-        								:box (:line-width (1 . 1) :color "white")))))
-     '(org-habit-ready-future-face
-       ((t (:background "gray"
-        								:foreground "white"
-        								:width expanded
-        								:height 1.0
-        								:box (:line-width (1 . 1) :color "white")))))
-     ))
-  :config
-  (load "~/.emacs.d/lisp/my-org-habit")
-  (setq org-habit-following-days 1
-        org-habit-preceding-days 9
-        org-habit-show-habits nil
-        org-habit-show-all-today t
-        org-habit-graph-column 60
-        org-habit-overdue-glyph ?○
-        org-habit-alert-glyph ?○
-        org-habit-ready-future-glyph ?○ ;;⬡
-        org-habit-today-glyph ?◎
-        org-habit-completed-glyph ?●
-        org-habit-show-done-always-green t)
-
-  (defun toggle-org-habit-show-all-today ()
-    "Toggle the value of `org-habit-show-all-today' between t and nil."
-    (interactive)
-    (setq org-habit-show-all-today (not org-habit-show-all-today))
-    (message "org-habit-show-all-today is now %s"
-        		 (if org-habit-show-all-today "nil" "t"))
-    (org-agenda-refresh))
-
-  (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
-
-(use-package org-habit-stats
-  :ensure t
-  :config
-  (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
-  (add-hook 'org-agenda-mode-hook
-        		(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
-
-(defun org-habit-streak-count ()
-  (goto-char (point-min))
-  (while (not (eobp))
-    (when (get-text-property (point) 'org-habit-p)
-      (let* ((habit-data (get-text-property (point) 'org-habit-p))
-             (today (time-to-days (current-time)))
-             (streak 0)
-             (all-done-dates (nth 4 habit-data)))
-
-        ;; Сортируем даты по убыванию
-        (when all-done-dates
-          (setq all-done-dates (sort (copy-sequence all-done-dates) #'>))
-          (let ((current-date (car all-done-dates)))
-            ;; Считаем стрик, только если последняя дата - сегодня или вчера
-            (when (and current-date (>= current-date (1- today)))
-              (while (and all-done-dates 
-                          (= (car all-done-dates) current-date))
-                (setq streak (1+ streak))
-                (setq current-date (1- current-date))
-                (setq all-done-dates (cdr all-done-dates))))))
-
-        (end-of-line)
-        (insert (format " [🔥 %d]" streak))))
-    (forward-line 1)))
-
-(add-hook 'org-agenda-finalize-hook 'org-habit-streak-count)
 
 ;;(frostyx/guix :install "alsa-utils")
   

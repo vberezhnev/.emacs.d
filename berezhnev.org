@@ -3084,20 +3084,33 @@ generally like to use the ~C-u~ prefix.
 ***** For org-agenda
 #+begin_src emacs-lisp :lexical no
   (defun my/time-tracking-view (&optional arg)
-    "Create a dedicated time tracking view with statistics."
+    "Create a dedicated time tracking view with colorful styling."
     (let* ((day-of-week (upcase (format-time-string "%^a")))
            (required-property (concat "REQUIRED_TIME_" day-of-week))
            (categories '("EGE" "MERITRANK" "CODING" "PERSONAL"))
-           (main-categories '("EGE" "MERITRANK" "CODING")) ; отдельный список для основных категорий
+           (main-categories '("EGE" "MERITRANK" "CODING"))
            (today-start (format-time-string "%Y-%m-%d"))
            (today-end (format-time-string "%Y-%m-%d" (time-add (current-time) 86400))))
 
       ;; Очищаем буфер и устанавливаем заголовок
       (org-agenda-prepare "Time Tracking")
       
-      ;;(insert "\n\n")
-      (insert "\n────────── === TIME REQUIREMENTS === ──────────\n")
-      ;;(insert "──────────────────────────────────────────────\n")
+      ;; Красочный разделитель
+      (insert 
+       (propertize "============================\n" 
+                   'face '(:foreground "#4A90E2")))
+      
+      ;; Заголовок с цветом и стилем
+      (insert 
+       (propertize "🕰️ TIME TRACKING DASHBOARD 🕰️\n" 
+                   'face '(:foreground "#4A90E2" 
+                           :weight bold 
+                           :height 1.2)))
+      
+      ;; Дата с цветовым оформлением
+      (insert 
+       (propertize (format-time-string "📅 Date: %Y-%m-%d\n\n")
+                   'face '(:foreground "#2196F3")))
       
       (let ((total-time 0.0)
             (category-data '())
@@ -3150,7 +3163,13 @@ generally like to use the ~C-u~ prefix.
 
             (push (list category actual required tasks) category-data)))
 
-        ;; Основная таблица
+        ;; Заголовок категорий с цветом
+        (insert 
+         (propertize "📊 Time Breakdown\n" 
+                     'face '(:foreground "#2196F3" 
+                             :weight bold)))
+        
+        ;; Основная таблица с цветным оформлением
         (insert "| Category   | Required | Actual  | Progress  |\n")
         (insert "|------------+----------+---------+-----------|\n")
 
@@ -3163,35 +3182,64 @@ generally like to use the ~C-u~ prefix.
                                 category "---" actual "---"))
               (let ((progress (if (> required 0.0)
                                   (* 100.0 (/ actual required))
-                                0.0)))
-                (insert (format "| %-10s | %8.1f | %7.1f | %8.1f%% |\n"
-                                category required actual progress))))))
+                                0.0))
+                    (cat-color 
+                     (cond 
+                      ((string= category "EGE") "#FF6B6B")
+                      ((string= category "MERITRANK") "#4CAF50")
+                      ((string= category "CODING") "#2196F3")
+                      (t "#333333"))))
+                (insert 
+                 (format "| %s | %8.1f | %7.1f | %8.1f%% |\n"
+                         (propertize (format "%-10s" category)
+                                     'face `(:foreground ,cat-color 
+                                             :weight bold))
+                         required actual progress))))))
 
-        ;; (insert "|------------+----------+---------+-----------|\n")
-
-        ;; Добавляем график бюджета времени
-        (insert "\n────────────────── === TIME BUDGET GRAPH === ──────────────────────\n")
+        ;; График бюджета времени
+        (insert "\n")
+        (insert 
+         (propertize "📅 Time Budget Graph\n" 
+                     'face '(:foreground "#2196F3" 
+                             :weight bold)))
+        
         (insert (save-window-excursion
                   (with-temp-buffer
                     (org-clock-budget-report)
                     (buffer-string))))
 
-        ;; Расширенная статистика (без PERSONAL)
-        ;; (insert "\n=== Productivity Statistics ===\n")
-        ;; (insert "──────────────────────────────────────────────\n")
+        ;; Расширенная статистика
         (insert "\n")
+        (insert 
+         (propertize "📈 Productivity Statistics\n" 
+                     'face '(:foreground "#2196F3" 
+                             :weight bold)))
         
-        (insert (format "Most productive category: %s (%.1f hours)\n" most-active-cat most-active-hours))
+        ;; Статистика с цветовым оформлением
+        (when most-active-cat
+          (insert 
+           (propertize (format "🏆 Most productive category: %s (%.1f hours)\n" 
+                               most-active-cat most-active-hours)
+                       'face '(:foreground "#4CAF50"))))
+        
         (when (> total-tasks 0)
-          (insert (format "Average time per task: %.1f minutes\n"
-                          (/ (* total-time 60) total-tasks))))
+          (insert 
+           (propertize (format "⏱️ Average time per task: %.1f minutes\n"
+                               (/ (* total-time 60) total-tasks))
+                       'face '(:foreground "#FF9800"))))
 
-        ;; Общий прогресс
+        ;; Общий прогресс с цветовым оформлением
         (let ((total-progress (if (> total-required 0)
                                   (* 100.0 (/ total-time total-required))
                                 0)))
-          (insert (format "Overall progress: %.1f%% (%.1f/%.1f hours)\n"
-                          total-progress total-time total-required))))))
+          (insert 
+           (propertize (format "📊 Overall progress: %.1f%% (%.1f/%.1f hours)\n" 
+                               total-progress total-time total-required)
+                       'face `(:foreground 
+                               ,(cond 
+                                 ((>= total-progress 80) "#4CAF50")
+                                 ((>= total-progress 50) "#FF9800")
+                                 (t "#FF5722")))))))))
 #+end_src
 
 #+RESULTS:
@@ -3207,7 +3255,10 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
 :END:
 #+begin_src emacs-lisp :lexical no
   (evil-leader/set-key
-          "z" '(org-agenda nil "z"))
+          "z" '(org-agenda nil "z")
+          "qs" 'hq-shop
+          "qb" 'hq-buy-item
+          "qu" 'hq-use-item)
 
   (global-set-key (kbd "C-c C-x o") 'org-clock-out)
   (global-set-key (kbd "C-c C-x j") 'org-clock-go-to)
@@ -3317,13 +3368,17 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
          														:face (:background "salmon"))))))
 
    						(tags "CLOSED>=\"<today>\""
-   									((org-agenda-overriding-header "\nCompleted today\n")))))
+   									((org-agenda-overriding-header "\nCompleted today\n")))
+              
+              (gtd-add-progress-info-to-agenda "")))
+            
             ("x" "Habits view"
              ((agenda "" ((org-agenda-span 'day)
                           (org-habit-show-habits t)
                           (org-agenda-remove-tags t)
                           (org-agenda-prefix-format "  ∘ %t %s")
                           (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
+                          (org-agenda-finalize-hook '(hq-add-quest-info-to-agenda))
                           (org-super-agenda-groups
                            '((:name "Everytime"
          														:tag ("everytime"))
@@ -3336,7 +3391,9 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
          										 ;; (:name "Challenges"
          										 ;;  			:tag "challenge")
          										 (:discard (:anything))
-         										 (:discard (:not (:tag "habit")))))))))
+         										 (:discard (:not (:tag "habit")))))))
+              (hq-add-quest-info-to-agenda "")))
+            
             ("p" "Private counter"
              ((agenda "" ((org-agenda-span 'day)
                           (org-habit-show-habits t)
@@ -3397,6 +3454,139 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
 
 #+RESULTS:
 : org-agenda
+
+**** Org-habit
+#+begin_src emacs-lisp
+  (use-package org-habit
+    :after org
+    :ensure nil
+    :straight (:type built-in)
+    :init
+    ;;(add-to-list 'org-modules 'org-habit)
+    (progn
+      (custom-set-faces
+       '(org-habit-clear-face
+         ((t (:background "pale green"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+
+       '(org-habit-clear-future-face
+         ((t (:background "gray"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-alert-future-face
+         ((t (:background "light coral"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-alert-face
+         ((t (:background "light coral"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-overdue-face
+         ((t (:background "light coral"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-overdue-future-face
+         ((t (:background "gray"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-ready-face
+         ((t (:background "pale green"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       '(org-habit-ready-future-face
+         ((t (:background "gray"
+          								:foreground "white"
+          								:width expanded
+          								:height 1.0
+          								:box (:line-width (1 . 1) :color "white")))))
+       ))
+    :config
+    (load "~/.emacs.d/lisp/my-org-habit")
+    (setq org-habit-following-days 1
+          org-habit-preceding-days 9
+          org-habit-show-habits nil
+          org-habit-show-all-today t
+          org-habit-graph-column 60
+          org-habit-overdue-glyph ?○
+          org-habit-alert-glyph ?○
+          org-habit-ready-future-glyph ?○ ;;⬡
+          org-habit-today-glyph ?◎
+          org-habit-completed-glyph ?●
+          org-habit-show-done-always-green t)
+
+    (defun toggle-org-habit-show-all-today ()
+      "Toggle the value of `org-habit-show-all-today' between t and nil."
+      (interactive)
+      (setq org-habit-show-all-today (not org-habit-show-all-today))
+      (message "org-habit-show-all-today is now %s"
+          		 (if org-habit-show-all-today "nil" "t"))
+      (org-agenda-refresh))
+
+    (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
+
+  (use-package org-habit-stats
+    :ensure t
+    :config
+    (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
+    (add-hook 'org-agenda-mode-hook
+          		(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
+
+(defun org-habit-count-last-streak (state-str)
+  "Подсчитывает количество последних подряд идущих ● в строке состояния."
+  (let ((streak 0))
+    (cl-loop for i from (1- (length state-str)) downto 0
+             while (= (aref state-str i) ?●)
+             do (setq streak (1+ streak)))
+    streak))
+
+(defun org-habit-streak-count ()
+  "Подсчитывает и отображает текущий стрик для каждой привычки в org-agenda."
+  (goto-char (point-min))
+  (while (not (eobp))
+    (when (get-text-property (point) 'org-habit-p)
+      (let ((streak 0))
+        ;; Ищем строку состояния привычки (○●◎)
+        (save-excursion
+          (when (re-search-forward "\\([○●◎]\\)+" (line-end-position) t)
+            (let ((state-str (match-string 0)))
+              ;; Если последний символ ●, считаем стрик
+              (when (= (aref state-str (1- (length state-str))) ?●)
+                (setq streak (org-habit-count-last-streak state-str))))))
+        
+        (end-of-line)
+        (insert (format " [🔥 %d]" streak))))
+    (forward-line 1)))
+
+(add-hook 'org-agenda-finalize-hook 'org-habit-streak-count)
+#+end_src
+
+#+RESULTS:
+| org-habit-streak-count |
+
+**** Org gamifications
+#+begin_src emacs-lisp :lexical no
+  (load "~/.emacs.d/lisp/gamifications/quest-system-core")
+  (load "~/.emacs.d/lisp/gamifications/habit-quest")
+  (load "~/.emacs.d/lisp/gamifications/tasks-quest")
+#+end_src
+
+#+RESULTS:
+: t
 
 **** Insert org-agenda
 #+begin_src emacs-lisp :lexical no
@@ -3751,129 +3941,6 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
 
 #+RESULTS:
 : t
-
-**** Org-habit
-#+begin_src emacs-lisp
-  (use-package org-habit
-    :after org
-    :ensure nil
-    :straight (:type built-in)
-    :init
-    ;;(add-to-list 'org-modules 'org-habit)
-    (progn
-      (custom-set-faces
-       '(org-habit-clear-face
-         ((t (:background "pale green"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-
-       '(org-habit-clear-future-face
-         ((t (:background "gray"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-alert-future-face
-         ((t (:background "light coral"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-alert-face
-         ((t (:background "light coral"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-overdue-face
-         ((t (:background "light coral"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-overdue-future-face
-         ((t (:background "gray"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-ready-face
-         ((t (:background "pale green"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-ready-future-face
-         ((t (:background "gray"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       ))
-    :config
-    (load "~/.emacs.d/lisp/my-org-habit")
-    (setq org-habit-following-days 1
-          org-habit-preceding-days 9
-          org-habit-show-habits nil
-          org-habit-show-all-today t
-          org-habit-graph-column 60
-          org-habit-overdue-glyph ?○
-          org-habit-alert-glyph ?○
-          org-habit-ready-future-glyph ?○ ;;⬡
-          org-habit-today-glyph ?◎
-          org-habit-completed-glyph ?●
-          org-habit-show-done-always-green t)
-
-    (defun toggle-org-habit-show-all-today ()
-      "Toggle the value of `org-habit-show-all-today' between t and nil."
-      (interactive)
-      (setq org-habit-show-all-today (not org-habit-show-all-today))
-      (message "org-habit-show-all-today is now %s"
-          		 (if org-habit-show-all-today "nil" "t"))
-      (org-agenda-refresh))
-
-    (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
-
-  (use-package org-habit-stats
-    :ensure t
-    :config
-    (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
-    (add-hook 'org-agenda-mode-hook
-          		(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
-
-(defun org-habit-count-last-streak (state-str)
-  "Подсчитывает количество последних подряд идущих ● в строке состояния."
-  (let ((streak 0))
-    (cl-loop for i from (1- (length state-str)) downto 0
-             while (= (aref state-str i) ?●)
-             do (setq streak (1+ streak)))
-    streak))
-
-(defun org-habit-streak-count ()
-  "Подсчитывает и отображает текущий стрик для каждой привычки в org-agenda."
-  (goto-char (point-min))
-  (while (not (eobp))
-    (when (get-text-property (point) 'org-habit-p)
-      (let ((streak 0))
-        ;; Ищем строку состояния привычки (○●◎)
-        (save-excursion
-          (when (re-search-forward "\\([○●◎]\\)+" (line-end-position) t)
-            (let ((state-str (match-string 0)))
-              ;; Если последний символ ●, считаем стрик
-              (when (= (aref state-str (1- (length state-str))) ?●)
-                (setq streak (org-habit-count-last-streak state-str))))))
-        
-        (end-of-line)
-        (insert (format " [🔥 %d]" streak))))
-    (forward-line 1)))
-
-(add-hook 'org-agenda-finalize-hook 'org-habit-streak-count)
-#+end_src
-
-#+RESULTS:
-| org-agenda-property-add-properties | org-habit-streak-count | org-modern-agenda |
 
 **** Org-pomodoro
 :LOGBOOK:
