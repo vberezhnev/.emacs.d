@@ -3378,7 +3378,7 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
                           (org-agenda-remove-tags t)
                           (org-agenda-prefix-format "  ∘ %t %s")
                           (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
-                          (org-agenda-finalize-hook '(hq-add-quest-info-to-agenda))
+                          (org-agenda-finalize-hook '(hq-add-quest-info-to-agenda hq-update-quest-info))
                           (org-super-agenda-groups
                            '((:name "Everytime"
          														:tag ("everytime"))
@@ -3547,26 +3547,42 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
           		(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
 
 (defun org-habit-count-last-streak (state-str)
-  "Подсчитывает количество последних подряд идущих ● в строке состояния."
-  (let ((streak 0))
-    (cl-loop for i from (1- (length state-str)) downto 0
-             while (= (aref state-str i) ?●)
-             do (setq streak (1+ streak)))
+  "Подсчитать количество последовательных выполненных дней (●), включая незавершенные задачи (◎).
+Стрик включает ◎ только если перед ним есть выполненные дни."
+  (let ((streak 0)
+        (length (length state-str))
+        (has-completed nil))  ; Отслеживаем, были ли выполненные дни
+    ;; Идем с конца строки
+    (catch 'break
+      (dotimes (i length)
+        (let ((current-char (aref state-str (- length i 1))))
+          (cond
+           ;; Незавершенная задача на сегодня (◎) учитывается только при наличии выполненных дней
+           ((char-equal current-char ?◎)
+            (when has-completed
+              (setq streak (1+ streak))))
+           ;; Выполненная задача (●) увеличивает стрик и отмечает наличие выполнений
+           ((char-equal current-char ?●)
+            (setq streak (1+ streak))
+            (setq has-completed t))
+           ;; Пропущенная задача (○) прерывает подсчет
+           (t
+            (throw 'break streak))))))
     streak))
 
 (defun org-habit-streak-count ()
-  "Подсчитывает и отображает текущий стрик для каждой привычки в org-agenda."
+  "Display current streak for each habit in org-agenda.
+A streak consists of consecutive completed days (●) and can include
+today's unfinished tasks (◎) only if there are completed days before it."
   (goto-char (point-min))
   (while (not (eobp))
     (when (get-text-property (point) 'org-habit-p)
       (let ((streak 0))
-        ;; Ищем строку состояния привычки (○●◎)
+        ;; Look for the habit's state string (○●◎)
         (save-excursion
           (when (re-search-forward "\\([○●◎]\\)+" (line-end-position) t)
             (let ((state-str (match-string 0)))
-              ;; Если последний символ ●, считаем стрик
-              (when (= (aref state-str (1- (length state-str))) ?●)
-                (setq streak (org-habit-count-last-streak state-str))))))
+              (setq streak (org-habit-count-last-streak state-str)))))
         
         (end-of-line)
         (insert (format " [🔥 %d]" streak))))
@@ -3576,12 +3592,13 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
 #+end_src
 
 #+RESULTS:
-| org-habit-streak-count |
+| org-agenda-property-add-properties | org-modern-agenda | org-habit-streak-count |
 
 **** Org gamifications
 #+begin_src emacs-lisp :lexical no
   (load "~/.emacs.d/lisp/gamifications/quest-system-core")
   (load "~/.emacs.d/lisp/gamifications/market")
+  (load "~/.emacs.d/lisp/gamifications/penalties")
   (load "~/.emacs.d/lisp/gamifications/habit-quest")
   (load "~/.emacs.d/lisp/gamifications/tasks-quest")
 #+end_src

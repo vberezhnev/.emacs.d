@@ -4,6 +4,7 @@
 (require 'widget)
 (require 'wid-edit)
 (require 'market)
+(require 'penalties)
 
 ;; Базовые показатели персонажа
 (defvar hq-xp 0 "Опыт персонажа")
@@ -14,7 +15,7 @@
 (defvar hq-quests
   '((:id 1 :name "Путь к осознанности"
 				 :description "Выполните все три медитации 5 дней подряд"
-				 :habits ("🎯‍ - Утренняя медитация" "🌟️ Дневная медитация" "🌿 - Вечерняя медитация")
+				 :habits ("🎯‍ - Утренняя медитация" "🌟️ - Дневная медитация" "🌿 - Вечерняя медитация")
 				 :required 5 :progress 0 :completed nil
 				 :reward-xp 100 :reward-gold 50)
 
@@ -73,74 +74,96 @@
         (setq hq-xp (nth 0 data)
               hq-level (nth 1 data)
               hq-gold (nth 2 data)
-              hq-quests (nth 3 data))
-        (when (> (length data) 4)
-          (setq hq-inventory (nth 4 data)))
-        (when (> (length data) 5)
-          (setq hq-daily-bonus (nth 5 data)))
-        (when (> (length data) 6)
-          (setq hq-last-bonus-date (nth 6 data)))))))
+              hq-quests (nth 3 data)
+              hq-inventory (nth 4 data)
+              hq-daily-bonus (nth 5 data)
+              hq-last-bonus-date (nth 6 data)
+              hq-penalty-history (nth 7 data))))))
+
+(defun hq-calculate-combined-streak (habit-stats habits)
+  "Подсчитать количество дней, когда все привычки выполнялись вместе."
+  (let* ((first-habit (car habits))
+         (habit-marker (get-text-property (point) 'org-habit-p))
+         (habit-graph (get-text-property (point) 'org-habit-graph))
+         (days (length habit-graph))
+         (combined-streak 0))
+    ;; Для каждого дня проверяем, все ли привычки были выполнены
+    (dotimes (day days)
+      (let ((all-done t))
+        (dolist (habit habits)
+          (unless (char-equal (aref habit-graph day) ?●)
+            (setq all-done nil)))
+        (when all-done
+          (setq combined-streak (1+ combined-streak)))))
+    combined-streak))
 
 ;; Функция для обновления статистики квестов
 (defun hq-update-quest-progress ()
-  "Обновить прогресс квестов на основе текущих стриков привычек"
+  "Обновить прогресс квестов на основе текущих стриков привычек.
+Для квестов с несколькими привычками учитывается их совместное выполнение."
   (interactive)
-  ;; Создаем временный хэш для хранения текущих стриков привычек
-  (let ((habit-streaks (make-hash-table :test 'equal))
-        (agenda-buffer (get-buffer "*Org Agenda*")))
-
-    ;; Проверяем, что буфер agenda существует
-    (when agenda-buffer
-      ;; Собираем информацию о стриках
-      (with-current-buffer agenda-buffer
-        (save-excursion
-          (goto-char (point-min))
-          (while (not (eobp))
-            (when (get-text-property (point) 'org-habit-p)
-              (let* ((marker (get-text-property (point) 'org-hd-marker))
-                     (habit-name nil)
-                     (streak 0))
-                ;; Получаем название привычки
-                (when marker
-                  (with-current-buffer (marker-buffer marker)
-                    (save-excursion
-                      (goto-char (marker-position marker))
-                      (setq habit-name (org-get-heading t t t t)))))
-
-                ;; Получаем стрик из [🔥 N]
-                (save-excursion
-                  (when (re-search-forward "\\[🔥 \\([0-9]+\\)\\]" (line-end-position) t)
-                    (setq streak (string-to-number (match-string 1)))))
-
-                ;; Сохраняем стрик
-                (when habit-name
-                  (puthash habit-name streak habit-streaks))))
-            (forward-line 1)))))
-
+  (let ((habit-stats (make-hash-table :test 'equal)))
+    ;; Собираем информацию о привычках
+    (with-current-buffer "*Org Agenda*"
+      (save-excursion
+        (goto-char (point-min))
+        (while (not (eobp))
+          (when (get-text-property (point) 'org-habit-p)
+            (let* ((marker (get-text-property (point) 'org-hd-marker))
+                   (habit-name nil)
+                   (habit-streak 0))
+              ;; Получаем название привычки
+              (when marker
+                (with-current-buffer (marker-buffer marker)
+                  (save-excursion
+                    (goto-char (marker-position marker))
+                    (setq habit-name (org-get-heading t t t t)))))
+              
+              ;; Получаем стрик из [🔥 N]
+              (save-excursion
+                (when (re-search-forward "\\[🔥 \\([0-9]+\\)\\]" (line-end-position) t)
+                  (setq habit-streak (string-to-number (match-string 1)))))
+              
+              ;; Находим последние 10 символов состояния привычки
+              (save-excursion
+                (when (re-search-forward "\\([○●]+\\)[◎ ]*\\[🔥" (line-end-position) t)
+                  (let ((state-str (match-string 1)))
+                    ;; Сохраняем и название, и состояние привычки
+                    (when habit-name
+                      (puthash habit-name 
+                               (cons habit-streak state-str) 
+                               habit-stats)))))))
+          (forward-line 1))))
+    
     ;; Обновляем прогресс квестов
     (dolist (quest hq-quests)
       (unless (plist-get quest :completed)
-        (let ((min-streak 999)
-              (habits (plist-get quest :habits)))
-          ;; Находим минимальный стрик среди связанных привычек
-          (dolist (habit habits)
-            (let ((streak (gethash habit habit-streaks 0)))
-              (when (< streak min-streak)
-                (setq min-streak streak))))
-
-          ;; Ограничиваем минимальный стрик разумным значением
-          (when (= min-streak 999)
-            (setq min-streak 0))
-
+        (let* ((habits (plist-get quest :habits))
+               (required (plist-get quest :required))
+               (current-streak 0))
+          
+          (if (= (length habits) 1)
+              ;; Для квестов с одной привычкой
+              (let ((habit-data (gethash (car habits) habit-stats)))
+                (when habit-data
+                  (setq current-streak (car habit-data))))
+            
+            ;; Для квестов с несколькими привычками
+            (let ((min-streak 999))
+              (dolist (habit habits)
+                (let ((habit-data (gethash habit habit-stats)))
+                  (when habit-data
+                    (let ((streak (car habit-data)))
+                      (when (< streak min-streak)
+                        (setq min-streak streak))))))
+              (unless (= min-streak 999)
+                (setq current-streak min-streak))))
+          
           ;; Обновляем прогресс квеста
-          (setf (plist-get quest :progress) min-streak)
-
-          ;; Проверяем завершение квеста
-          (when (>= min-streak (plist-get quest :required))
-            (setf (plist-get quest :completed) t))))
-
-			;; Сохраняем обновленные данные
-			(hq-save-data))))
+          (setf (plist-get quest :progress) current-streak))))
+    
+    ;; Сохраняем обновленные данные
+    (hq-save-data)))
 
 ;; Функция для генерации бонусного задания
 (defun hq-generate-daily-bonus ()
@@ -425,11 +448,22 @@
   ;; Загружаем сохраненные данные
   (hq-load-data)
 
-  ;; Привязка клавиш
-  (global-set-key (kbd "C-c q") 'hq-habits-quest-view)
-  (global-set-key (kbd "C-c C-q") 'hq-display-quests)
 
   (message "Квестовая система для org-habit настроена!"))
+
+(defun hq-update-quest-info ()
+  "Обновить информацию о квестах в agenda."
+  (when (string= (buffer-name) "*Org Agenda*")
+    (message "Updating quest progress...")  ; Отладочное сообщение
+    (hq-update-quest-progress)
+    (let ((inhibit-read-only t))
+      (save-excursion
+        (goto-char (point-max))
+        (hq-add-quest-info-to-agenda)))))
+
+  ;; Привязка клавиш
+  (global-set-key (kbd "C-c q") 'hq-habits-quest-view)
+  ;; (global-set-key (kbd "C-c q") ' hq-update-quest-info)
 
 ;; Устанавливаем систему
 (hq-setup)

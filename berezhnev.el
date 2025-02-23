@@ -1578,7 +1578,7 @@
                         (org-agenda-remove-tags t)
                         (org-agenda-prefix-format "  ∘ %t %s")
                         (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
-                        (org-agenda-finalize-hook '(hq-add-quest-info-to-agenda))
+                        (org-agenda-finalize-hook '(hq-add-quest-info-to-agenda hq-update-quest-info))
                         (org-super-agenda-groups
                          '((:name "Everytime"
        														:tag ("everytime"))
@@ -1770,6 +1770,7 @@
 
 (load "~/.emacs.d/lisp/gamifications/quest-system-core")
 (load "~/.emacs.d/lisp/gamifications/market")
+(load "~/.emacs.d/lisp/gamifications/penalties")
 (load "~/.emacs.d/lisp/gamifications/habit-quest")
 (load "~/.emacs.d/lisp/gamifications/tasks-quest")
 

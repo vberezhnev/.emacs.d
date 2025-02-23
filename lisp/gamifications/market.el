@@ -229,4 +229,7 @@
     (message "🎉 %s" use-message)
     (hq-market)))
 
+;; Глобальная привязка клавиш для магазина
+(global-set-key (kbd "C-c m") 'hq-market)
+
 (provide 'market)
