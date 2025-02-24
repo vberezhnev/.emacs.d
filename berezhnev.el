@@ -1734,33 +1734,50 @@
     (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
 
   (use-package org-habit-stats
-    :ensure t
+    :ensure nil
+    :load-path "~/.emacs.d/lisp/"
     :config
     (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
     (add-hook 'org-agenda-mode-hook
           		(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
 
 (defun org-habit-count-last-streak (state-str)
-  "Подсчитывает количество последних подряд идущих ● в строке состояния."
-  (let ((streak 0))
-    (cl-loop for i from (1- (length state-str)) downto 0
-             while (= (aref state-str i) ?●)
-             do (setq streak (1+ streak)))
+  "Подсчитать количество последовательных выполненных дней (●), включая незавершенные задачи (◎).
+Стрик включает ◎ только если перед ним есть выполненные дни."
+  (let ((streak 0)
+        (length (length state-str))
+        (has-completed nil))  ; Отслеживаем, были ли выполненные дни
+    ;; Идем с конца строки
+    (catch 'break
+      (dotimes (i length)
+        (let ((current-char (aref state-str (- length i 1))))
+          (cond
+           ;; Незавершенная задача на сегодня (◎) учитывается только при наличии выполненных дней
+           ((char-equal current-char ?◎)
+            (when has-completed
+              (setq streak (1+ streak))))
+           ;; Выполненная задача (●) увеличивает стрик и отмечает наличие выполнений
+           ((char-equal current-char ?●)
+            (setq streak (1+ streak))
+            (setq has-completed t))
+           ;; Пропущенная задача (○) прерывает подсчет
+           (t
+            (throw 'break streak))))))
     streak))
 
 (defun org-habit-streak-count ()
-  "Подсчитывает и отображает текущий стрик для каждой привычки в org-agenda."
+  "Display current streak for each habit in org-agenda.
+A streak consists of consecutive completed days (●) and can include
+today's unfinished tasks (◎) only if there are completed days before it."
   (goto-char (point-min))
   (while (not (eobp))
     (when (get-text-property (point) 'org-habit-p)
       (let ((streak 0))
-        ;; Ищем строку состояния привычки (○●◎)
+        ;; Look for the habit's state string (○●◎)
         (save-excursion
           (when (re-search-forward "\\([○●◎]\\)+" (line-end-position) t)
             (let ((state-str (match-string 0)))
-              ;; Если последний символ ●, считаем стрик
-              (when (= (aref state-str (1- (length state-str))) ?●)
-                (setq streak (org-habit-count-last-streak state-str))))))
+              (setq streak (org-habit-count-last-streak state-str)))))
         
         (end-of-line)
         (insert (format " [🔥 %d]" streak))))
@@ -1768,9 +1785,68 @@
 
 (add-hook 'org-agenda-finalize-hook 'org-habit-streak-count)
 
+(defun my-find-work-habit ()
+  "Находит привычку '3+ часа работы' в org-файлах и возвращает её данные."
+  (let ((work-habit-data nil))
+    ;; Перебираем все org-файлы из org-agenda-files
+    (dolist (file (org-agenda-files))
+      (with-current-buffer (find-file-noselect file)
+        (org-with-point-at 1
+          ;; Ищем нашу привычку
+          (while (and (not work-habit-data)
+                     (re-search-forward "⚡ - 3\\+ часа работы" nil t))
+            ;; Сохраняем позицию
+            (let ((pos (point)))
+              ;; Переходим к началу заголовка
+              (org-back-to-heading t)
+              ;; Проверяем, является ли это привычкой
+              (when (org-is-habit-p)
+                ;; Получаем данные привычки
+                (setq work-habit-data 
+                      (org-habit-stats-parse-todo (point))))
+              ;; Возвращаемся к исходной позиции
+              (goto-char pos))))))
+    work-habit-data))
+
+(defun my-display-work-habit-calendar ()
+    "Отображает календарь для привычки '3+ часа работы' в начале org-agenda буфера."
+    (let ((work-habit-data (my-find-work-habit)))
+      (when work-habit-data
+        ;; Создаем календарь в отдельном буфере
+        (org-habit-stats-make-calendar-buffer work-habit-data)
+        
+        ;; Сохраняем текущую позицию в agenda буфере
+        (save-excursion
+          (goto-char (point-min))
+          (when (search-forward "Everytime" nil t)
+            (forward-line -1)
+            
+            ;; Добавляем заголовок
+            (insert "\nКалендарь рабочих часов (3+ часа в день)\n")
+            (insert "================================\n")
+            
+            ;; Копируем содержимое календаря из временного буфера
+            (let ((calendar-content (with-current-buffer org-habit-stats-calendar-buffer
+                                    (buffer-string)))
+                  (calendar-overlays (org-habit-stats-get-calendar-overlays)))
+              ;; Вставляем содержимое календаря
+              (let ((start-pos (point)))
+                (insert calendar-content)
+                ;; Применяем оверлеи с правильным смещением
+                (org-habit-stats-apply-overlays calendar-overlays
+                                              (- start-pos 1)
+                                              (current-buffer))))
+            
+            ;; Добавляем разделитель после календаря
+            (insert "\n================================\n\n")
+)))))
+
+  ;; Регистрируем функцию как хук финализации agenda
+  (add-hook 'org-agenda-finalize-hook 'my-display-work-habit-calendar)
+
 (load "~/.emacs.d/lisp/gamifications/quest-system-core")
 (load "~/.emacs.d/lisp/gamifications/market")
-(load "~/.emacs.d/lisp/gamifications/penalties")
+;;(load "~/.emacs.d/lisp/gamifications/penalties")
 (load "~/.emacs.d/lisp/gamifications/habit-quest")
 (load "~/.emacs.d/lisp/gamifications/tasks-quest")
 
@@ -2266,7 +2342,8 @@
 	(org-gtd-horizons-file "horizons.org")
   :config
   (org-edna-mode)
-  :bind (("C-c d c" . (lambda () (interactive) (org-gtd-capture nil "i")))
+  :bind (;;("C-c d c" . (lambda () (interactive) (org-gtd-capture nil "i")))
+				 ("C-c d c" . org-gtd-capture)
 				 ("C-c d e" . org-gtd-engage)
 				 ("C-c d r" . org-gtd-engage-grouped-by-context)
 				 ("C-c d p" . org-gtd-process-inbox)

@@ -4,7 +4,7 @@
 (require 'widget)
 (require 'wid-edit)
 (require 'market)
-(require 'penalties)
+;; (require 'penalties)
 
 ;; Базовые показатели персонажа
 (defvar hq-xp 0 "Опыт персонажа")
@@ -17,25 +17,25 @@
 				 :description "Выполните все три медитации 5 дней подряд"
 				 :habits ("🎯‍ - Утренняя медитация" "🌟️ - Дневная медитация" "🌿 - Вечерняя медитация")
 				 :required 5 :progress 0 :completed nil
-				 :reward-xp 100 :reward-gold 50)
+				 :reward-xp 200 :reward-gold 100)
 
     (:id 2 :name "Железная дисциплина"
 				 :description "Просыпайтесь в 05:30 7 дней подряд"
 				 :habits ("⏰ - Проснуться в 05;30")
 				 :required 7 :progress 0 :completed nil
-				 :reward-xp 150 :reward-gold 75)
+				 :reward-xp 300 :reward-gold 150)
 
     (:id 3 :name "Энергетический баланс"
 				 :description "Выпивайте 2 литра воды и делайте 10к шагов 10 дней подряд"
 				 :habits ("💧 - 2 литра воды" "🚶 - 10к шагов")
 				 :required 10 :progress 0 :completed nil
-				 :reward-xp 200 :reward-gold 100)
+				 :reward-xp 400 :reward-gold 200)
 
     (:id 4 :name "Фокус на учебе"
 				 :description "Готовьтесь к ЕГЭ 5 дней подряд"
 				 :habits ("📝 - ЕГЭ")
 				 :required 5 :progress 0 :completed nil
-				 :reward-xp 120 :reward-gold 60)
+				 :reward-xp 400 :reward-gold 400)
 
     (:id 5 :name "Режим бодрости"
 				 :description "Принимайте контрастный душ 7 дней подряд"
@@ -80,87 +80,107 @@
               hq-last-bonus-date (nth 6 data)
               hq-penalty-history (nth 7 data))))))
 
-(defun hq-calculate-combined-streak (habit-stats habits)
-  "Подсчитать количество дней, когда все привычки выполнялись вместе."
-  (let* ((first-habit (car habits))
-         (habit-marker (get-text-property (point) 'org-habit-p))
-         (habit-graph (get-text-property (point) 'org-habit-graph))
-         (days (length habit-graph))
-         (combined-streak 0))
-    ;; Для каждого дня проверяем, все ли привычки были выполнены
-    (dotimes (day days)
-      (let ((all-done t))
-        (dolist (habit habits)
-          (unless (char-equal (aref habit-graph day) ?●)
-            (setq all-done nil)))
-        (when all-done
-          (setq combined-streak (1+ combined-streak)))))
-    combined-streak))
+(defun hq-calculate-combined-streak (habits habit-stats)
+  "Подсчитать количество последовательных дней, когда все привычки были выполнены.
+HABITS - список привычек для проверки
+HABIT-STATS - хеш-таблица с данными о привычках"
+  (let ((streaks-data nil))
+    ;; Собираем состояния всех привычек
+    (dolist (habit habits)
+      (when-let ((habit-data (gethash habit habit-stats)))
+        (push (cdr habit-data) streaks-data)))
+    
+    ;; Если получили данные для всех привычек
+    (when (= (length streaks-data) (length habits))
+      (let ((combined-streak 0)
+            (day-index 0)
+            (continue t))
+        ;; Идем по дням, начиная с последнего
+        (while (and continue
+                    (< day-index (length (car streaks-data))))
+          (let ((all-done t))
+            ;; Проверяем все привычки в текущий день
+            (dolist (habit-state streaks-data)
+              (when (and (< day-index (length habit-state))
+                        (not (char-equal (aref habit-state day-index) ?●)))
+                (setq all-done nil)))
+            
+            ;; Если все привычки выполнены в этот день
+            (if all-done
+                (setq combined-streak (1+ combined-streak))
+              ;; Если хоть одна не выполнена, прекращаем подсчет
+              (setq continue nil)))
+          (setq day-index (1+ day-index)))
+        combined-streak))))
+
+;; Добавляем глобальную переменную для хранения статистики привычек
+(defvar habit-stats (make-hash-table :test 'equal)
+  "Хеш-таблица для хранения статистики привычек.
+Ключи - названия привычек, значения - пары (стрик . строка-состояния)")
 
 ;; Функция для обновления статистики квестов
 (defun hq-update-quest-progress ()
-  "Обновить прогресс квестов на основе текущих стриков привычек.
-Для квестов с несколькими привычками учитывается их совместное выполнение."
+  "Обновить прогресс квестов на основе текущих стриков привычек."
   (interactive)
-  (let ((habit-stats (make-hash-table :test 'equal)))
-    ;; Собираем информацию о привычках
-    (with-current-buffer "*Org Agenda*"
-      (save-excursion
-        (goto-char (point-min))
-        (while (not (eobp))
-          (when (get-text-property (point) 'org-habit-p)
-            (let* ((marker (get-text-property (point) 'org-hd-marker))
-                   (habit-name nil)
-                   (habit-streak 0))
-              ;; Получаем название привычки
-              (when marker
-                (with-current-buffer (marker-buffer marker)
-                  (save-excursion
-                    (goto-char (marker-position marker))
-                    (setq habit-name (org-get-heading t t t t)))))
-              
-              ;; Получаем стрик из [🔥 N]
-              (save-excursion
-                (when (re-search-forward "\\[🔥 \\([0-9]+\\)\\]" (line-end-position) t)
-                  (setq habit-streak (string-to-number (match-string 1)))))
-              
-              ;; Находим последние 10 символов состояния привычки
-              (save-excursion
-                (when (re-search-forward "\\([○●]+\\)[◎ ]*\\[🔥" (line-end-position) t)
-                  (let ((state-str (match-string 1)))
-                    ;; Сохраняем и название, и состояние привычки
-                    (when habit-name
-                      (puthash habit-name 
-                               (cons habit-streak state-str) 
-                               habit-stats)))))))
-          (forward-line 1))))
+  (clrhash habit-stats)
+  
+  ;; Собираем информацию о привычках
+  (with-current-buffer "*Org Agenda*"
+    (save-excursion
+      (goto-char (point-min))
+      (while (not (eobp))
+        (when (get-text-property (point) 'org-habit-p)
+          (let* ((marker (get-text-property (point) 'org-hd-marker))
+                 (habit-name nil)
+                 (habit-streak 0)
+                 (habits-state nil))
+            
+            ;; Получаем название привычки
+            (when marker
+              (with-current-buffer (marker-buffer marker)
+                (save-excursion
+                  (goto-char (marker-position marker))
+                  (setq habit-name (org-get-heading t t t t)))))
+            
+            ;; Получаем актуальные данные о стриках
+            (save-excursion
+              (end-of-line)
+              (when (re-search-backward "\\[🔥 \\([0-9]+\\)\\]" (line-beginning-position) t)
+                (setq habit-streak (string-to-number (match-string 1)))
+                ;; Также сохраняем состояние привычки
+                (when (re-search-backward "\\([○●◎]+\\)" (line-beginning-position) t)
+                  (setq habits-state (buffer-substring-no-properties
+                                    (match-beginning 1)
+                                    (match-end 1)))))
+            
+            ;; Сохраняем данные привычки
+            (when (and habit-name habit-streak)
+              (puthash habit-name
+                       (cons habit-streak (or habits-state ""))
+                       habit-stats)))))
+        (forward-line 1)))
     
     ;; Обновляем прогресс квестов
-    (dolist (quest hq-quests)
-      (unless (plist-get quest :completed)
-        (let* ((habits (plist-get quest :habits))
-               (required (plist-get quest :required))
-               (current-streak 0))
+  (dolist (quest hq-quests)
+    (unless (plist-get quest :completed)
+      (let* ((habits (plist-get quest :habits))
+             (required (plist-get quest :required))
+             (current-progress 0))
+        
+        (if (= (length habits) 1)
+            ;; Для квестов с одной привычкой
+            (let ((habit-data (gethash (car habits) habit-stats)))
+              (when habit-data
+                (setq current-progress (car habit-data))))
           
-          (if (= (length habits) 1)
-              ;; Для квестов с одной привычкой
-              (let ((habit-data (gethash (car habits) habit-stats)))
-                (when habit-data
-                  (setq current-streak (car habit-data))))
-            
-            ;; Для квестов с несколькими привычками
-            (let ((min-streak 999))
-              (dolist (habit habits)
-                (let ((habit-data (gethash habit habit-stats)))
-                  (when habit-data
-                    (let ((streak (car habit-data)))
-                      (when (< streak min-streak)
-                        (setq min-streak streak))))))
-              (unless (= min-streak 999)
-                (setq current-streak min-streak))))
-          
-          ;; Обновляем прогресс квеста
-          (setf (plist-get quest :progress) current-streak))))
+          ;; Для квестов с несколькими привычками
+          ;; Используем новую функцию подсчета общего стрика
+          (setq current-progress 
+                (hq-calculate-combined-streak habits habit-stats)))
+        
+        ;; Обновляем прогресс квеста
+        (setf (plist-get quest :progress) current-progress))))
+  
     
     ;; Сохраняем обновленные данные
     (hq-save-data)))
@@ -197,106 +217,110 @@
       (hq-save-data))))
 
 ;; Функция для проверки бонусного задания
-(defun hq-check-daily-bonus (habit-name)
-  (when (and hq-daily-bonus
-             (string= habit-name (plist-get hq-daily-bonus :habit)))
-    (let ((bonus-xp (plist-get hq-daily-bonus :xp))
-          (bonus-gold (plist-get hq-daily-bonus :gold)))
-      (hq-add-xp-and-gold bonus-xp bonus-gold)
-      (setq hq-daily-bonus nil)
-      (hq-save-data))))
+;; (defun hq-check-daily-bonus (habit-name)
+;;   (when (and hq-daily-bonus
+;;              (string= habit-name (plist-get hq-daily-bonus :habit)))
+;;     (let ((bonus-xp (plist-get hq-daily-bonus :xp))
+;;           (bonus-gold (plist-get hq-daily-bonus :gold)))
+;;       (hq-add-xp-and-gold bonus-xp bonus-gold)
+;;       (setq hq-daily-bonus nil)
+;;       (hq-save-data))))
 
 (defun hq-add-quest-info-to-agenda (&optional arg)
-  "Добавить информацию о квестах в конец agenda"
+  "Добавить информацию о квестах в конец agenda с защитой от ошибок."
   (interactive)
   (let ((inhibit-read-only t))
-    ;; Добавляем разделитель перед информацией о квестах
-    (goto-char (point-max))
-    (insert "\n"
-            (propertize "============================\n"
-                        'face '(:foreground "#4A90E2")))
-    (insert (propertize "🎮 HABIT QUEST SYSTEM 🎮\n"
-                        'face '(:foreground "#4A90E2" :weight bold :height 1.2)))
-
-    ;; Статистика персонажа с цветовым оформлением
-    (insert
-     (propertize (format "👤 Level %d " hq-level)
-                 'face '(:foreground "#FFD700" :weight bold))
-     "| "
-     (propertize (format "XP: %d/%d "
-                         (mod hq-xp 100)
-                         100)
-                 'face '(:foreground "#4CAF50" :weight bold))
-     "| "
-     (propertize (format "Gold: %d 🪙\n" hq-gold)
-                 'face '(:foreground "#FFD700" :weight bold))
-     "\n")
-
-    ;; Бонусное задание
-    (when hq-daily-bonus
+    ;; Защита от nil значений
+    (let ((current-level (or hq-level 1))
+          (current-xp (or hq-xp 0))
+          (current-gold (or hq-gold 0)))
+      
+      ;; Добавляем разделитель
+      (goto-char (point-max))
+      (insert "\n"
+              (propertize "============================\n"
+                          'face '(:foreground "#4A90E2")))
+      
+      ;; Статистика персонажа
       (insert
-       (propertize "🎯 Бонусное задание на сегодня\n"
-                   'face '(:foreground "#2196F3" :weight bold))
-       (format "Выполните привычку '%s' для получения бонуса: "
-               (plist-get hq-daily-bonus :habit))
-       (propertize (format "%d XP, %d золота\n\n"
-                           (plist-get hq-daily-bonus :xp)
-                           (plist-get hq-daily-bonus :gold))
-                   'face '(:foreground "#4CAF50"))))
-
-    ;; Активные квесты
-    (insert
-     (propertize "📜 Активные квесты\n"
-                 'face '(:foreground "#2196F3" :weight bold)))
-
-    (let ((active-quests 0)
-          (quest-bar-width 20))
-      (dolist (quest hq-quests)
-        (unless (plist-get quest :completed)
-          (setq active-quests (1+ active-quests))
-          (let* ((name (plist-get quest :name))
-                 (progress (plist-get quest :progress))
-                 (required (plist-get quest :required))
-                 (progress-percent (if (> required 0)
-                                       (/ (* progress 100.0) required)
-                                     0))
-                 (filled-length (round (* quest-bar-width (/ progress-percent 100.0))))
-                 (empty-length (- quest-bar-width filled-length)))
-
-            (insert
-             (propertize (format "∘ %s\n" name)
-                         'face '(:foreground "#4A90E2")))
-
-            (insert
-             (propertize (format "  %d/%d дней " progress required)
-                         'face '(:foreground "#333333")))
-
-            (insert
-             (propertize
-              (concat
-               (make-string filled-length ?#)
-               (make-string empty-length ?·))
-              'face '(:foreground "#4CAF50"))
-             (format " %.1f%%\n\n" progress-percent)))))
-
-      (when (zerop active-quests)
+       (propertize "🎮 HABIT QUEST SYSTEM 🎮\n"
+                   'face '(:foreground "#4A90E2" :weight bold :height 1.2))
+       (propertize (format "👤 Level %d " current-level)
+                   'face '(:foreground "#FFD700" :weight bold))
+       "| "
+       (propertize (format "XP: %d/%d "
+                           (mod current-xp 100)
+                           100)
+                   'face '(:foreground "#4CAF50" :weight bold))
+       "| "
+       (propertize (format "Gold: %d 🪙\n" current-gold)
+                   'face '(:foreground "#FFD700" :weight bold)))
+      
+      ;; Бонусное задание
+      (when hq-daily-bonus
         (insert
-         (propertize "  Нет активных квестов\n"
-                     'face '(:foreground "#888888" :slant italic)))))
-
-    ;; Кнопка перехода в Market
-		(insert "\n")
-		(let ((market-button
-					 (propertize "[🏪 Открыть Market]"
-											 'face '(:foreground "white"
-																					 :background "#4CAF50"
-																					 :weight bold
-																					 :box (:line-width 2 :style released-button))
-											 'mouse-face 'highlight
-											 'keymap (let ((map (make-sparse-keymap)))
-																 (define-key map [mouse-1] 'hq-market)
-																 map))))
-			(insert market-button "\n"))))
+         (propertize "🎯 Бонусное задание на сегодня\n"
+                     'face '(:foreground "#2196F3" :weight bold))
+         (format "Выполните привычку '%s' для получения бонуса: "
+                 (plist-get hq-daily-bonus :habit))
+         (propertize (format "%d XP, %d золота\n"
+                            (or (plist-get hq-daily-bonus :xp) 0)
+                            (or (plist-get hq-daily-bonus :gold) 0))
+                     'face '(:foreground "#4CAF50"))))
+      
+      ;; Активные квесты
+      (insert
+       (propertize "\n📜 Активные квесты\n"
+                   'face '(:foreground "#2196F3" :weight bold)))
+      
+      (let ((active-quests 0)
+            (quest-bar-width 20))
+        (dolist (quest hq-quests)
+          (unless (plist-get quest :completed)
+            (setq active-quests (1+ active-quests))
+            (let* ((name (or (plist-get quest :name) "Неизвестный квест"))
+                   (progress (or (plist-get quest :progress) 0))
+                   (required (or (plist-get quest :required) 1))
+                   (progress-percent (if (> required 0)
+                                        (* (/ (float progress) required) 100)
+                                      0.0))
+                   (filled-length (round (* quest-bar-width (/ progress-percent 100.0))))
+                   (empty-length (- quest-bar-width filled-length)))
+              
+              (insert
+               (propertize (format "∘ %s\n" name)
+                           'face '(:foreground "#4A90E2")))
+              
+              (insert
+               (propertize (format "  %d/%d дней " progress required)
+                           'face '(:foreground "#333333")))
+              
+              (insert
+               (propertize (concat
+                           (make-string filled-length ?#)
+                           (make-string empty-length ?·))
+                          'face '(:foreground "#4CAF50")))
+              
+              (insert (format " %.1f%%\n\n" progress-percent)))))
+        
+        (when (zerop active-quests)
+          (insert
+           (propertize "  Нет активных квестов\n"
+                       'face '(:foreground "#888888" :slant italic)))))
+      
+      ;; Кнопка Market
+      (insert "\n")
+      (let ((market-button
+             (propertize "[🏪 Открыть Market]"
+                        'face '(:foreground "white"
+                                          :background "#4CAF50"
+                                          :weight bold
+                                          :box (:line-width 2 :style released-button))
+                        'mouse-face 'highlight
+                        'keymap (let ((map (make-sparse-keymap)))
+                                 (define-key map [mouse-1] 'hq-market)
+                                 map))))
+        (insert market-button "\n")))))
 
 ;; Хук для выделения бонусного задания
 (defun hq-org-habit-streak-hook ()
@@ -369,27 +393,36 @@
 
 ;; Функция для отображения quest view (исправленная)
 (defun hq-habits-quest-view ()
-  "Отобразить agenda с информацией о квестах"
+  "Отобразить agenda с информацией о квестах."
   (interactive)
-
+  
+  ;; Проверяем, что все необходимые переменные инициализированы
+  (unless hq-quests
+    (setq hq-quests '()))  ; Инициализируем пустым списком если nil
+  
   ;; Генерируем бонусное задание перед открытием view
   (hq-generate-daily-bonus)
-
-  ;; Вызываем оригинальный Habits view
-  (org-agenda nil "x")
-
-  ;; Обновляем информацию о квестах через таймер
+  
+  ;; Защищенный вызов org-agenda
+  (condition-case err
+      (org-agenda nil "x")
+    (error
+     (message "Ошибка при открытии agenda: %s" err)))
+  
+  ;; Устанавливаем таймер для обновления с проверками
   (run-with-timer 0.5 nil
                   (lambda ()
                     (when (get-buffer "*Org Agenda*")
-                      ;; Обновляем прогресс
-                      (hq-update-quest-progress)
-
-                      ;; Добавляем информацию о квестах
                       (with-current-buffer "*Org Agenda*"
                         (save-excursion
-                          (let ((inhibit-read-only t))
-                            (hq-add-quest-info-to-agenda))))))))
+                          ;; Обновляем прогресс с защитой от ошибок
+                          (condition-case nil
+                              (progn
+                                (hq-update-quest-progress)
+                                (let ((inhibit-read-only t))
+                                  (hq-add-quest-info-to-agenda)))
+                            (error
+                             (message "Ошибка при обновлении информации о квестах")))))))))
 
 (defvar hq-daily-bonus nil
   "Текущее ежедневное бонусное задание.")

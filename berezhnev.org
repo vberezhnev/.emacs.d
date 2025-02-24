@@ -3457,148 +3457,213 @@ CLOCK: [2024-11-14 Чт 15:11]--[2024-11-14 Чт 15:11] =>  0:00
 
 **** Org-habit
 #+begin_src emacs-lisp
-  (use-package org-habit
-    :after org
-    :ensure nil
-    :straight (:type built-in)
-    :init
-    ;;(add-to-list 'org-modules 'org-habit)
-    (progn
-      (custom-set-faces
-       '(org-habit-clear-face
-         ((t (:background "pale green"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
+    (use-package org-habit
+      :after org
+      :ensure nil
+      :straight (:type built-in)
+      :init
+      ;;(add-to-list 'org-modules 'org-habit)
+      (progn
+        (custom-set-faces
+         '(org-habit-clear-face
+           ((t (:background "pale green"
+            								:foreground "white"
+            								:width expanded
+            								:height 1.0
+            								:box (:line-width (1 . 1) :color "white")))))
 
-       '(org-habit-clear-future-face
-         ((t (:background "gray"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-alert-future-face
-         ((t (:background "light coral"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-alert-face
-         ((t (:background "light coral"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-overdue-face
-         ((t (:background "light coral"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-overdue-future-face
-         ((t (:background "gray"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-ready-face
-         ((t (:background "pale green"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       '(org-habit-ready-future-face
-         ((t (:background "gray"
-          								:foreground "white"
-          								:width expanded
-          								:height 1.0
-          								:box (:line-width (1 . 1) :color "white")))))
-       ))
-    :config
-    (load "~/.emacs.d/lisp/my-org-habit")
-    (setq org-habit-following-days 1
-          org-habit-preceding-days 9
-          org-habit-show-habits nil
-          org-habit-show-all-today t
-          org-habit-graph-column 60
-          org-habit-overdue-glyph ?○
-          org-habit-alert-glyph ?○
-          org-habit-ready-future-glyph ?○ ;;⬡
-          org-habit-today-glyph ?◎
-          org-habit-completed-glyph ?●
-          org-habit-show-done-always-green t)
+         '(org-habit-clear-future-face
+           ((t (:background "gray"
+            								:foreground "white"
+            								:width expanded
+            								:height 1.0
+            								:box (:line-width (1 . 1) :color "white")))))
+         '(org-habit-alert-future-face
+           ((t (:background "light coral"
+            								:foreground "white"
+            								:width expanded
+            								:height 1.0
+            								:box (:line-width (1 . 1) :color "white")))))
+         '(org-habit-alert-face
+           ((t (:background "light coral"
+            								:foreground "white"
+            								:width expanded
+            								:height 1.0
+            								:box (:line-width (1 . 1) :color "white")))))
+         '(org-habit-overdue-face
+           ((t (:background "light coral"
+            								:foreground "white"
+            								:width expanded
+            								:height 1.0
+            								:box (:line-width (1 . 1) :color "white")))))
+         '(org-habit-overdue-future-face
+           ((t (:background "gray"
+            								:foreground "white"
+            								:width expanded
+            								:height 1.0
+            								:box (:line-width (1 . 1) :color "white")))))
+         '(org-habit-ready-face
+           ((t (:background "pale green"
+            								:foreground "white"
+            								:width expanded
+            								:height 1.0
+            								:box (:line-width (1 . 1) :color "white")))))
+         '(org-habit-ready-future-face
+           ((t (:background "gray"
+            								:foreground "white"
+            								:width expanded
+            								:height 1.0
+            								:box (:line-width (1 . 1) :color "white")))))
+         ))
+      :config
+      (load "~/.emacs.d/lisp/my-org-habit")
+      (setq org-habit-following-days 1
+            org-habit-preceding-days 9
+            org-habit-show-habits nil
+            org-habit-show-all-today t
+            org-habit-graph-column 60
+            org-habit-overdue-glyph ?○
+            org-habit-alert-glyph ?○
+            org-habit-ready-future-glyph ?○ ;;⬡
+            org-habit-today-glyph ?◎
+            org-habit-completed-glyph ?●
+            org-habit-show-done-always-green t)
 
-    (defun toggle-org-habit-show-all-today ()
-      "Toggle the value of `org-habit-show-all-today' between t and nil."
-      (interactive)
-      (setq org-habit-show-all-today (not org-habit-show-all-today))
-      (message "org-habit-show-all-today is now %s"
-          		 (if org-habit-show-all-today "nil" "t"))
-      (org-agenda-refresh))
+      (defun toggle-org-habit-show-all-today ()
+        "Toggle the value of `org-habit-show-all-today' between t and nil."
+        (interactive)
+        (setq org-habit-show-all-today (not org-habit-show-all-today))
+        (message "org-habit-show-all-today is now %s"
+            		 (if org-habit-show-all-today "nil" "t"))
+        (org-agenda-refresh))
 
-    (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
+      (define-key org-agenda-mode-map (kbd "<f12>") 'toggle-org-habit-show-all-today))
 
-  (use-package org-habit-stats
-    :ensure t
-    :config
-    (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
-    (add-hook 'org-agenda-mode-hook
-          		(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
+    (use-package org-habit-stats
+      :ensure nil
+      :load-path "~/.emacs.d/lisp/"
+      :config
+      (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
+      (add-hook 'org-agenda-mode-hook
+            		(lambda () (define-key org-agenda-mode-map "Z" 'org-habit-stats-view-next-habit-in-agenda))))
 
-(defun org-habit-count-last-streak (state-str)
-  "Подсчитать количество последовательных выполненных дней (●), включая незавершенные задачи (◎).
-Стрик включает ◎ только если перед ним есть выполненные дни."
-  (let ((streak 0)
-        (length (length state-str))
-        (has-completed nil))  ; Отслеживаем, были ли выполненные дни
-    ;; Идем с конца строки
-    (catch 'break
-      (dotimes (i length)
-        (let ((current-char (aref state-str (- length i 1))))
-          (cond
-           ;; Незавершенная задача на сегодня (◎) учитывается только при наличии выполненных дней
-           ((char-equal current-char ?◎)
-            (when has-completed
-              (setq streak (1+ streak))))
-           ;; Выполненная задача (●) увеличивает стрик и отмечает наличие выполнений
-           ((char-equal current-char ?●)
-            (setq streak (1+ streak))
-            (setq has-completed t))
-           ;; Пропущенная задача (○) прерывает подсчет
-           (t
-            (throw 'break streak))))))
-    streak))
+  (defun org-habit-count-last-streak (state-str)
+    "Подсчитать количество последовательных выполненных дней (●), включая незавершенные задачи (◎).
+  Стрик включает ◎ только если перед ним есть выполненные дни."
+    (let ((streak 0)
+          (length (length state-str))
+          (has-completed nil))  ; Отслеживаем, были ли выполненные дни
+      ;; Идем с конца строки
+      (catch 'break
+        (dotimes (i length)
+          (let ((current-char (aref state-str (- length i 1))))
+            (cond
+             ;; Незавершенная задача на сегодня (◎) учитывается только при наличии выполненных дней
+             ((char-equal current-char ?◎)
+              (when has-completed
+                (setq streak (1+ streak))))
+             ;; Выполненная задача (●) увеличивает стрик и отмечает наличие выполнений
+             ((char-equal current-char ?●)
+              (setq streak (1+ streak))
+              (setq has-completed t))
+             ;; Пропущенная задача (○) прерывает подсчет
+             (t
+              (throw 'break streak))))))
+      streak))
 
-(defun org-habit-streak-count ()
-  "Display current streak for each habit in org-agenda.
-A streak consists of consecutive completed days (●) and can include
-today's unfinished tasks (◎) only if there are completed days before it."
-  (goto-char (point-min))
-  (while (not (eobp))
-    (when (get-text-property (point) 'org-habit-p)
-      (let ((streak 0))
-        ;; Look for the habit's state string (○●◎)
-        (save-excursion
-          (when (re-search-forward "\\([○●◎]\\)+" (line-end-position) t)
-            (let ((state-str (match-string 0)))
-              (setq streak (org-habit-count-last-streak state-str)))))
-        
-        (end-of-line)
-        (insert (format " [🔥 %d]" streak))))
-    (forward-line 1)))
+  (defun org-habit-streak-count ()
+    "Display current streak for each habit in org-agenda.
+  A streak consists of consecutive completed days (●) and can include
+  today's unfinished tasks (◎) only if there are completed days before it."
+    (goto-char (point-min))
+    (while (not (eobp))
+      (when (get-text-property (point) 'org-habit-p)
+        (let ((streak 0))
+          ;; Look for the habit's state string (○●◎)
+          (save-excursion
+            (when (re-search-forward "\\([○●◎]\\)+" (line-end-position) t)
+              (let ((state-str (match-string 0)))
+                (setq streak (org-habit-count-last-streak state-str)))))
+          
+          (end-of-line)
+          (insert (format " [🔥 %d]" streak))))
+      (forward-line 1)))
 
-(add-hook 'org-agenda-finalize-hook 'org-habit-streak-count)
+  (add-hook 'org-agenda-finalize-hook 'org-habit-streak-count)
 #+end_src
 
 #+RESULTS:
 | org-agenda-property-add-properties | org-modern-agenda | org-habit-streak-count |
 
+#+begin_src emacs-lisp :lexical no
+  (defun my-find-work-habit ()
+    "Находит привычку '3+ часа работы' в org-файлах и возвращает её данные."
+    (let ((work-habit-data nil))
+      ;; Перебираем все org-файлы из org-agenda-files
+      (dolist (file (org-agenda-files))
+        (with-current-buffer (find-file-noselect file)
+          (org-with-point-at 1
+            ;; Ищем нашу привычку
+            (while (and (not work-habit-data)
+                       (re-search-forward "⚡ - 3\\+ часа работы" nil t))
+              ;; Сохраняем позицию
+              (let ((pos (point)))
+                ;; Переходим к началу заголовка
+                (org-back-to-heading t)
+                ;; Проверяем, является ли это привычкой
+                (when (org-is-habit-p)
+                  ;; Получаем данные привычки
+                  (setq work-habit-data 
+                        (org-habit-stats-parse-todo (point))))
+                ;; Возвращаемся к исходной позиции
+                (goto-char pos))))))
+      work-habit-data))
+
+  (defun my-display-work-habit-calendar ()
+      "Отображает календарь для привычки '3+ часа работы' в начале org-agenda буфера."
+      (let ((work-habit-data (my-find-work-habit)))
+        (when work-habit-data
+          ;; Создаем календарь в отдельном буфере
+          (org-habit-stats-make-calendar-buffer work-habit-data)
+          
+          ;; Сохраняем текущую позицию в agenda буфере
+          (save-excursion
+            (goto-char (point-min))
+            (when (search-forward "Everytime" nil t)
+              (forward-line -1)
+              
+              ;; Добавляем заголовок
+              (insert "\nКалендарь рабочих часов (3+ часа в день)\n")
+              (insert "================================\n")
+              
+              ;; Копируем содержимое календаря из временного буфера
+              (let ((calendar-content (with-current-buffer org-habit-stats-calendar-buffer
+                                      (buffer-string)))
+                    (calendar-overlays (org-habit-stats-get-calendar-overlays)))
+                ;; Вставляем содержимое календаря
+                (let ((start-pos (point)))
+                  (insert calendar-content)
+                  ;; Применяем оверлеи с правильным смещением
+                  (org-habit-stats-apply-overlays calendar-overlays
+                                                (- start-pos 1)
+                                                (current-buffer))))
+              
+              ;; Добавляем разделитель после календаря
+              (insert "\n================================\n\n")
+  )))))
+
+    ;; Регистрируем функцию как хук финализации agenda
+    (add-hook 'org-agenda-finalize-hook 'my-display-work-habit-calendar)
+#+end_src
+
+#+RESULTS:
+| org-agenda-property-add-properties | org-modern-agenda | my-display-work-habit-calendar | org-habit-streak-count |
+
 **** Org gamifications
 #+begin_src emacs-lisp :lexical no
   (load "~/.emacs.d/lisp/gamifications/quest-system-core")
   (load "~/.emacs.d/lisp/gamifications/market")
-  (load "~/.emacs.d/lisp/gamifications/penalties")
+  ;;(load "~/.emacs.d/lisp/gamifications/penalties")
   (load "~/.emacs.d/lisp/gamifications/habit-quest")
   (load "~/.emacs.d/lisp/gamifications/tasks-quest")
 #+end_src
@@ -4442,7 +4507,8 @@ Replace Postman with org-mode!
   	(org-gtd-horizons-file "horizons.org")
     :config
     (org-edna-mode)
-    :bind (("C-c d c" . (lambda () (interactive) (org-gtd-capture nil "i")))
+    :bind (;;("C-c d c" . (lambda () (interactive) (org-gtd-capture nil "i")))
+  				 ("C-c d c" . org-gtd-capture)
   				 ("C-c d e" . org-gtd-engage)
   				 ("C-c d r" . org-gtd-engage-grouped-by-context)
   				 ("C-c d p" . org-gtd-process-inbox)

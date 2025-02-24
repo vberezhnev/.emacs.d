@@ -138,125 +138,114 @@
 (define-key org-mode-map (kbd "C-c r") 'hq-show-potential-reward)
 
 (defun gtd-add-progress-info-to-agenda (&optional arg)
-	"Добавить информацию о прогрессе в GTD view"
-	(interactive)
-	(let ((inhibit-read-only t))
-		;; ... (начало функции без изменений)
+  "Добавить информацию о прогрессе в GTD view с отладочной информацией"
+  (interactive)
+  (let ((inhibit-read-only t)
+        ;; (debug-buffer (get-buffer-create "*GTD Debug*"))
+				)
+    ;; (with-current-buffer debug-buffer
+    ;;   (erase-buffer))
+    
+    (let* ((categories '("EGE" "MERITRANK" "CODING" "PERSONAL"))
+           (total-tasks 0)
+           (completed-tasks 0)
+           (category-stats (make-hash-table :test 'equal)))
 
-		;; Статистика прогресса по категориям
-		(let* ((categories '("EGE" "MERITRANK" "CODING" "PERSONAL"))
-					 (total-tasks 0)
-					 (completed-tasks 0)
-					 (category-stats (make-hash-table :test 'equal)))
+      ;; (defun log-debug (msg &rest args)
+      ;;   (with-current-buffer debug-buffer
+      ;;     (goto-char (point-max))
+      ;;     (insert (apply 'format (concat msg "\n") args))))
 
-			;; Подсчет задач
-			(save-excursion
-				(goto-char (point-min))
-				;; Ищем секцию "Today"
-				(when (search-forward " Today" nil t)
-					(forward-line 1)  ; Переходим на следующую строку
-					(while (and (not (looking-at "^$"))
-											(not (looking-at " Passed deadline"))
-											(not (eobp)))
-						(let ((line (buffer-substring-no-properties
-												 (line-beginning-position)
-												 (line-end-position))))
-							(when (string-match "^\\([A-Z]+\\)\\s-+|" line)
-								(let* ((category (match-string 1 line))
-											 (is-completed (or (string-match "DONE" line)
-																				 (string-match "done" line)))
-											 (stats (or (gethash category category-stats) '(0 0))))
-									(when (member category categories)
-										(puthash category
-														 (list
-															(1+ (car stats))
-															(if is-completed
-																	(1+ (cadr stats))
-																(cadr stats)))
-														 category-stats)
-										(setq total-tasks (1+ total-tasks))
-										(when is-completed
-											(setq completed-tasks (1+ completed-tasks)))))))
-						(forward-line 1))))
+      (save-excursion
+        (goto-char (point-min))
+        ;; (log-debug "Начинаем анализ буфера...")
+        
+        (while (not (eobp))
+          (let* ((line (buffer-substring-no-properties
+                       (line-beginning-position)
+                       (line-end-position))))
+            
+            ;; (log-debug "Проверяем строку: %s" line)
+            
+            ;; Изменено регулярное выражение для учета начальных пробелов
+            (when (string-match "^\\s-*\\([A-Z]+\\)\\s-+|" line)
+              (let* ((category (match-string 1 line))
+                     (is-completed (or (string-match "DONE" line)
+                                     (string-match "done" line)))
+                     (stats (or (gethash category category-stats) (list 0 0))))
+                
+                ;; (log-debug "Найдена задача: Категория=%s, Завершена=%s, line=%s" 
+                ;;           category 
+                ;;           (if is-completed "да" "нет")
+                ;;           line)
+                
+                (when (member category categories)
+                  ;; (log-debug "Обновляем статистику для категории %s" category)
+                  (puthash category
+                           (list (1+ (car stats))
+                                 (if is-completed
+                                     (1+ (cadr stats))
+                                   (cadr stats)))
+                           category-stats)
+                  (setq total-tasks (1+ total-tasks))
+                  (when is-completed
+                    (setq completed-tasks (1+ completed-tasks)))))))
+          (forward-line 1)))
 
-			;; Отображение прогресса по категориям
-			(insert
-			 (propertize "## Прогресс по категориям\n"
-									 'face '(:foreground "#2196F3" :weight bold)))
+      ;; (log-debug "\nИтоговая статистика:")
+      ;; (log-debug "Всего задач: %d" total-tasks)
+      ;; (log-debug "Выполнено задач: %d" completed-tasks)
+      ;; (maphash (lambda (category stats)
+      ;;            (log-debug "Категория %s: Всего=%d, Выполнено=%d"
+      ;;                      category (car stats) (cadr stats)))
+      ;;          category-stats)
 
-			(dolist (category categories)
-				(let* ((stats (gethash category category-stats '(0 0)))
-							 (total (car stats))
-							 (completed (cadr stats))
-							 (progress-percent (if (> total 0)
-																		 (/ (* completed 100.0) total)
-																	 0))
-							 (quest-bar-width 20)
-							 (filled-length (round (* quest-bar-width (/ progress-percent 100.0))))
-							 (empty-length (- quest-bar-width filled-length))
-							 (category-color (cdr (assoc category hq-category-colors)))
-							 ;; (category-icon (cdr (assoc category hq-category-emoji)))
-							 (base-rewards (cdr (assoc category hq-task-rewards))))
-
-					;; Название категории с эмодзи
-					;; (insert
-					;;  (propertize (format "%s %s\n" category-icon category)
-					;;              'face `(:foreground ,category-color :weight bold)))
-
-					;; Прогресс-бар и статистика
-					(insert "  ")
-					(insert
-					 (propertize (format "%d/%d задач " completed total)
-											 'face '(:foreground "#333333")))
-
-					(insert
-					 (propertize
-						(concat
-						 (make-string filled-length ?▰)
-						 (make-string empty-length ?▱))
-						'face `(:foreground ,category-color)))
-
-					(insert
-					 (propertize (format " %.1f%%\n" progress-percent)
-											 'face `(:foreground ,category-color :weight bold)))
-
-					;; Информация о наградах
-					(insert
-					 (format "    Награда за задачу: +%d XP, +%d 🪙\n\n"
-									 (plist-get base-rewards :xp)
-									 (plist-get base-rewards :gold)))))
-
-			;; Общий прогресс
-			(let* ((overall-progress (if (> total-tasks 0)
-																	 (/ (* completed-tasks 100.0) total-tasks)
-																 0))
-						 (quest-bar-width 30)
-						 (filled-length (round (* quest-bar-width (/ overall-progress 100.0))))
-						 (empty-length (- quest-bar-width filled-length)))
-
-				(insert
-				 (propertize "## Общий прогресс\n"
-										 'face '(:foreground "#2196F3" :weight bold)))
-
-				(insert "  ")
-				(insert
-				 (propertize (format "%d/%d задач " completed-tasks total-tasks)
-										 'face '(:foreground "#333333")))
-
-				;; Цвет прогресс-бара зависит от процента выполнения
-				(let ((progress-color
-							 (cond
-								((>= overall-progress 80) "#4CAF50") ; Зеленый для высокого прогресса
-								((>= overall-progress 50) "#FFA726") ; Оранжевый для среднего
-								(t "#FF7043"))))                     ; Красноватый для низкого
-
-					(insert
-					 (propertize
-						(concat
-						 (make-string filled-length ?▰)
-						 (make-string empty-length ?▱))
-						'face `(:foreground ,progress-color)))
-
-					(insert
-					 (propertize (format " %.1f%%\n" overall-progress)
-											 'face `(:foreground ,progress-color :weight bold))))))))
+      ;; Отображение прогресса
+      (goto-char (point-max))
+      (insert "\n## Прогресс по категориям\n")
+      
+      (dolist (category categories)
+        (let* ((stats (gethash category category-stats '(0 0)))
+               (total (car stats))
+               (completed (cadr stats))
+               (progress-percent (if (> total 0)
+                                   (/ (* completed 100.0) total)
+                                 0))
+               (quest-bar-width 20)
+               (filled-length (round (* quest-bar-width (/ progress-percent 100.0))))
+               (empty-length (- quest-bar-width filled-length))
+               (category-color (cdr (assoc category hq-category-colors)))
+               (base-rewards (cdr (assoc category hq-task-rewards))))
+          
+          (insert (format "  %d/%d задач " completed total))
+          (insert (propertize
+                  (concat
+                   (make-string filled-length ?▰)
+                   (make-string empty-length ?▱))
+                  'face `(:foreground ,category-color)))
+          (insert (format " %.1f%%\n" progress-percent))
+          
+          (insert (format "    Награда за задачу: +%d XP, +%d 🪙\n"
+                         (plist-get base-rewards :xp)
+                         (plist-get base-rewards :gold)))))
+      
+      ;; Общий прогресс
+      (insert "\n## Общий прогресс\n")
+      (let* ((overall-progress (if (> total-tasks 0)
+                                  (/ (* completed-tasks 100.0) total-tasks)
+                                0))
+             (quest-bar-width 30)
+             (filled-length (round (* quest-bar-width (/ overall-progress 100.0))))
+             (empty-length (- quest-bar-width filled-length)))
+        
+        (insert (format "  %d/%d задач " completed-tasks total-tasks))
+        (insert (propertize
+                (concat
+                 (make-string filled-length ?▰)
+                 (make-string empty-length ?▱))
+                'face '(:foreground "#4CAF50")))
+        (insert (format " %.1f%%\n" overall-progress))))
+    
+    ;; Показываем отладочный буфер
+    ;; (display-buffer debug-buffer)
+		))
