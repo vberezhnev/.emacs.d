@@ -25,7 +25,7 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
-(straight-use-package 'org)
+;; (straight-use-package 'org)
 
 (setq package-enable-at-startup nil)
 (package-initialize)
@@ -37,13 +37,15 @@
 (require 'use-package)
 
 ;; Use latest Org
-(use-package org
-  :ensure t)
+;; (use-package org
+;;   :ensure t)
 
-(use-package org-contrib
-  :ensure t)
+;; (use-package org-contrib
+;;   :ensure t)
 
 ;; Tangle configuration
-(org-babel-load-file (expand-file-name "berezhnev.org" user-emacs-directory))
+;;(org-babel-load-file (expand-file-name "berezhnev.org" user-emacs-directory))
+(load-file "~/.emacs.d/regular.el")
+
 (put 'dired-find-alternate-file 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
