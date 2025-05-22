@@ -1,6 +1,4 @@
 (require 'org-macs)
-(require 'all-the-icons)
-(org-assert-version)
 
 (require 'cl-lib)
 (require 'org)
@@ -16,24 +14,23 @@
 	:config
 	(setq
 	 org-ellipsis " ⤵" ;; ⤵, ᗐ, ↴, ▼, ▶, ⤵, ▾
-	 org-roam-v2-ack t                 ; anonying startup message
+	 ;; org-roam-v2-ack t                 ; anonying startup message
 	 org-log-done 'time                ; I need to know when a task is done
 	 org-hide-leading-stars t
 	 org-log-into-drawer t
 	 org-startup-folded t
-	 org-odd-levels-only t
 	 org-pretty-entities t
 	 org-startup-indented t
 	 org-adapt-indentation t
 	 org-hide-macro-markers t
 	 org-hide-block-startup nil
-	 org-src-fontify-natively t
-	 org-src-tab-acts-natively t
+	 ;; org-src-fontify-natively t
+	 ;; org-src-tab-acts-natively t
 	 org-cycle-separator-lines 2
 	 org-startup-with-inline-images t
 	 org-display-remote-inline-images t
-	 org-src-preserve-indentation nil
-	 org-edit-src-content-indentation 2
+	 ;; org-src-preserve-indentation nil
+	 ;; org-edit-src-content-indentation 2
 	 org-fontify-quote-and-verse-blocks t
 	 org-export-with-smart-quotes t
 
@@ -61,7 +58,7 @@
   "Generate a table showing daily time requirements and progress for categories."
   (let* ((day-of-week (upcase (format-time-string "%^a")))
          (required-property (concat "REQUIRED_TIME_" day-of-week))
-         (categories '("EGE" "MERITRANK" "CODING"))
+         (categories '("EGE" "CORE" "ASCENT"))
          (today-start (format-time-string "%Y-%m-%d"))
          (today-end (format-time-string "%Y-%m-%d" (time-add (current-time) 86400))))
 
@@ -103,8 +100,8 @@
   "Create a dedicated time tracking view with colorful styling."
   (let* ((day-of-week (upcase (format-time-string "%^a")))
          (required-property (concat "REQUIRED_TIME_" day-of-week))
-         (categories '("EGE" "MERITRANK" "CODING" "PERSONAL"))
-         (main-categories '("EGE" "MERITRANK" "CODING"))
+         (categories '("EGE" "CORE" "ASCENT" "PERSONAL"))
+         (main-categories '("EGE" "CORE" "ASCENT"))
          (today-start (format-time-string "%Y-%m-%d"))
          (today-end (format-time-string "%Y-%m-%d" (time-add (current-time) 86400))))
 
@@ -202,8 +199,8 @@
                   (cat-color
                    (cond
                     ((string= category "EGE") "#FF6B6B")
-                    ((string= category "MERITRANK") "#4CAF50")
-                    ((string= category "CODING") "#2196F3")
+                    ((string= category "CORE") "#4CAF50")
+                    ((string= category "ASCENT") "#2196F3")
                     (t "#333333"))))
               (insert
                (format "| %s | %8.1f | %7.1f | %8.1f%% |\n"
@@ -257,14 +254,22 @@
                                ((>= total-progress 50) "#FF9800")
                                (t "#FF5722")))))))))
 
-(evil-leader/set-key
-  "z" '(org-agenda nil "z")
-  "qs" 'hq-shop
-  "qb" 'hq-buy-item
-  "qu" 'hq-use-item)
-
 (global-set-key (kbd "C-c C-x o") 'org-clock-out)
 (global-set-key (kbd "C-c C-x j") 'org-clock-go-to)
+
+(use-package org-super-agenda
+  :ensure t
+  :config
+  (org-super-agenda-mode 1))
+
+;; (add-to-list 'load-path "~/Templates2/Lisp/org-habit-enhanced")
+;; (require 'org-habit-core)
+;; (require 'org-habit-enhanced)
+;; (require 'org-habit-stats)
+;; (require 'org-habit-quest)
+;; (require 'org-habit-tasks)
+;; (require 'org-habit-market)
+;; (hq-setup)
 
 (use-package org-agenda
   :ensure nil
@@ -273,7 +278,7 @@
   (:map global-map
         ("C-c a" . org-agenda))
   :config
-  (setq org-agenda-start-on-weekday 0
+  (setq org-agenda-start-on-weekday 1
         org-agenda-skip-scheduled-if-done t ; changed
         org-agenda-skip-deadline-if-done t ; changed
         org-agenda-include-deadlines t
@@ -305,7 +310,7 @@
      			(tags . "%t %-10c | %s")
      			(search . "%c %t %s"))
         org-agenda-clockreport-parameter-plist
-        (quote (:maxlevel 5 :compact t :wstart 0 :link nil :formula % :tags nil :properties ("CATEGORY" "EFFORT" "File") :narrow 80 :fileskip0 t))
+        (quote (:maxlevel 5 :compact t :wstart 0 :link t :formula % :tags nil :properties ("CATEGORY" "EFFORT" "File") :narrow 80 :fileskip0 t))
         org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:")
         org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:")
        	org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
@@ -370,10 +375,6 @@
  						(tags "CLOSED>=\"<today>\""
  									((org-agenda-overriding-header "\nCompleted today\n")))
 
-						(my/time-tracking-view "")
- 						(tags "CLOSED>=\"<today>\""
- 									((org-agenda-overriding-header "\n === COMPLETED TASKS ===")
- 									 (org-agenda-remove-tags t)))
 						(gtd-add-progress-info-to-agenda "")))
 
           ("x" "Habits view"
@@ -382,7 +383,7 @@
                         (org-agenda-remove-tags t)
                         (org-agenda-prefix-format "  ∘ %t %s")
                         (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
-                        (org-agenda-finalize-hook '(hq-add-quest-info-to-agenda hq-update-quest-info))
+                        ;; (org-agenda-finalize-hook '(hq-add-quest-info-to-agenda hq-update-quest-info))
                         (org-super-agenda-groups
                          '((:name "Everytime"
        														:tag ("everytime"))
@@ -438,7 +439,7 @@
  															 :block day
  															 :compact t
  															 :wstart 0
- 															 :link nil
+ 															 :link t
  															 :formula %
  															 :tags nil
 															 :hidefiles t
@@ -650,7 +651,7 @@ today's unfinished tasks (◎) only if there are completed days before it."
 
 (load "~/.emacs.d/lisp/gamifications/quest-system-core")
 (load "~/.emacs.d/lisp/gamifications/market")
-;;(load "~/.emacs.d/lisp/gamifications/penalties")
+(load "~/.emacs.d/lisp/gamifications/quest-ui")
 (load "~/.emacs.d/lisp/gamifications/habit-quest")
 (load "~/.emacs.d/lisp/gamifications/tasks-quest")
 
@@ -678,10 +679,10 @@ today's unfinished tasks (◎) only if there are completed days before it."
 					 :fetcher github
 					 :repo "jkitchin/org-ref"
 					 :branch "master")
-	;;:ensure t
+	:ensure nil
   :config
-	;;(require 'org-ref)
-	;;(require 'org-ref-helm)
+	(require 'org-ref)
+	;; (require 'org-ref-helm)
 	(define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
 
 	(setq bibtex-completion-bibliography '("~/Org/Bibliography/Bibliography.bib")
@@ -767,8 +768,8 @@ today's unfinished tasks (◎) only if there are completed days before it."
  'org-babel-load-languages
  '((emacs-lisp . t)
    (js         . t)
-   (solidity   . t)
-   (typescript . t)
+   ;; (solidity   . t)
+   ;; (typescript . t)
    (shell      . t)
    (python     . t)
    (rust       . t)
@@ -788,48 +789,49 @@ today's unfinished tasks (◎) only if there are completed days before it."
 
 (use-package org-modern
   :hook (org-mode . org-modern-mode)
+	:after org
   :ensure t
+	:init
+	(global-org-modern-mode 1)
   :config
-  (setq
-   ;; Edit settings
-   org-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   ;; Appearance
-   org-modern-radio-target    '("❰" t "❱")
-   org-modern-internal-target '("↪ " t "")
-   org-modern-block-name
-   '((t . t)
-  	 ("src" "ϰ" "ϰ"))
-   org-modern-progress t
-   org-modern-statistics nil
-   org-modern-todo t
-   org-modern-todo-faces (quote (("TODO" :background "indian red" :foreground "white" :weight bold)
-  															 ("NEXT" :background "sky blue" :foreground "black" :weight bold)
-  															 ("WAIT" :background "olive drab" :foreground "black" :weight bold)
-  															 ("DONE" :background "pale green" :foreground "black" :weight bold)
-  															 ("CNCL" :background "dark red" :foreground "white" :weight bold)))
-   org-modern-priority t
-   org-modern-priority-faces (quote ((?A :background "red"
-  																			 :foreground "black")
-  																	 (?B :background "dark orange"
-  																			 :foreground "black")
-  																	 (?C :background "tan"
-  																			 :foreground "black")))
-   org-modern-tag t
-   org-modern-timestamp nil
-   org-modern-statistics t
-   ;; org-modern-table t
-   org-modern-tag-faces (quote (("@article" :background "#0b8043" :foreground "#000000")
-  															("@mathematics" :background "#bc8f8f" :foreground "#000000")
-                                ("blockchain" :background "#f5511d" "#000000")
-  															("solana" :background "#DC1FFF" :foreground "#000000")
-  															("rust" :background "#CE412B" :foreground "#000000")
-  															("go" :background "#00bfff" :foreground "#00000")))
-   org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
-   org-modern-hide-stars " "
-   org-modern-keyword "‣"
-   org-modern-table t))
-(global-org-modern-mode t)
+  (setq org-catch-invisible-edits 'show-and-error
+				;; org-special-ctrl-a/e t
+				;; Appearance
+				org-modern-radio-target    '("❰" t "❱")
+				org-modern-internal-target '("↪ " t "")
+				org-modern-block-name '((t . t)
+  															("src" "ϰ" "ϰ")
+																("quote" "❝" "❞"))
+				org-modern-progress t
+				org-modern-statistics nil
+				org-modern-todo t
+				org-modern-todo-faces (quote (("TODO" :background "indian red" :foreground "white" :weight bold)
+  																		("NEXT" :background "sky blue" :foreground "black" :weight bold)
+  																		("WAIT" :background "olive drab" :foreground "black" :weight bold)
+  																		("DONE" :background "pale green" :foreground "black" :weight bold)
+  																		("CNCL" :background "dark red" :foreground "white" :weight bold)))
+				org-modern-priority t
+				org-modern-priority-faces (quote ((?A :background "red"
+  																						:foreground "black")
+  																				(?B :background "dark orange"
+  																						:foreground "black")
+  																				(?C :background "tan"
+  																						:foreground "black")))
+				org-modern-tag t
+				org-modern-timestamp nil
+				org-modern-statistics t
+				;; org-modern-table t
+				org-modern-tag-faces (quote (("@article" :background "#0b8043" :foreground "#000000")
+  																	 ("@mathematics" :background "#bc8f8f" :foreground "#000000")
+																		 ("blockchain" :background "#f5511d" "#000000")
+  																	 ("solana" :background "#DC1FFF" :foreground "#000000")
+  																	 ("rust" :background "#CE412B" :foreground "#000000")
+  																	 ("go" :background "#00bfff" :foreground "#00000")))
+				org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
+				org-modern-hide-stars " "
+				org-modern-keyword "‣"
+				org-modern-table t))
+;; (global-org-modern-mode t)
 
 ;;(frostyx/guix :install "alsa-utils")
 
@@ -897,6 +899,7 @@ today's unfinished tasks (◎) only if there are completed days before it."
 
 (use-package org-roam
   :ensure t
+	:demand t
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
@@ -1031,15 +1034,15 @@ today's unfinished tasks (◎) only if there are completed days before it."
       (kill-line)
       (kill-line))))
 
-(use-package org-roam-ui
-  :straight
-  (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
-  :after org-roam
-  :config
-  (setq org-roam-ui-sync-theme t
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start t))
+;; (use-package org-roam-ui
+;;   :straight
+;;   (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+;;   :after org-roam
+;;   :config
+;;   (setq org-roam-ui-sync-theme t
+;;         org-roam-ui-follow t
+;;         org-roam-ui-update-on-save t
+;;         org-roam-ui-open-on-start t))
 
 ;; (use-package org-readwise
 ;;   :quelpa (org-readwise :fetcher github :repo "CountGreven/org-readwise")
@@ -1072,30 +1075,19 @@ today's unfinished tasks (◎) only if there are completed days before it."
   (setq org-cliplink-max-length 800)
   (global-set-key (kbd "C-x p i") 'org-cliplink))
 
-;; (evil-leader/set-key
-;; "de" 'org-gtd-engage
-;; "dr" 'org-gtd-engage-grouped-by-context
-;; "dp" 'org-gtd-process-inbox
-;; "c" 'org-gtd-organize)
-
-(evil-leader/set-key
-	;; "dc" 'org-gtd-capture
-  "dc" (lambda () (interactive) (org-gtd-capture nil "i"))
-	"de" 'org-gtd-engage
-	"dp" 'org-gtd-process-inbox
-	"dn" 'org-gtd-show-all-next
-	"ds" 'org-gtd-review-stuck-projects)
+(setq org-gtd-update-ack "3.0.0")
 
 (use-package org-gtd
   :ensure t
+	:demand t
   :straight (org-gtd :type git
                      :host github
                      :repo "trevoke/org-gtd.el")
   :custom
   (org-gtd-directory "~/Org/agenda/GTD/")
-  ;; (org-edna-use-inheritance t)
-  ;; (org-gtd-update-ack "3.0.0")
-	(org-gtd-areas-of-focus '("PERSONAL" "MERITRANK" "CODING" "EGE"))
+  (org-edna-use-inheritance t)
+  (org-gtd-update-ack "3.0.0")
+	(org-gtd-areas-of-focus '("PERSONAL" "CORE" "ASCENT" "EGE"))
   (org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command))
 	(org-gtd-clarify-show-horizons t)
 	(org-gtd-horizons-file "horizons.org")
@@ -1136,6 +1128,13 @@ today's unfinished tasks (◎) only if there are completed days before it."
        :url "https://github.com/ichernyshovvv/timeblock.el"
        :branch "master"))))
 
+(use-package repeat-todo
+  :quelpa (repeat-todo
+					 :fetcher github
+					 :repo "cashpw/repeat-todo"
+					 :branch "main")
+	:after org)
+
 (use-package org-timeblock
   :straight (org-timeblock :type git
  													 :host github
@@ -1145,21 +1144,11 @@ today's unfinished tasks (◎) only if there are completed days before it."
   (:map global-map
  				("C-c s" . org-timeblock))
   :config
-  (setq org-now-location '("~/Org/agenda/Calendar.org")
+  (setq org-now-location '("~/Org/agenda/GTD/org-gtd-tasks.org")
         org-timeblock-inbox-file "/home/berezhnev/Org/agenda/Calendar.org"
         org-timeblock-n-days-view 3))
 
-(set-face-attribute 'org-quote nil
-                    :family "URW Bookman"              ;; Шрифт с засечками для элегантности
-                    :height 115                    ;; Чуть крупнее для изящного выделения
-                    :weight 'normal                ;; Нормальный вес для читаемости
-                    :slant 'italic                 ;; Наклон для классического стиля цитаты
-                    :foreground "#3c2f2f"          ;; Тёплый тёмно-коричневый для уюта
-                    :background "#f5f1e9"          ;; Кремовый фон для мягкости
-                    :box '(:line-width 2           ;; Тонкая рамка с тенью
-                           :color "#d9d2c5"        ;; Нейтральный серо-бежевый
-                           :style released-button) ;; Эффект приподнятости
-                    :extend t                      ;; Фон до края строки
-                    :inherit '(org-block italic))  ;; Наследуем базовые черты
+;; (use-package habitica
+;; 	:ensure t)
 
 (provide 'org-mode)

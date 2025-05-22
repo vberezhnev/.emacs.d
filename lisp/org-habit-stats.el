@@ -231,29 +231,29 @@ the message when the unstreak length is exactly that value."
 
 (defcustom org-habit-stats-graph-functions-alist
   '((org-habit-stats-graph-completions-per-month . (:key "m"
-                                                    :title "Monthly Completions"
-                                                    :x-label "Months"
-                                                    :y-label "Completions"
-                                                    :dir horizontal
-                                                    :max-bars 5))
+																												 :title "Monthly Completions"
+																												 :x-label "Months"
+																												 :y-label "Completions"
+																												 :dir horizontal
+																												 :max-bars 5))
     (org-habit-stats-graph-completions-per-week . (:key "w"
-                                                   :title "Weekly Completions"
-                                                   :x-label "Weeks"
-                                                   :y-label "Completions"
-                                                   :dir vertical
-                                                   :max-bars 10))
+																												:title "Weekly Completions"
+																												:x-label "Weeks"
+																												:y-label "Completions"
+																												:dir vertical
+																												:max-bars 10))
     (org-habit-stats-graph-completions-per-weekday . (:key "d"
-                                                      :title "Completions by Day"
-                                                      :x-label "Day"
-                                                      :y-label "Completions"
-                                                      :dir vertical
-                                                      :max-bars 7))
+																													 :title "Completions by Day"
+																													 :x-label "Day"
+																													 :y-label "Completions"
+																													 :dir vertical
+																													 :max-bars 7))
     (org-habit-stats-graph-daily-strength . (:key "s"
-                                             :title "Daily Habit Strength"
-                                             :x-label "Day"
-                                             :y-label "Strength"
-                                             :dir vertical
-                                             :max-bars 14)))
+																									:title "Daily Habit Strength"
+																									:x-label "Day"
+																									:y-label "Strength"
+																									:dir vertical
+																									:max-bars 14)))
   "Alist mapping graph functions to a list of key value pairs.
 This includes the key that invokes the function, the title of the
 graph, the name of the x-axis, the name of the y-axis, the graph
@@ -385,7 +385,7 @@ if `org-habit-stats-include-uncompleted-today` is t."
         (history (reverse history)))
     (seq-reduce ;;replace with reduce
      (lambda (a b)
-         (setq a (1- a))
+       (setq a (1- a))
        (while (> a b)
          (if (= a today)
              (if org-habit-stats-include-uncompleted-today
@@ -434,10 +434,10 @@ are removed."
            (let ((most-recent-complete (caar full-history)))
              (dolist (x full-history (reverse new-history))
                (when (= 1 (cdr x))
-                   (setq most-recent-complete (car x)))
+                 (setq most-recent-complete (car x)))
                ;; if incomplete, and difference from prev completion is nonzero mod repeat len, remove it
                (when (not (and (= 0 (cdr x))
-                             (/= 0 (mod (- (car x) most-recent-complete) repeat-len))))
+															 (/= 0 (mod (- (car x) most-recent-complete) repeat-len))))
                  (push x new-history)))))
           (t (error "Invalid repeat type %s" repeat-type)))))
 
@@ -448,7 +448,7 @@ are removed."
 ;;     0))
 
 (defun org-habit-stats--streak (h)
-"Helper function for `org-habit-stats-streak'.
+	"Helper function for `org-habit-stats-streak'.
 
 H must be new-to-old habit history."
   (let ((streak 0))
@@ -610,10 +610,10 @@ of HISTORY, HISTORY-REV, HABIT-DATA."
 See the docstring of `org-habit-stats-streak' for a description
 of HISTORY, HISTORY-REV, HABIT-DATA."
   (let* ((numerator (org-habit-stats-alltime-total history history-rev habit-data))
-        (denominator (float (length history))))
+         (denominator (float (length history))))
     (org-habit-stats-percentage-format (if (= denominator 0)
-        0
-      (/ numerator denominator)))))
+																					 0
+																				 (/ numerator denominator)))))
 
 (defun org-habit-stats-30-day-total (history history-rev _habit-data)
   "Return the total number of completions in the last 30 days.
@@ -726,10 +726,10 @@ pair is returned as the message.
 See the docstring of `org-habit-stats-streak' for a description
 of HISTORY, HISTORY-REV, HABIT-DATA."
   (let* ((streak (org-habit-stats-streak history history-rev habit-data))
-        (message (alist-get streak org-habit-stats-streak-message-alist)))
+         (message (alist-get streak org-habit-stats-streak-message-alist)))
     (when message
       (propertize message
-        'face 'org-habit-stats-message-positive))))
+									'face 'org-habit-stats-message-positive))))
 
 (defun org-habit-stats-unstreak-message (history history-rev habit-data)
   "Return a message based on the habit's streak or nil.
@@ -740,10 +740,10 @@ pair is returned as the message.
 See the docstring of `org-habit-stats-streak' for a description
 of HISTORY, HISTORY-REV, HABIT-DATA."
   (let* ((unstreak (org-habit-stats-unstreak history history-rev habit-data))
-        (message (alist-get unstreak org-habit-stats-unstreak-message-alist)))
+         (message (alist-get unstreak org-habit-stats-unstreak-message-alist)))
     (when message
       (propertize message
-       'face 'org-habit-stats-message-encouraging))))
+									'face 'org-habit-stats-message-encouraging))))
 
 (defun org-habit-stats-comeback-message (history history-rev habit-data)
   "Return a message when a comeback happens.
@@ -777,7 +777,7 @@ of HABIT-DATA."
     (dolist (completed-day completed-dates nil)
       (let ((completed-day-gregorian (calendar-gregorian-from-absolute completed-day)))
         (when (calendar-date-is-visible-p completed-day-gregorian)
-            (calendar-mark-visible-date completed-day-gregorian 'org-habit-stats-calendar-completed))))))
+          (calendar-mark-visible-date completed-day-gregorian 'org-habit-stats-calendar-completed))))))
 
 (defun org-habit-stats-get-calendar-contents ()
   "Return contents of `org-habit-stats-calendar-buffer'."
@@ -796,18 +796,18 @@ These are overlays corresponding to completed days."
   (dolist (ol ol-list)
     (let* ((new-start (+ (overlay-start ol) offset))
            (new-end (+ (overlay-end ol) offset))
-          (space-at-new-start (save-excursion
-                               (goto-char new-start)
-                               (eq ?  (char-after))))
-          (new-start-adjusted (if (and org-habit-stats-calendar-dont-highlight-whitespace
-                                       space-at-new-start
-                                     (< new-start new-end))
-                                (1+ new-start)
-                              new-start)))
-     (move-overlay (copy-overlay ol)
-                   new-start-adjusted
-                   new-end
-                   buffer))))
+           (space-at-new-start (save-excursion
+																 (goto-char new-start)
+																 (eq ?  (char-after))))
+           (new-start-adjusted (if (and org-habit-stats-calendar-dont-highlight-whitespace
+																				space-at-new-start
+																				(< new-start new-end))
+																	 (1+ new-start)
+																 new-start)))
+			(move-overlay (copy-overlay ol)
+										new-start-adjusted
+										new-end
+										buffer))))
 
 ;; create calendar buffer, inject text at top, mark custom dates, set so curr month on the right first
 (defun org-habit-stats-make-calendar-buffer (habit-data)
@@ -821,28 +821,28 @@ HABIT-DATA contains the results of `org-habit-parse-todo`."
            (current-month (calendar-extract-month date))
            (current-year (calendar-extract-year date))
            ;; Чтобы текущий месяц был в центре, начинаем с -2 месяца
-           (start-month (- current-month 2))
+           (start-month (- current-month 0))
            (start-year current-year))
-      
+
       ;; Корректируем переход через год
       ;; Если start-month стал 0 или отрицательным, добавляем 12 и уменьшаем год
-      (when (<= start-month 0)
-        (setq start-month (+ start-month 14)
-              start-year (1- start-year)))
-      
+			(when (<= start-month 0)
+				(setq start-month (+ start-month 12)  ;; Change 11 to 12
+							start-year (1- start-year)))
+
       ;; Отключаем различные отметки в календаре для чистоты отображения
-      (let (calendar-today-visible-hook 
+      (let (calendar-today-visible-hook
             calendar-today-invisible-hook
             calendar-mark-holidays-flag
             calendar-mark-diary-entries-flag)
         ;; Генерируем календарь, начиная с месяца -2 от текущего
         ;; Например, если сейчас февраль (2), то start-month будет 12 (декабрь)
         (calendar-generate-window start-month start-year))
-      
+
       ;; Сохраняем значения для использования в других функциях
       (setq org-habit-stats-displayed-month start-month
             org-habit-stats-displayed-year start-year)
-      
+
       ;; Отмечаем дни выполнения привычки
       (org-habit-stats-calendar-mark-habits habit-data))
     ;; Запускаем хуки инициализации календаря
@@ -855,7 +855,7 @@ HABIT-DATA contains the results of `org-habit-parse-todo`."
          (habit-data org-habit-stats-current-habit-data))
     (with-current-buffer org-habit-stats-calendar-buffer
       (setq buffer-read-only nil)
-      (let (calendar-today-visible-hook 
+      (let (calendar-today-visible-hook
             calendar-today-invisible-hook
             calendar-mark-holidays-flag    ; Добавлено
             calendar-mark-diary-entries-flag) ; Добавлено
@@ -899,8 +899,8 @@ N can be positive, zero, or negative."
   (org-habit-stats-increment-displayed-month n)
   (if (not (derived-mode-p 'org-habit-stats-mode))
       (user-error "Not in an org-habit-stats-mode buffer")
-  (org-habit-stats-refresh-calendar-buffer)
-  (org-habit-stats-refresh-calendar-section)))
+		(org-habit-stats-refresh-calendar-buffer)
+		(org-habit-stats-refresh-calendar-section)))
 
 (defun org-habit-stats-calendar-scroll-right (arg)
   "Move the `org-habit-stats' calendar forward ARG months."
@@ -978,7 +978,7 @@ of HISTORY, HISTORY-REV, HABIT-DATA."
   (org-habit-stats-graph-count-per-category
    history
    (lambda (d) (let ((day (calendar-gregorian-from-absolute d)))
-                     (list (car day) (caddr day)))) ;; converts absolute date to list (month year)
+                 (list (car day) (caddr day)))) ;; converts absolute date to list (month year)
    (lambda (m1 m2) (cond ((< (nth 1 m1) (nth 1 m2)) t)
                          ((= (nth 1 m1) (nth 1 m2)) (if (< (nth 0 m1) (nth 0 m2)) t nil))
                          (t nil)))
@@ -991,11 +991,13 @@ See the docstring of `org-habit-stats-streak' for a description
 of HISTORY, HISTORY-REV, HABIT-DATA."
   (org-habit-stats-graph-count-per-category
    history
+   ;; (lambda (d) (- d (mod (+ d 1) 7))) ;; Смещение на 1 день, чтобы неделя начиналась с воскресенья
+
    (lambda (d) (- d (mod d 7))) ;; converts absolute date to the sunday before or on; (month day year) format
    (lambda (d1 d2) (< d1 d2))
    (lambda (d) (let ((time (org-habit-stats-days-to-time d)))
                  (org-habit-stats-format-absolute-time-string org-habit-stats-graph-date-format
-                                     time)))))
+																															time)))))
 
 (defun org-habit-stats--pad-history (history n)
   "Pad the habit's HISTORY to length N.
@@ -1022,12 +1024,12 @@ of HISTORY, HISTORY-REV, HABIT-DATA."
 See the docstring of `org-habit-stats-streak' for a description
 of HISTORY, HISTORY-REV, HABIT-DATA."
   (let* ((dayslst (mapcar (lambda (d) (org-habit-stats-format-absolute-time-string
-                                   org-habit-stats-graph-date-format
-                                   (org-habit-stats-days-to-time (car d))))
-                        history)))
-     (cons dayslst
-           (reverse (org-habit-stats--exp-smoothing-list-full
-                     history history-rev habit-data)))))
+																			 org-habit-stats-graph-date-format
+																			 (org-habit-stats-days-to-time (car d))))
+													history)))
+    (cons dayslst
+          (reverse (org-habit-stats--exp-smoothing-list-full
+                    history history-rev habit-data)))))
 
 ;;; Chart functions
 
@@ -1050,10 +1052,10 @@ It creates them out of the colors in
         newface)
     (dolist (color org-habit-stats-graph-colors-list)
       (setq newface (make-face
-                (intern (concat "org-habit-chart-" color))))
-            (set-face-background newface color)
-            (set-face-foreground newface "black")
-            (push newface faces))
+										 (intern (concat "org-habit-chart-" color))))
+      (set-face-background newface color)
+      (set-face-foreground newface "black")
+      (push newface faces))
     (reverse faces)))
 
 (defun org-habit-stats-chart-draw-line-custom-char (dir zone start end horizontal-char vertical-char)
@@ -1070,16 +1072,16 @@ lines."
 
 See `chart-draw-line' for meaning of DIR, ZONE, START, and END."
   (org-habit-stats-chart-draw-line-custom-char dir zone start end
-                                   org-habit-stats-graph-data-horizontal-char
-                                   org-habit-stats-graph-data-vertical-char))
+																							 org-habit-stats-graph-data-horizontal-char
+																							 org-habit-stats-graph-data-vertical-char))
 
 (defun org-habit-stats-chart-draw-line-axis (dir zone start end)
   "Modification of `chart-draw-line' to use custom characters for axes.
 
 See `chart-draw-line' for meaning of DIR, ZONE, START, and END."
   (org-habit-stats-chart-draw-line-custom-char dir zone start end
-                                   org-habit-stats-graph-axis-horizontal-char
-                                   org-habit-stats-graph-axis-vertical-char))
+																							 org-habit-stats-graph-axis-horizontal-char
+																							 org-habit-stats-graph-axis-vertical-char))
 
 (cl-defmethod org-habit-stats-chart-translate-xpos ((c chart) x)
   "Translate in chart C the coordinate X into a screen column."
@@ -1285,8 +1287,8 @@ end of the sequence instead."
     (dolist (x s)
       (oset x data (org-habit-stats--chart-trim-offset
                     (oref x data) max offset end)))
-      (oset nx items (org-habit-stats--chart-trim-offset
-                      (oref nx items) max offset end))))
+    (oset nx items (org-habit-stats--chart-trim-offset
+                    (oref nx items) max offset end))))
 
 (defun org-habit-stats-chart-bar-quickie-extended (dir title namelst nametitle numlst numtitle
                                                        &optional max sort-pred offset end width height
@@ -1486,17 +1488,17 @@ of HISTORY, HISTORY-REV, HABIT-DATA."
   (let* ((i 0)
          (stats-start (point))
          (statresults (org-habit-stats-calculate-stats history history-rev habit-data)))
-      (dolist (x statresults)
-        (insert (org-habit-stats-format-one-stat (car x)
-                                                 (cdr x)))
-        (setq i (1+ i))
-        (when (and (> i 0) (= (mod i 2) 0))
-          (insert "\n")))
-      (insert "\n")
-      (setq org-habit-stats-stat-bounds (cons stats-start (point)))))
+    (dolist (x statresults)
+      (insert (org-habit-stats-format-one-stat (car x)
+                                               (cdr x)))
+      (setq i (1+ i))
+      (when (and (> i 0) (= (mod i 2) 0))
+        (insert "\n")))
+    (insert "\n")
+    (setq org-habit-stats-stat-bounds (cons stats-start (point)))))
 
 (defun org-habit-stats-insert-messages (history history-rev habit-data)
-   "Insert all messages into the buffer.
+  "Insert all messages into the buffer.
 
 See the docstring of `org-habit-stats-streak' for a description
 of HISTORY, HISTORY-REV, HABIT-DATA."
@@ -1523,15 +1525,15 @@ of HABIT-DATA."
     (let ((calendar-height (- (line-number-at-pos) cal-start-line)))
       (when (< calendar-height 8)
         (insert (make-string (- 7 calendar-height) ?\n)))
-    (insert (make-string 1 ?\n))
+			(insert (make-string 1 ?\n))
 
-    (when org-habit-stats-graph-bounds
-      (let ((cal-bound-diff (- (point) (cdr org-habit-stats-calendar-bounds)))
-            (graph-start (car org-habit-stats-graph-bounds))
-            (graph-end (cdr org-habit-stats-graph-bounds)))
-        (setq org-habit-stats-graph-bounds (cons (+ graph-start cal-bound-diff)
-                                                 (+ graph-end cal-bound-diff)))))
-    (setq org-habit-stats-calendar-bounds (cons cal-start (point))))))
+			(when org-habit-stats-graph-bounds
+				(let ((cal-bound-diff (- (point) (cdr org-habit-stats-calendar-bounds)))
+							(graph-start (car org-habit-stats-graph-bounds))
+							(graph-end (cdr org-habit-stats-graph-bounds)))
+					(setq org-habit-stats-graph-bounds (cons (+ graph-start cal-bound-diff)
+																									 (+ graph-end cal-bound-diff)))))
+			(setq org-habit-stats-calendar-bounds (cons cal-start (point))))))
 
 ;;; Refresh sections
 (defun org-habit-stats-refresh-buffer ()
@@ -1572,8 +1574,8 @@ of HABIT-DATA."
   "Insert a divider.
 The divider consists of 80 `org-agenda-block-separator'."
   (insert (make-string 80
-           ;; (max 80 (window-width))
-           org-agenda-block-separator))
+											 ;; (max 80 (window-width))
+											 org-agenda-block-separator))
   (insert (make-string 1 ?\n)))
 
 (defun org-habit-stats-insert-section-header (name)
@@ -1619,8 +1621,8 @@ navigate between habits."
                             (truncate-string-to-width habit-name 25 nil nil t)
                             "*"))
          (cal-buff-name (concat "*Org-Habit-Stats Calendar "
-                            (truncate-string-to-width habit-name 25 nil nil t)
-                            "*")))
+																(truncate-string-to-width habit-name 25 nil nil t)
+																"*")))
     (setq org-habit-stats-current-buffer buff-name)
     (setq org-habit-stats-current-calendar-buffer cal-buff-name)
     (switch-to-buffer (get-buffer-create org-habit-stats-current-buffer))
@@ -1737,7 +1739,7 @@ habit data getting truncated."
         (setq is-habit (org-is-habit-p (point)))
         (when is-habit
           (when (not (eq (car (org-element-at-point)) 'headline))
-              (outline-previous-heading))
+            (outline-previous-heading))
           (setq habit-name (org-element-property :raw-value (org-element-at-point))
                 habit-data (org-habit-stats-parse-todo (point))
                 habit-description (org-entry-get (point) "DESCRIPTION"))))
@@ -1753,19 +1755,19 @@ habit data getting truncated."
   (interactive)
   (if (not (derived-mode-p 'org-agenda-mode))
       (user-error "Not in agenda buffer")
-  (let ((orig-pos (point))
-        habit-pos)
-    (while (and (not (eobp))
-                (not (setq habit-pos (org-habit-stats--agenda-item-is-habit-p))))
-      (forward-line))
-    (when (not habit-pos)
-      (goto-char (point-min))
-      (while (and (< (point) orig-pos)
-                  (not (setq habit-pos (org-habit-stats--agenda-item-is-habit-p))))
-        (forward-line)))
-    (if habit-pos
-        (org-habit-stats-view-habit-at-point-agenda)
-      (user-error "No habits found in agenda buffer")))))
+		(let ((orig-pos (point))
+					habit-pos)
+			(while (and (not (eobp))
+									(not (setq habit-pos (org-habit-stats--agenda-item-is-habit-p))))
+				(forward-line))
+			(when (not habit-pos)
+				(goto-char (point-min))
+				(while (and (< (point) orig-pos)
+										(not (setq habit-pos (org-habit-stats--agenda-item-is-habit-p))))
+					(forward-line)))
+			(if habit-pos
+					(org-habit-stats-view-habit-at-point-agenda)
+				(user-error "No habits found in agenda buffer")))))
 
 (defun org-habit-stats-view-previous-habit-in-agenda ()
   "View previous habit in the current org agenda buffer (internal)."
@@ -1821,11 +1823,11 @@ habit data getting truncated."
 (defun org-habit-stats-exit ()
   "Kill org-habit-stats buffer and the internal calendar buffer."
   (interactive)
-   (if (not (derived-mode-p 'org-habit-stats-mode))
+  (if (not (derived-mode-p 'org-habit-stats-mode))
       (user-error "Not in an org-habit-stats-mode buffer")
-  (when (bufferp org-habit-stats-calendar-buffer)
+		(when (bufferp org-habit-stats-calendar-buffer)
       (kill-buffer org-habit-stats-calendar-buffer))
-  (kill-buffer org-habit-stats-current-buffer)))
+		(kill-buffer org-habit-stats-current-buffer)))
 
 ;;; Major mode
 (defun org-habit-stats-format-graph-func-name (s)
@@ -1855,7 +1857,7 @@ habit data getting truncated."
              (graph-switch-func (intern graph-switch-func-name)))
         (fset graph-switch-func (lambda () (interactive) (org-habit-stats-switch-graph graph-func)))
         (define-key map (kbd (concat org-habit-stats-graph-command-prefix graph-key))
-          graph-switch-func)))
+										graph-switch-func)))
     map)
   "Keymap for `org-habit-stats-mode'.")
 
@@ -1867,7 +1869,7 @@ habit data getting truncated."
         indent-tabs-mode nil)
   (setq org-habit-stats-graph-current-offset 0)
   (if org-habit-stats-graph-default-func
-        (setq org-habit-stats-graph-current-func org-habit-stats-graph-default-func)
+      (setq org-habit-stats-graph-current-func org-habit-stats-graph-default-func)
     (setq org-habit-stats-graph-current-func (caar org-habit-stats-graph-functions-alist)))
   (setq org-habit-stats-graph-face-list (org-habit-stats-graph-create-faces)))
 

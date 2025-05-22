@@ -1,6 +1,7 @@
 ;;; habit-quest.el --- Quest system for org-habit -*- lexical-binding: t; -*-
 
 (require 'quest-system-core)
+(require 'quest-ui)
 (require 'widget)
 (require 'wid-edit)
 (require 'market)
@@ -63,6 +64,8 @@
                  hq-daily-bonus
                  hq-last-bonus-date)
            (current-buffer))))
+
+;; (3566 36 319 ((:id 1 :name "Путь к осознанности" :description "Выполните все три медитации 5 дней подряд" :habits ("🎯‍ - Утренняя медитация" "🌟️ - Дневная медитация" "🌿 - Вечерняя медитация") :required 5 :progress 0 :completed nil :reward-xp 100 :reward-gold 50) (:id 2 :name "Железная дисциплина" :description "Просыпайтесь в 05:30 7 дней подряд" :habits ("⏰ - Проснуться в 05;30") :required 7 :progress 7 :completed nil :reward-xp 150 :reward-gold 75) (:id 3 :name "Энергетический баланс" :description "Выпивайте 2 литра воды и делайте 10к шагов 10 дней подряд" :habits ("💧 - 2 литра воды" "🚶 - 10к шагов") :required 10 :progress 0 :completed nil :reward-xp 200 :reward-gold 100) (:id 4 :name "Фокус на учебе" :description "Готовьтесь к ЕГЭ 5 дней подряд" :habits ("📝 - ЕГЭ") :required 5 :progress 0 :completed nil :reward-xp 120 :reward-gold 60) (:id 5 :name "Режим бодрости" :description "Принимайте контрастный душ 7 дней подряд" :habits ("🚿 - Контрастный душ") :required 7 :progress 0 :completed nil :reward-xp 140 :reward-gold 70)) nil (:habit "🌟️ - Дневная медитация" :xp 40 :gold 30) "2025-03-07")
 
 (defun hq-load-data ()
   "Загрузить данные квестовой системы"
@@ -215,112 +218,6 @@ HABIT-STATS - хеш-таблица с данными о привычках"
 
       (setq hq-last-bonus-date current-date)
       (hq-save-data))))
-
-;; Функция для проверки бонусного задания
-;; (defun hq-check-daily-bonus (habit-name)
-;;   (when (and hq-daily-bonus
-;;              (string= habit-name (plist-get hq-daily-bonus :habit)))
-;;     (let ((bonus-xp (plist-get hq-daily-bonus :xp))
-;;           (bonus-gold (plist-get hq-daily-bonus :gold)))
-;;       (hq-add-xp-and-gold bonus-xp bonus-gold)
-;;       (setq hq-daily-bonus nil)
-;;       (hq-save-data))))
-
-(defun hq-add-quest-info-to-agenda (&optional arg)
-  "Добавить информацию о квестах в конец agenda с защитой от ошибок."
-  (interactive)
-  (let ((inhibit-read-only t))
-    ;; Защита от nil значений
-    (let ((current-level (or hq-level 1))
-          (current-xp (or hq-xp 0))
-          (current-gold (or hq-gold 0)))
-      
-      ;; Добавляем разделитель
-      (goto-char (point-max))
-      (insert "\n"
-              (propertize "============================\n"
-                          'face '(:foreground "#4A90E2")))
-      
-      ;; Статистика персонажа
-      (insert
-       (propertize "🎮 HABIT QUEST SYSTEM 🎮\n"
-                   'face '(:foreground "#4A90E2" :weight bold :height 1.2))
-       (propertize (format "👤 Level %d " current-level)
-                   'face '(:foreground "#FFD700" :weight bold))
-       "| "
-       (propertize (format "XP: %d/%d "
-                           (mod current-xp 100)
-                           100)
-                   'face '(:foreground "#4CAF50" :weight bold))
-       "| "
-       (propertize (format "Gold: %d 🪙\n" current-gold)
-                   'face '(:foreground "#FFD700" :weight bold)))
-      
-      ;; Бонусное задание
-      (when hq-daily-bonus
-        (insert
-         (propertize "🎯 Бонусное задание на сегодня\n"
-                     'face '(:foreground "#2196F3" :weight bold))
-         (format "Выполните привычку '%s' для получения бонуса: "
-                 (plist-get hq-daily-bonus :habit))
-         (propertize (format "%d XP, %d золота\n"
-                            (or (plist-get hq-daily-bonus :xp) 0)
-                            (or (plist-get hq-daily-bonus :gold) 0))
-                     'face '(:foreground "#4CAF50"))))
-      
-      ;; Активные квесты
-      (insert
-       (propertize "\n📜 Активные квесты\n"
-                   'face '(:foreground "#2196F3" :weight bold)))
-      
-      (let ((active-quests 0)
-            (quest-bar-width 20))
-        (dolist (quest hq-quests)
-          (unless (plist-get quest :completed)
-            (setq active-quests (1+ active-quests))
-            (let* ((name (or (plist-get quest :name) "Неизвестный квест"))
-                   (progress (or (plist-get quest :progress) 0))
-                   (required (or (plist-get quest :required) 1))
-                   (progress-percent (if (> required 0)
-                                        (* (/ (float progress) required) 100)
-                                      0.0))
-                   (filled-length (round (* quest-bar-width (/ progress-percent 100.0))))
-                   (empty-length (- quest-bar-width filled-length)))
-              
-              (insert
-               (propertize (format "∘ %s\n" name)
-                           'face '(:foreground "#4A90E2")))
-              
-              (insert
-               (propertize (format "  %d/%d дней " progress required)
-                           'face '(:foreground "#333333")))
-              
-              (insert
-               (propertize (concat
-                           (make-string filled-length ?#)
-                           (make-string empty-length ?·))
-                          'face '(:foreground "#4CAF50")))
-              
-              (insert (format " %.1f%%\n\n" progress-percent)))))
-        
-        (when (zerop active-quests)
-          (insert
-           (propertize "  Нет активных квестов\n"
-                       'face '(:foreground "#888888" :slant italic)))))
-      
-      ;; Кнопка Market
-      (insert "\n")
-      (let ((market-button
-             (propertize "[🏪 Открыть Market]"
-                        'face '(:foreground "white"
-                                          :background "#4CAF50"
-                                          :weight bold
-                                          :box (:line-width 2 :style released-button))
-                        'mouse-face 'highlight
-                        'keymap (let ((map (make-sparse-keymap)))
-                                 (define-key map [mouse-1] 'hq-market)
-                                 map))))
-        (insert market-button "\n")))))
 
 ;; Хук для выделения бонусного задания
 (defun hq-org-habit-streak-hook ()
