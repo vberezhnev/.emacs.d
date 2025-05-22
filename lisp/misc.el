@@ -46,7 +46,7 @@
 	(dashboard-setup-startup-hook)
   :config
   (setq dashboard-banner-logo-title "Build an epic shit"
-        dashboard-startup-banner "~/.emacs.d/images/black-hole.png"
+        dashboard-startup-banner "~/.emacs.d/images/Emacs-logo.svg"
         dashboard-center-content    t
         dashboard-show-shortcuts    t
         ;; dashboard-startupify-list     nil
@@ -54,7 +54,7 @@
         initial-buffer-choice       (lambda () (get-buffer "*dashboard*"))
         dashboard-set-file-icons    t
 				dashboard-items '((recents  . 12)
-                          (agenda   . 3)
+                          ;; (agenda   . 3)
                           (projects . 6)
 													(bookmarks . 3))))
 
@@ -122,6 +122,7 @@
   (setq display-time-load-average nil)
 	(setq doom-modeline-height 24
 				all-the-icons-scale-factor 0.8
+				doom-modeline-vcs-max-length 30
 				doom-modeline-icon t
 				doom-gruvbox-padded-modeline t
 				doom-modeline-modal-modern-icon t
