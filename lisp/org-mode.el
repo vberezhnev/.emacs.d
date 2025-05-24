@@ -515,7 +515,7 @@
           							:box (:line-width (1 . 1) :color "white")))))
      ))
   :config
-  (load "~/.emacs.d/lisp/my-org-habit")
+  (load "~/.emacs.d/lisp/packages/my-org-habit")
   (setq org-habit-following-days 1
         org-habit-preceding-days 9
         org-habit-show-habits nil
@@ -540,7 +540,7 @@
 
 (use-package org-habit-stats
   :ensure nil
-  :load-path "~/.emacs.d/lisp/"
+  :load-path "~/.emacs.d/lisp/packages/"
   :config
   (add-hook 'org-after-todo-state-change-hook 'org-habit-stats-update-properties)
   (add-hook 'org-agenda-mode-hook

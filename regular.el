@@ -75,7 +75,7 @@
          ("M-s M-s" . gptel)))
 
 (use-package whisper
-  :load-path "~/.emacs.d/lisp/whisper.el"
+  :load-path "~/.emacs.d/lisp/packages/whisper.el"
   :bind ("M-s M-t" . whisper-run)
   :config
   (setq whisper-install-directory "/tmp/"

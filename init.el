@@ -148,11 +148,6 @@
 (use-package org-contrib
   :ensure t)
 
-;;(change-theme 'tsdh-light 'doom-xcode)
-;; (change-theme 'doom-one-light 'doom-one)
-;; (load-theme 'doom-one-light)
-
-
 (server-start)
 
 ;; (set-frame-parameter (selected-frame) 'alpha '(85 . 80))
@@ -162,27 +157,30 @@
 
 ;; Tangle configuration
 ;;(org-babel-load-file (expand-file-name "berezhnev.org" user-emacs-directory))
-(load-file "~/.emacs.d/regular.el")
-(load-file "~/.emacs.d/exwm.el")
 
-;;;;;;;;;;;;;;;;;;;;;; EVIL ;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;; REGULAR ;;;;;;;;;;;;;;;;;;
+(load-file "~/.emacs.d/regular.el")
+
+;;;;;;;;;;;;;;;;;;;;;; EXWM ;;;;;;;;;;;;;;;;;;;;;
+;; (load-file "~/.emacs.d/exwm.el")
+
+;;;;;;;;;;;;;;;;;;;;;; EVIL ;;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/evil.el")
 
-;;;;;;;;;;;;;;;;;;;;; ORG-MODE ;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;; ORG-MODE ;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/org-mode.el")
 
-;;;;;;;;;;;;;;;;;;;;;;;;; LANGUAGES ;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;; LANGUAGES ;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/languages.el")
 
-;;;;;;;;;;;;;;;;;;;;;;;;; DIRED ;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;; DIRED ;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/dired.el")
 
-;;;;;;;;;;;;;;;;;;;;;;;;; GIT ;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;; GIT ;;;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/git.el")
 
+;;;;;;;;;;;;;;;;;;;;;; MISC ;;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/misc.el")
-
-(load-file "~/.emacs.d/regular.el")
 
 (put 'dired-find-alternate-file 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
