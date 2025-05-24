@@ -27,6 +27,10 @@
   (setq calendar-latitude 43.11)
   (setq calendar-longitude 131.88))
 
+;; (change-theme 'tsdh-light 'doom-xcode)
+(change-theme 'doom-one-light 'doom-one)
+(load-theme 'doom-one-light)
+
 (use-package auto-dark
   :ensure t
   :config
