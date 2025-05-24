@@ -1,58 +1,59 @@
+;;;;;;;;;;;;;;;;;;;;;;; COMPANY ;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package company
-    :ensure t
-    :config
-		(setq company-idle-delay 0
-					company-minimum-prefix-length 1)
+  :ensure t
+  :config
+  (setq company-idle-delay 0
+        company-minimum-prefix-length 1
+        company-dabbrev-ignore-case nil
+        company-dabbrev-downcase nil
+        company-icon-margin 3)
+  (add-hook 'after-init-hook 'global-company-mode)
+  (add-hook 'after-init-hook 'company-tng-mode)
+  (setq company-tng-auto-configure nil)
+  (with-eval-after-load 'company-tng
+    (setq company-active-map company-tng-map)))
 
-	;; Go - lsp-mode
-	;; Set up before-save hooks to format buffer and add/delete imports.
-	;; (defun lsp-go-install-save-hooks ()
-	;; 	(add-hook 'before-save-hook #'lsp-format-buffer t t)
-	;; 	(add-hook 'before-save-hook #'lsp-organize-imports t t))
-	;; (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+(setq company-frontends '(company-tng-frontend company-box-frontend))
 
-	;; Start LSP Mode and YASnippet mode
-	(add-hook 'go-mode-hook #'lsp-deferred)
-	(add-hook 'go-mode-hook #'yas-minor-mode))
-
-(setq company-dabbrev-ignore-case nil)
-(setq company-dabbrev-downcase nil)
-
-(setq company-icon-margin 3)
-
-(add-hook 'after-init-hook 'company-tng-mode)
-
-(setq company-tng-auto-configure nil)
-(with-eval-after-load 'company-tng
-  (setq company-active-map company-tng-map))
-
-(add-hook 'after-init-hook 'global-company-mode)
+;;;;;;;;;;;;;;;;;;;;;;; COMPANY-BOX ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package company-box
   :ensure t
-  :hook
-  (company-mode . company-box-mode)
-
+  :hook (company-mode . company-box-mode)
   :config
-  (setq company-box-icon-right-margin 1))
+  (setq company-box-icon-right-margin 1
+        company-box-max-candidates 50
+        company-box-show-single-candidate t
+        company-box-doc-delay 0.0))
 
-(setq company-frontends '(company-tng-frontend company-box-frontend))
+;;;;;;;;;;;;;;;;;;;;;;; COMPANY-ORG-BLOCK ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package company-org-block
   :ensure t
   :defer t
   :custom
-  (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
+  (company-org-block-edit-style 'auto)
   :hook ((org-mode . (lambda ()
                        (setq-local company-backends '(company-org-block))
                        (company-mode +1)))))
 
+;;;;;;;;;;;;;;;;;;;;;;; DIFF-HL ;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package diff-hl
   :ensure t)
 
+;;;;;;;;;;;;;;;;;;;;;;; FLYCHECK ;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package flycheck
   :ensure t
-	:demand t)
+  :demand t
+  :config
+  (add-hook 'eglot-managed-mode-hook #'flycheck-mode)
+  (setq flycheck-check-syntax-automatically '(save idle-change))
+  (add-hook 'after-init-hook #'global-flycheck-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;; YASNIPPET ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package yasnippet
   :ensure t
@@ -67,36 +68,27 @@
             yasnippet-snippets-dir))
 (yas-reload-all)
 
+;;;;;;;;;;;;;;;;;;;;;;; SCRATCH ;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package scratch
   :ensure t)
 
-;; (general-vmap
-;;   :keymaps 'lisp-interaction-mode-map
-;;   "<tab>" #'indent-region)
-
-;; (use-package package-lint
-;;   :ensure t)
-
-(use-package json-mode
-  :ensure t)
-
-(use-package protobuf-mode
-	:ensure t)
+;;;;;;;;;;;;;;;;;;;;;;; TYPESCRIPT-MODE ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package typescript-mode
   :ensure t
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
   :config
-  ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
-  ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
   (define-derived-mode typescriptreact-mode typescript-mode
     "TypeScript TSX"))
 
+;;;;;;;;;;;;;;;;;;;;;;; RUSTIC ;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package rustic
   :ensure t
-	:after (eglot flycheck)
-	:defer t
+  :after (eglot flycheck)
+  :defer t
   :bind (:map rustic-mode-map
               ("M-j" . lsp-ui-imenu)
               ("M-?" . lsp-find-references)
@@ -105,136 +97,113 @@
               ("C-c C-c r" . lsp-rename)
               ("C-c C-c q" . lsp-workspace-restart)
               ("C-c C-c Q" . lsp-workspace-shutdown)
-							("C-c C-c t" . rustic-cargo-test)
-							("C-c C-c r" . rustic-cargo-run)
-							("C-c C-c s" . lsp-rust-analyzer-status))
- 	:mode ("\\.rs$" . rustic-mode)
-	:custom
-	(rustic-lsp-client 'eglot)
-	(rustic-lsp-server 'rust-analyzer)
+              ("C-c C-c t" . rustic-cargo-test)
+              ("C-c C-c r" . rustic-cargo-run)
+              ("C-c C-c s" . lsp-rust-analyzer-status))
+  :mode ("\\.rs$" . rustic-mode)
+  :custom
+  (rustic-lsp-client 'eglot)
+  (rustic-lsp-server 'rust-analyzer)
   :config
-	(add-hook 'rustic-mode-hook #'eglot-ensure)
-	
-	(defun rk/rustic-mode-hook ()
-		(when buffer-file-name
-			(setq-local buffer-save-without-query t))
-		((and )dd-hook 'before-save-hook 'lsp-format-buffer nil t))
-	
-	(use-package rust-playground
-		:ensure t))
+  (add-hook 'rustic-mode-hook #'eglot-ensure)
+  (defun rk/rustic-mode-hook ()
+    (when buffer-file-name
+      (setq-local buffer-save-without-query t)))
+  (use-package rust-playground
+    :ensure t))
+
+;;;;;;;;;;;;;;;;;;;;;;; GO-MODE ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package go-mode
-  :straight t
-	:ensure t
+  :ensure t
   :mode ("\\.go\\'" . go-mode)
   :config
   (defun my-go-mode-hook ()
     (setq tab-width 2)
     (setq gofmt-command "goimports")
-    (set (make-local-variable 'company-backends) '(company-go))
+    (set (make-local-variable 'company-backends)
+         '((company-go :with company-capf)))
+    (eglot-ensure)
     (company-mode))
-  (add-hook 'go-mode-hook 'my-go-mode-hook))
+  (add-hook 'go-mode-hook #'my-go-mode-hook)
+  (add-hook 'go-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'eglot-format-buffer nil t)
+              (add-hook 'before-save-hook
+                        (lambda () (when (eglot--server-capable :codeActionProvider)
+                                     (eglot-code-actions nil "source.organizeImports")))
+                        nil t))))
+
+;;;;;;;;;;;;;;;;;;;;;;; COMPANY-GO ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package company-go
-  :after (company go-mode)
-	:ensure t
-  :straight t)
+  :ensure t
+  :after (company go-mode))
 
-;; (use-package go-errcheck
-;;   :after go-mode
-;; 	:ensure t
-;;   :straight t)
+;;;;;;;;;;;;;;;;;;;;;;; EGLOT ;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (use-package eglot
-;;   :ensure t
-;;   :config
-;;   (add-to-list 'eglot-server-programs '(rustic-mode . ("rust-analyzer")))
+(use-package eglot
+  :ensure t
+  :commands (eglot eglot-ensure)
+  :config
+  (add-to-list 'eglot-server-programs
+               '((rustic-mode rust-mode) . ("rust-analyzer"))
+               '((go-mode) . ("gopls"))
+               '((typescript-mode typescriptreact-mode) . ("typescript-language-server" "--stdio"))
+               '((python-mode) . ("pylsp"))
+               '((c-mode c++-mode) . ("clangd"))
+               '((js-mode) . ("typescript-language-server" "--stdio")))
+  (setq eglot-autoshutdown t
+        eglot-sync-connect 0
+        eglot-confirm-server-initiated-edits nil
+        eglot-extend-to-xref t
+        eglot-events-buffer-size 0
+        eglot-send-changes-idle-time 0.2)
+  (setq eldoc-idle-delay 0.0
+        eldoc-echo-area-use-multiline-p t
+        eldoc-documentation-strategy 'eldoc-documentation-compose)
+  (defun my/eglot-format-on-save ()
+    (when (eglot-managed-p)
+      (eglot-format-buffer)))
+  (add-hook 'before-save-hook #'my/eglot-format-on-save)
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (when (eglot--server-capable :inlayHintProvider)
+                (eglot-inlay-hints-mode))))
+  :bind (:map eglot-mode-map
+              ("C-c l f" . eglot-format-buffer)
+              ("C-c l r" . eglot-rename)
+              ("C-c l a" . eglot-code-actions)
+              ("C-c l d" . xref-find-definitions)
+              ("C-c l ?" . xref-find-references)
+              ("C-c l e" . flycheck-list-errors)
+              ("C-c l q" . eglot-shutdown)
+              ("M-j" . eglot-code-action-quickfix)))
 
-;;   ;; (setq-default eglot-workspace-configuration
-;;   ;;               '((:pylsp . (:configurationSources ["flake8"] :plugins (:pycodestyle (:enabled nil) :mccabe (:enabled nil) :flake8 (:enabled t))))))
-
-;;   :hook
-;;   ((rustic-mode . eglot-ensure)))
-
-;; (use-package lsp-mode
-;;   :ensure t
-;; 	:demand t
-;;   :commands (lsp lsp-deferred)
-;;   :bind (:map lsp-mode-map
-;;               ("C-c f" . lsp-format-buffer))
-;;   :hook ((go-mode         . lsp-deferred)
-;;          (rustic-mode       . lsp-deferred)
-;;          (lisp            . lsp)
-;;          (python-mode     . lsp-deferred)
-;;          (c-mode          . lsp-deferred)
-;;          (c++-mode        . lsp-deferred)
-;;          (js-mode         . lsp-deferred)
-;;          (typescript-mode . lsp-deferred)
-;;          (lsp-mode        . lsp-enable-which-key-integration))
-;;   :init
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   :custom
-;;   ;; what to use when checking on-save. "check" is default, I prefer clippy
-;;   (lsp-rust-analyzer-cargo-watch-command "clippy")
-;;   (lsp-eldoc-render-all t)
-;;   (lsp-idle-delay 0)
-;;   ;; enable / disable the hints as you prefer:
-;;   (lsp-inlay-hint-enable t)
-;;   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
-;;   (lsp-rust-analyzer-display-chaining-hints t)
-;;   (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
-;;   (lsp-rust-analyzer-display-closure-return-type-hints t)
-;;   (lsp-rust-analyzer-display-parameter-hints t)
-;;   ;; (lsp-rust-analyzer-display-reborrow-hints t)
-
-;;   :config
-;;   (setq lsp-headerline-breadcrumb-enable nil
-;; 	      lsp-signature-render-documentation nil
-;; 	      lsp-enable-snippet t ;; nil
-;; 	      lsp-lens-enable t ;; nil
-;; 	      lsp-diagnostic-provider :none)
-;; 	(with-eval-after-load 'lsp-mode
-;; 	(set-face-attribute 'lsp-face-highlight-read nil :underline nil)))
+;;;;;;;;;;;;;;;;;;;;;;; HELM-LSP ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package helm-lsp
   :ensure t)
 
-;; (use-package lsp-ui
-;;   :ensure t
-;;   :hook (lsp-mode . lsp-ui-mode)
-;;   :commands lsp-ui-mode
-;;   :config
-;;   (setq
-;;    lsp-inlay-hints-mode t
-;;    lsp-ui-doc-enable t
-;;    lsp-ui-doc-max-height 8
-;;    lsp-ui-doc-max-width 130         ; 150 (default) is too wide
-;;    lsp-ui-doc-delay 0.0           ; 0.2 (default) is too naggy
-;;    lsp-ui-doc-show-with-mouse t  ; don't disappear on mouseover
-;;    ;; lsp-ui-doc-show-with-cursor t
-;;    lsp-ui-doc-border (face-foreground 'default)
-;;    lsp-ui-doc-position 'at-point
-;;    lsp-ui-doc-include-signature t
-;;    lsp-ui-doc-header t))
+;;;;;;;;;;;;;;;;;;;;;;; FORMAT-ALL ;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package format-all
+  :ensure t
+  :config
+  (global-set-key (kbd "C-c C-f") 'format-all-buffer)
+  (add-hook 'prog-mode-hook 'format-all-ensure-formatter))
+
+;;;;;;;;;;;;;;;;;;;;;;; DOCKERFILE-MODE ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package dockerfile-mode
   :ensure t)
 
-(use-package format-all
-  :ensure t
-  :preface
-  ;; (defun ian/format-code ()
-  ;;   "Auto-format whole buffer."
-  ;;   (interactive)
-  ;;   (if (derived-mode-p 'prolog-mode)
-  ;;       (prolog-indent-buffer)
-  ;;     (format-all-buffer)))
-  :config
-  ;; (global-set-key (kbd "M-F") 'ian/format-code)
-  (global-set-key (kbd "C-c C-f") 'format-all-buffer)
-  (add-hook 'prog-mode-hook 'format-all-ensure-formatter))
+;;;;;;;;;;;;;;;;;;;;;;; JSON-MODE ;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (use-package direnv
-;; 	:ensure t
-;; 	:config
-;; 	(direnv-mode))
+(use-package json-mode
+  :ensure t)
+
+;;;;;;;;;;;;;;;;;;;;;;; PROTOBUF-MODE ;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package protobuf-mode
+  :ensure t)
