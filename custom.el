@@ -33,8 +33,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-	 '("5c7720c63b729140ed88cf35413f36c728ab7c70f8cd8422d9ee1cedeb618de5"
+	 '("48042425e84cd92184837e01d0b4fe9f912d875c43021c3bcb7eeb51f1be5710"
+		 "5a0ddbd75929d24f5ef34944d78789c6c3421aa943c15218bac791c199fc897d"
+		 "51fa6edfd6c8a4defc2681e4c438caf24908854c12ea12a1fbfd4d055a9647a3"
 		 "0325a6b5eea7e5febae709dab35ec8648908af12cf2d2b569bedc8da0a3a81c1"
+		 "5c7720c63b729140ed88cf35413f36c728ab7c70f8cd8422d9ee1cedeb618de5"
 		 default))
  '(helm-minibuffer-history-key "M-p"))
 (custom-set-faces
@@ -42,6 +45,11 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(magit-branch-local ((t (:foreground "#98c379"))))
+ '(magit-branch-remote ((t (:foreground "#e06c75"))))
+ '(magit-diff-added ((t (:background "#3d4f3d" :foreground "#98c379"))))
+ '(magit-diff-removed ((t (:background "#4f3d3d" :foreground "#e06c75"))))
+ '(magit-section-heading ((t (:foreground "#61afef" :weight bold))))
  '(org-habit-alert-face ((t (:background "light coral" :foreground "white" :width expanded :height 1.0 :box (:line-width (1 . 1) :color "white")))))
  '(org-habit-alert-future-face ((t (:background "light coral" :foreground "white" :width expanded :height 1.0 :box (:line-width (1 . 1) :color "white")))))
  '(org-habit-clear-face ((t (:background "pale green" :foreground "white" :width expanded :height 1.0 :box (:line-width (1 . 1) :color "white")))))

@@ -1,5 +1,8 @@
 (setq evil-want-keybinding nil)
 
+;; (use-package xah-fly-keys
+;; 	:ensure nil)
+
 (use-package general
 	:ensure t
 	:config
