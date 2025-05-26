@@ -207,3 +207,7 @@
 
 (use-package protobuf-mode
   :ensure t)
+
+
+(use-package nix-mode
+	:ensure t)
