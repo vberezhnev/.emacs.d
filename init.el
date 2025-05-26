@@ -174,7 +174,7 @@
 (load-file "~/.emacs.d/regular.el")
 
 ;;;;;;;;;;;;;;;;;;;;;; EXWM ;;;;;;;;;;;;;;;;;;;;;
-;; (load-file "~/.emacs.d/exwm.el")
+;; (load-file "~/.emacs.d/exwm/exwm.el")
 
 ;;;;;;;;;;;;;;;;;;;;;; EVIL ;;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/evil.el")
