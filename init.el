@@ -162,14 +162,6 @@
 
 (server-start)
 
-;; (set-frame-parameter (selected-frame) 'alpha '(85 . 80))
-;; (add-to-list 'default-frame-alist '(alpha . (85 . 80)))
-;; (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
-
-;; Tangle configuration
-;;(org-babel-load-file (expand-file-name "berezhnev.org" user-emacs-directory))
-
 ;;;;;;;;;;;;;;;;;;;;;; REGULAR ;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/regular.el")
 
