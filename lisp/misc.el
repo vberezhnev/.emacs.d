@@ -32,7 +32,7 @@
 
 ;; (change-theme 'tsdh-light 'doom-xcode)
 (change-theme 'doom-gruvbox-light 'doom-gruvbox)
-;; (load-theme 'doom-one-light)
+;; (load-theme 'doom-gruvbox)
 
 (use-package auto-dark
   :ensure t
@@ -199,16 +199,27 @@
 
 ;; (use-package helm-posframe
 ;;   :ensure t
-;;   ;; :disabled t
 ;;   :config
 ;;   (helm-posframe-enable)
-;;   (setq helm-posframe-poshandler
-;;         #'posframe-poshandler-frame-center)
-;;   (setq helm-posframe-width 200)
-;;   (setq helm-posframe-height 600)
-;;   (setq helm-posframe-parameters
-;;         '((left-fringe . 10)
-;;           (right-fringe . 10))))
+;;   ;; (setq helm-posframe-poshandler
+;;   ;;       #'posframe-poshandler-frame-center)
+;;   ;; (setq helm-posframe-width 200)
+;;   ;; (setq helm-posframe-height 600)
+;;   ;; (setq helm-posframe-parameters
+;;   ;;       '((left-fringe . 10)
+;;   ;;         (right-fringe . 10)))
+;; 	)
+
+(use-package mini-frame
+	:ensure t
+	:config
+	(mini-frame-mode t))
+
+(custom-set-variables
+ '(mini-frame-show-parameters
+   '((top . 10)
+     (width . 0.7)
+     (left . 0.5))))
 
 (use-package which-key
   :ensure t
