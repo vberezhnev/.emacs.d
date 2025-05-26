@@ -60,7 +60,7 @@
         dashboard-set-heading-icons t
         initial-buffer-choice       (lambda () (get-buffer "*dashboard*"))
         dashboard-set-file-icons    t
-				dashboard-items '((recents  . 12)
+				dashboard-items '((recents  . 10)
                           ;; (agenda   . 3)
                           (projects . 6)
 													(bookmarks . 3))))
