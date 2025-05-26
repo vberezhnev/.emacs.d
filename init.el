@@ -120,14 +120,26 @@
 (defun frostyx/set-default-font (size)
   (set-face-attribute
    'default nil
-   :family "Iosevka"
+   ;; :family "Anonymous Pro" 
+   :family "JetBrains Mono" 
+   ;; :family "Fira Code"
+   ;; :family "Iosevka"
    ;;:foundry "ADBO"
-   :height 150 ;;size
-   ;; :weight 'regular ;;'normal
-   ;; :width 'normal
-   :slant 'normal))
+   :height size
+   :weight 'light))
 
-(frostyx/set-default-font 120)
+(frostyx/set-default-font 140)
+
+;; (set-face-attribute 'default nil
+;;  :family "Anonymous Pro"
+;;  :height 150
+;;  :weight 'light)
+;; (set-face-attribute 'variable-pitch nil
+;;  :family "JetBrains Mono"
+;;  :height 1.0)
+;; (set-face-attribute 'fixed-pitch nil
+;;  :family "JetBrains Mono"
+;;  :height 1.0)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
