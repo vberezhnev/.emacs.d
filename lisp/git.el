@@ -1,4 +1,3 @@
-;; Needed for Forge
 (setq auth-sources '("~/.authinfo"))
 
 (use-package magit
@@ -7,33 +6,28 @@
 	(evil-leader/set-key
 		"gg" 'magit
 		"ga" 'magit-stage-file
-		"gc" 'magit-commit  ;; Maybe magit-commit-create
-		"gp" 'magit-push-current)
-
-	;; Общие настройки Magit
-  (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1) ; Открывать буферы в том же окне
-  (setq magit-diff-refine-hunk 'all)     ; Подсвечивать изменения на уровне слов
+		"gc" 'magit-commit
+		"gp" 'magit-push-current
+		"gc" 'magit-clone)
+  (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+  (setq magit-diff-refine-hunk 'all)
   (setq magit-section-initial-visibility-alist
         '((untracked . show)
           (unstaged . show)
-          (staged . show)))                  ; Разворачивать секции
-  (setq magit-status-margin '(t age magit-log-margin-width nil 18)) ; Временные метки в статусе
-  (setq magit-log-margin '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18)) ; Формат лога
-  (setq magit-commit-show-diff t)         ; Показывать diff при создании коммита
-  (setq magit-revision-show-gravatars nil) ; Отключить gravatar
-
-	;; Улучшение производительности
-  (setq magit-refresh-status-buffer t)    ; Обновлять статус автоматически
-  (setq magit-diff-paint-whitespace t)    ; Подсвечивать лишние пробелы
-  (setq magit-auto-revert-mode t)         ; Автоматически обновлять буферы при изменениях в Git
-
-	;; Визуальные улучшения
+          (staged . show)))
+  (setq magit-status-margin '(t age magit-log-margin-width nil 18))
+  (setq magit-log-margin '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
+  (setq magit-commit-show-diff t)
+  (setq magit-revision-show-gravatars nil)
+  (setq magit-refresh-status-buffer t)
+  (setq magit-diff-paint-whitespace t)
+  (setq magit-auto-revert-mode t)
   (custom-set-faces
-   '(magit-section-heading ((t (:foreground "#61afef" :weight bold)))) ; Цвет заголовков секций
-   '(magit-branch-local ((t (:foreground "#98c379"))))               ; Цвет локальных веток
-   '(magit-branch-remote ((t (:foreground "#e06c75"))))              ; Цвет удалённых веток
-   '(magit-diff-added ((t (:background "#3d4f3d" :foreground "#98c379"))))   ; Цвет добавленных строк
-   '(magit-diff-removed ((t (:background "#4f3d3d" :foreground "#e06c75")))))) ; Цвет удалённых строк
+   '(magit-section-heading ((t (:foreground "#61afef" :weight bold))))
+   '(magit-branch-local ((t (:foreground "#98c379"))))
+   '(magit-branch-remote ((t (:foreground "#e06c75"))))
+   '(magit-diff-added ((t (:background "#3d4f3d" :foreground "#98c379"))))
+   '(magit-diff-removed ((t (:background "#4f3d3d" :foreground "#e06c75"))))))
 
 (use-package magit-todos
   :ensure t
@@ -54,6 +48,105 @@
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
-;; (use-package forge
-;;   :ensure t
-;;   :after magit)
+;; (use-package llm
+;;   :straight t
+;;   :init
+;;   (require 'llm-gemini)
+;;   :config
+;;   (setopt llm-aiml-provider
+;;           (make-llm-openai  :host "api.aimlapi.com"
+;; 														:endpoint "/chat/completions"
+;; 														:key (getenv "AIML_API")
+;; 														:models '(gpt-4o)))
+;;   :custom
+;;   (llm-warn-on-nonfree nil))
+
+;; (use-package llm
+;; 	:straight t
+;; 	:demand t
+;;   :init
+;;   (require 'llm-openai)
+;;   (setq llm-aiml-provider
+;; 				(make-llm-openai-compatible :key "api.aimlapi.com"
+;; 																		;; :endpoint "/chat/completions"
+;; 																		:key (getenv "AIML_API")
+;; 																		:chat-model "gpt-4o")))
+
+;; (make-llm-openai :host "api.aimlapi.com"
+;; 								 :endpoint "/chat/completions"
+;; 								 :key (getenv "AIML_API")
+;; 								 :models '(gpt-4o))))
+
+(use-package gptel
+  :quelpa (gptel
+					 :fetcher github
+					 :repo "karthink/gptel"
+					 :branch "master")
+  :init
+  (setq gptel-api-key (getenv "AIML_API"))
+  (setq gptel-max-tokens 8024)
+	(setq gptel-verbose t)
+  :config
+  (setq gptel-model 'gpt-4o
+        gptel-backend
+        (gptel-make-openai "AIMLAPI"
+          :host "api.aimlapi.com"
+          :endpoint "/chat/completions"
+          :stream t
+          :key gptel-api-key
+          :models '(gpt-4o
+                    gpt-4o-2024-08-06
+                    gpt-4-turbo
+                    chatgpt-4o-latest)))
+  :bind (("M-s M-d" . gptel-context-add)
+         ("M-s M-f" . gptel-add-file)
+         ("M-s M-a" . gptel-menu)
+         ("M-s M-r" . gptel--regenerate)
+         ("M-s M-e" . gptel-rewrite)
+         ("M-s M-s" . gptel)))
+
+(use-package gptel-magit
+  :load-path "~/.emacs.d/lisp/packages/"
+  ;; :after (gptel magit)
+	:init
+  (setq gptel-api-key (getenv "AIML_API"))
+  (setq gptel-max-tokens 8024)
+	(setq gptel-verbose t)
+  :config
+  (setq gptel-magit-model 'gpt-4o)
+  (setq gptel-magit-backend
+        (gptel-make-openai "AIMLAPI"
+          :host "api.aimlapi.com"
+          :endpoint "/chat/completions"
+          :stream nil
+          :key (getenv "AIML_API")
+          :models '(gpt-4o)))
+	  (gptel-magit-install)
+
+  :bind (:map git-commit-mode-map
+              ("M-g" . gptel-magit-generate-message))
+  :hook
+  (magit-mode . gptel-magit-install))
+
+;; (use-package magit-gptcommit
+;;   :straight (magit-gptcommit
+;;              :type git
+;;              :host github
+;;              :repo "douo/magit-gptcommit"
+;;              :branch "gptel")
+;;   :demand t
+;;   :after (magit gptel)
+;;   :bind (:map git-commit-mode-map
+;;               ("C-c C-g" . magit-gptcommit-commit-accept))
+;;   :config
+;;   (setq magit-gptcommit-llm-provider
+;;         (gptel-make-openai "AIMLAPI"
+;;           :host "api.aimlapi.com"
+;;           :endpoint "/chat/completions"
+;;           :stream nil ; Disable streaming
+;;           :key (getenv "AIML_API")
+;;           :models '("gpt-4o")))
+;;   (magit-gptcommit-mode 1))
+
+(provide 'git)
+;;; git.el ends here

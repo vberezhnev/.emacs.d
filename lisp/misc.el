@@ -18,6 +18,9 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
+(use-package gruvbox-theme
+	:ensure t)
+
 (use-package theme-changer
   :ensure t
   :demand t
@@ -28,8 +31,8 @@
   (setq calendar-longitude 131.88))
 
 ;; (change-theme 'tsdh-light 'doom-xcode)
-(change-theme 'doom-one-light 'doom-one)
-(load-theme 'doom-one-light)
+(change-theme 'doom-gruvbox-light 'doom-gruvbox)
+;; (load-theme 'doom-one-light)
 
 (use-package auto-dark
   :ensure t
@@ -173,6 +176,9 @@
 
 (use-package helm
   :ensure t
+	:bind (("M-x" . helm-M-x)
+         ("C-x C-f" . helm-find-files))
+         ;; ("C-x b" . helm-mini)
   :config
   (helm-mode 1)
   (setq helm-autoresize-mode t)
