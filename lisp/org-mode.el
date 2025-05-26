@@ -517,7 +517,7 @@
   :config
   (load "~/.emacs.d/lisp/packages/my-org-habit")
   (setq org-habit-following-days 1
-        org-habit-preceding-days 9
+        org-habit-preceding-days 6
         org-habit-show-habits nil
         org-habit-show-all-today t
         org-habit-graph-column 60
