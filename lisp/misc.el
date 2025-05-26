@@ -181,45 +181,68 @@
          ;; ("C-x b" . helm-mini)
   :config
   (helm-mode 1)
-  (setq helm-autoresize-mode t)
-  (setq helm-buffer-max-length 40)
-  (setq helm-locate-fuzzy-match t)
-	(setq helm-move-to-line-cycle-in-source nil)
+  ;; (setq helm-autoresize-mode t)
+  ;; (setq helm-buffer-max-length 40)
+  ;; (setq helm-locate-fuzzy-match t)
+	;; (setq helm-move-to-line-cycle-in-source nil)
 
-  (global-set-key (kbd "M-x") #'helm-M-x)
-  (define-key helm-map (kbd "S-SPC") 'helm-toggle-visible-mark)
-  (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
-  (define-key helm-map (kbd "TAB") #'helm-execute-persistent-action)
-  (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-  (define-key helm-map (kbd "C-j") 'helm-next-line)
-  (define-key helm-map (kbd "C-k") 'helm-previous-line)
-  (define-key helm-map (kbd "C-h") 'helm-next-source)
+  ;; (global-set-key (kbd "M-x") #'helm-M-x)
+  ;; (define-key helm-map (kbd "S-SPC") 'helm-toggle-visible-mark)
+  ;; (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
+  ;; (define-key helm-map (kbd "TAB") #'helm-execute-persistent-action)
+  ;; (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+  ;; (define-key helm-map (kbd "C-j") 'helm-next-line)
+  ;; (define-key helm-map (kbd "C-k") 'helm-previous-line)
+  ;; (define-key helm-map (kbd "C-h") 'helm-next-source)
 
   (define-key helm-map [escape] 'helm-keyboard-quit))
 
-;; (use-package helm-posframe
-;;   :ensure t
-;;   :config
-;;   (helm-posframe-enable)
-;;   ;; (setq helm-posframe-poshandler
-;;   ;;       #'posframe-poshandler-frame-center)
-;;   ;; (setq helm-posframe-width 200)
-;;   ;; (setq helm-posframe-height 600)
-;;   ;; (setq helm-posframe-parameters
-;;   ;;       '((left-fringe . 10)
-;;   ;;         (right-fringe . 10)))
-;; 	)
+(use-package helm-posframe
+  :ensure t
+  :config
+  ;; (setq helm-posframe-width 200)
+  ;; (setq helm-posframe-height 600)
+	(setq helm-posframe-parameters '((left-fringe . 10) (right-fringe . 10)))
+  (setq helm-posframe-poshandler
+        #'posframe-poshandler-frame-center)
+  (helm-posframe-enable)
+  ;; (setq helm-posframe-parameters
+  ;;       '((left-fringe . 10)
+  ;;         (right-fringe . 10)))
+	)
 
-(use-package mini-frame
+(use-package which-key-posframe
 	:ensure t
 	:config
-	(mini-frame-mode t))
+  (which-key-posframe-mode))
 
-(custom-set-variables
- '(mini-frame-show-parameters
-   '((top . 10)
-     (width . 0.7)
-     (left . 0.5))))
+(use-package company-posframe
+	:ensure t
+  :config
+  (setq company-posframe-show-metadata nil)
+  (setq company-posframe-show-indicator nil)
+  (setq company-posframe-quickhelp-delay nil)
+  (company-posframe-mode +1))
+
+(use-package flycheck-posframe
+	:ensure t
+  :after flycheck
+  :hook (flycheck-mode . flycheck-posframe-mode)
+  :custom
+  (flycheck-posframe-position 'window-bottom-left-corner)
+  (flycheck-posframe-warning-prefix "\u26a0 ")
+  (flycheck-posframe-error-prefix "\u26a0 "))
+
+;; (use-package mini-frame
+;; 	:ensure t
+;; 	:config
+;; 	(mini-frame-mode t))
+
+;; (custom-set-variables
+;;  '(mini-frame-show-parameters
+;;    '((top . 10)
+;;      (width . 0.7)
+;;      (left . 0.5))))
 
 (use-package which-key
   :ensure t
