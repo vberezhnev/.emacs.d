@@ -29,6 +29,15 @@
    '(magit-diff-added ((t (:background "#3d4f3d" :foreground "#98c379"))))
    '(magit-diff-removed ((t (:background "#4f3d3d" :foreground "#e06c75"))))))
 
+(use-package conventional-commit
+  :straight (conventional-commit
+             :type git
+             :host github
+             :repo "akirak/conventional-commit.el"
+             :branch "master")
+  :hook
+  (git-commit-mode . conventional-commit-setup))
+
 (use-package magit-todos
   :ensure t
   :after magit
@@ -47,35 +56,6 @@
   (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
-
-;; (use-package llm
-;;   :straight t
-;;   :init
-;;   (require 'llm-gemini)
-;;   :config
-;;   (setopt llm-aiml-provider
-;;           (make-llm-openai  :host "api.aimlapi.com"
-;; 														:endpoint "/chat/completions"
-;; 														:key (getenv "AIML_API")
-;; 														:models '(gpt-4o)))
-;;   :custom
-;;   (llm-warn-on-nonfree nil))
-
-;; (use-package llm
-;; 	:straight t
-;; 	:demand t
-;;   :init
-;;   (require 'llm-openai)
-;;   (setq llm-aiml-provider
-;; 				(make-llm-openai-compatible :key "api.aimlapi.com"
-;; 																		;; :endpoint "/chat/completions"
-;; 																		:key (getenv "AIML_API")
-;; 																		:chat-model "gpt-4o")))
-
-;; (make-llm-openai :host "api.aimlapi.com"
-;; 								 :endpoint "/chat/completions"
-;; 								 :key (getenv "AIML_API")
-;; 								 :models '(gpt-4o))))
 
 (use-package gptel
   :quelpa (gptel
@@ -127,26 +107,6 @@
               ("M-g" . gptel-magit-generate-message))
   :hook
   (magit-mode . gptel-magit-install))
-
-;; (use-package magit-gptcommit
-;;   :straight (magit-gptcommit
-;;              :type git
-;;              :host github
-;;              :repo "douo/magit-gptcommit"
-;;              :branch "gptel")
-;;   :demand t
-;;   :after (magit gptel)
-;;   :bind (:map git-commit-mode-map
-;;               ("C-c C-g" . magit-gptcommit-commit-accept))
-;;   :config
-;;   (setq magit-gptcommit-llm-provider
-;;         (gptel-make-openai "AIMLAPI"
-;;           :host "api.aimlapi.com"
-;;           :endpoint "/chat/completions"
-;;           :stream nil ; Disable streaming
-;;           :key (getenv "AIML_API")
-;;           :models '("gpt-4o")))
-;;   (magit-gptcommit-mode 1))
 
 (provide 'git)
 ;;; git.el ends here
