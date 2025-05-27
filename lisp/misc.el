@@ -31,14 +31,15 @@
   (setq calendar-longitude 131.88))
 
 ;; (change-theme 'tsdh-light 'doom-xcode)
-(change-theme 'doom-gruvbox-light 'doom-gruvbox)
 ;; (load-theme 'doom-gruvbox)
 
 (use-package auto-dark
   :ensure t
   :config
-  (setq auto-dark-themes '((doom-one) (doom-one-light)))
-	;; auto-dark-polling-interval-seconds 0
+	(setq auto-dark-themes '((doom-gruvbox) (doom-gruvbox-light))
+				auto-dark-polling-interval-seconds 0)
+	(change-theme 'doom-gruvbox-light 'doom-gruvbox)
+
 	;; auto-dark-allow-osascript nil
 	;; auto-dark-allow-powershell nil)
   (auto-dark-mode t))
@@ -171,8 +172,14 @@
          (nov-mode          . olivetti-mode)
          (markdown-mode     . olivetti-mode)
          (mu4e-view-mode    . olivetti-mode)
-         (elfeed-show-mode  . olivetti-mode)))
-(setq olivetti-body-width 150)
+         (elfeed-show-mode  . (lambda ()
+                                 (olivetti-mode 1)
+                                 (setq-local olivetti-body-width 80)))
+         (elfeed-search-mode . (lambda ()
+                                 (olivetti-mode 1)
+                                 (setq-local olivetti-body-width 100))))
+  :config
+  (setq olivetti-body-width 150))
 
 (use-package helm
   :ensure t
@@ -181,19 +188,19 @@
          ;; ("C-x b" . helm-mini)
   :config
   (helm-mode 1)
-  ;; (setq helm-autoresize-mode t)
-  ;; (setq helm-buffer-max-length 40)
-  ;; (setq helm-locate-fuzzy-match t)
-	;; (setq helm-move-to-line-cycle-in-source nil)
+  (setq helm-autoresize-mode t)
+  (setq helm-buffer-max-length 40)
+  (setq helm-locate-fuzzy-match t)
+	(setq helm-move-to-line-cycle-in-source nil)
 
-  ;; (global-set-key (kbd "M-x") #'helm-M-x)
-  ;; (define-key helm-map (kbd "S-SPC") 'helm-toggle-visible-mark)
-  ;; (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
-  ;; (define-key helm-map (kbd "TAB") #'helm-execute-persistent-action)
-  ;; (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-  ;; (define-key helm-map (kbd "C-j") 'helm-next-line)
-  ;; (define-key helm-map (kbd "C-k") 'helm-previous-line)
-  ;; (define-key helm-map (kbd "C-h") 'helm-next-source)
+  (global-set-key (kbd "M-x") #'helm-M-x)
+  (define-key helm-map (kbd "S-SPC") 'helm-toggle-visible-mark)
+  (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to do persistent action
+  (define-key helm-map (kbd "TAB") #'helm-execute-persistent-action)
+  (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+  (define-key helm-map (kbd "C-j") 'helm-next-line)
+  (define-key helm-map (kbd "C-k") 'helm-previous-line)
+  (define-key helm-map (kbd "C-h") 'helm-next-source)
 
   (define-key helm-map [escape] 'helm-keyboard-quit))
 
@@ -212,13 +219,13 @@
 	:config
   (which-key-posframe-mode))
 
-(use-package company-posframe
-	:ensure t
-  :config
-  (setq company-posframe-show-metadata nil)
-  (setq company-posframe-show-indicator nil)
-  (setq company-posframe-quickhelp-delay nil)
-  (company-posframe-mode +1))
+;; (use-package company-posframe
+;; 	:ensure t
+;;   :config
+;;   (setq company-posframe-show-metadata nil)
+;;   (setq company-posframe-show-indicator nil)
+;;   (setq company-posframe-quickhelp-delay nil)
+;;   (company-posframe-mode +1))
 
 (use-package flycheck-posframe
 	:ensure t
