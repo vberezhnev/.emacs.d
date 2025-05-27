@@ -1,31 +1,33 @@
+(use-package xclip
+	:ensure t)
+
 ;;;;;;;;;;;;;;;;;;;;;;; COMPANY ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package company
   :ensure t
   :config
-  (setq company-idle-delay 0
-        company-minimum-prefix-length 1
+  (setq company-idle-delay 0.1          
+        company-minimum-prefix-length 1 
         company-dabbrev-ignore-case nil
         company-dabbrev-downcase nil
-        company-icon-margin 3)
+        company-selection-wrap-around t 
+        company-transformers '(company-sort-by-occurrence)) 
   (add-hook 'after-init-hook 'global-company-mode)
-  (add-hook 'after-init-hook 'company-tng-mode)
-  (setq company-tng-auto-configure nil)
-  (with-eval-after-load 'company-tng
-    (setq company-active-map company-tng-map)))
-
-(setq company-frontends '(company-tng-frontend company-box-frontend))
+  (define-key company-active-map (kbd "TAB") 'company-complete-selection)
+  (define-key company-active-map (kbd "<return>") 'company-complete-selection)
+  (setq company-frontends '(company-pseudo-tooltip-frontend))) ; Легкий фронтенд
 
 ;;;;;;;;;;;;;;;;;;;;;;; COMPANY-BOX ;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package company-box
-  :ensure t
-  :hook (company-mode . company-box-mode)
-  :config
-  (setq company-box-icon-right-margin 1
-        company-box-max-candidates 50
-        company-box-show-single-candidate t
-        company-box-doc-delay 0.0))
+;; Отключен company-box для снижения нагрузки
+;; Раскомментируйте, если хотите попробовать с оптимизированными настройками
+;; (use-package company-box
+;;   :ensure t
+;;   :hook (company-mode . company-box-mode)
+;;   :config
+;;   (setq company-box-max-candidates 10   ; Минимальное количество кандидатов
+;;         company-box-show-single-candidate t
+;;         company-box-doc-delay 0.3))     ; Задержка для документации
 
 ;;;;;;;;;;;;;;;;;;;;;;; COMPANY-ORG-BLOCK ;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -52,6 +54,18 @@
   (add-hook 'eglot-managed-mode-hook #'flycheck-mode)
   (setq flycheck-check-syntax-automatically '(save idle-change))
   (add-hook 'after-init-hook #'global-flycheck-mode))
+
+(use-package flycheck-popup-tip
+	:ensure t
+	:after flycheck
+	:config
+  (add-hook 'flycheck-mode-hook 'flycheck-popup-tip-mode))
+
+(use-package flycheck-rust
+	:ensure t
+	:after flycheck
+	:config
+	(add-hook 'rustic-mode-hook #'flycheck-rust-setup))
 
 ;;;;;;;;;;;;;;;;;;;;;;; YASNIPPET ;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -148,10 +162,10 @@
   :config
   (add-to-list 'eglot-server-programs
                '((rustic-mode rust-mode) . ("rust-analyzer"))
-               '((go-mode) . ("gopls"))
+               ;; '((go-mode) . ("gopls"))
                '((typescript-mode typescriptreact-mode) . ("typescript-language-server" "--stdio"))
-               '((python-mode) . ("pylsp"))
-               '((c-mode c++-mode) . ("clangd"))
+               ;; '((python-mode) . ("pylsp"))
+               ;; '((c-mode c++-mode) . ("clangd"))
                '((js-mode) . ("typescript-language-server" "--stdio")))
   (setq eglot-autoshutdown t
         eglot-sync-connect 0
