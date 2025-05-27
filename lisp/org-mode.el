@@ -679,7 +679,7 @@ today's unfinished tasks (◎) only if there are completed days before it."
 					 :fetcher github
 					 :repo "jkitchin/org-ref"
 					 :branch "master")
-	:ensure nil
+	;; :ensure nil
   :config
 	(require 'org-ref)
 	;; (require 'org-ref-helm)
