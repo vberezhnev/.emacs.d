@@ -1,4 +1,4 @@
-
+;; https://github.com/chenyanming/calibredb.el
 (use-package calibredb
 	:ensure t
 	:config
@@ -12,6 +12,7 @@
 	;; (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
 	(setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename))
 
+;; https://github.com/Zweihander-Main/kindle-highlights-to-org/
 (use-package kindle-highlights-to-org
   :straight (:host github
 									 :repo "Zweihander-Main/kindle-highlights-to-org"
