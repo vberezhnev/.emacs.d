@@ -186,6 +186,9 @@
 ;;;;;;;;;;;;;;;;;;;;;; GIT ;;;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/git.el")
 
+;;;;;;;;;;;;;;;;;;;;;; READERS ;;;;;;;;;;;;;;;;;;;;;;
+(load-file "~/.emacs.d/lisp/readers.el")
+
 ;;;;;;;;;;;;;;;;;;;;;; MISC ;;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/misc.el")
 
