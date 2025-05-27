@@ -192,5 +192,8 @@
 ;;;;;;;;;;;;;;;;;;;;;; MISC ;;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/misc.el")
 
+;;;;;;;;;;;;;;;;;;;;;; RSS ;;;;;;;;;;;;;;;;;;;;;
+(load-file "~/.emacs.d/lisp/rss.el")
+
 (put 'dired-find-alternate-file 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
