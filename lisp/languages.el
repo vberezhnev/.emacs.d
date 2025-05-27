@@ -208,6 +208,17 @@
 (use-package protobuf-mode
   :ensure t)
 
+;;;;;;;;;;;;;;;;;;;;;;; NIX-MODE ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package nix-mode
+	:ensure t)
+	
+;;;;;;;;;;;;;;;;;;;;;;; DOCKER-COMPOSE-MODE ;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package docker-compose-mode
+	:ensure t)
+
+;;;;;;;;;;;;;;;;;;;;;;; DOTENV-MODE ;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package dotenv-mode
 	:ensure t)
