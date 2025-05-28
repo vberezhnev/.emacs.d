@@ -51,7 +51,7 @@
                               ((role . "user") (content . ,prompt))])
                  (max_tokens . 500)
                  (stream . :json-false)))) ; Force boolean
-    (message "Запрос JSON: %s" (json-encode data))
+    ;; (message "Запрос JSON: %s" (json-encode data))
     data))
 
 (defun gptel-magit--request (diff &rest args)
@@ -73,8 +73,8 @@
              (json-encode request-data)
              'utf-8 t))
            (callback (plist-get args :callback)))
-      (message "Экранированный diff: %s" escaped-diff)
-      (message "Отправляемый JSON: %s" (json-encode request-data)) ; Debug log
+      ;; (message "Экранированный diff: %s" escaped-diff)
+      ;; (message "Отправляемый JSON: %s" (json-encode request-data)) ; Debug log
       (url-retrieve url
                     (lambda (status)
                       (let* ((raw-response (buffer-string))
@@ -108,8 +108,8 @@
                                      :error ,(if (plist-get status :error)
                                                  (format "%s" (plist-get status :error))
                                                (unless parsed-response "Failed to parse response")))))
-                        (message "Сырой ответ API: %s" raw-response)
-                        (message "Информация API: %s" info)
+                        ;; (message "Сырой ответ API: %s" raw-response)
+                        ;; (message "Информация API: %s" info)
                         (funcall callback parsed-response info)))
                     nil t t))))
 
@@ -127,7 +127,8 @@
            (with-current-buffer (current-buffer)
              (goto-char (point-min))
              (insert response)
-             (message "Commit message inserted: %s" response))
+             ;; (message "Commit message inserted: %s" response)
+						 )
          (message "Failed to generate commit message: %s" (plist-get info :error)))))))
 
 (defun gptel-magit--generate (callback)
