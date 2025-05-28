@@ -121,14 +121,14 @@
   (set-face-attribute
    'default nil
    ;; :family "Anonymous Pro" 
-   :family "JetBrains Mono" 
-   ;; :family "Fira Code"
+   ;; :family "JetBrains Mono" 
+   :family "Fira Code"
    ;; :family "Iosevka"
    ;;:foundry "ADBO"
    :height size
-   :weight 'light))
+   :weight 'medium))
 
-(frostyx/set-default-font 140)
+(frostyx/set-default-font 145)
 
 ;; (set-face-attribute 'default nil
 ;;  :family "Anonymous Pro"
@@ -194,6 +194,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;; RSS ;;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/rss.el")
+ 
+;;;;;;;;;;;;;;;;;;;;;; RSS ;;;;;;;;;;;;;;;;;;;;;
+(load-file "~/.emacs.d/lisp/calendar.el")
 
 (put 'dired-find-alternate-file 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
