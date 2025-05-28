@@ -1119,35 +1119,6 @@ today's unfinished tasks (◎) only if there are completed days before it."
   (setq org-hide-emphasis-markers t
         org-appear-autolinks 'just-brackets))
 
-(use-package timeblock
-  :init
-  (unless (package-installed-p 'timeblock)
-    (package-vc-install
-     '(timeblock
-       :vc-backend Git
-       :url "https://github.com/ichernyshovvv/timeblock.el"
-       :branch "master"))))
-
-(use-package repeat-todo
-  :quelpa (repeat-todo
-					 :fetcher github
-					 :repo "cashpw/repeat-todo"
-					 :branch "main")
-	:after org)
-
-(use-package org-timeblock
-  :straight (org-timeblock :type git
- 													 :host github
- 													 :repo "ichernyshovvv/org-timeblock")
-  :demand t
-  :bind
-  (:map global-map
- 				("C-c s" . org-timeblock))
-  :config
-  (setq org-now-location '("~/Org/agenda/GTD/org-gtd-tasks.org")
-        org-timeblock-inbox-file "/home/berezhnev/Org/agenda/Calendar.org"
-        org-timeblock-n-days-view 3))
-
 ;; (use-package habitica
 ;; 	:ensure t)
 

@@ -257,8 +257,8 @@
 (add-hook 'elfeed-search-mode-hook #'nano-elfeed-search-mode)
 (add-hook 'elfeed-show-mode-hook #'nano-elfeed-show-mode)
 
-(setq rmh-elfeed-org-files
-      (list (expand-file-name "elfeed.org" user-emacs-directory)))
-(elfeed-org)
+;; (setq rmh-elfeed-org-files
+;;       (list (expand-file-name "elfeed.org" user-emacs-directory)))
+;; (elfeed-org)
 
 (provide 'nano-elfeed)

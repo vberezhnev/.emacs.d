@@ -1,3 +1,6 @@
+(use-package nano-theme
+	:ensure t)
+
 (use-package elfeed
   :ensure t
   ;; :commands (elfeed)
