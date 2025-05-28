@@ -1,41 +1,15 @@
-;; (custom-set-variables
-;;  ;; custom-set-variables was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(custom-safe-themes
-;;    '("0325a6b5eea7e5febae709dab35ec8648908af12cf2d2b569bedc8da0a3a81c1"
-;;      "5c7720c63b729140ed88cf35413f36c728ab7c70f8cd8422d9ee1cedeb618de5"
-;;      default))
-;;  '(helm-minibuffer-history-key "M-p")
-;;  '(package-vc-selected-packages
-;;    '((timeblock :vc-backend Git :url
-;; 		"https://github.com/ichernyshovvv/timeblock.el"
-;; 		:branch "master"))))
-;;  ;; custom-set-faces was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;; (custom-set-faces
-;;  ;; custom-set-faces was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(org-habit-clear-face ((t (:background "pale green" :foreground "white" :width expanded :height 1.0 :box (:line-width (1 . 1) :color "white")))))
-;;  '(org-habit-clear-future-face ((t (:background "gray" :foreground "white" :width expanded :height 1.0 :box (:line-width (1 . 1) :color "white")))))
-;;  '(org-habit-overdue-face ((t (:background "light coral" :foreground "white" :width expanded :height 1.0 :box (:line-width (1 . 1) :color "white")))))
-;;  '(org-habit-overdue-future-face ((t (:background "gray" :foreground "white" :width expanded :height 1.0 :box (:line-width (1 . 1) :color "white")))))
-;;  '(org-habit-ready-face ((t (:background "pale green" :foreground "white" :width expanded :height 1.0 :box (:line-width (1 . 1) :color "white")))))
-;;  '(org-habit-ready-future-face ((t (:background "gray" :foreground "white" :width expanded :height 1.0 :box (:line-width (1 . 1) :color "white"))))))
+;;; -*- lexical-binding: t -*-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-	 '("0325a6b5eea7e5febae709dab35ec8648908af12cf2d2b569bedc8da0a3a81c1"
+	 '("48042425e84cd92184837e01d0b4fe9f912d875c43021c3bcb7eeb51f1be5710"
+		 "0325a6b5eea7e5febae709dab35ec8648908af12cf2d2b569bedc8da0a3a81c1"
 		 "5c7720c63b729140ed88cf35413f36c728ab7c70f8cd8422d9ee1cedeb618de5"
 		 default))
+ '(helm-minibuffer-history-key "M-p"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
