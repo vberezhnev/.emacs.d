@@ -21,29 +21,29 @@
 (use-package gruvbox-theme
 	:ensure t)
 
-;; (use-package theme-changer
-;;   :ensure t
-;;   :demand t
-;;   :straight (:host github :repo "hadronzoo/theme-changer" :branch "master")
-;;   :config
-;;   (setq calendar-location-name "Vladivostok, RU")
-;;   (setq calendar-latitude 43.11)
-;;   (setq calendar-longitude 131.88))
+(use-package theme-changer
+  :ensure t
+  :demand t
+  :straight (:host github :repo "hadronzoo/theme-changer" :branch "master")
+  :config
+  (setq calendar-location-name "Vladivostok, RU")
+  (setq calendar-latitude 43.11)
+  (setq calendar-longitude 131.88))
 
-;; ;; (change-theme 'tsdh-light 'doom-xcode)
+;; (change-theme 'tsdh-light 'doom-xcode)
 
-;; (use-package auto-dark
-;;   :ensure t
-;;   :config
-;; 	(setq auto-dark-themes '((doom-gruvbox) (doom-one-light))
-;; 				auto-dark-polling-interval-seconds 0)
-;; 	(change-theme 'doom-one-light 'doom-gruvbox)
+(use-package auto-dark
+  :ensure t
+  :config
+	(setq auto-dark-themes '((doom-gruvbox) (doom-one-light))
+				auto-dark-polling-interval-seconds 0)
+	(change-theme 'doom-one-light 'doom-gruvbox)
 
-;; 	;; auto-dark-allow-osascript nil
-;; 	;; auto-dark-allow-powershell nil)
-;;   (auto-dark-mode t))
+	;; auto-dark-allow-osascript nil
+	;; auto-dark-allow-powershell nil)
+  (auto-dark-mode t))
 
-(load-theme 'doom-gruvbox)
+;; (load-theme 'doom-gruvbox)
 
 ;;;;;;;;;;;;;;;;;;;;;; MISC ;;;;;;;;;;;;;;;;;;;;
 
