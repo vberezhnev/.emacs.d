@@ -114,6 +114,33 @@
 
 (xterm-mouse-mode t)
 
+;; (use-package display-line-numbers
+;;   :ensure nil
+;;   :hook (prog-mode . display-line-numbers-mode)
+;; 	:demand t
+;;   :config
+;; 	(setq display-line-numbers 'relative
+;;         display-line-numbers-width 3))
+;; ;; (setq display-line-numbers 'relative)
+;; ;; (global-display-line-numbers-mode)
+
+;; (use-package nlinum
+;; 	:ensure t)
+
+;; (use-package nlinum-relative
+;; 	:ensure t)
+
+(setq display-line-numbers 'relative)
+(setq display-line-numbers-type 'visual)
+(global-display-line-numbers-mode)
+(setq display-line-numbers-width 2)
+(setq display-line-numbers-current-absolute nil)
+
+;; (defun nolinum ()
+;;   (global-linum-mode 0)
+;; )
+;; (add-hook 'prog-mode-hook 'display-line-numbers)
+
 ;; auto-save-mode doesn't create the path automatically!
 (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
 
@@ -128,7 +155,7 @@
    :height size
    :weight 'medium))
 
-(frostyx/set-default-font 145)
+(frostyx/set-default-font 130)
 
 ;; (set-face-attribute 'default nil
 ;;  :family "Anonymous Pro"
