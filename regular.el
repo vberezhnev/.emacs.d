@@ -20,19 +20,10 @@
 (setq system-packages-package-manager 'guix)
 (setq system-packages-use-sudo t)
 
-(use-package display-line-numbers
-  :ensure nil
-  :hook (prog-mode . display-line-numbers-mode)
-  :init
-	(setq display-line-numbers 'relative
-        display-line-numbers-width 3))
-
 (use-package rainbow-delimiters
   :ensure t
   :config
   (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
-
-(setq display-line-numbers 'relative)
 
 (use-package no-littering
   :ensure t)
