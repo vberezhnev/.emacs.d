@@ -9,7 +9,8 @@
   (setq-default elfeed-search-filter "")
 	(setq elfeed-search-trailing-width 15)
 	(defun elfeed-search-format-date (date) "")
-	
+	(setq elfeed-db-directory "~/.elfeed")
+
   ;; Keybindings for elfeed-search-mode
   (with-eval-after-load "elfeed-search"
     (evil-define-key* 'normal elfeed-search-mode-map
