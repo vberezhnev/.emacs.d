@@ -206,7 +206,7 @@
 
 (defun nano-elfeed-show-mode ()
   (visual-line-mode)
-;;  (setq truncate-lines t)
+ (setq truncate-lines nil)
   (let ((inhibit-read-only t)
         (inhibit-modification-hooks t))
     (setq-local truncate-lines nil)
