@@ -78,12 +78,6 @@
                     gpt-4o-2024-08-06
                     gpt-4-turbo
                     chatgpt-4o-latest))
-				(gptel-make-xai "AIMLAPI-GROK"
-          :host "api.aimlapi.com"
-          :endpoint "/chat/completions"
-          :stream t
-          :key gptel-api-key
-          :models '(x-ai/grok-3-beta))
 				)
   :bind (("M-s M-d" . gptel-context-add)
          ("M-s M-f" . gptel-add-file)
