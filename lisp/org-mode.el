@@ -858,7 +858,6 @@ today's unfinished tasks (◎) only if there are completed days before it."
 
         org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
         org-pomodoro-start-sound (expand-file-name "sounds/bell.wav" user-emacs-directory)
-        org-pomodoro-length 40                ; The length of a pomodoro in minutes
 
         org-pomodoro-finished-sound-p t      ; Determines whether to play a sound when a pomodoro finished
         org-pomodoro-finished-sound (expand-file-name "sounds/bell.wav" user-emacs-directory)

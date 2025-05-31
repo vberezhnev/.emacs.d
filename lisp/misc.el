@@ -206,8 +206,8 @@
   ;; (setq helm-posframe-width 200)
   ;; (setq helm-posframe-height 600)
 	(setq helm-posframe-parameters '((left-fringe . 10) (right-fringe . 10)))
-  (setq helm-posframe-poshandler
-        'posframe-poshandler-frame-center)
+  ;; (setq helm-posframe-poshandler
+  ;;       'posframe-poshandler-frame-center)
   (helm-posframe-enable))
 
 (use-package which-key-posframe
