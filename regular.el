@@ -105,9 +105,13 @@
 					(auto-directory)
 					(auto-mode))))
 
+(use-package bluetooth
+	:ensure t)
+
 ;; (use-package reader
 ;; 	:ensure t
 ;;    :straight '(reader :type git :host codeberg :repo "divyaranjan/emacs-reader"
 ;;   										:files ("reader.el" "render-core.so")
 ;;   										:pre-build ("make" "all")))
+
 
