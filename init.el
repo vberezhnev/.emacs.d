@@ -134,7 +134,7 @@
 (setq display-line-numbers-type 'visual)
 (global-display-line-numbers-mode)
 (setq display-line-numbers-width 2)
-(setq display-line-numbers-current-absolute nil)
+(setq display-line-numbers-current-absolute t)
 
 ;; (defun nolinum ()
 ;;   (global-linum-mode 0)
