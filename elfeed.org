@@ -1,9 +1,4 @@
 * Blogs                                                              :elfeed:
-** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40Augustscommunity&format=Mrss][Август Круглый Год (@Augustscommunity) - Telegram]]
-:PROPERTIES:
-:TITLE: Telegram
-:END:
-
 ** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40LimarevIvan&format=Mrss][Ivan Limarev / Merlin AI (@LimarevIvan) - Telegram]]
 :PROPERTIES:
 :TITLE: Telegram
@@ -14,18 +9,14 @@
 :TITLE: Telegram
 :END:
 
-** https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40m0rtymerr_channel&format=Mrss
+** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40m0rtymerr_channel&format=Mrss][Осознанная Меркантильность - Telegram]]
 :PROPERTIES:
 :TITLE: Telegram
 :END:
+                                                                :youtube:
+** [[https://www.youtube.com/feeds/videos.xml?playlist_id=PLP1V2-34UCJoRT5j-Pml9pMGp-LzpNBI3][Курс по самодисциплине от Глеба Карпова]]
 
-** [[https://www.youtube.com/feeds/videos.xml?playlist_id=PLP1V2-34UCJoRT5j-Pml9pMGp-LzpNBI3][Курс по самодисциплине от Глеба Карпова]]                         :youtube:
-** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCpwQ3deqRxm1e2tM6pMZF4A][Andrii Baumeister]]                                               :youtube:
-:PROPERTIES:
-:TITLE:    YouTube
-:END:
-
-** Bussiness
+** Business
 *** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40moscowachBusiness&format=Mrss][Москвач Бизнес (@moscowachBusiness) - Telegram]]
 :PROPERTIES:
 :TITLE: Telegram
@@ -36,13 +27,21 @@
 :TITLE: Telegram
 :END:
 
+** Philosohpy                                                   :philosophy:
+*** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40Augustscommunity&format=Mrss][Август Круглый Год (@Augustscommunity) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+*** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCpwQ3deqRxm1e2tM6pMZF4A][Andrii Baumeister]]                                              :youtube:
+:PROPERTIES:
+:TITLE:    YouTube
+:END:
+
 ** Software Development                                                 :dev:
 *** Emacs                                                           :emacs:
-**** http://www.terminally-incoherent.com/blog/feed
-**** http://nullprogram.com/feed
-**** entry-title: \(emacs\|org-mode\)
-**** http://planet.emacsen.org/atom.xml
-**** [[toobnix:154][EmacsConf]]
+**** [[http://www.terminally-incoherent.com/blog/feed][Terminally Incoherent]] 
+**** [[http://nullprogram.com/feed][null program]]
 *** Rust                                                             :rust:
 **** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40rust_lib&format=Mrss][Rust (@rust_lib) - Telegram]]
 :PROPERTIES:
@@ -59,8 +58,11 @@
 :TITLE: Telegram
 :END:
 
+**** [[https://www.reddit.com/r/rust/.rss][The Rust Programming Language - Reddit]]
+**** [[https://habr.com/ru/rss/hubs/rust/articles/?fl=ru][Rust - Хабр]]
+
 *** Go                                                                 :go:
-**** https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40go_in_action&format=Mrss
+**** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40go_in_action&format=Mrss][Go in Action (@go_in_action) - Telegram]]
 :PROPERTIES:
 :TITLE: Telegram
 :END:
