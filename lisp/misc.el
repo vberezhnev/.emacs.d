@@ -43,7 +43,7 @@
 	;; auto-dark-allow-powershell nil)
   (auto-dark-mode t))
 
-;; (load-theme 'doom-gruvbox)
+(load-theme 'doom-gruvbox)
 
 ;;;;;;;;;;;;;;;;;;;;;; MISC ;;;;;;;;;;;;;;;;;;;;
 
@@ -125,8 +125,8 @@
 	(display-battery-mode t)
 	(display-time-mode t)
 	(setq display-time-format "%H:%M") ;;  %d.%m.%Y
-	(setq display-time-day-and-date t)           
-	(setq display-time-24hr-format t)            
+	(setq display-time-day-and-date t)
+	(setq display-time-24hr-format t)
 	(setq display-time-interval 60)
   (setq display-time-load-average nil)
 	(setq doom-modeline-height 24
@@ -145,7 +145,7 @@
 				doom-modeline-battery t
 				doom-modeline-time t
 				doom-modeline-mode-alist '())
-	
+
 	(doom-modeline-def-modeline 'my-custom-modeline
 		;; Left
     '(bar buffer-info remote-host buffer-position word-count selection-info)
@@ -181,7 +181,7 @@
   :ensure t
 	:bind (("M-x" . helm-M-x)
          ("C-x C-f" . helm-find-files))
-         ;; ("C-x b" . helm-mini)
+  ;; ("C-x b" . helm-mini)
   :config
   (helm-mode 1)
   (setq helm-autoresize-mode t)
@@ -202,12 +202,19 @@
 
 (use-package helm-posframe
   :ensure t
+  :after helm
   :config
-  ;; (setq helm-posframe-width 200)
-  ;; (setq helm-posframe-height 600)
-	(setq helm-posframe-parameters '((left-fringe . 10) (right-fringe . 10)))
-  ;; (setq helm-posframe-poshandler
-  ;;       'posframe-poshandler-frame-center)
+  (setq helm-display-header-line t) ; Show input in posframe header
+  (setq helm-echo-input-in-header-line t) ; Hide input in minibuffer
+  (setq helm-posframe-width 120) ; Width for readability
+  (setq helm-posframe-height 20) ; Height for candidates + header
+  (setq helm-posframe-poshandler 'posframe-poshandler-frame-center) ; Center posframe
+  (setq helm-posframe-parameters '((left-fringe . 10)
+                                   (right-fringe . 10)
+                                   (border-width . 2)
+                                   (border-color . "#555555")
+                                   (internal-border-width . 2)
+                                   (internal-border-color . "#555555"))) ; Borders
   (helm-posframe-enable))
 
 (use-package which-key-posframe
@@ -215,13 +222,13 @@
 	:config
   (which-key-posframe-mode))
 
-;; (use-package company-posframe
-;; 	:ensure t
-;;   :config
-;;   (setq company-posframe-show-metadata nil)
-;;   (setq company-posframe-show-indicator nil)
-;;   (setq company-posframe-quickhelp-delay nil)
-;;   (company-posframe-mode +1))
+(use-package company-posframe
+	:ensure t
+  :config
+  (setq company-posframe-show-metadata nil)
+  (setq company-posframe-show-indicator nil)
+  (setq company-posframe-quickhelp-delay nil)
+  (company-posframe-mode +1))
 
 (use-package flycheck-posframe
 	:ensure t
