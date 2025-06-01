@@ -1,23 +1,77 @@
 * Blogs                                                              :elfeed:
-** http://git-annex.branchable.com/design/assistant/blog/index.rss :mustread:
-** http://feeds.feedburner.com/InformationIsBeautiful
-** [[http://orgmode.org][Org Mode Links supported as well]]
+** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40Augustscommunity&format=Mrss][Август Круглый Год (@Augustscommunity) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40LimarevIvan&format=Mrss][Ivan Limarev / Merlin AI (@LimarevIvan) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40yaproductmanager&format=Mrss][Записки продакт-менеджера | Вадим Кузнецов (@yaproductmanager) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+** https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40m0rtymerr_channel&format=Mrss
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+** [[https://www.youtube.com/feeds/videos.xml?playlist_id=PLP1V2-34UCJoRT5j-Pml9pMGp-LzpNBI3][Курс по самодисциплине от Глеба Карпова]]                         :youtube:
+** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCpwQ3deqRxm1e2tM6pMZF4A][Andrii Baumeister]]                                               :youtube:
+:PROPERTIES:
+:TITLE:    YouTube
+:END:
+
+** Bussiness
+*** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40moscowachBusiness&format=Mrss][Москвач Бизнес (@moscowachBusiness) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+*** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40nonabstractum&format=Mrss][Nonabstractum | Экономика & Стратегия (@nonabstractum) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
 ** Software Development                                                 :dev:
-*** Emacs                                                    :emacs:mustread:
+*** Emacs                                                           :emacs:
 **** http://www.terminally-incoherent.com/blog/feed
 **** http://nullprogram.com/feed
 **** entry-title: \(emacs\|org-mode\)
 **** http://planet.emacsen.org/atom.xml
 **** [[toobnix:154][EmacsConf]]
-*** Web Development                                                     :web:
-**** http://planet.phpunit.de/atom.xml
-**** http://feeds.feedburner.com/symfony/blog
-**** http://feeds.feedburner.com/qooxdoo/blog/content
-*** Eclipse                                                         :eclipse:
-**** http://blog.eclipse-tips.com/feeds/posts/default?alt=rss
-**** http://ed-merks.blogspot.com/feeds/posts/default
-     A description of a feed can be written under any headline.
-     The text will be ignored by elfeed.
-**** http://feeds.feedburner.com/eclipselive                         :ignore:
-**** http://www.fosslc.org/drupal/rss.xml                             :video:
-#+link: toobnix https://toobnix.org/feeds/videos.xml?videoChannelId=
+*** Rust                                                             :rust:
+**** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40rust_lib&format=Mrss][Rust (@rust_lib) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+**** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40rust_code&format=Mrss][Rust (@rust_code) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+**** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40books_englishhh&format=Mrss][RSS-Bridge]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+*** Go                                                                 :go:
+**** https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40go_in_action&format=Mrss
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+*** MachineLearning & AI                                               :ai:
+**** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40ai_machinelearning_big_data&format=Mrss][Machinelearning (@ai_machinelearning_big_data) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+**** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40machinelearning_ru&format=Mrss][Машинное обучение RU (@machinelearning_ru) - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
