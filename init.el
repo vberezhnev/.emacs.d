@@ -225,5 +225,8 @@
 ;;;;;;;;;;;;;;;;;;;;;; RSS ;;;;;;;;;;;;;;;;;;;;;
 (load-file "~/.emacs.d/lisp/calendar.el")
 
+;;;;;;;;;;;;;;;;;;;;;; RSS ;;;;;;;;;;;;;;;;;;;;;
+(load-file "~/.emacs.d/lisp/telega.el")
+
 (put 'dired-find-alternate-file 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
