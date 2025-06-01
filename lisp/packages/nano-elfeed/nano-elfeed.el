@@ -83,9 +83,9 @@
 (defvar nano-elfeed-icons
   `(("RSS"             . ,(nano-elfeed-make-icon "rss"))
     ("Aeon"            . ,(nano-elfeed-make-icon "aeon"))
+		("YouTube"         . ,(nano-elfeed-make-icon "youtube"))
     ("Emacs"           . ,(nano-elfeed-make-icon "reddit"))
     ("Emacs org-mode"  . ,(nano-elfeed-make-icon "reddit"))
-    ("YouTube"         . ,(nano-elfeed-make-icon "youtube"))
     ("Slashdot"        . ,(nano-elfeed-make-icon "slashdot"))
     ("Ars Technica"    . ,(nano-elfeed-make-icon "ars-technica"))
     ("Boing Boing"     . ,(nano-elfeed-make-icon "boing-boing"))
