@@ -87,16 +87,20 @@
     "of" 'org-footnote-new
     "op" 'my/org-pomodoro
     "ot" 'org-timeblock
-    "og" 'org-gtd-capture
-    "oe" 'org-gtd-engage
-    "oi" 'org-gtd-process-inbox
-    "on" 'org-gtd-show-all-next
-    "os" 'org-gtd-review-stuck-projects
     "ob" 'org-cite-insert
     "odm" 'org-download-clipboard
     "odo" 'org-download-image
     "odi" 'org-cliplink
-    
+
+    ;; Org-mode
+    "d" '(:ignore t :which-key "org-gtd")
+		"dc" 'org-gtd-capture
+    "de" 'org-gtd-engage
+    "dp" 'org-gtd-process-inbox
+    "dn" 'org-gtd-show-all-next
+    "ds" 'org-gtd-review-stuck-projects
+
+		
     ;; Org-roam
     "n" '(:ignore t :which-key "notes")
     "nl" 'org-roam-buffer-toggle
@@ -146,14 +150,16 @@
     "o" 'elfeed-show-visit
     ;; "j" 'elfeed-show-next
     ;; "k" 'elfeed-show-prev
-    "f" 'elfeed-tube-fetch
-    "s" 'elfeed-tube-save)
+    ;; "f" 'elfeed-tube-fetch
+    ;; "s" 'elfeed-tube-save
+		)
+	
 
   (general-def :states 'normal :keymaps 'org-mode-map
-    "i" 'org-cite-insert
-    "dm" 'org-download-clipboard
-    "do" 'org-download-image
-    "di" 'org-cliplink)
+    "i" 'org-cite-insert)
+    ;; "dm" 'org-download-clipboard
+    ;; "do" 'org-download-image
+    ;; "di" 'org-cliplink
 
   (general-def :states 'normal :keymaps 'magit-mode-map
     "SPC" nil) ; Unbind SPC to avoid leader key conflicts
@@ -176,19 +182,19 @@
   :after evil
   :config
   (setq evil-want-integration t)
-  (evil-collection-init '(ibuffer bookmark vterm magit org-timeblock enlight xwidget-webkit sunrise helm))
+  (evil-collection-init '(ibuffer bookmark vterm magit enlight xwidget-webkit sunrise helm))
   (evil-set-initial-state 'ibuffer-mode 'normal)
   (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
   (evil-set-initial-state 'vterm-mode 'normal)
   (evil-set-initial-state 'magit-mode 'emacs)
   (evil-set-initial-state 'bluetooth-mode 'emacs)
-  (evil-set-initial-state 'org-timeblock-mode 'emacs)
   ;; (evil-set-initial-state 'org-agenda-mode 'emacs)
   (evil-set-initial-state 'org-super-agenda-mode 'emacs)
   (evil-set-initial-state 'dashboard-mode 'emacs)
   ;; (evil-set-initial-state 'telega-mode-line-mode 'emacs)
   ;; (evil-set-initial-state 'calibredb-mode 'normal)
   (evil-set-initial-state 'enlight-mode 'emacs)
+  (evil-set-initial-state 'org-timeblock-mode 'emacs)
   (evil-set-initial-state 'org-timeblock-list-mode 'emacs)
   (evil-set-initial-state 'treemacs-mode 'emacs)
   (evil-set-initial-state 'xwidget-webkit-mode 'emacs)
