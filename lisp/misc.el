@@ -334,3 +334,6 @@
   ("C-c p" . projectile-command-map)
   :init
   (setq projectile-project-search-path '("~/Templates2")))
+
+(use-package ripgrep
+	:ensure t)
