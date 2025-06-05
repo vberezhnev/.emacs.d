@@ -325,3 +325,12 @@
   :quelpa (listen :fetcher github :repo "alphapapa/listen.el")
 	:config
 	(setq listen-directory "~/Documents/Music/"))
+
+(use-package projectile
+	:ensure t
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (setq projectile-project-search-path '("~/Templates2")))
