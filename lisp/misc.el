@@ -315,3 +315,8 @@
          (mu4e-view-mode    . centered-cursor-mode)
          (elfeed-show-mode  . centered-cursor-mode)
          (elfeed-search-mode . centered-cursor-mode)))
+
+;; (use-package empv
+;;   :quelpa (empv
+;;            :fetcher github
+;;            :repo "isamert/empv.el"))
