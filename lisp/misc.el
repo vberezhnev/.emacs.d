@@ -320,3 +320,8 @@
 ;;   :quelpa (empv
 ;;            :fetcher github
 ;;            :repo "isamert/empv.el"))
+
+(use-package listen
+  :quelpa (listen :fetcher github :repo "alphapapa/listen.el")
+	:config
+	(setq listen-directory "~/Documents/Music/"))
