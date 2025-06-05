@@ -106,7 +106,9 @@
 					(auto-mode))))
 
 (use-package bluetooth
-	:ensure t)
+	:ensure t
+	:config
+	(setq bluetooth-battery-warning-level 15))
 
 ;; (use-package reader
 ;; 	:ensure t
