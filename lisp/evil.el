@@ -63,7 +63,15 @@
     ;; "wj" 'evil-window-down
     ;; "wk" 'evil-window-up
     ;; "wl" 'evil-window-right
-    
+		
+		"p" '(:ignore t :which-key "projectile")
+		"pf" 'projectile-find-file
+		"pd" 'projectile-find-dir
+		"pp" 'projectile-switch-project
+		"pa" 'projectile-add-known-project
+		"pa" 'projectile-add-known-project
+		"ps" 'projectile-ripgrep
+		
     ;; File operations
     "f" '(:ignore t :which-key "files")
     "ff" 'helm-find-files
