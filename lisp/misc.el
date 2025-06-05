@@ -302,3 +302,16 @@
   :after (treemacs)
   :ensure t
   :config (treemacs-set-scope-type 'Tabs))
+
+
+(use-package centered-cursor-mode
+	:ensure t
+	:hook (
+				 (text-mode         . centered-cursor-mode)
+         (prog-mode         . centered-cursor-mode)
+         (org-mode          . centered-cursor-mode)
+         (nov-mode          . centered-cursor-mode)
+         (markdown-mode     . centered-cursor-mode)
+         (mu4e-view-mode    . centered-cursor-mode)
+         (elfeed-show-mode  . centered-cursor-mode)
+         (elfeed-search-mode . centered-cursor-mode)))
