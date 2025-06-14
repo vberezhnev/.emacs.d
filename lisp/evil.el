@@ -202,6 +202,7 @@
   ;; (evil-set-initial-state 'telega-mode-line-mode 'emacs)
   ;; (evil-set-initial-state 'calibredb-mode 'normal)
   (evil-set-initial-state 'enlight-mode 'emacs)
+  (evil-set-initial-state 'dired-mode 'emacs)
   (evil-set-initial-state 'org-timeblock-mode 'emacs)
   (evil-set-initial-state 'org-timeblock-list-mode 'emacs)
   (evil-set-initial-state 'treemacs-mode 'emacs)

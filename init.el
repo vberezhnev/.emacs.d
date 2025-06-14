@@ -179,7 +179,6 @@
   (setq python-indent-offset 2))
 (add-hook 'prog-mode-hook #'hook-tab-width)
 
-
 ;; Use latest Org
 (use-package org
   :ensure t)
