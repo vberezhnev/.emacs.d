@@ -51,7 +51,8 @@
   :ensure t
   :demand t
   :config
-  (add-hook 'lsp-bridge-mode-hook #'flycheck-mode)
+  ;; (add-hook 'lsp-bridge-mode-hook #'flycheck-mode)
+  ;; (add-hook #'eglot-h #'flycheck-mode)
   (setq flycheck-check-syntax-automatically '(save idle-change))
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
@@ -99,31 +100,31 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;; RUSTIC ;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (use-package rustic
-;;   :ensure t
-;;   :after (lsp-bridge flycheck)
-;;   :defer t
-;;   :bind (:map rustic-mode-map
-;;               ("M-j" . lsp-bridge-find-impl)
-;;               ("M-?" . lsp-bridge-find-references)
-;;               ("C-c C-c l" . flycheck-list-errors)
-;;               ("C-c C-c a" . lsp-bridge-code-action)
-;;               ("C-c C-c r" . lsp-bridge-rename)
-;;               ("C-c C-c q" . lsp-bridge-restart-process)
-;;               ("C-c C-c t" . rustic-cargo-test)
-;;               ("C-c C-c r" . rustic-cargo-run)
-;;               ("C-c C-c s" . lsp-bridge-diagnostic-list))
-;;   :mode ("\\.rs$" . rustic-mode)
-;;   :custom
-;;   (rustic-lsp-client nil) ;; Отключите eglot
-;;   :config
-;; 	(add-hook 'rustic-mode-hook #'lsp-bridge-mode)
-;;   (add-hook 'rustic-mode-hook (lambda () (company-mode -1)))
-;;   (defun rk/rustic-mode-hook ()
-;;     (when buffer-file-name
-;;       (setq-local buffer-save-without-query t)))
-;;   (use-package rust-playground
-;;     :ensure t))
+(use-package rustic
+  :ensure t
+  :after (lsp-bridge flycheck)
+  :defer t
+  :bind (:map rustic-mode-map
+              ("M-j" . lsp-bridge-find-impl)
+              ("M-?" . lsp-bridge-find-references)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c a" . lsp-bridge-code-action)
+              ("C-c C-c r" . lsp-bridge-rename)
+              ("C-c C-c q" . lsp-bridge-restart-process)
+              ("C-c C-c t" . rustic-cargo-test)
+              ("C-c C-c r" . rustic-cargo-run)
+              ("C-c C-c s" . lsp-bridge-diagnostic-list))
+  :mode ("\\.rs$" . rustic-mode)
+  :custom
+  (rustic-lsp-client nil) ;; Отключите eglot
+  :config
+	(add-hook 'rustic-mode-hook #'lsp-bridge-mode)
+  (add-hook 'rustic-mode-hook (lambda () (company-mode -1)))
+  (defun rk/rustic-mode-hook ()
+    (when buffer-file-name
+      (setq-local buffer-save-without-query t)))
+  (use-package rust-playground
+    :ensure t))
 
 ;;;;;;;;;;;;;;;;;;;;;;; GO-MODE ;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -155,68 +156,76 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;; LSP-BRIDGE ;; ;;;;;;;;;;;;;;;;;;;;;
 
-(use-package lsp-bridge
-	:straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
-            :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
-            :build (:not compile))
-	:init
-	(global-lsp-bridge-mode)
-  :config
-  ;; (global-lsp-bridge-mode)
-  (setq lsp-bridge-enable-log t
-        ;; lsp-bridge-rust-server "rust-analyzer"
-        lsp-bridge-enable-inlay-hint t
-        lsp-bridge-enable-diagnostics t
-        lsp-bridge-enable-signature-help t
-        ;; lsp-bridge-get-project-path-by-filepath
-        ;; (lambda (filepath) (locate-dominating-file filepath "Cargo.toml"))
-				)
-  :bind (:map lsp-bridge-mode-map
-              ("M-j" . lsp-bridge-find-def)
-              ("M-?" . lsp-bridge-find-references)
-              ("C-c C-c a" . lsp-bridge-code-action)
-              ("C-c C-c r" . lsp-bridge-rename)
-              ("C-c C-c l" . lsp-bridge-diagnostic-list)))
+;; (use-package lsp-bridge
+;; 	:straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+;;             :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+;;             :build (:not compile))
+;; 	:init
+;; 	(global-lsp-bridge-mode)
+;;   :config
+;;   ;; (global-lsp-bridge-mode)
+;;   (setq lsp-bridge-enable-log t
+;;         ;; lsp-bridge-rust-server "rust-analyzer"
+;;         lsp-bridge-enable-inlay-hint t
+;;         lsp-bridge-enable-diagnostics t
+;;         lsp-bridge-enable-signature-help t
+;;         ;; lsp-bridge-get-project-path-by-filepath
+;;         ;; (lambda (filepath) (locate-dominating-file filepath "Cargo.toml"))
+;; 				)
+;;   :bind (:map lsp-bridge-mode-map
+;;               ("M-j" . lsp-bridge-find-def)
+;;               ("M-?" . lsp-bridge-find-references)
+;;               ("C-c C-c a" . lsp-bridge-code-action)
+;;               ("C-c C-c r" . lsp-bridge-rename)
+;;               ("C-c C-c l" . lsp-bridge-diagnostic-list)))
 
 ;;;;;;;;;;;;;;;;;;;;;;; EGLOT ;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (use-package eglot
-;;   :ensure t
-;;   :commands (eglot eglot-ensure)
-;;   :config
-;;   (add-to-list 'eglot-server-programs
-;;                '((rustic-mode rust-mode) . ("rust-analyzer"))
-;;                ;; '((go-mode) . ("gopls"))
-;;                '((typescript-mode typescriptreact-mode) . ("typescript-language-server" "--stdio"))
-;;                ;; '((python-mode) . ("pylsp"))
-;;                ;; '((c-mode c++-mode) . ("clangd"))
-;;                '((js-mode) . ("typescript-language-server" "--stdio")))
-;;   (setq eglot-autoshutdown t
-;;         eglot-sync-connect 0
-;;         eglot-confirm-server-initiated-edits nil
-;;         eglot-extend-to-xref t
-;;         eglot-events-buffer-size 0
-;;         eglot-send-changes-idle-time 0.2)
-;;   (setq eldoc-idle-delay 0.0
-;;         eldoc-echo-area-use-multiline-p t
-;;         eldoc-documentation-strategy 'eldoc-documentation-compose)
-;;   (defun my/eglot-format-on-save ()
-;;     (when (eglot-managed-p)
-;;       (eglot-format-buffer)))
-;;   (add-hook 'before-save-hook #'my/eglot-format-on-save)
-;;   (add-hook 'eglot-managed-mode-hook
-;;             (lambda ()
-;;               (when (eglot--server-capable :inlayHintProvider)
-;;                 (eglot-inlay-hints-mode))))
-;;   :bind (:map eglot-mode-map
-;;               ("C-c l f" . eglot-format-buffer)
-;;               ("C-c l r" . eglot-rename)
-;;               ("C-c l a" . eglot-code-actions)
-;;               ("C-c l d" . xref-find-definitions)
-;;               ("C-c l ?" . xref-find-references)
-;;               ("C-c l e" . flycheck-list-errors)
-;;               ("C-c l q" . eglot-shutdown)
-;;               ("M-j" . eglot-code-action-quickfix)))
+(use-package eglot
+  :ensure t
+  :commands (eglot eglot-ensure)
+  :config
+  (add-to-list 'eglot-server-programs
+               '((rustic-mode rust-mode) . ("rust-analyzer"))
+               ;; '((go-mode) . ("gopls"))
+               '((typescript-mode typescriptreact-mode) . ("typescript-language-server" "--stdio"))
+               ;; '((python-mode) . ("pylsp"))
+               ;; '((c-mode c++-mode) . ("clangd"))
+               '((js-mode) . ("typescript-language-server" "--stdio")))
+  (setq eglot-autoshutdown t
+        eglot-sync-connect 0
+        eglot-confirm-server-initiated-edits nil
+        eglot-extend-to-xref t
+        eglot-events-buffer-size 0
+        eglot-send-changes-idle-time 0.2)
+  (setq eldoc-idle-delay 0.0
+        eldoc-echo-area-use-multiline-p t
+        eldoc-documentation-strategy 'eldoc-documentation-compose)
+  (defun my/eglot-format-on-save ()
+    (when (eglot-managed-p)
+      (eglot-format-buffer)))
+  (add-hook 'before-save-hook #'my/eglot-format-on-save)
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (when (eglot--server-capable :inlayHintProvider)
+                (eglot-inlay-hints-mode))))
+  :bind (:map eglot-mode-map
+              ("C-c l f" . eglot-format-buffer)
+              ("C-c l r" . eglot-rename)
+              ("C-c l a" . eglot-code-actions)
+              ("C-c l d" . xref-find-definitions)
+              ("C-c l ?" . xref-find-references)
+              ("C-c l e" . flycheck-list-errors)
+              ("C-c l q" . eglot-shutdown)
+              ("M-j" . eglot-code-action-quickfix)))
+
+;; cargo install emacs-lsp-booster
+(use-package eglot-booster
+	:straight (:host github
+									 :repo "jdtsmith/eglot-booster"
+									 :branch "main" :files ("*.el" "out"))
+	:after eglot
+	:config	(eglot-booster-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;; HELM-LSP ;;;;;;;;;;;;;;;;;;;;;;;
 
