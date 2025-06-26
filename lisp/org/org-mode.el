@@ -55,6 +55,9 @@
 						(org-redisplay-inline-images))))
     (add-to-list 'org-modules 'org-tempo t)))
 
+(global-set-key (kbd "C-c C-x o") 'org-clock-out)
+(global-set-key (kbd "C-c C-x j") 'org-clock-go-to)
+
 (defun org-dblock-write:time-requirements (params)
   "Generate a table showing daily time requirements and progress for categories."
   (let* ((day-of-week (upcase (format-time-string "%^a")))
@@ -89,19 +92,6 @@
                           category required actual progress)))))
 
     (insert "|------------+----------+---------+-----------|")))
-
-
-(global-set-key (kbd "C-c C-x o") 'org-clock-out)
-(global-set-key (kbd "C-c C-x j") 'org-clock-go-to)
-
-;; (add-to-list 'load-path "~/Templates2/Lisp/org-habit-enhanced")
-;; (require 'org-habit-core)
-;; (require 'org-habit-enhanced)
-;; (require 'org-habit-stats)
-;; (require 'org-habit-quest)
-;; (require 'org-habit-tasks)
-;; (require 'org-habit-market)
-;; (hq-setup)
 
 (defun my/insert-daily-reports ()
   "Вставить отчеты habits и day results в текущий буфер с измененными параметрами отображения."
@@ -214,8 +204,8 @@
   :ensure t
   :bind (("C-c k" . my/org-pomodoro))
   :config
-  (setq org-pomodoro-audio-player (or (executable-find "aplay") (executable-find "afplay"))
-        org-pomodoro-play-sounds t           ; Determines whether soudns are played or not
+  (setq org-pomodoro-audio-player (or (executable-find "mpv") (executable-find "aplay"))
+        org-pomodoro-play-sounds t
 	org-pomodoro-keep-killed-pomodoro-time t
 	org-pomodoro-format " %s"
 	org-pomodoro-short-break-format " Short Break %s"
@@ -223,15 +213,15 @@
 	;; org-pomodoro-finished-sound-p t
         ;; org-pomodoro-start-sound "/home/vberezhnev/.emacs.d/sounds/bell.mp3"
 
-        org-pomodoro-start-sound-p t         ; Determine whether to play a sound when a pomodoro started
-        org-pomodoro-start-sound (expand-file-name "sounds/bell.wav" user-emacs-directory)
+        org-pomodoro-start-sound-p t
+        org-pomodoro-start-sound "~/.emacs.d/sounds/bell.wav" 
 
-        org-pomodoro-finished-sound-p t      ; Determines whether to play a sound when a pomodoro finished
-        org-pomodoro-finished-sound (expand-file-name "sounds/bell.wav" user-emacs-directory)
+        org-pomodoro-finished-sound-p t
+        org-pomodoro-finished-sound "~/.emacs.d/sounds/bell.wav"
 
-        org-pomodoro-manual-break t          ; Whether the user needs to exit manually from a running pomodoro to enter a break
-        org-pomodoro-overtime-sound-p t      ; Determines whether to play a sound when a pomodoro starts to run overtime
-        org-pomodoro-overtime-sound (expand-file-name "sounds/bell.wav" user-emacs-directory)
+        org-pomodoro-manual-break t
+        org-pomodoro-overtime-sound-p t
+        org-pomodoro-overtime-sound "~/.emacs.d/sounds/bell.wav"
 
 	org-pomodoro-length 40
 	org-pomodoro-short-break-length 5
@@ -260,11 +250,6 @@
 
 (use-package emacsql
   :ensure t)
-;; (use-package sqlite3
-;;   :ensure t)
-
-(use-package restclient
-  :ensure t)
 
 (use-package org-download
   :ensure t
@@ -280,8 +265,6 @@
   (setq org-cliplink-max-length 800)
   (global-set-key (kbd "C-x p i") 'org-cliplink))
 
-(setq org-gtd-update-ack "3.0.0")
-
 (use-package org-gtd
   :ensure t
   :straight (org-gtd :type git
@@ -291,14 +274,13 @@
   (org-gtd-directory "~/Org/agenda/GTD/")
   (org-edna-use-inheritance t)
   (org-gtd-update-ack "3.0.0")
-  (org-gtd-areas-of-focus '("PERSONAL" "CORE" "ASCENT" "EGE"))
+  (org-gtd-areas-of-focus '("PERSONAL" "CORE" "ASCENT" "CHINESE"))
   (org-gtd-organize-hooks '(org-gtd-set-area-of-focus org-set-tags-command))
   (org-gtd-clarify-show-horizons t)
   (org-gtd-horizons-file "horizons.org")
   :config
   (org-edna-mode)
-  :bind (;;("C-c d c" . (lambda () (interactive) (org-gtd-capture nil "i")))
-	 ("C-c d c" . org-gtd-capture)
+  :bind (("C-c d c" . org-gtd-capture)
 	 ("C-c d e" . org-gtd-engage)
 	 ("C-c d r" . org-gtd-engage-grouped-by-context)
 	 ("C-c d p" . org-gtd-process-inbox)

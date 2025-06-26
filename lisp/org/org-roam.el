@@ -52,104 +52,9 @@
 
      ("j" "Мысли" plain "* %U"
       :if-new (file+head "%<%Y-%m-%d>.org" "* %U\n#+title: %U\n\n"))))
-
   
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
   :config
-  ;; Enable org-roam-dailies
-  ;; (require 'org-roam-dailies)
-  ;; Enable db autosync to ensure node metadata is up-to-date
-  
-
-;; (defun my/org-roam-dailies-customize ()
-;;   "Применяет кастомизации только для файлов org-roam-dailies."
-;;   ;; (when (and buffer-file-name
-;;   ;;            (string-prefix-p
-;;   ;;             (expand-file-name (concat org-roam-directory "/" org-roam-dailies-directory))
-;;   ;;             buffer-file-name)))
-;;     ;; Здесь будут настройки для изменения внешнего вида
-;;     (my/apply-journal-style))
-
-;; (defun my/apply-journal-style ()
-;;   "Применяет уникальный стиль для org-roam-dailies."
-;;   ;; Установить другой шрифт
-;;   (buffer-face-set '(:family "Iosevka" :height 140 :weight regular))
-  
-;;   ;; Отключить номера строк и другие отвлекающие элементы
-;;   (display-line-numbers-mode -1)
-;;   (hl-line-mode -1)
-  
-;;   ;; Изменить фон и цвета текста для атмосферы
-;;   (set-background-color "#1C2526")
-;;   (set-foreground-color "#E8E8E8")
-  
-;;   ;; Убрать панель инструментов и меню
-;;   (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-;;   (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-  
-;;   ;; Включить режим writeroom для минимализма
-;;   (writeroom-mode 1)
-  
-;;   ;; Опционально: включить эффект печатной машинки
-;;   (when (fboundp 'typewriter-mode) (typewriter-mode 1))
-  
-;;   ;; Скрыть заголовки и свойства Org-mode для чистоты
-;;   (org-appear-mode 1)
-;;   (setq-local org-hide-emphasis-markers t)
-;;   (setq-local org-pretty-entities t))
-
-;; (defun my/reset-journal-style ()
-;;   "Сбрасывает кастомизации при выходе из файла журнала."
-;;   ;; Восстановить стандартный шрифт
-;;   (buffer-face-set nil)
-  
-;;   ;; Восстановить фон и цвета
-;;   (set-background-color nil)
-;;   (set-foreground-color nil)
-  
-;;   ;; Вернуть панели и настройки
-;;   (when (fboundp 'tool-bar-mode) (tool-bar-mode 1))
-;;   (when (fboundp 'menu-bar-mode) (menu-bar-mode 1))
-  
-;;   ;; Отключить writeroom и typewriter
-;;   (writeroom-mode -1)
-;;   (when (fboundp 'typewriter-mode) (typewriter-mode -1))
-  
-;;   ;; Восстановить номера строк и другие режимы
-;;   (display-line-numbers-mode 1)
-;;   (hl-line-mode 1))
-
-;; (add-hook 'org-roam-dailies-mode-hook #'my/org-roam-dailies-customize)
-
-;; ;; Применять сброс при закрытии файла журнала
-;; (add-hook 'kill-buffer-hook
-;;           (lambda ()
-;;             (when (and buffer-file-name
-;;                        (string-prefix-p
-;;                         (expand-file-name (concat org-roam-directory "/" org-roam-dailies-directory))
-;;                         buffer-file-name))
-;;               (my/reset-journal-style))))
-
-;; (use-package writeroom-mode
-;;   :ensure t
-;;   :config
-;;   (setq writeroom-width 80))
-
-  ;; ;; Fix before-save-hook to avoid org-roam-node nil error
-  ;; (defun my/org-roam-safe-save ()
-  ;;   "Safely save org-roam-dailies buffer without node errors."
-  ;;   (when (and (bound-and-true-p org-roam-dailies-mode)
-  ;;              (buffer-file-name)
-  ;;              (string-match-p (regexp-quote org-roam-dailies-directory)
-  ;;                              (buffer-file-name)))
-  ;;     ;; Ensure buffer is recognized as an org-roam node
-  ;;     (unless (org-roam-node-at-point)
-  ;;       (org-roam-node-insert))
-  ;;     ;; Run org-roam save hooks safely
-  ;;     (condition-case err
-  ;;         (org-roam-db-sync)
-  ;;       (error (message "Org-roam db sync error: %s" err)))))
-  
   ;; Org-noter integration with org-roam-bibtex
   (setq orb-preformat-keywords
         '("title" "citekey"  "url" "author-or-editor" "keywords" "file")
@@ -167,20 +72,14 @@
         (concat "${title:*} "
                 (propertize "${tags:60}" 'face 'org-tag)))
 
-  ;;for org-roam-buffer-toggle
-  ;;Recommendation in the official manual
-  ;; (add-to-list 'display-buffer-alist
-  ;;              '("\\*org-roam\\*"
-  ;;                (display-buffer-in-direction)
-  ;;                (direction . right)
-  ;;                (window-width . 0.33)
-  ;;                (window-height . fit-window-to-buffer)))
-  )
-  ;; Add hooks
-  ;; :hook
-  ;; ((org-roam-dailies-mode . my/org-roam-dailies-setup)
-  ;;  (kill-buffer-hook . my/org-roam-dailies-cleanup))
-  ;;  (before-save-hook . my/org-roam-safe-save))
+  ;; for org-roam-buffer-toggle
+  ;; Recommendation in the official manual
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-direction)
+                 (direction . right)
+                 (window-width . 0.33)
+                 (window-height . fit-window-to-buffer))))
 
 
 (use-package org-roam-timestamps
@@ -236,27 +135,15 @@
       (kill-line)
       (kill-line))))
 
-;; (use-package org-roam-ui
-;;   :straight
-;;   (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
-;;   :after org-roam
-;;   :config
-;;   (setq org-roam-ui-sync-theme t
-;;         org-roam-ui-follow t
-;;         org-roam-ui-update-on-save t
-;;         org-roam-ui-open-on-start t))
-
-;; (use-package org-readwise
-;;   :quelpa (org-readwise :fetcher github :repo "CountGreven/org-readwise")
-;;   :config
-;;   ;; Ensure auth-source is configured to find your Readwise token
-;;   (setq auth-sources '("~/.authinfo"))
-
-;; Set the output location for your highlights (buffer or file)
-;; (setq org-readwise-output-location "~/Org/readwise-highlights.org")
-
-;; ;; Optionally set the debug level (0 = no debug, 1 = basic debug, 2 = detailed debug)
-;; (setq org-readwise-debug-level 1))
+(use-package org-roam-ui
+  :straight
+  (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
 
 (use-package org-ref
   :quelpa (org-ref
@@ -330,88 +217,6 @@
      :function #'citar-has-notes
      :padding "  "
      :tag "has:notes")))
-
-;; (use-package doct
-;;   :ensure t
-;;   :after org-roam
-;;   :config
-;;   ;; Ensure org-roam and org-roam-dailies are loaded
-;;   (require 'org-roam)
-;;   (require 'org-roam-dailies)
-
-;;   ;; Set org-roam directories (adjust paths as needed)
-;;   (setq org-roam-directory "~/Org/Org-roam"
-;;         org-roam-dailies-directory "~/Org/Org-roam/journal")
-
-;;   ;; Define org-roam capture templates
-;;   (setq org-roam-capture-templates
-;;         (doct
-;;          '(("Atomic note (with source)"
-;;             :keys "a"
-;;             :type plain
-;;             :file "~/Org/Templates/Atomic note.org"
-;;             :target (file+head "%<%Y-%m-%d-%H:%M>--${slug}.org"
-;; 			       "#+startup: latexpreview\n#+date: %U\n#+title: ${title}\n")
-;;             :unnarrowed t)
-;;            ("Biography (Person)"
-;;             :keys "b"
-;;             :type plain
-;;             :file "~/Org/Templates/Person.org"
-;;             :target (file+head "persons/%<%Y-%m-%d-%H:%M>--person-${slug}.org"
-;; 			       "#+title: ${title}\n#+filetags: :Biography:\n#+date: %U\n")
-;;             :unnarrowed t)
-;;            ("Bibliography reference"
-;;             :keys "r"
-;;             :type plain
-;;             :file "~/Org/Templates/Bibliography reference.org"
-;;             :target (file+head "bibliography/references/${citekey}.org"
-;; 			       "#+title: ${title}\n#+date: %U")
-;;             :unnarrowed t))))
-
-;;   ;; Define org-roam capture ref templates
-;;   ;; (setq org-roam-capture-ref-templates
-;;   ;;       (doct
-;;   ;;        '(("Ref"
-;;   ;;           :keys "r"
-;;   ;;           :type plain
-;;   ;;           :template "%?"
-;;   ;;           :target (file+head "web/${slug}.org"
-;;   ;;                             "#+title: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n\n%(zp/org-protocol-insert-selection-dwim \"%i\")")
-;;   ;;           :unnarrowed t)
-;;   ;;          ("Incremental"
-;;   ;;           :keys "i"
-;;   ;;           :type plain
-;;   ;;           :template "* %?\n%(zp/org-protocol-insert-selection-dwim \"%i\")"
-;;   ;;           :target (file+head "web/${slug}.org"
-;;   ;;                             "#+title: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n\n")
-;;   ;;           :unnarrowed t
-;;   ;;           :empty-lines-before 1))))
-
-;;   ;; Define org-roam dailies capture templates
-;;   (setq org-roam-dailies-capture-templates
-;;         (doct
-;;          '(("Дневник продуктивности - утро"
-;;             :keys "d"
-;;             :type plain
-;;             :file "~/Org/Templates/journal/Morning.org"
-;;             :target (file+head "%<%Y-%m-%d>.org"
-;; 			       "* %U\n#+title: %U\n\n"))
-;;            ("Дневник продуктивности - вечер"
-;;             :keys "D"
-;;             :type plain
-;;             :file "~/Org/Templates/journal/Evening.org"
-;;             :target (file+head "%<%Y-%m-%d>.org"
-;; 			       "* %U\n#+title: %U\n\n"))
-;;            ;; ("Мысли"
-;;            ;;  :keys "j"
-;;            ;;  :type plain
-;;            ;;  :template "* %U"
-;;            ;;  :target (file+head "%<%Y-%m-%d>.org"
-;;            ;;                     "* %U\n#+title: %U\n\n"))
-;; 	   )))
-
-;;   ;; Enable epa file caching for symmetric encryption
-;;   (setq epa-file-cache-passphrase-for-symmetric-encryption t))
 
 ;; (use-package khoj
 ;;   :ensure t
