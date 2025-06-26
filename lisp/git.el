@@ -90,7 +90,7 @@
   (setq gptel-model 'deepseek-r1-concise)
   (setq gptel-backend (gptel-make-ollama "Ollama"
 			:host "localhost:11434"
-			:models '(deepseek-r1-concise)
+			:models '(mistral-nemo:12b)
 			:stream t))
 
   :bind (("M-s M-d" . gptel-context-add)
@@ -100,28 +100,26 @@
          ("M-s M-e" . gptel-rewrite)
          ("M-s M-s" . gptel)))
 
-;; (use-package gptel-magit
-;;   :load-path "~/.emacs.d/lisp/packages/"
-;;   ;; :after (gptel magit)
-;;   :init
-;;   (setq gptel-api-key "7995a988739243c6969c5653218cb330")
-;;   (setq gptel-max-tokens 8024)
-;;   (setq gptel-verbose t)
-;;   :config
-;;   (setq gptel-magit-model 'gpt-4o
-;; 	gptel-magit-backend
-;; 	(gptel-make-openai "AIMLAPI"
-;; 	  :host "api.aimlapi.com"
-;; 	  :endpoint "/chat/completions"
-;; 	  :stream nil
-;; 	  :key "7995a988739243c6969c5653218cb330"
-;; 	  :models '(gpt-4o)))
-;;   (gptel-magit-install)
+(use-package gptel-magit
+  :load-path "~/.emacs.d/lisp/packages/"
+  ;; :after (gptel magit)
+  :init
+  (setq gptel-api-key "7995a988739243c6969c5653218cb330")
+  (setq gptel-max-tokens 8024)
+  (setq gptel-verbose t)
+  :config
+  (setq gptel-magit-model 'mistral-nemo:12b
+	gptel-magit-backend
+	(gptel-make-ollama "Ollama"
+			:host "localhost:11434"
+			:models '(mistral-nemo:12b)
+			:stream t))
+  (gptel-magit-install)
 
-;;   :bind (:map git-commit-mode-map
-;;               ("M-g" . gptel-magit-generate-message))
-;;   :hook
-;;   (magit-mode . gptel-magit-install))
+  :bind (:map git-commit-mode-map
+              ("M-g" . gptel-magit-generate-message))
+  :hook
+  (magit-mode . gptel-magit-install))
 
 (provide 'git)
 ;;; git.el ends here
