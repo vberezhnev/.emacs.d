@@ -1,1 +1,0 @@
-(0 1 0 ((:id 1 :name "Fitness Challenge" :description "Exercise daily for 7 days" :habits ("🏋️ - Workout") :required 7 :progress 0 :completed nil :reward-xp 250 :reward-gold 120)) nil (:habit "🏋️ - Workout" :xp 40 :gold 30) "2025-05-21")

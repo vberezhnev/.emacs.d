@@ -52,30 +52,24 @@
   (my-leader-def
     "a" '(:ignore t :which-key "apps")
     "aa" 'org-agenda
-    "cx" 'elfeed
     
-    ;; Window management
-    ;; "w" '(:ignore t :which-key "windows")
-    ;; "wv" 'evil-window-vsplit
-    ;; "ws" 'evil-window-split
-    ;; "wd" 'evil-window-delete
-    ;; "wh" 'evil-window-left
-    ;; "wj" 'evil-window-down
-    ;; "wk" 'evil-window-up
-    ;; "wl" 'evil-window-right
-		
-		"p" '(:ignore t :which-key "projectile")
-		"pf" 'projectile-find-file
-		"pd" 'projectile-find-dir
-		"pp" 'projectile-switch-project
-		"pa" 'projectile-add-known-project
-		"pa" 'projectile-add-known-project
-		"ps" 'projectile-ripgrep
+    "r" '(:ignore t :which-key "bookmarks")
+    "rb" 'consult-bookmark
+    "rm" 'bookmark-set
+    "rl" 'bookmark-bmenu-list
+    
+    "p" '(:ignore t :which-key "projectile")
+    "pf" 'projectile-find-file
+    "pd" 'projectile-find-dir
+    "pp" 'projectile-switch-project
+    "pa" 'projectile-add-known-project
+    "pa" 'projectile-add-known-project
+    "ps" 'projectile-ripgrep
 		
     ;; File operations
     "f" '(:ignore t :which-key "files")
-    "ff" 'helm-find-files
-    "fr" 'helm-recentf
+    "ff" 'find-file
+    "fr" 'consult-recent-file
     "fs" 'save-buffer
     
     ;; Git/Magit
@@ -83,7 +77,7 @@
     "gg" 'magit
     "gc" 'magit-clone
 
-		;; Eval
+    ;; Eval
     "e" '(:ignore t :which-key "eval")
     "ee" 'eval-buffer
     "er" 'eval-region
@@ -102,13 +96,12 @@
 
     ;; Org-mode
     "d" '(:ignore t :which-key "org-gtd")
-		"dc" 'org-gtd-capture
+    "dc" '(lambda () (interactive) (org-gtd-capture nil "i"))
     "de" 'org-gtd-engage
     "dp" 'org-gtd-process-inbox
     "dn" 'org-gtd-show-all-next
     "ds" 'org-gtd-review-stuck-projects
 
-		
     ;; Org-roam
     "n" '(:ignore t :which-key "notes")
     "nl" 'org-roam-buffer-toggle
@@ -134,17 +127,19 @@
     "my" 'hydra-main/body
     
     ;; Toggle modes
-    "t" '(:ignore t :which-key "toggle")
+    "t" '(:ignore t :which-key "treemacs")
     "tt" 'treemacs
     "td" 'treemacs-select-directory
     "tb" 'treemacs-bookmark
     
     ;; Top-level bindings
     "b" 'bluetooth-list-devices
-    "q" 'multi-vterm
-    "x" 'helm-M-x
+    "w" 'multi-vterm
+    "k" 'kill-buffer
+    "q" 'rzgrep
     "h" 'global-hide-mode-line-mode)
-
+  
+  
   ;; Mode-specific bindings
   (general-def :states 'normal :keymaps 'elfeed-search-mode-map
     "<return>" 'elfeed-search-show-entry
@@ -190,7 +185,7 @@
   :after evil
   :config
   (setq evil-want-integration t)
-  (evil-collection-init '(ibuffer bookmark vterm magit enlight xwidget-webkit sunrise helm))
+  (evil-collection-init '(ibuffer bookmark vterm magit enlight xwidget-webkit sunrise))
   (evil-set-initial-state 'ibuffer-mode 'normal)
   (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
   (evil-set-initial-state 'vterm-mode 'normal)
@@ -198,7 +193,7 @@
   (evil-set-initial-state 'bluetooth-mode 'emacs)
   ;; (evil-set-initial-state 'org-agenda-mode 'emacs)
   (evil-set-initial-state 'org-super-agenda-mode 'emacs)
-  (evil-set-initial-state 'dashboard-mode 'emacs)
+  (evil-set-initial-state 'dashboard-mode 'normal)
   ;; (evil-set-initial-state 'telega-mode-line-mode 'emacs)
   ;; (evil-set-initial-state 'calibredb-mode 'normal)
   (evil-set-initial-state 'enlight-mode 'emacs)
@@ -244,7 +239,37 @@
 (use-package which-key
   :ensure t
   :config
-  (which-key-mode 1)
-  (setq which-key-idle-delay 0.3))
+  (which-key-mode 1))
+
+(use-package which-key-posframe
+  :ensure t
+  :config
+  (which-key-posframe-mode))
+  (setq which-key-idle-delay 0.3)
+
+;; Needed for `:after char-fold' to work
+(use-package char-fold
+  :ensure t
+  :custom
+  (char-fold-symmetric t)
+  (search-default-mode #'char-fold-to-regexp))
+
+(use-package reverse-im
+  :ensure t ; install `reverse-im' using package.el
+  :demand t ; always load it
+  :after char-fold ; but only after `char-fold' is loaded
+  :bind
+  ("M-T" . reverse-im-translate-word) ; to fix a word written in the wrong layout
+  :custom
+  ;; cache generated keymaps
+  (reverse-im-cache-file (locate-user-emacs-file "reverse-im-cache.el"))
+  ;; use lax matching
+  (reverse-im-char-fold t)
+  ;; advice read-char to fix commands that use their own shortcut mechanism
+  (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
+  ;; translate these methods
+  (reverse-im-input-methods '("ukrainian-computer"))
+  :config
+  (reverse-im-mode t)) ; turn the mode on
 
 (provide 'evil)
