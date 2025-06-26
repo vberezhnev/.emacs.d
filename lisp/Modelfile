@@ -1,0 +1,5 @@
+FROM deepseek-r1:8b
+SYSTEM You are a concise assistant. Return only the final answer without any reasoning, steps, or <think> tags. Do not generate any intermediate thoughts.
+PARAMETER temperature 0.2
+PARAMETER top_p 0.6
+PARAMETER stop '<｜begin▁of▁sentence｜>' '<｜end▁of▁sentence｜>''
