@@ -8,9 +8,9 @@
 (require 'package)
 (setq package-archives
       '(("melpa" . "https://melpa.org/packages/")
-				("melpa-stable" . "https://stable.melpa.org/packages/")
-				("gnu" . "http://elpa.gnu.org/packages/")
-				("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+	("melpa-stable" . "https://stable.melpa.org/packages/")
+	("gnu" . "http://elpa.gnu.org/packages/")
+	("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
 ;; install straight
 (defvar bootstrap-version)
@@ -96,15 +96,11 @@
 (use-package system-packages
   :ensure t)
 
-(defun frostyx/guix (&key install)
-  (let ((system-packages-package-manager 'guix)
+(defun vb/guix (&key install)
+  (let ((system-packages-package-manager ')
         (system-packages-use-sudo nil))
     (or (frostyx/rpm-query install)
- 				(system-packages-install install))))
-
-(defun frostyx/rpm-query (pack)
-  (equal 0 (shell-command
-            (concat "rpm -q " pack))))
+ 	(system-packages-install install))))
 
 (setq system-packages-package-manager 'guix)
 (setq system-packages-use-sudo t)
@@ -136,15 +132,6 @@
   :init
   (which-key-mode))
 
-;; (use-package selectrum
-;;   :ensure t
-;;   :init
-;;   (selectrum-mode)
-;;   :custom
-;;   (completion-styles '(flex substring partial-completion)))
-
-
-
 ;; Some common sense settings
 
 (electric-pair-mode)
@@ -155,15 +142,15 @@
 (setq custom-file (concat user-emacs-directory "custom.el")
       mouse-yank-at-point t
 
-      backup-by-copying t               ; don't clobber symlinks
-      version-control t                 ; version numbers for backup files
-      delete-old-versions t             ; delete excess backup files silently
+      backup-by-copying t
+      version-control t
+      delete-old-versions t
       delete-by-moving-to-trash t
-      kept-old-versions 6               ; oldest versions to keep when a new numbered backup is made (default: 2)
-      kept-new-versions 9               ; newest versions to keep when a new numbered backup is made (default: 2)
-      auto-save-default t               ; auto-save every buffer that visits a file
+      kept-old-versions 6
+      kept-new-versions 9
+      auto-save-default t
 
-      scroll-step 1
+      scroll-step 8
       scroll-margin 5
       scroll-conservatively 101
 
@@ -202,127 +189,55 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode 0))
 
-;; (cond
-;;  ((member "Monaco" (font-family-list))
-;;   (set-face-attribute 'default nil :font "Monaco-14"))
-;;  ((member "Inconsolata" (font-family-list))
-;;   (set-face-attribute 'default nil :font "Inconsolata-14"))
-;;  ((member "Consolas" (font-family-list))
-;;   (set-face-attribute 'default nil :font "Consolas-14"))
-;;  ((member "DejaVu Sans Mono" (font-family-list))
-;;   (set-face-attribute 'default nil :font "DejaVu Sans Mono-14")))
-
-;; (use-package auto-package-update
-;;   :ensure t
-;;   :config
-;;   (setq auto-package-update-delete-old-versions t
-;;         auto-package-update-interval 365
-;;         auto-package-update-prompt-before-update nil
-;;         auto-package-update-hide-results t)
-;;   (auto-package-update-at-time "04:00"))
+(use-package auto-package-update
+  :ensure t
+  :config
+  (setq auto-package-update-delete-old-versions t
+        auto-package-update-interval 365
+        auto-package-update-prompt-before-update nil
+        auto-package-update-hide-results t)
+  (auto-package-update-at-time "04:00"))
 
 (use-package vterm
   :ensure t)
 
 (use-package multi-vterm
-	:bind (:map global-map ("C-x e" . multi-vterm))
-	:ensure t)
-
-;; (use-package bufler
-;;   :bind (:map global-map ("C-x b" . bufler-switch-buffer))
-;;   :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"
-;;                   :files (:defaults (:exclude "helm-bufler.el")))
-;;   :config
-;;   (use-package helm-bufler
-;;     :quelpa (helm-bufler :fetcher github :repo "alphapapa/bufler.el"
-;;                          :files ("helm-bufler.el")))
-;;   (setf bufler-groups
-;;         (bufler-defgroups
-;; 	  ;; Группа для ~/Templates2/Rust/t12stat и vterm буферов в этой директории
-;; 	  (group
-;;            (group-or "t12stat"
-;;                      (dir "~/Templates2/Rust/t12stat")
-;;                      (group-and "vterm in t12stat"
-;; 				(mode-match "vterm" (rx bos "vterm-"))
-;; 				(lambda (buffer)
-;; 				  (with-current-buffer buffer
-;; 				    (when (and (bound-and-true-p vterm-default-directory)
-;;                                                (string-prefix-p "~/Templates2/Rust/t12stat"
-;; 								(expand-file-name vterm-default-directory)))
-;; 				      "t12stat"))))))
-;; 	  ;; Остальные группы из стандартной конфигурации
-;; 	  (group
-;;            (auto-workspace))
-;; 	  (group
-;;            (group-or "*Help/Info*"
-;;                      (mode-match "*Help*" (rx bos "help-"))
-;;                      (mode-match "*Info*" (rx bos "info-"))))
-;; 	  (group
-;;            (group-and "*Special*"
-;; 		      (lambda (buffer)
-;; 			(unless (or (funcall (mode-match "Magit" (rx bos "magit-status")) buffer)
-;; 				    (funcall (mode-match "Dired" (rx bos "dired")) buffer)
-;; 				    (funcall (auto-file) buffer))
-;; 			  "*Special*")))
-;;            (group
-;; 	    (name-match "**Special**"
-;; 			(rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
-;;            (group
-;; 	    (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
-;; 	    (auto-directory))
-;;            (mode-match "*Helm*" (rx bos "helm-"))
-;;            (auto-mode))
-;; 	  (dir user-emacs-directory)
-;; 	  (group
-;;            (dir (if (bound-and-true-p org-directory)
-;; 		    org-directory
-;; 		  "~/org"))
-;;            (group
-;; 	    (auto-indirect)
-;; 	    (auto-file))
-;;            (group-not "*special*" (auto-file))
-;;            (auto-mode))
-;; 	  (group
-;;            (auto-projectile))
-;; 	  (group
-;;            (auto-project))
-;; 	  (auto-directory)
-;; 	  (auto-mode))))
-
+  :bind (:map global-map ("C-x e" . multi-vterm))
+  :ensure t)
 
 (use-package doom-modeline
   :ensure t
   :init
   (doom-modeline-mode 1)
-	:config
-	(display-battery-mode t)
-	(display-time-mode t)
-	(setq display-time-format "%H:%M") ;;  %d.%m.%Y
-	(setq display-time-day-and-date t)
-	(setq display-time-24hr-format t)
-	(setq display-time-interval 60)
+  :config
+  (display-battery-mode t)
+  (display-time-mode t)
+  (setq display-time-format "%H:%M") ;;  %d.%m.%Y
+  (setq display-time-day-and-date t)
+  (setq display-time-24hr-format t)
+  (setq display-time-interval 60)
   (setq display-time-load-average nil)
-	(setq doom-modeline-height 24
-				all-the-icons-scale-factor 0.8
-				doom-modeline-vcs-max-length 30
-				doom-modeline-icon t
-				doom-gruvbox-padded-modeline t
-				doom-modeline-modal-modern-icon t
-				doom-modeline-modal t
-				doom-modeline-modal-icon t
-				doom-modeline-buffer-file-name-style 'buffer-name
-				doom-modeline-buffer-encoding nil
-				doom-modeline-env-version nil
-				doom-modeline-enable-word-count nil
-				doom-modeline-position-line-format '("|%")
-				doom-modeline-battery t
-				doom-modeline-time t
-				doom-modeline-mode-alist '())
+  (setq doom-modeline-height 24
+	all-the-icons-scale-factor 0.8
+	doom-modeline-vcs-max-length 30
+	doom-modeline-icon t
+	doom-gruvbox-padded-modeline t
+	doom-modeline-modal-modern-icon t
+	doom-modeline-modal t
+	doom-modeline-modal-icon t
+	doom-modeline-buffer-file-name-style 'buffer-name
+	doom-modeline-buffer-encoding nil
+	doom-modeline-env-version nil
+	doom-modeline-enable-word-count nil
+	doom-modeline-position-line-format '("|%")
+	doom-modeline-battery t
+	doom-modeline-time t
+	doom-modeline-mode-alist '())
 
-	(doom-modeline-def-modeline 'my-custom-modeline
-		;; Left
+  (doom-modeline-def-modeline 'my-custom-modeline
+    ;; Left
     '(bar buffer-info remote-host buffer-position word-count selection-info)
-		;; right
+    ;; right
     '(time battery major-mode misc-info process vcs))
   (doom-modeline-set-modeline 'my-custom-modeline t))
 
@@ -379,13 +294,13 @@
   :ensure t
   :config
   (setq dashboard-display-icons-p t)
-(setq dashboard-heading-icons
+  (setq dashboard-heading-icons
         '((recents   . "nf-cod-file")
-          (bookmarks . "nf-cod-bookmark")         
-          (projects  . "nf-cod-rocket")          
+          (bookmarks . "nf-cod-bookmark")
+          (projects  . "nf-cod-rocket")
           (agenda    . "nf-cod-calendar")))
-;; (setq dashboard-show-shortcuts nil)
-(setq dashboard-init-info "")
+  ;; (setq dashboard-show-shortcuts nil)
+  (setq dashboard-init-info "")
   (setq dashboard-center-content t)
   (setq dashboard-items '((recents . 5)
                           (bookmarks . 5)
@@ -430,26 +345,10 @@
 (use-package hide-mode-line
   :ensure t)
 
-(use-package zen-mode
-  :ensure t)
-
 (use-package bluetooth
   :ensure t
   :config
   (setq bluetooth-battery-warning-level 15))
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
 (setq tramp-ssh-controlmaster-options "")
 
@@ -463,7 +362,7 @@
   (setq calendar-location-name "Vladivostok, RU"
 	calendar-latitude 43.11
 	calendar-longitude 131.88)
-  
+
   (change-theme 'leuven 'twitch-dark))
 
 ;; (use-package auto-dark
@@ -473,7 +372,7 @@
 ;;   :config
 ;;   (setq auto-dark-themes '((doom-gruvbox) (doom-one-light))
 ;; 	auto-dark-polling-interval-seconds 0)
-  
+
 ;;   ;; auto-dark-allow-osascript nil
 ;;   ;; auto-dark-allow-powershell nil)
 ;;   (auto-dark-mode t))
@@ -493,4 +392,4 @@
 (load-file "~/.emacs.d/lisp/dired.el")
 (load-file "~/.emacs.d/lisp/org/org.el")
 
- ;; (load-file "~/Downloads/Telegram Desktop/twitch-dark-theme.el")
+;; (load-file "~/Downloads/Telegram Desktop/twitch-dark-theme.el")
