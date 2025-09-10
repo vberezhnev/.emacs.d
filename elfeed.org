@@ -1,0 +1,136 @@
+* Blogs                                                              :elfeed:
+** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40LimarevIvan&format=Mrss][Ivan Limarev - Telegram]]                                        :telegram:
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40yaproductmanager&format=Mrss][Записки продакт-менеджера | Вадим Кузнецов - Telegram]]          :telegram:
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40m0rtymerr_channel&format=Mrss][Осознанная Меркантильность - Telegram]]                          :telegram:
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+** [[https://www.youtube.com/feeds/videos.xml?playlist_id=PLP1V2-34UCJoRT5j-Pml9pMGp-LzpNBI3][Курс по самодисциплине от Глеба Карпова]]                         :youtube:
+:PROPERTIES:
+:TITLE: YouTube
+:END:
+
+** Business                                                       :business:
+*** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40moscowachBusiness&format=Mrss][Москвач Бизнес - Telegram]]                                    :telegram:
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+*** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40nonabstractum&format=Mrss][Nonabstractum | Экономика & Стратегия - Telegram]]             :telegram:
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+** Philosophy                                                   :philosophy:
+*** Telegram                                                     :telegram:
+**** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40Augustscommunity&format=Mrss][Август Круглый Год - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+
+*** YouTube                                                       :youtube:
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCpwQ3deqRxm1e2tM6pMZF4A][Andrii Baumeister]]
+:PROPERTIES:
+:TITLE: YouTube
+:END:
+
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCjWy2g76QZf7QLEwx4cB46g][Alexey Arestovych]]
+:PROPERTIES:
+:TITLE: YouTube
+:END:
+
+** Software Development                                                :dev:
+*** Emacs                                                           :emacs:
+**** [[http://www.terminally-incoherent.com/blog/feed][Terminally Incoherent]]
+:PROPERTIES:
+:TITLE: RSS
+:END:
+
+**** [[http://nullprogram.com/feed][null program]]
+:PROPERTIES:
+:TITLE: RSS
+:END:
+
+*** Rust                                                             :rust:
+**** Telegram                                                   :telegram:
+***** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40rust_lib&format=Mrss][Rust - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+***** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40rust_code&format=Mrss][Rust - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+***** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40books_englishhh&format=Mrss][RSS-Bridge]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+**** Reddit                                                       :reddit:
+***** [[https://www.reddit.com/r/rust/.rss][The Rust Programming Language - Reddit]]
+:PROPERTIES:
+:TITLE: Reddit
+:END:
+**** Habr                                                           :habr:
+***** [[https://habr.com/ru/rss/hubs/rust/articles/?fl=ru][Rust - Хабр]]
+:PROPERTIES:
+:TITLE: Habr
+:END:
+
+**** [[https://blog.rust-lang.org/feed][Rust Blog]]
+:PROPERTIES:
+:TITLE: RSS
+:END:
+
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCSp-OaMpsO8K0KkOqyBl7_w][Let's Get Rusty]]                                             :youtube:
+:PROPERTIES:
+:TITLE: YouTube
+:END:
+
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCUMwY9iS8oMyWDYIe6_RmoA][No Boilerplate]]                                            :youtube:
+:PROPERTIES:
+:TITLE: YouTube
+:END:
+*** Go                                                                 :go:
+**** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40go_in_action&format=Mrss][Go in Action - Telegram]]                                    :telegram:
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+*** MachineLearning & AI                                               :ai:
+**** Telegram                                                   :telegram:
+***** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40ai_machinelearning_big_data&format=Mrss][Machinelearning - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+***** [[https://rss-bridge.org/bridge01/?action=display&bridge=TelegramBridge&username=%40machinelearning_ru&format=Mrss][Машинное обучение RU - Telegram]]
+:PROPERTIES:
+:TITLE: Telegram
+:END:
+
+** Science                                                         :science:
+*** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCY6zVRa3Km52bsBmpyQnk6A][Vert Dider]]                                                    :youtube:
+:PROPERTIES:
+:TITLE: YouTube
+:END:
+*** [[https://habr.com/ru/rss/hubs/popular_science/articles/?fl=ru][Научно-популярное - Хабр]]                                         :habr:
+*** Astronomy                                                   :astronomy:
+**** [[https://habr.com/ru/rss/hubs/astronomy/articles/?fl=ru][Астрономия - Хабр]]
+** Podcasts                                                       :podcasts:
+*** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCSHZKyawb77ixDdsGog4iWA][Lex Fridman]]                                                   :youtube:
+:PROPERTIES:
+:TITLE: YouTube
+:END:

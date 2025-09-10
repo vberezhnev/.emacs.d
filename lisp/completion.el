@@ -1,43 +1,37 @@
-;;; completion.el -*- lexical-binding: t; -*-
+;;; completion.el --- Completion framework configuration -*- lexical-binding: t; -*-
 
-;; Убедитесь, что у вас установлены необходимые пакеты:
-;; vertico, orderless, consult, consult-dir, consult-flycheck, consult-yasnippet,
-;; embark, marginalia, wgrep, vertico-posframe, vertico-multiform
-
-;; Требуется для корректной работы некоторых функций
-(require 'recentf)
-(require 'minibuffer)
-
-;;; Vertico
+;; Vertico: Load after init
 (use-package vertico
-  :ensure t
+  :straight t
+  :commands (vertico-mode vertico-next vertico-previous vertico-directory-delete-char)
   :hook (after-init . vertico-mode)
-  :config
+  :bind (:map vertico-map
+         ("C-j" . vertico-next)
+         ("C-k" . vertico-previous)
+         ("DEL" . vertico-directory-delete-char))
+  :init
+  (require 'recentf) ;; Needed for consult-recent-file and consult-buffer
+  (require 'minibuffer) ;; Needed for minibuffer completions
   (setq vertico-resize nil
         vertico-count 17
         vertico-cycle t)
-  ;; Используем consult-completion-in-region, если vertico-mode активен
+  :config
   (setq-default completion-in-region-function
                 (lambda (&rest args)
                   (apply (if vertico-mode
                              #'consult-completion-in-region
                            #'completion--in-region)
                          args)))
-  ;; Привязки клавиш для vertico-map
-  (define-key vertico-map (kbd "C-j") #'vertico-next)
-  (define-key vertico-map (kbd "C-k") #'vertico-previous)
-  (define-key vertico-map (kbd "DEL") #'vertico-directory-delete-char)
-  ;; Очистка путей при навигации по директориям
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
-  ;; Скрытие буфера *Completions* для проблемных команд
   (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions))
 
-;;; Orderless
+;; Orderless: Load after init
 (use-package orderless
-  :ensure t
+  :straight t
+  :commands (orderless-filter)
   :hook (after-init . (lambda () (setq completion-styles '(orderless basic))))
-  :config
+  :init
   (setq orderless-affix-dispatch-alist
         '((?! . orderless-without-literal)
           (?& . orderless-annotation)
@@ -49,14 +43,18 @@
         completion-category-defaults nil
         completion-category-overrides '((file (styles orderless partial-completion)))
         orderless-component-separator #'orderless-escapable-split-on-space)
-  ;; Убираем наследование для completions-first-difference
-  (set-face-attribute 'completions-first-difference nil :inherit nil))
+  :config
+  (set-face-attribute 'completions-first-difference nil :inherit nil)
+  (setq completion-styles '(orderless flex)
+        completion-category-overrides '((eglot (styles . (orderless flex))))))
 
-;;; Consult
+;; Consult: Load for specific commands
 (use-package consult
-  :ensure t
-  :bind (;; Переопределение стандартных команд
-         ([remap bookmark-jump] . consult-bookmark)
+  :straight t
+  :commands (consult-bookmark consult-goto-line consult-imenu consult-locate
+             consult-theme consult-recent-file consult-buffer
+             consult-buffer-other-window consult-buffer-other-frame consult-yank-pop)
+  :bind (([remap bookmark-jump] . consult-bookmark)
          ([remap goto-line] . consult-goto-line)
          ([remap imenu] . consult-imenu)
          ([remap locate] . consult-locate)
@@ -67,7 +65,6 @@
          ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
          ([remap yank-pop] . consult-yank-pop))
   :config
-  ;; Включаем recentf-mode для consult-recent-file и consult-buffer
   (advice-add #'consult-recent-file :before (lambda (&rest _) (recentf-mode +1)))
   (advice-add #'consult-buffer :before (lambda (&rest _) (recentf-mode +1)))
   (setq consult-narrow-key "<"
@@ -81,7 +78,6 @@
           "--color=never"
           "--full-path --absolute-path"
           "--hidden --exclude .git"))
-  ;; Настройка предпросмотра для некоторых команд
   (consult-customize
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file
@@ -91,124 +87,152 @@
    consult-theme
    :preview-key (list "C-SPC" :debounce 0.5 'any)))
 
-;;; Consult-dir
+;; Consult-dir: Load for directory navigation
 (use-package consult-dir
-  :ensure t
+  :straight t
+  :commands (consult-dir consult-dir-jump-file)
   :bind (([remap list-directory] . consult-dir)
          :map vertico-map
          ("C-x C-d" . consult-dir)
          ("C-x C-j" . consult-dir-jump-file))
   :config
-  ;; Добавляем источники для SSH и локальных директорий
   (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t)
   (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-local t))
 
-;;; Consult-flycheck
+;; Consult-flycheck: Load after consult and flycheck
 (use-package consult-flycheck
-  :ensure t
-  :after (consult flycheck))
+  :straight t
+  :after (consult flycheck)
+  :commands (consult-flycheck)
+  :defer t)
 
-;;; Consult-yasnippet
+;; Consult-yasnippet: Load after consult and yasnippet
 (use-package consult-yasnippet
-  :ensure t
+  :straight t
   :after (consult yasnippet)
+  :commands (consult-yasnippet)
   :bind ([remap yas-insert-snippet] . consult-yasnippet))
 
-;;; Embark
+;; Embark: Load for action commands
 (use-package embark
-  :ensure t
+  :straight t
+  :commands (embark-act embark-export embark-collect)
   :bind (("C-;" . embark-act)
          :map minibuffer-local-map
          ("C-;" . embark-act)
          ("C-c C-;" . embark-export)
-         ("C-c C-l" . embark-collect)
-         ;; :prefix-map embark-prefix
-         ;; (:prefix "C-h" . embark-prefix-help-command)
-	 )
-  ;; :config
-  ;; (require 'consult)
-  ;; Отключаем which-key для embark
-  ;; (setq which-key-use-C-h-commands nil
-  ;;       prefix-help-command #'embark-prefix-help-command)
-  )
+         ("C-c C-l" . embark-collect)))
 
+;; Embark-consult: Load after embark and consult
 (use-package embark-consult
-  :ensure t)
+  :straight t
+  :after (embark consult)
+  :defer t)
 
-;;; Marginalia
+;; Marginalia: Load after init
 (use-package marginalia
-  :ensure t
+  :straight t
+  :commands (marginalia-mode marginalia-cycle)
   :hook (after-init . marginalia-mode)
   :bind (:map minibuffer-local-map
-              ("M-A" . marginalia-cycle)))
+         ("M-A" . marginalia-cycle)))
 
-;;; Wgrep
+;; Wgrep: Load on demand
 (use-package wgrep
-  :ensure t
+  :straight t
+  :commands (wgrep-setup wgrep-change-to-wgrep-mode)
   :config
   (setq wgrep-auto-save-buffer t))
 
-;;; Vertico-posframe (опционально, если вы хотите использовать childframe)
+;; Vertico-posframe: Load with vertico
 (use-package vertico-posframe
-  :ensure t
+  :straight t
+  :after vertico
+  :commands (vertico-posframe-mode)
   :hook (vertico-mode . vertico-posframe-mode))
 
-;;; Vertico-multiform
-(use-package vertico-multiform
-  ;; :ensure t
-  :hook (vertico-mode . vertico-multiform-mode)
-  :config
-  (defun +vertico-highlight-directory (file)
-    "Highlight directories in file candidates."
-    (when (string-suffix-p "/" file)
-      (add-face-text-property 0 (length file) 'marginalia-file-priv-dir 'append file))
-    file)
-  (add-to-list 'vertico-multiform-categories
-               '(file
-                 (+vertico-transform-functions . +vertico-highlight-directory))))
+;; Vertico-multiform: Load with vertico
+;; (use-package vertico-multiform
+;;   :straight t
+;;   :after vertico
+;;   :commands (vertico-multiform-mode)
+;;   :hook (vertico-mode . vertico-multiform-mode)
+;;   :config
+;;   (defun +vertico-highlight-directory (file)
+;;     "Highlight directories in file candidates."
+;;     (when (string-suffix-p "/" file)
+;;       (add-face-text-property 0 (length file) 'marginalia-file-priv-dir 'append file))
+;;     file)
+;;   (add-to-list 'vertico-multiform-categories
+;;                '(file
+;;                  (+vertico-transform-functions . +vertico-highlight-directory))))
+
+;; (use-package company
+;;   :straight t)
 
 ;; (use-package corfu
-;;   :ensure t
+;;   :straight t
+;;   ;; Optional customizations
 ;;   :custom
-;;   (corfu-auto t)                 ;; Enable auto completion
 ;;   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-;;   :bind
-;;   (:map corfu-map
-;;         ("C-n" . corfu-next)
-;;         ("C-p" . corfu-previous)
-;;         ("M-<" . corfu-first)
-;;         ("M->" . corfu-last)
-;;         ("TAB" . corfu-complete)
-;;         ([tab] . corfu-complete))
+;;   (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+;;   (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+;;   (corfu-preview-current nil)    ;; Disable current candidate preview
+;;   (corfu-preselect 'prompt)      ;; Preselect the prompt
+;;   (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+
+;;   ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
+;;   ;; :hook ((prog-mode . corfu-mode)
+;;   ;;        (vterm-mode . corfu-mode)
+;;   ;;        (eshell-mode . corfu-mode))
 ;;   :init
-;;   (global-corfu-mode))
+;;   (global-corfu-mode)
 
-;; (defun corfu-yasnippet-or-completion ()
-;;   (interactive)
-;;   (or (do-yas-expand)
-;;       (corfu-complete)))
+;;   ;; Enable optional extension modes:
+;;   (corfu-history-mode)
+;;   (corfu-popupinfo-mode))
 
-;; (defun check-expansion ()
-;;   (save-excursion
-;;     (if (looking-at "\\_>") t
-;;       (backward-char 1)
-;;       (if (looking-at "\\.") t
-;;         (backward-char 1)
-;;         (if (looking-at "::") t nil)))))
+;; (use-package corfu
+;;   :straight (:host github :repo "minad/corfu" :branch "main")
+;;   :demand t
+;;   :custom
+;;   (corfu-auto t)                 ;; Enable auto-completion
+;;   (corfu-cycle t)                ;; Cycle through candidates
+;;   (corfu-preselect 'prompt)      ;; Preselect the prompt
+;;   (corfu-quit-at-boundary nil)   ;; Don't quit at completion boundary
+;;   (corfu-quit-no-match t)        ;; Quit if no match
+;;   (corfu-preview-current nil)    ;; Disable current candidate preview
+;;   :init
+;;   (global-corfu-mode)
+;;   (corfu-popupinfo-mode 1)       ;; Show documentation popups
+;;   :config
+;;   (setq corfu-popupinfo-delay '(0.5 . 0.2)) ;; Adjust popup delay for responsiveness
+;;   :bind (:map corfu-map
+;;               ("C-n" . corfu-next)
+;;               ("C-p" . corfu-previous)
+;;               ("TAB" . corfu-insert)
+;;               ("C-g" . corfu-quit)))
 
-;; (defun do-yas-expand ()
-;;   (let ((yas/fallback-behavior 'return-nil))
-;;     (yas/expand)))
-
-;; (defun tab-indent-or-complete ()
-;;   (interactive)
-;;   (if (minibufferp)
-;;       (minibuffer-complete)
-;;     (if (or (not yas/minor-mode)
-;;             (null (do-yas-expand)))
-;;         (if (check-expansion)
-;;             (corfu-complete)
-;;           (indent-for-tab-command)))))
+;; (use-package cape
+;;   :straight t
+;;   :demand t
+;;   :init
+;;   ;; Add useful CAPF backends
+;;   (add-to-list 'completion-at-point-functions #'cape-dabbrev) ;; Buffer completions
+;;   (add-to-list 'completion-at-point-functions #'cape-file)    ;; File paths
+;;   (add-to-list 'completion-at-point-functions #'cape-keyword) ;; Keywords
+;;   ;; Org-roam completions
+;;   (add-hook 'org-mode-hook
+;;             (lambda ()
+;;               (add-to-list 'completion-at-point-functions #'org-roam-complete-link-at-point)
+;;               (add-to-list 'completion-at-point-functions #'org-roam-complete-everywhere)))
+;;   :config
+;;   ;; Enable org-roam completion everywhere
+;;   (setq org-roam-completion-everywhere t)
+;;   ;; :bind (("C-c p d" . cape-dabbrev)
+;;   ;;        ("C-c p f" . cape-file)
+;;   ;;        ("C-c p k" . cape-keyword))
+;;   )
 
 (provide 'completion)
 ;;; completion.el ends here

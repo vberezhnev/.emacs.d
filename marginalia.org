@@ -1,0 +1,421 @@
+
+* 26-osnovnyh-patternov-mikroservisnoj-razrabotki
+:PROPERTIES:
+:org-remark-file: cloud.vk.com/blog/26-osnovnyh-patternov-mikroservisnoj-razrabotki/
+:END:
+
+** «божественные классы» (God Classes) — сущности, которые будут общими для  нескольких микросервисов. Как правило, их очень сложно разделить.
+:PROPERTIES:
+:org-remark-id: 7b6b0b7e
+:org-remark-label: nil
+:org-remark-beg: 2720
+:org-remark-end: 2859
+:org-remark-link: [[https://cloud.vk.com/blog/26-osnovnyh-patternov-mikroservisnoj-razrabotki/]]
+:org-remark-original-text: «божественные классы» (God Classes) — сущности, которые будут общими для  нескольких микросервисов. Как правило, их очень сложно разделить.
+:END:
+
+* 925312
+:PROPERTIES:
+:org-remark-file: habr.com/ru/articles/925312/
+:END:
+
+**  Аристотель не отличал психику от души и называл её “первой энтелехией организма, имеющего способность к жизни” (энтелехия - внутренняя сила, потенциально заключающая в себе цель и окончательный результат).
+:PROPERTIES:
+:org-remark-id: 3a61681f
+:org-remark-label: nil
+:org-remark-beg: 501
+:org-remark-end: 707
+:org-remark-link: [[https://habr.com/ru/articles/925312/]]
+:org-remark-original-text: Аристотель не отличал психику от души и называл её “первой энтелехией организма, имеющего способность к жизни” (энтелехия - внутренняя сила, потенциально заключающая в себе цель и окончательный результат).
+:END:
+
+** Сейчас пользуется некоторой популярностью учение панпсихизма, утверждающее всеобщую одушевлённость природы. Истоки этого представления можно найти в античной философии (гилозоизм) и разных культурах (анимизм).
+:PROPERTIES:
+:org-remark-id: 06452002
+:org-remark-label: nil
+:org-remark-beg: 1945
+:org-remark-end: 2154
+:org-remark-link: [[https://habr.com/ru/articles/925312/]]
+:org-remark-original-text: Сейчас пользуется некоторой популярностью учение панпсихизма, утверждающее всеобщую одушевлённость природы. Истоки этого представления можно найти в античной философии (гилозоизм) и разных культурах (анимизм).
+:END:
+
+** Дальнейшее развитие учения Аристотеля о душе нашло в витализме. Теория витализма постулирует, что процессы в биологических организмах зависят от нематериальной сверхъестественной силы, управляющей жизненными явлениями — "жизненной силы" и не могут быть полностью объяснены законами физики и химии.
+:PROPERTIES:
+:org-remark-id: cb674a36
+:org-remark-label: nil
+:org-remark-beg: 708
+:org-remark-end: 1005
+:org-remark-link: [[https://habr.com/ru/articles/925312/]]
+:org-remark-original-text: Дальнейшее развитие учения Аристотеля о душе нашло в витализме. Теория витализма постулирует, что процессы в биологических организмах зависят от нематериальной сверхъестественной силы, управляющей жизненными явлениями — "жизненной силы" и не могут быть полностью объяснены законами физики и химии.
+:END:
+
+* 922534
+:PROPERTIES:
+:org-remark-file: habr.com/ru/articles/922534/
+:END:
+
+** TODO Но я-то привык к быстрым локальным сборкам, возможным благодаря инкрементной компиляции
+:PROPERTIES:
+:org-remark-id: 3e0108e1
+:org-remark-label: nil
+:org-remark-beg: 2294
+:org-remark-end: 2381
+:org-remark-link: [[https://habr.com/ru/articles/922534/]]
+:org-remark-original-text: Но я-то привык к быстрым локальным сборкам, возможным благодаря инкрементной компиляции
+:END:
+
+Погуглить, что такое инкрементальные компиляции в Rust
+** * -Z time-llvm-passes — выводит информацию о профилировании LLVM в текстовом  виде  * -Z llvm-time-trace — выводит информацию о профилировании LLVM в формате  трассировки Chrome 
+:PROPERTIES:
+:org-remark-id: 796ac015
+:org-remark-label: nil
+:org-remark-beg: 17006
+:org-remark-end: 17184
+:org-remark-link: [[https://habr.com/ru/articles/922534/]]
+:org-remark-original-text: * -Z time-llvm-passes — выводит информацию о профилировании LLVM в текстовом  виде  * -Z llvm-time-trace — выводит информацию о профилировании LLVM в формате  трассировки Chrome
+:END:
+
+** Соединяем всё вместе  У нас есть множество возможных подходов. Давайте попробуем:  1 Заменить встраивание аргументами LLVM;  2 Разбивать затратные функции в основном крейте;   3 Удалить дженерики из зависимостей, чтобы их не нужно было компилировать в  основном крейте  Изменим финальные команды Dockerfile следующим образом:  RUN RUSTFLAGS='-Cllvm-args=-inline-threshold=10 -Cllvm-args=-inlinedefault-threshold=10 -Cllvm-args=-inlinehint-threshold=10' \         cargo chef cook --release --target=x86_64-unknown-linux-musl --recipe-path=/workdir/recipe.json  ...  RUN RUSTFLAGS='-Cllvm-args=-inline-threshold=10 -Cllvm-args=-inlinedefault-threshold=10 -Cllvm-args=-inlinehint-threshold=10' \         cargo build --timings --release --target=x86_64-unknown-linux-musl --package web-http-server  ... и внесём множество более мелких изменений в основной крейт:  $ git diff --stat base..HEAD -- web-http-server ...  10 files changed, 898 insertions(+), 657 deletions(-)  ... а также изменения в крупные зависимости:  * Сделаем дженерик-функцию не дженериком:  https://github.com/pulldown-cmark/pulldown-cmark/pull/1045  * Соберём отдельный крейт с не дженериками: изменения в cargo-chef, с новым  локальным крейтом, раскрывающим новые версии API без дженериков, которые я  использую из lol_html и deadpool_postgres  ... что обеспечит нам время компиляции 32,3 с. 
+:PROPERTIES:
+:org-remark-id: dd8e4895
+:org-remark-label: nil
+:org-remark-beg: 65105
+:org-remark-end: 66465
+:org-remark-link: [[https://habr.com/ru/articles/922534/]]
+:org-remark-original-text: Соединяем всё вместе  У нас есть множество возможных подходов. Давайте попробуем:  1 Заменить встраивание аргументами LLVM;  2 Разбивать затратные функции в основном крейте;   3 Удалить дженерики из зависимостей, чтобы их не нужно было компилировать в  основном крейте  Изменим финальные команды Dockerfile следующим образом:  RUN RUSTFLAGS='-Cllvm-args=-inline-threshold=10 -Cllvm-args=-inlinedefault-threshold=10 -Cllvm-args=-inlinehint-threshold=10' \         cargo chef cook --release --target=x86_64-unknown-linux-musl --recipe-path=/workdir/recipe.json  ...  RUN RUSTFLAGS='-Cllvm-args=-inline-threshold=10 -Cllvm-args=-inlinedefault-threshold=10 -Cllvm-args=-inlinehint-threshold=10' \         cargo build --timings --release --target=x86_64-unknown-linux-musl --package web-http-server  ... и внесём множество более мелких изменений в основной крейт:  $ git diff --stat base..HEAD -- web-http-server ...  10 files changed, 898 insertions(+), 657 deletions(-)  ... а также изменения в крупные зависимости:  * Сделаем дженерик-функцию не дженериком:  https://github.com/pulldown-cmark/pulldown-cmark/pull/1045  * Соберём отдельный крейт с не дженериками: изменения в cargo-chef, с новым  локальным крейтом, раскрывающим новые версии API без дженериков, которые я  использую из lol_html и deadpool_postgres  ... что обеспечит нам время компиляции 32,3 с.
+:END:
+
+** После того, как я опубликовал этот пост, пара пользователей Bluesky дала мне хорошие советы!  1 Включить -Zshare-generics; и  2 Заменить Alpine  Включаем -Zshare-generics  Пётр Осевич с Bluesky предложил включить -Zshare-generics:   При этом будут заново использоваться экземпляры дженериков из зависимостей  крейта. Флаг не включён в релизных сборках (по умолчанию), потому что  отрицательно сказывается на кодогенерации.   [ ... ]   Флаг доступен только в nightly-сборках, но включён для dev-сборок даже при  использовании стабильного тулчейна.  Звучит неплохо, давайте попробуем его включить!  RUSTFLAGS="-Zshare-generics -Cllvm-args=-inline-threshold=10 -Cllvm-args=-inlinedefault-threshold=10 -Cllvm-args=-inlinehint-threshold=10" ...  Конечный результат любопытен — снижение общего времени компиляции с 32,3 с до 29,1 с, даже несмотря на то, что многие из core::ptr::drop_in_place, которые мы компилировали ранее, всё ещё присутствуют. 
+:PROPERTIES:
+:org-remark-id: df63cbcf
+:org-remark-label: nil
+:org-remark-beg: 66561
+:org-remark-end: 67503
+:org-remark-link: [[https://habr.com/ru/articles/922534/]]
+:org-remark-original-text: После того, как я опубликовал этот пост, пара пользователей Bluesky дала мне хорошие советы!  1 Включить -Zshare-generics; и  2 Заменить Alpine  Включаем -Zshare-generics  Пётр Осевич с Bluesky предложил включить -Zshare-generics:   При этом будут заново использоваться экземпляры дженериков из зависимостей  крейта. Флаг не включён в релизных сборках (по умолчанию), потому что  отрицательно сказывается на кодогенерации.   [ ... ]   Флаг доступен только в nightly-сборках, но включён для dev-сборок даже при  использовании стабильного тулчейна.  Звучит неплохо, давайте попробуем его включить!  RUSTFLAGS="-Zshare-generics -Cllvm-args=-inline-threshold=10 -Cllvm-args=-inlinedefault-threshold=10 -Cllvm-args=-inlinehint-threshold=10" ...  Конечный результат любопытен — снижение общего времени компиляции с 32,3 с до 29,1 с, даже несмотря на то, что многие из core::ptr::drop_in_place, которые мы компилировали ранее, всё ещё присутствуют.
+:END:
+
+** Перейдя с alpine на debian и убрав --target=x86_64-unknown-linux-musl, я снизил время компиляции с 29,1 с аж до 9,1 с! 
+:PROPERTIES:
+:org-remark-id: a9548dd7
+:org-remark-label: nil
+:org-remark-beg: 69455
+:org-remark-end: 69574
+:org-remark-link: [[https://habr.com/ru/articles/922534/]]
+:org-remark-original-text: Перейдя с alpine на debian и убрав --target=x86_64-unknown-linux-musl, я снизил время компиляции с 29,1 с аж до 9,1 с!
+:END:
+
+** Подведём итог  1 Мы начинали примерно с 175 с  2 Отключив LTO (и отладочные символы!), мы получили 51 с (-71%)  3 Перейдя на opt-level = 1 для финального крейта, мы получили 48,8 с (-4%)  4 Уменьшив встраивание при помощи -C llvm-args, мы получили 40,7 с (-16%)  5 Локальные изменения позволили добиться 37,7 с (-7%)  6 Изменения в зависимостях дали нам 32,3 с (-14%)  С дополнениями:  7 Включив -Zshare-generics, мы получили 29,1 с (-10%)  8 А уйдя с alpine, получили 9,1 с (-69%)  
+:PROPERTIES:
+:org-remark-id: 5e9c5967
+:org-remark-label: nil
+:org-remark-beg: 69575
+:org-remark-end: 70058
+:org-remark-link: [[https://habr.com/ru/articles/922534/]]
+:org-remark-original-text: Подведём итог  1 Мы начинали примерно с 175 с  2 Отключив LTO (и отладочные символы!), мы получили 51 с (-71%)  3 Перейдя на opt-level = 1 для финального крейта, мы получили 48,8 с (-4%)  4 Уменьшив встраивание при помощи -C llvm-args, мы получили 40,7 с (-16%)  5 Локальные изменения позволили добиться 37,7 с (-7%)  6 Изменения в зависимостях дали нам 32,3 с (-14%)  С дополнениями:  7 Включив -Zshare-generics, мы получили 29,1 с (-10%)  8 А уйдя с alpine, получили 9,1 с (-69%)
+:END:
+
+* 928144
+:PROPERTIES:
+:org-remark-file: habr.com/ru/articles/928144/
+:END:
+
+** По умолчанию Rust линкует предварительно  собранную стандартную библиотеку
+:PROPERTIES:
+:org-remark-id: 601a8cc2
+:org-remark-label: nil
+:org-remark-beg: 8868
+:org-remark-end: 8942
+:org-remark-link: [[https://habr.com/ru/articles/928144/]]
+:org-remark-original-text: По умолчанию Rust линкует предварительно  собранную стандартную библиотеку
+:END:
+
+* 928062
+:PROPERTIES:
+:org-remark-file: habr.com/ru/articles/928062/
+:END:
+
+** Наиболее подробно изученные БАДы это: омега-3 (39 исследований), зверобой (38), пребиотики разного спектра (18), витамин D (14), а также шафран (18).
+:PROPERTIES:
+:org-remark-id: fea2b710
+:org-remark-label: nil
+:org-remark-beg: 1358
+:org-remark-end: 1507
+:org-remark-link: [[https://habr.com/ru/articles/928062/]]
+:org-remark-original-text: Наиболее подробно изученные БАДы это: омега-3 (39 исследований), зверобой (38), пребиотики разного спектра (18), витамин D (14), а также шафран (18).
+:END:
+
+** Зверобой и шафран держатся в топе по наиболее выраженным положительным результатам. Исследования показали, что эти две добавки эффективны как в сравнении с плацебо, так и демонстрируют результаты в сравнении с рецептурными антидепрессантами.
+:PROPERTIES:
+:org-remark-id: 3b85c4c7
+:org-remark-label: nil
+:org-remark-beg: 1898
+:org-remark-end: 2139
+:org-remark-link: [[https://habr.com/ru/articles/928062/]]
+:org-remark-original-text: Зверобой и шафран держатся в топе по наиболее выраженным положительным результатам. Исследования показали, что эти две добавки эффективны как в сравнении с плацебо, так и демонстрируют результаты в сравнении с рецептурными антидепрессантами.
+:END:
+
+** состояние микрофлоры ЖКТ напрямую коррелирует с рисками депрессии
+:PROPERTIES:
+:org-remark-id: a2be3d88
+:org-remark-label: nil
+:org-remark-beg: 2321
+:org-remark-end: 2386
+:org-remark-link: [[https://habr.com/ru/articles/928062/]]
+:org-remark-original-text: состояние микрофлоры ЖКТ напрямую коррелирует с рисками депрессии
+:END:
+
+* 928760
+:PROPERTIES:
+:org-remark-file: habr.com/ru/articles/928760/
+:END:
+
+** Исследователи обнаружили, что ходьба или бег трусцой по 30-50 минут три-четыре раза в неделю эффективно борются с дневной усталостью.   Они уменьшают спутанность сознания, способствуют стабильности настроения и, если заниматься на свежем воздухе, улучшая цикл бодрствования и сна.
+:PROPERTIES:
+:org-remark-id: 259e3a76
+:org-remark-label: nil
+:org-remark-beg: 3749
+:org-remark-end: 4029
+:org-remark-link: [[https://habr.com/ru/articles/928760/]]
+:org-remark-original-text: Исследователи обнаружили, что ходьба или бег трусцой по 30-50 минут три-четыре раза в неделю эффективно борются с дневной усталостью.   Они уменьшают спутанность сознания, способствуют стабильности настроения и, если заниматься на свежем воздухе, улучшая цикл бодрствования и сна.
+:END:
+
+** Чтобы стать чем-то большим чем человек, нужно сперва стать полноценной версией человека. С развитой физической активностью, дисциплиной и способностью целенаправленно преследовать задачи. А тогда уже и подключать ноотропы и БАДы для буста тела и сознания.
+:PROPERTIES:
+:org-remark-id: 57381d15
+:org-remark-label: nil
+:org-remark-beg: 6894
+:org-remark-end: 7149
+:org-remark-link: [[https://habr.com/ru/articles/928760/]]
+:org-remark-original-text: Чтобы стать чем-то большим чем человек, нужно сперва стать полноценной версией человека. С развитой физической активностью, дисциплиной и способностью целенаправленно преследовать задачи. А тогда уже и подключать ноотропы и БАДы для буста тела и сознания.
+:END:
+
+* 650721
+:PROPERTIES:
+:org-remark-file: habr.com/ru/companies/dododev/articles/650721/
+:END:
+
+** Модульный монолит — это подход к проектированию приложений, который позволяет, с одной стороны, отложить во времени операционную сложность использования микросервисов, а с другой — избежать превращения монолитной системы в большой комок грязи.
+:PROPERTIES:
+:org-remark-id: e8820b6d
+:org-remark-label: nil
+:org-remark-beg: 366
+:org-remark-end: 609
+:org-remark-link: [[https://habr.com/ru/companies/dododev/articles/650721/]]
+:org-remark-original-text: Модульный монолит — это подход к проектированию приложений, который позволяет, с одной стороны, отложить во времени операционную сложность использования микросервисов, а с другой — избежать превращения монолитной системы в большой комок грязи.
+:END:
+
+** монолит — это не что иное, как строго одна единица развёртывания.
+:PROPERTIES:
+:org-remark-id: 6a13a828
+:org-remark-label: nil
+:org-remark-beg: 5157
+:org-remark-end: 5222
+:org-remark-link: [[https://habr.com/ru/companies/dododev/articles/650721/]]
+:org-remark-original-text: монолит — это не что иное, как строго одна единица развёртывания.
+:END:
+
+** Чтобы архитектуру можно было назвать модульной, модули должны:  * быть независимы и взаимозаменяемы;  * иметь всё необходимое для реализации определённой  части бизнес-функционала;  * иметь чётко определённый интерфейс.
+:PROPERTIES:
+:org-remark-id: 1fa4d4b7
+:org-remark-label: nil
+:org-remark-beg: 6276
+:org-remark-end: 6495
+:org-remark-link: [[https://habr.com/ru/companies/dododev/articles/650721/]]
+:org-remark-original-text: Чтобы архитектуру можно было назвать модульной, модули должны:  * быть независимы и взаимозаменяемы;  * иметь всё необходимое для реализации определённой  части бизнес-функционала;  * иметь чётко определённый интерфейс.
+:END:
+
+* 801757
+:PROPERTIES:
+:org-remark-file: habr.com/ru/articles/801757/
+:END:
+
+** ClickHouse — это высокопроизводительная  аналитическая система управления базами данных  (СУБД) с открытым исходным кодом. Яндекс  разработал ее для решения задач веб-аналитики в  Яндекс Метрике.
+:PROPERTIES:
+:org-remark-id: 6c3972ea
+:org-remark-label: nil
+:org-remark-beg: 1825
+:org-remark-end: 2020
+:org-remark-link: [[https://habr.com/ru/articles/801757/]]
+:org-remark-original-text: ClickHouse — это высокопроизводительная  аналитическая система управления базами данных  (СУБД) с открытым исходным кодом. Яндекс  разработал ее для решения задач веб-аналитики в  Яндекс Метрике.
+:END:
+
+** Что важно, на мой взгляд:  * система быстрая и заточена под работу с большими  массивами данных,  * используется в крупных продуктовых командах, поэтому  уметь в ней работать — плюс к резюме,  * она опенсорсная. 
+:PROPERTIES:
+:org-remark-id: 25866f55
+:org-remark-label: nil
+:org-remark-beg: 2022
+:org-remark-end: 2234
+:org-remark-link: [[https://habr.com/ru/articles/801757/]]
+:org-remark-original-text: Что важно, на мой взгляд:  * система быстрая и заточена под работу с большими  массивами данных,  * используется в крупных продуктовых командах, поэтому  уметь в ней работать — плюс к резюме,  * она опенсорсная.
+:END:
+
+** ClickHouse использует собственный диалект SQL, близкий к стандартному, но содержащий различные расширения: массивы и вложенные структуры данных, функции высшего порядка, вероятностные структуры, функции для работы с URI.
+:PROPERTIES:
+:org-remark-id: 0f1b1c21
+:org-remark-label: nil
+:org-remark-beg: 2245
+:org-remark-end: 2465
+:org-remark-link: [[https://habr.com/ru/articles/801757/]]
+:org-remark-original-text: ClickHouse использует собственный диалект SQL, близкий к стандартному, но содержащий различные расширения: массивы и вложенные структуры данных, функции высшего порядка, вероятностные структуры, функции для работы с URI.
+:END:
+
+* 267125
+:PROPERTIES:
+:org-remark-file: habr.com/ru/articles/267125/
+:END:
+
+** Являясь одним из вариантов слоеной архитектуры, гексагональная подразумевает разделение приложения на отдельные концептуальные слои, имеющие разную зону ответственности, а также регламентирует то, каким образом они связаны друг с другом.
+:PROPERTIES:
+:org-remark-id: ca848381
+:org-remark-label: nil
+:org-remark-beg: 601
+:org-remark-end: 838
+:org-remark-link: [[https://habr.com/ru/articles/267125/]]
+:org-remark-original-text: Являясь одним из вариантов слоеной архитектуры, гексагональная подразумевает разделение приложения на отдельные концептуальные слои, имеющие разную зону ответственности, а также регламентирует то, каким образом они связаны друг с другом.
+:END:
+
+** Гексагональная архитектура, ни в коем случае не новый подход к разработке с применением фреймворков. Напротив, это всего лишь обобщение «лучших практик» — практик новых и старых.
+:PROPERTIES:
+:org-remark-id: c6c9c71c
+:org-remark-label: nil
+:org-remark-beg: 975
+:org-remark-end: 1153
+:org-remark-link: [[https://habr.com/ru/articles/267125/]]
+:org-remark-original-text: Гексагональная архитектура, ни в коем случае не новый подход к разработке с применением фреймворков. Напротив, это всего лишь обобщение «лучших практик» — практик новых и старых.
+:END:
+
+** Этот тип архитектуры придерживается классических идей, к которой приходят разработчики при проектировании приложений: отделение кода приложения от фреймворка. Пусть наше приложение формируется само по себе, а не на базе фреймворка, используя последний только как инструмент для решения каких-то задач нашего приложения.
+:PROPERTIES:
+:org-remark-id: 5ff4e68f
+:org-remark-label: nil
+:org-remark-beg: 1350
+:org-remark-end: 1669
+:org-remark-link: [[https://habr.com/ru/articles/267125/]]
+:org-remark-original-text: Этот тип архитектуры придерживается классических идей, к которой приходят разработчики при проектировании приложений: отделение кода приложения от фреймворка. Пусть наше приложение формируется само по себе, а не на базе фреймворка, используя последний только как инструмент для решения каких-то задач нашего приложения.
+:END:
+
+** Основное назначение этой архитектуры:   Позволяет взаимодействовать с приложением как  пользователю, так и программам, автоматическим тестам,  скриптам пакетной обработки. Также позволяет  разрабатывать и тестировать приложение без каких-либо  дополнительных устройств или баз данных.
+:PROPERTIES:
+:org-remark-id: 65746da5
+:org-remark-label: nil
+:org-remark-beg: 1843
+:org-remark-end: 2127
+:org-remark-link: [[https://habr.com/ru/articles/267125/]]
+:org-remark-original-text: Основное назначение этой архитектуры:   Позволяет взаимодействовать с приложением как  пользователю, так и программам, автоматическим тестам,  скриптам пакетной обработки. Также позволяет  разрабатывать и тестировать приложение без каких-либо  дополнительных устройств или баз данных.
+:END:
+
+* master-hexagonal-architecture-rust
+:PROPERTIES:
+:org-remark-file: www.howtocodeit.com/articles/master-hexagonal-architecture-rust
+:END:
+
+** type-driven design is the cherry to hexagonal architecture's sundae, and you'll see many examples of newtypes in this tutorial
+:PROPERTIES:
+:org-remark-id: 434deee8
+:org-remark-label: nil
+:org-remark-beg: 2534
+:org-remark-end: 2660
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: type-driven design is the cherry to hexagonal architecture's sundae, and you'll see many examples of newtypes in this tutorial
+:END:
+
+** You'd have the same problem if this code lived in a setup module. It's not the location of the setup, but the failure to encapsulate and abstract dependencies that makes this code hard to maintain.  An isometric illustration of a megaphone   "The failure to encapsulate and abstract dependencies makes  this code hard to maintain." 
+:PROPERTIES:
+:org-remark-id: 3d358c3d
+:org-remark-label: nil
+:org-remark-beg: 6777
+:org-remark-end: 7109
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: You'd have the same problem if this code lived in a setup module. It's not the location of the setup, but the failure to encapsulate and abstract dependencies that makes this code hard to maintain.  An isometric illustration of a megaphone   "The failure to encapsulate and abstract dependencies makes  this code hard to maintain."
+:END:
+
+Имеется ввиду, что важно разделять логику в функциях. В данном случае важно уметь инкапсулировать и абкстрактизизоровать зависимости. В ином случае код будет сложно поддерживать со временем.
+
+** To change your database client – not even to change the kind of database, just the code that calls it – you'd have to rip out this hard dependency from every corner of your application.
+:PROPERTIES:
+:org-remark-id: 2bed71c3
+:org-remark-label: nil
+:org-remark-beg: 7681
+:org-remark-end: 7866
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: To change your database client – not even to change the kind of database, just the code that calls it – you'd have to rip out this hard dependency from every corner of your application.
+:END:
+
+Здесь та же история, что и в прошлый раз. "Утечка абстракции": логика клиента базы данных находится напрямую в ~main~. Это достаточно близко к понятию хардкода.
+
+** Integration tests are slow and expensive – they aren't suited to exhaustive coverage.
+:PROPERTIES:
+:org-remark-id: 733f1f0b
+:org-remark-label: nil
+:org-remark-beg: 10827
+:org-remark-end: 10912
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: Integration tests are slow and expensive – they aren't suited to exhaustive coverage.
+:END:
+
+** Tokio is a hard dependency of most production Rust applications. This is by necessity. An async runtime is a dependency on a grand scale, practically part of the language itself. Your application can't function without it, and its purpose is so fundamental that you'd gain nothing from attempting to abstract it away. 
+:PROPERTIES:
+:org-remark-id: d7622080
+:org-remark-label: nil
+:org-remark-beg: 11342
+:org-remark-end: 11660
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: Tokio is a hard dependency of most production Rust applications. This is by necessity. An async runtime is a dependency on a grand scale, practically part of the language itself. Your application can't function without it, and its purpose is so fundamental that you'd gain nothing from attempting to abstract it away.
+:END:
+
+Да, ~tokio~ как библиотека протекают во все части приложения, но это исключение. Асинхронный рантайм это практически часть самого языка.
+** HTTP packages, database clients, message queues, etc. do not fall into this category. Teams opt to change these dependencies regularly, for reasons including:  * scaling pressures that require new technical solutions, * deprecation of key libraries, * security threats, * someone more senior said so.
+:PROPERTIES:
+:org-remark-id: 9325f0ce
+:org-remark-label: nil
+:org-remark-beg: 12148
+:org-remark-end: 12448
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: HTTP packages, database clients, message queues, etc. do not fall into this category. Teams opt to change these dependencies regularly, for reasons including:  * scaling pressures that require new technical solutions, * deprecation of key libraries, * security threats, * someone more senior said so.
+:END:
+
+Важно строить основное приложение максимально изолированно (кроме tokio и anyhow) изолированно от используемых инструментов/фреймворков.
+** It's critical that we abstract these packages behind our own, clean interfaces, forcing conformity with our application.
+:PROPERTIES:
+:org-remark-id: b8412fc0
+:org-remark-label: nil
+:org-remark-beg: 12450
+:org-remark-end: 12570
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: It's critical that we abstract these packages behind our own, clean interfaces, forcing conformity with our application.
+:END:
+
+** AuthorRepository is what's known as a domain trait.
+:PROPERTIES:
+:org-remark-id: 5b10cee2
+:org-remark-label: nil
+:org-remark-beg: 16502
+:org-remark-end: 16553
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: AuthorRepository is what's known as a domain trait.
+:END:
+
+т.е трейт, имеющий в себе бизнес-логику
+** You might also have heard the term "port" before – a point of entry to your business logic.
+:PROPERTIES:
+:org-remark-id: 2001d2f4
+:org-remark-label: nil
+:org-remark-beg: 16554
+:org-remark-end: 16645
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: You might also have heard the term "port" before – a point of entry to your business logic.
+:END:
+
+Портом называют точку входа в элементы бизнес-логики
+** A concrete implementation of a port (say, an SQLite AuthorRepository) is called an adapter.
+:PROPERTIES:
+:org-remark-id: 9e94a3a9
+:org-remark-label: nil
+:org-remark-beg: 16646
+:org-remark-end: 16737
+:org-remark-link: [[https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust]]
+:org-remark-original-text: A concrete implementation of a port (say, an SQLite AuthorRepository) is called an adapter.
+:END:
+
+Адаптер -- конкретная реализация портов

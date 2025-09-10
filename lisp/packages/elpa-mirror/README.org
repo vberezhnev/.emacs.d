@@ -1,0 +1,85 @@
+* elpa-mirror
+[[https://github.com/redguardtoo/elpa-mirror/actions/workflows/test.yml][https://github.com/redguardtoo/elpa-mirror/actions/workflows/test.yml/badge.svg]]
+[[http://melpa.org/#/elpa-mirror][file:http://melpa.org/packages/elpa-mirror-badge.svg]]
+[[http://stable.melpa.org/#/elpa-mirror][file:http://stable.melpa.org/packages/elpa-mirror-badge.svg]]
+
+Create local Emacs package repository from *installed packages* so package upgrade never breaks.
+
+* Why
+- Package installation is fast. It takes only 15 seconds to install 115 packages
+- The package repository could be hosted on USB/Dropbox/GitHub
+- Tested with Emacs 27, 28, 29 on OSX/Cygwin/Windows10/Linux
+* Install
+CLI program "tar" is required.  It's already installed on Windows10/Linux/macOS.
+
+- Download =elpa-mirror.el= to somewhere (say =~/.emacs.d/site-lisp/elpa-mirror/=)
+- Add below code into "~/.emacs",
+#+begin_src elisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/elpa-mirror")
+(require 'elpa-mirror)
+#+end_src
+
+* Usage
+=M-x elpamr-create-mirror-for-installed= to create local repository.
+
+To update existing local repository, run =M-x elpamr-create-mirror-for-installed= again.
+
+BTW, =elpa-mirror.el= can run as an independent script,
+#+begin_src sh
+mkdir -p ~/myelpa && emacs --batch -l ~/.emacs.d/init.el -l ~/any-directory-you-prefer/elpa-mirror.el --eval='(setq elpamr-default-output-directory "~/myelpa")' --eval='(elpamr-create-mirror-for-installed)'
+#+end_src
+
+To use the local repository =~/myelpa/=, insert below code into =~/.emacs=,
+#+begin_src elisp
+;; myelpa is the ONLY repository now, dont forget trailing slash in the directory
+(setq package-archives '(("myelpa" . "~/myelpa/")))
+#+end_src
+
+** Repository on Dropbox
+Insert below code into =~/.emacs=:
+#+begin_src elisp
+;; add-to-list will not override default elpa.
+;; So now you have two repositories.
+;; One is GNU elpa. Another is myelpa
+(add-to-list 'package-archives
+             '("myelpa" . "https://dl.dropboxusercontent.com/u/858862/myelpa/"))
+#+end_src
+
+** Repository on GitHub
+My repository is [[https://github.com/redguardtoo/myelpa]].
+
+Insert below code into =.emacs=:
+#+begin_src elisp
+;; add-to-list will not override default elpa.
+;; So now you have two repositories.
+;; One is GNU elpa. Another is myelpa
+(add-to-list 'package-archives
+             '("myelpa" . "https://raw.githubusercontent.com/redguardtoo/myelpa/master/"))
+#+end_src
+
+* Tips
+** Exclude packages
+See =elpamr-exclude-packages=.
+** Exclude files/directories in package directory
+See =elpamr-tar-command-exclude-patterns=.
+
+=elpamr-exclude-patterns-filter-function= lets users define a filter function to exclude files and directories per package. The function returns the result to replace =elpamr-tar-command-exclude-patterns=.
+
+Below setup adds directory "bin/" into package "vagrant-tramp".
+#+begin_src elisp
+(setq elpamr-exclude-patterns-filter-function
+      (lambda (package-dir)
+        (let ((patterns elpamr-tar-command-exclude-patterns))
+          (when (string-match "vagrant-tramp" package-dir)
+            (setq patterns (remove "*/bin" patterns)))
+          patterns)))
+#+end_src
+
+** Change output directory,
+#+begin_src elisp
+(setq elpamr-default-output-directory "~/myelpa")
+#+end_src
+
+* Report a Bug
+
+Reproduce the bug, report it at [[https://github.com/redguardtoo/elpa-mirror]], and attach the contents of the buffer =*elpa-mirror log*=.

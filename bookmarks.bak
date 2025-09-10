@@ -1,0 +1,119 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("A half-hour to learn Rust"
+ (front-context-string . "A half-hour to l")
+ (rear-context-string . " 27 min #rust \n\n")
+ (position . 55)
+ (last-modified 26747 7037 155477 803000)
+ (location . "https://fasterthanli.me/articles/a-half-hour-to-learn-rust#destructuring-structs")
+ (handler . eww-bookmark-jump)
+ (defaults "A half-hour to learn Rust" "*A half-hour to learn Rust # eww*"))
+("Модульный монолит: Начало | Дочитать"
+ (front-context-string . "Давайте разберём")
+ (rear-context-string . "ный интерфейс.\n\n")
+ (position . 6497)
+ (last-modified 26745 60285 264226 195000)
+ (location . "https://habr.com/ru/companies/dododev/articles/650721/")
+ (handler . eww-bookmark-jump))
+("Почему 21 см — это «магическая длина» нашей Вселенной / Хабр"
+ (front-context-string . "Самый распростра")
+ (rear-context-string . " и электронов.\n\n")
+ (position . 607)
+ (last-modified 26744 37120 935714 436000)
+ (location . "https://habr.com/ru/articles/906020/")
+ (handler . eww-bookmark-jump))
+("Разные существа в космосе - Дочитать"
+ (front-context-string . "Альфред Уайтхед ")
+ (rear-context-string . " как сознание.\n\n")
+ (position . 2923)
+ (last-modified 26739 56529 890827 645000)
+ (location . "https://habr.com/ru/articles/925312/")
+ (handler . eww-bookmark-jump))
+("Books"
+ (filename . "~/Documents/Books/")
+ (front-context-string . "ome/berezhnev/Do")
+ (rear-context-string)
+ (position . 5)
+ (last-modified 26739 52945 204245 83000))
+(#1="Telega Manual HTML"
+    (front-context-string . "* Getting starte")
+    (rear-context-string . "rver in docker\n\n")
+    (position . 330)
+    (last-modified 26739 52515 677320 6000)
+    (location . "https://raw.githubusercontent.com/zevlg/telega.el/refs/heads/master/docs/index.html#installation")
+    (handler . eww-bookmark-jump)
+    (defaults #1# "" "*Telega Manual (v0.8.452) # eww*"))
+
+("JPPromo Server 2: Terminal"
+ (handler . vterm--bookmark-handler)
+ (thisdir . "/ssh:jpserver-2:~/")
+ (buf-name . "*vterminal<3>*"))
+("JPPromo Server 2: Root directory"
+ (filename . "/ssh:jpserver-2:~/")
+ (front-context-string . "  /ssh:jpserver-2")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 26736 37404 283741 951000))
+
+("Raspberry Pi: terminal"
+ (handler . vterm--bookmark-handler)
+ (thisdir . "/ssh:pi@31.200.229.59#2222:~/")
+ (buf-name . "*vterminal<1>*"))
+("Raspberry Pi: dired"
+ (filename . "/ssh:pi@31.200.229.59#2222:~/")
+ (front-context-string . "  /ssh:pi@31.200")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 26735 35908 494426 927000))
+
+("Telega.el Manual"
+ (front-context-string . "#+options: times")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 26734 53129 23819 508000)
+ (location . "https://raw.githubusercontent.com/zevlg/telega.el/refs/heads/master/docs/telega-manual.org")
+ (handler . eww-bookmark-jump))
+(#1="26 основных паттернов микросервисной разработки"
+    (front-context-string . "26 основных патт")
+    (rear-context-string . "evOps\n* Статья\n\n")
+    (position . 1210)
+    (last-modified 26734 35721 133928 232000)
+    (location . "https://cloud.vk.com/blog/26-osnovnyh-patternov-mikroservisnoj-razrabotki/")
+    (handler . eww-bookmark-jump)
+    (defaults #1# "Паттерны микросервисной разработки: самый полный список" "*Паттерны микросервисной разработки: самы # eww*"))
+("Emacs posts"
+ (front-context-string . "# -*- coding: ut")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 26718 43326 144697 251000)
+ (location . "https://raw.githubusercontent.com/tonyaldon/posts/refs/heads/master/posts.org")
+ (handler . eww-bookmark-jump))
+
+;; ("JPPromo Server 1: pg-bun-proxy.yml"
+;;  (filename . "/ssh:root@109.107.181.201:~/pg-bun-proxy.yml")
+;;  (front-context-string . "version: '3'\nser")
+;;  (rear-context-string)
+;;  (position . 1)
+;;  (last-modified 26715 57336 873587 26000))
+
+("org-refile-last-stored"
+ (filename . "~/Org/agenda/GTD/org-gtd-tasks.org")
+ (front-context-string . "** NEXT Починить")
+ (rear-context-string . "D]$ \n#+end_src\n\n")
+ (position . 29621)
+ (last-modified 26745 36642 354033 602000))
+("Mine personality"
+ (filename . "~/Documents/Books/Psychology/Neurotypology/Personality.org")
+ (front-context-string . "* Для работы с A")
+ (rear-context-string . " спать в 20:45\n\n")
+ (position . 644)
+ (last-modified 26714 40097 255405 238000))
+("org-capture-last-stored"
+ (filename . "~/Org/agenda/GTD/inbox.org")
+ (front-context-string . "* Купить и запус")
+ (rear-context-string . ".\n#+end_comment\n")
+ (position . 95)
+ (last-modified 26747 43450 929557 313000))
+)

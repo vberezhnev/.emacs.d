@@ -639,3 +639,115 @@
 
 
 
+
+;; (use-package lsp-bridge
+;;   :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+;;                          :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+;;                          :build (:not compile))
+;;   ;; :init
+;;   ;; (global-lsp-bridge-mode)
+;;   ;; (defun lsp-bridge-hook ()
+;;   ;;   ;; Отключить company-mode и corfu в lsp-bridge
+;;   ;;   (when (featurep 'corfu)
+;;   ;;     (corfu-mode -1))
+;;   ;;   (when (featurep 'company)
+;;   ;;     (company-mode -1)))
+;;   :hook
+;;   ((emacs-lisp-mode    . lsp-bridge-mode)
+;;    (rustic-mode        . lsp-bridge-mode)
+;;    (typescript-mode    . lsp-bridge-mode)
+;;    (typescript-ts-mode . lsp-bridge-mode)
+;;    (dockerfile-mode    . lsp-bridge-mode))
+;;   :bind (:map lsp-bridge-mode-map
+;;               ("C-." . lsp-bridge-show-documentation)
+;;               ("M-n" . lsp-bridge-diagnostic-jump-next)
+;;               ("M-p" . lsp-bridge-diagnostic-jump-prev)
+;;               ("M-." . lsp-bridge-find-def)
+;;               ("M-," . lsp-bridge-find-def-return))
+;;   :config
+;;   (setq lsp-bridge-enable-hover-diagnostic t
+;; 	lsp-bridge-headerline-breadcrumb-enable nil
+;; 	lsp-headerline-breadcrumb-enable nil
+;; 	lsp-file-watch-threshold 3500 ;; Default: 1000
+;;         acm-enable-capf t ;; Enable CAPF for non-LSP backends (e.g., Emacs Lisp)
+;;         ;; lsp-bridge-enable-org-babel t
+;; 	;; lsp-bridge-enable-with-tramp t
+;; 	acm-enable-doc t
+;;         lsp-bridge-enable-inlay-hint t
+;;         ;; acm-enable-elisp t ;; Explicitly enable Emacs Lisp completion backend
+;;         ;; acm-backend-elisp-candidate-min-length 0 ;; Trigger completion immediately
+;;         lsp-bridge-headerline-breadcrumb-enable t) ;; Disable breadcrumbs
+;;   ;; Ensure acm is initialized for elisp
+;;   ;; (add-to-list 'acm-backend-capf-mode-list 'emacs-lisp-mode)
+;;   )
+
+;; init-rust.el --- Configuration for Rust and related development tools
+
+;; LSP-mode: Load for programming modes
+;; (use-package lsp-mode
+;;   :straight t
+;;   ;; :commands (lsp lsp-deferred)
+;;   :hook ((tsx-mode        . lsp-deferred)
+;;          (typescript-mode . lsp-deferred)
+;;          (js-mode         . lsp-deferred)
+;;          (rustic-mode     . lsp-deferred)
+;; 	 (emacs-lisp-mode . lsp-deferred)
+;;          ;; (lsp-mode . lsp-diagnostics-mode)
+;;          ;; (lsp-mode . lsp-enable-which-key-integration)
+;; 	 )
+;;   :init
+;;   (setq lsp-file-watch-threshold 3500
+;;         lsp-headerline-breadcrumb-enable-symbol-numbers nil
+;;         lsp-eldoc-render-all t
+;;         lsp-idle-delay 0.1
+;;         lsp-rust-analyzer-server-display-inlay-hints t
+;;         lsp-rust-analyzer-display-chaining-hints t)
+;;   :config
+;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+;; LSP-ui: Load after lsp-mode
+;; (use-package lsp-ui
+;;   :straight t
+;;   ;; :after lsp-mode
+;;   ;; :commands (lsp-ui-mode)
+;;   :custom
+;;   (lsp-ui-peek-always-show t)
+;;   (lsp-ui-sideline-show-hover t)
+;;   (lsp-ui-doc-enable t))
+
+;; ;; LSP-booster: Configure advice without loading packages
+;; (defun lsp-booster--advice-json-parse (old-fn &rest args)
+;;   "Try to parse bytecode instead of json."
+;;   (or
+;;    (when (equal (following-char) ?#)
+;;      (let ((bytecode (read (current-buffer))))
+;;        (when (byte-code-function-p bytecode)
+;;          (funcall bytecode))))
+;;    (apply old-fn args)))
+
+;; (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+;;   "Prepend emacs-lsp-booster command to lsp CMD."
+;;   (let ((orig-result (funcall old-fn cmd test?)))
+;;     (if (and (not test?)
+;;              (not (file-remote-p default-directory))
+;;              lsp-use-plists
+;;              (not (functionp 'json-rpc-connection))
+;;              (executable-find "emacs-lsp-booster"))
+;;         (progn
+;;           (when-let ((command-from-exec-path (executable-find (car orig-result))))
+;;             (setcar orig-result command-from-exec-path))
+;;           (message "Using emacs-lsp-booster for %s!" orig-result)
+;;           (cons "emacs-lsp-booster" orig-result))
+;;       orig-result)))
+
+;; (with-eval-after-load 'lsp-mode
+;;   (advice-add (if (and (require 'json nil t)
+;;                        (fboundp 'json-parse-buffer))
+;;                   'json-parse-buffer
+;;                 'json-read)
+;;               :around #'lsp-booster--advice-json-parse)
+;;   (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+
+;; (use-package lsp-mode
+;;   :straight t)
+
