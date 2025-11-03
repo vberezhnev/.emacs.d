@@ -1,4 +1,4 @@
-; Disable package loading at startup (already present, kept for clarity)
+					; Disable package loading at startup (already present, kept for clarity)
 (setq package-enable-at-startup nil)
 
 ;; Optimize garbage collection and process output (unchanged)
@@ -87,7 +87,7 @@
 ;; Font settings (unchanged)
 (set-face-attribute
  'default nil
- :family "Aporetic Sans Mono" ;; Iosevka
+ :family "Iosevka" ;; Aporetic Sans Mono
  :height 150)
 
 ;; System-packages: Load only when commands are invoked
@@ -244,9 +244,9 @@
   ;; :commands (change-theme)
   :demand t
   :init
-  (setq calendar-location-name "Vladivostok, RU"
-        calendar-latitude 43.11
-        calendar-longitude 131.88)
+  (setq calendar-location-name "Tianjin, CN"
+	calendar-latitude 39.13
+	calendar-longitude 117.20)
   :config
   ;; (load-file "~/.emacs.d/lisp/themes/twitch-dark-theme.el") ;; Load theme lazily
   (change-theme 'leuven 'modus-vivendi)) ;; dichromacy | cobrakai
@@ -449,7 +449,7 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag))
   :config
-  
+
   (use-package treemacs-evil
     :after (treemacs evil)
     :straight t)
@@ -481,6 +481,23 @@
   (zoom-mode 1)
   (setq zoom-size '(0.618 . 0.618)))
 (global-set-key (kbd "C-x +") 'zoom)
+
+(use-package hl-todo
+  :straight t
+  :config
+  (setq hl-todo-keyword-faces
+	'(("TODO"   . "#FF0000")
+          ("FIXME"  . "#FF0000")
+          ("DEBUG"  . "#A020F0")
+          ("STUB"   . "#1E90FF")))
+
+  (with-eval-after-load 'magit
+    (add-hook 'magit-log-wash-summary-hook
+              #'hl-todo-search-and-highlight t)
+    (add-hook 'magit-revision-wash-message-hook
+              #'hl-todo-search-and-highlight t))
+
+  (setq global-hl-todo-mode 1))
 
 ;; Load external files (unchanged, but ensure they respect lazy-loading)
 (load-file "~/.emacs.d/lisp/evil.el")

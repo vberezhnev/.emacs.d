@@ -38,12 +38,16 @@
 	org-duration-format 'h:mm
 	org-log-redeadline t
 	org-log-reschedule t
-	org-tag-alist '(("@chinese" . ?c)
-			("@core" . ?r)
-			("@ascent" . ?a)
-			("@idea" . ?i)
-			("@rust" . ?t)
-			("@solana" . ?s)))
+	org-tag-alist '(("interviewing" . ?i)
+			("@programming" . ?p)
+			;; ("c" . c)
+			("c++" . ?C)
+			("rust" . ?t)
+			("nestjs" . ?n)
+			("solana" . ?s)
+			("@idea" . ?I)
+			("@philosophy" . ?P)
+			("@math" . ?m)))
   :config
   (with-eval-after-load 'org
     (setq org-confirm-babel-evaluate nil)
@@ -326,7 +330,7 @@
 ;; Org-gtd: Load for GTD workflows
 (use-package org-gtd
   :straight (:type git :host github :repo "Trevoke/org-gtd.el")
-  :after org
+  ;; :after org
   ;; :commands (org-gtd-capture org-gtd-engage org-gtd-engage-grouped-by-context org-gtd-process-inbox org-gtd-organize)
   :bind (("C-c d c" . org-gtd-capture)
          ("C-c d e" . org-gtd-engage)
@@ -407,10 +411,16 @@
 ;; (load-file "~/.emacs.d/lisp/packages/org-popup-posframe/org-popup-posframe.el")
 ;; (org-popup-posframe-mode 1)
 
-(use-package repeat-todo
+;; (use-package repeat-todo
+;;   :straight (:host github
+;; 		   :repo "cashpw/repeat-todo"
+;; 		   :branch "main")
+;;   :after org)
+
+(use-package org-habit-plus
   :straight (:host github
-		   :repo "cashpw/repeat-todo"
-		   :branch "main")
+		   :repo "myshevchuk/org-habit-plus"
+		   :branch "master")
   :after org)
 
 (use-package org-timeblock
@@ -424,6 +434,7 @@
 (setq org-timeblock-inbox-file "~/Org/agenda/timeblock.org")
 (setq org-timeblock-span 7)
 (setq org-timeblock-scale-options '(7 . 25))
+(setq org-timeblock-show-future-repeats t)
 
 (use-package org-contacts
   :straight t
@@ -437,5 +448,36 @@
 ;;   :config
 ;;   (setq org-upcoming-modeline-format (lambda (ms mh) (format "📅 %s - %s" ms mh))))
 
+
+
+
+;; нахуй этот ваш org-clock-in
+;; (with-eval-after-load 'org
+;;   (define-key org-mode-map (kbd "C-c C-x C-i") nil)
+;;   (define-key org-mode-map (kbd "C-c C-x C-o") nil))
+;; (setq org-clock-auto-clockout-timer nil)
+;; (setq org-clock-mode-line-total 'none)
+;; (setq org-clock-persist nil)
+;; (setq org-clock-into-drawer nil)
+
+(use-package dash
+  :straight t)
+ 
+(use-package org-now
+  :straight (:host github :repo "alphapapa/org-now" :branch "master" :files ("*.el" "out"))
+  :after org  ;; Убедитесь, что org-mode загружен перед org-now
+  :config
+  (setq org-now-location '("~/Org/agenda/GTD/org-gtd-tasks.org" "TASKS IN PROGRESS"))
+  (setq org-now-window-side 'right)  ;; Показывать панель справа
+  ;; (setq org-now-default-cycle-level 2)  ;; Уровень раскрытия заголовков
+  ;; (setq org-now-no-other-window t)  ;; Не переключаться на панель через `other-window`
+  ;; Привязка клавиш
+  :general
+  (:keymaps 'org-mode-map
+            :prefix "M-SPC"
+            "rl" #'org-now-link
+            "rn" #'org-now-refile-to-now
+            "rp" #'org-now-refile-to-previous-location))
+ 
 (provide 'org-mode)
 ;;; org-mode.el ends here

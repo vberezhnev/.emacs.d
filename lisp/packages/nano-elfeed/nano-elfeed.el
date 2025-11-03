@@ -149,6 +149,7 @@
     ("Rust - Хабр" . ,(or (nano-elfeed-make-icon "habr") (cons "Habr" "Habr")))
     ("Научно-популярное - Хабр" . ,(or (nano-elfeed-make-icon "habr") (cons "Habr" "Habr")))
     ("Астрономия - Хабр" . ,(or (nano-elfeed-make-icon "habr") (cons "Habr" "Habr")))
+    ("Space.com" . ,(or (nano-elfeed-make-icon "rss") (cons "RSS" "RSS")))
     ("Rust Blog" . ,(or (nano-elfeed-make-icon "rss") (cons "RSS" "RSS")))
     ("Terminally Incoherent" . ,(or (nano-elfeed-make-icon "rss") (cons "RSS" "RSS")))
     ("null program" . ,(or (nano-elfeed-make-icon "rss") (cons "RSS" "RSS")))

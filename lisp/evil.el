@@ -229,8 +229,8 @@
   (evil-set-initial-state 'enlight-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal)
 
-  (evil-set-initial-state 'org-timeblock-mode 'normal)
-  (evil-set-initial-state 'org-timeblock-list-mode 'normal)
+  (evil-set-initial-state 'org-timeblock-mode 'emacs)
+  (evil-set-initial-state 'org-timeblock-list-mode 'emacs)
 
   (evil-set-initial-state 'treemacs-mode 'normal)
   (evil-set-initial-state 'xwidget-webkit-mode 'emacs)

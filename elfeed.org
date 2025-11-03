@@ -129,6 +129,7 @@
 *** [[https://habr.com/ru/rss/hubs/popular_science/articles/?fl=ru][Научно-популярное - Хабр]]                                         :habr:
 *** Astronomy                                                   :astronomy:
 **** [[https://habr.com/ru/rss/hubs/astronomy/articles/?fl=ru][Астрономия - Хабр]]
+**** [[https://www.space.com/feeds.xml][Space.com]]
 ** Podcasts                                                       :podcasts:
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCSHZKyawb77ixDdsGog4iWA][Lex Fridman]]                                                   :youtube:
 :PROPERTIES:

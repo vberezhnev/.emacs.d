@@ -19,82 +19,6 @@
   (load-file "~/Templates2/Lisp/better-org-habbit/better-org-habit-custom.el")
   (load-file "~/Templates2/Lisp/better-org-habbit/better-org-habit-stats.el")
   (load-file "~/Templates2/Lisp/better-org-habbit/better-org-habit.el")
-
-  (setq hq-categories
-        '((:name "CHINESE" :color "#FF4500" :xp 60 :gold 30)  ; Самые высокие награды
-          (:name "ASCENT" :color "#4CAF50" :xp 40 :gold 15)   ; Высокие награды
-          (:name "CORE" :color "#FFD700" :xp 35 :gold 10)     ; Средние награды
-          (:name "PERSONAL" :color "#6A5ACD" :xp 20 :gold 8))) ; Низкие награды
-
-  ;; Настройка категорий магазина
-  (setq hq-market-categories
-        '((:id "rest" :name "Rest" :icon "🌟" :description "Способы отдохнуть и восстановиться")
-          (:id "entertainment" :name "Entertainment" :icon "🎮" :description "Развлечения")
-          (:id "learning" :name "Learning" :icon "📚" :description "Ресурсы для саморазвития и китайского")
-          (:id "bonus" :name "Bonuses" :icon "✨" :description "Особые привилегии")
-          (:id "rare" :name "Rare Items" :icon "💎" :description "Уникальные предметы")))
-
-  ;; Настройка предметов магазина
-  (setq hq-market-items
-        '((:id "break-30" :name "30-минутный перерыв" :cost 30 :category "rest"
-               :description "Короткий перерыв для отдыха" :use-message "Расслабьтесь и восстановитесь!")
-          (:id "break-60" :name "Часовой отдых" :cost 50 :category "rest"
-               :description "Полный час отдыха" :use-message "Наслаждайтесь отдыхом!")
-          (:id "nap" :name "Короткий сон" :cost 80 :category "rest"
-               :description "15-20 минут сна для восстановления" :use-message "Освежающий сон!")
-          (:id "episode" :name "Эпизод сериала" :cost 60 :category "entertainment"
-               :description "Посмотрите эпизод любимого сериала" :use-message "Приятного просмотра!")
-          (:id "movie" :name "Фильм" :cost 100 :category "entertainment"
-               :description "Посмотрите полнометражный фильм" :use-message "Наслаждайтесь фильмом!")
-          (:id "chinese-lesson" :name "Урок китайского" :cost 80 :category "learning"
-               :description "Дополнительный урок塞尔: 30-минутный урок китайского" :use-message "Учитесь с удовольствием!")
-          (:id "self-study" :name "Час саморазвития" :cost 70 :category "learning"
-               :description "Час на чтение или курсы" :use-message "Развивайтесь дальше!")
-          (:id "delay-1h" :name "Отложить задачу на час" :cost 70 :category "bonus"
-               :description "Отложить задачу на 1 час" :use-message "Задача отложена на час!")
-          (:id "music" :name "Музыка во время работы" :cost 30 :category "bonus"
-               :description "Час музыки во время работы" :use-message "Наслаждайтесь музыкой!")
-          (:id "late-wake" :name "Поздний подъём" :cost 150 :category "bonus"
-               :description "Разрешение встать на час позже" :use-message "Поспите подольше!")
-          (:id "day-off" :name "Выходной день" :cost 500 :category "rare"
-               :description "Полный выходной от всех задач" :discountable nil
-               :use-message "Наслаждайтесь заслуженным выходным!")
-          (:id "weekend" :name "Игровой уикенд" :cost 1000 :category "rare"
-               :description "Уикенд для игр" :discountable nil
-               :use-message "Весёлого игрового уикенда!")))
-
-  ;; Настройка квестов
-  (setq hq-quests
-        '((:id 1 :name "Путь к осознанности"
-               :description "Выполняйте все три медитации 5 дней подряд"
-               :habits ("🌿 - Вечерняя медитация" "🧘 - Утренняя медитация" "🌙 - Дневная медитация")
-               :required 5 :progress 0 :completed nil
-               :reward-xp 200 :reward-gold 100)
-          (:id 2 :name "Ранний подъём"
-               :description "Просыпайтесь в 07:00 7 дней подряд"
-               :habits ("⏰ - Проснуться в 07:00")
-               :required 7 :progress 0 :completed nil
-               :reward-xp 250 :reward-gold 120)
-          (:id 3 :name "Здоровый баланс"
-               :description "Пейте 2 литра воды и делайте 10к шагов 10 дней подряд"
-               :habits ("💧 - 2 литра воды" "🚶 - 10к шагов")
-               :required 10 :progress 0 :completed nil
-               :reward-xp 350 :reward-gold 150)
-          (:id 4 :name "Мастер китайского"
-               :description "Изучайте китайский 7 дней подряд"
-               :habits ("📚 - Изучение китайских слов" "✍️ - Практика китайской грамматики" "🎧 - Аудирование на китайском")
-               :required 7 :progress 0 :completed nil
-               :reward-xp 500 :reward-gold 300)
-          (:id 5 :name "Саморазвитие"
-               :description "Работайте над саморазвитием 5 дней подряд"
-               :habits ("📖 - Чтение проф. литературы" "🎓 - Онлайн-курсы")
-               :required 5 :progress 0 :completed nil
-               :reward-xp 400 :reward-gold 200)
-          (:id 6 :name "Режим сна"
-               :description "Соблюдайте режим сна и принимайте БАДы 7 дней подряд"
-               :habits ("😴 - Соблюдение режима сна" "💊 - БАДы")
-               :required 7 :progress 0 :completed nil
-               :reward-xp 300 :reward-gold 150)))
   (hq-setup))
 
 (defun my/org-super-agenda-date-in-n-days (days)
@@ -192,7 +116,7 @@
 	  ;; 		  ((org-agenda-overriding-header "\n✅ Completed today\n")
 	  ;; 		   (org-agenda-remove-tags t)))
 	  ;; 	    (gtd-add-progress-info-to-agenda ""))))
-	  
+
 	  ;; Eisenhower Matrix — сортировка задач по важности и срочности:
 	  ;; Q1 (🔥🚨 Urgent & Important): задачи с высокой приоритетностью (B или выше) и ближайшими дедлайнами или запланированные на ближайшее время.
 	  ;; Q2 (🌟📋 Not Urgent & Important): важные, но не срочные задачи, без ближайших дедлайнов и не запланированные.
@@ -208,28 +132,40 @@
                     ((org-agenda-span 'day)
                      (org-agenda-remove-tags t)
                      (org-agenda-sorting-strategy '(priority-down deadline-up category-keep))
-		     (org-agenda-prefix-format "  ∘ %t %s")
+		     ;; (org-agenda-prefix-format "  ∘ %t %s")
+
+		     (org-agenda-prefix-format
+		      '((agenda . "%?-12t% s")
+			(todo . "%-10s")
+			(tags . "%t %-10c | %s")
+			(search . "%c %t %s")))
+		     (org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:"))
+		     (org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:"))
+
                      (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
                      (org-super-agenda-groups
                       `((:name "🔥🚨 Q1: Urgent & Important"
                                :order 1
                                :face (:background "#FF4500" :foreground "white" :weight bold)
-                               :and (:priority>= "B" :deadline (before ,(my/org-super-agenda-date-in-n-days 3)))
-                               :and (:category ("CHINESE" "CORE") :deadline (before ,(my/org-super-agenda-date-in-n-days 3)))
-                               :and (:priority>= "B" :scheduled (before ,(my/org-super-agenda-date-in-n-days 3)))
-                               :and (:category ("CHINESE" "CORE") :scheduled (before ,(my/org-super-agenda-date-in-n-days 3))))
+                               :and (:priority>= "B" :deadline (before ,(my/org-super-agenda-date-in-n-days 7)))
+                               :and (:category ("CORE") :deadline (before ,(my/org-super-agenda-date-in-n-days 7)))
+                               :and (:priority>= "B" :scheduled (before ,(my/org-super-agenda-date-in-n-days 7)))
+                               :and (:category ("CORE") :scheduled (before ,(my/org-super-agenda-date-in-n-days 7))))
+
 			(:name "🌟📋 Q2: Not Urgent & Important"
                                :order 2
                                :face (:background "#FFD700" :foreground "black" :weight bold)
                                :and (:priority>= "B" :not (:deadline t) :not (:scheduled t))
-                               :and (:category ("CHINESE" "CORE") :not (:deadline t) :not (:scheduled t)))
-			(:name "⏰⚠️ Q3: Urgent & Not Important"
-                               :order 3
+                               :and (:category ("CORE") :not (:deadline t) :not (:scheduled t)))
+
+			(:name "⏰⚠️ Q7: Urgent & Not Important"
+                               :order 7
                                :face (:background "#6A5ACD" :foreground "white")
-                               :and (:priority<= "C" :deadline (before ,(my/org-super-agenda-date-in-n-days 3)))
-                               :and (:category ("ASCENT" "PERSONAL") :deadline (before ,(my/org-super-agenda-date-in-n-days 3)))
-                               :and (:priority<= "C" :scheduled (before ,(my/org-super-agenda-date-in-n-days 3)))
-                               :and (:category ("ASCENT" "PERSONAL") :scheduled (before ,(my/org-super-agenda-date-in-n-days 3))))
+                               :and (:priority<= "C" :deadline (before ,(my/org-super-agenda-date-in-n-days 7)))
+                               :and (:category ("ASCENT" "PERSONAL") :deadline (before ,(my/org-super-agenda-date-in-n-days 7)))
+                               :and (:priority<= "C" :scheduled (before ,(my/org-super-agenda-date-in-n-days 7)))
+                               :and (:category ("ASCENT" "PERSONAL") :scheduled (before ,(my/org-super-agenda-date-in-n-days 7))))
+
 			(:name "🌿📝 Q4: Not Urgent & Not Important"
                                :order 4
                                :face (:background "#4CAF50" :foreground "white")
@@ -237,13 +173,13 @@
                                :and (:category ("ASCENT" "PERSONAL") :not (:deadline t) :not (:scheduled t)))
 			(:discard (:todo ("DONE" "CANCELLED")))))))
             (alltodo ""
-                     ((org-agenda-overriding-header "📋 Tasks without dates")
+                     ((org-agenda-overriding-header "🌿📋 Tasks without dates")
                       (org-super-agenda-groups
                        `((:name "🌟📋 Q2: Not Urgent & Important"
 				:order 2
 				:face (:background "#FFD700" :foreground "black" :weight bold)
 				:and (:priority>= "B" :not (:deadline t) :not (:scheduled t))
-				:and (:category ("CHINESE" "CORE") :not (:deadline t) :not (:scheduled t)))
+				:and (:category ("CORE") :not (:deadline t) :not (:scheduled t)))
 			 (:name "🌿📝 Q4: Not Urgent & Not Important"
 				:order 4
 				:face (:background "#4CAF50" :foreground "white")
@@ -331,14 +267,21 @@
 			(org-super-agenda-groups
 			 '((:name "📅📌 CORE Tasks"
                                   :category "CORE"
-                                  :face (:background "#F5E0A9" :foreground "black" :weight bold))))))))
-	  
+                                  :face (:background "#F5E0A9" :foreground "black" :weight bold))
+			   (:name "📅📌 ASCENT Tasks"
+                                  :category "ASCENT"
+                                  :face (:background "#F5E0A9" :foreground "black" :weight bold))
+			   ))))))
+
 	  ("w" "✅ Weekly Completed Tasks"
 	   ((tags "TODO=\"DONE\"&CLOSED>=\"<-1w>\"")))
 
 	  ("m" "📅 Monthly Completed Tasks"
-	   ((tags "TODO=\"DONE\"&CLOSED>=\"<-1m>\"")))
-	  ))
+	   ((tags "TODO=\"DONE\"&CLOSED>=\"<-1m>\""
+		  ((org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
+				       "~/Org/agenda/GTD/gtd_archive_2025"
+				       "~/Org/agenda/GTD/gtd_archive_2024"
+				       "~/Org/agenda/GTD/org-gtd-tasks.org_archive"))))))))
 
   (defun my/style-org-agenda()
     (set-face-attribute 'org-agenda-date nil :height 1.5)
@@ -350,7 +293,7 @@
   "Create a dedicated time tracking view with colorful styling."
   (let* ((day-of-week (upcase (format-time-string "%^a")))
 	 (required-property (concat "REQUIRED_TIME_" day-of-week))
-	 (categories '("CHINESE" "CORE" "ASCENT"))
+	 (categories '("CORE" "ASCENT"))
 	 (today-start (format-time-string "%Y-%m-%d"))
 	 (today-end (format-time-string "%Y-%m-%d" (time-add (current-time) 86400))))
     (org-agenda-prepare "Time Tracking")
@@ -413,7 +356,7 @@
 			   0.0))
 	       (cat-color
 		(cond
-		 ((string= category "CHINESE") "#FF4500")
+		 ;; ((string= category "CHINESE") "#FF4500")
 		 ((string= category "CORE") "#CE412B")
 		 ((string= category "ASCENT") "#32CD32")
 		 (t "#333333"))))
