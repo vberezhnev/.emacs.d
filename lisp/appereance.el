@@ -26,6 +26,18 @@
   ;; :commands (doom-modeline-mode)
   :hook (after-init . doom-modeline-mode) ;; Load after init to ensure UI is ready
   :config
+  (doom-modeline-def-segment my-org-agenda
+    "Show org agenda alerts in mode-line"
+    (concat
+     (when (> my/agenda-overdue 0)
+       (propertize (format " 🔥%d" my/agenda-overdue)
+                   'face '(:foreground "#ff6c6b")))
+     (when (> my/agenda-today 0)
+       (propertize (format " ⏳%d" my/agenda-today)
+                   'face '(:foreground "#ECBE7B")))
+     (when (> my/agenda-soon 0)
+       (propertize (format " 📌%d" my/agenda-soon)
+                   'face '(:foreground "#51afef")))))
   (display-battery-mode t)
   (display-time-mode t)
   (setq display-time-format "%H:%M"
@@ -54,6 +66,15 @@
   ;;   '(time battery major-mode misc-info process vcs))
   ;; (doom-modeline-set-modeline 'my-custom-modeline t)
   )
+
+;; (doom-modeline-def-modeline 'my-line
+;;   '(bar my-org-agenda workspace-name window-number modals matches buffer-info)
+;;   '(misc-info major-mode process vcs check))
+
+;; (add-hook 'doom-modeline-mode-hook
+;;           (lambda ()
+;;             (doom-modeline-set-modeline 'my-line 'default)))
+
 
 ;; Ligature: Load for programming and eww modes
 ;; (use-package ligature
