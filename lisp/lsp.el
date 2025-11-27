@@ -198,38 +198,47 @@
   :config
   (define-derived-mode typescriptreact-mode typescript-mode "TypeScript TSX"))
 
-(use-package tide
-  :ensure t
-  :mode (("\\.ts\\'" . typescript-ts-mode)
-         ("\\.tsx\\'" . typescript-ts-mode))
-  :after (company flycheck)
-  :hook ((typescript-ts-mode . tide-setup)
-         (tsx-ts-mode . tide-setup)
-         (typescript-ts-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save)))
+;; (use-package tide
+;;   :ensure t
+;;   :mode (("\\.ts\\'" . typescript-ts-mode)
+;;          ("\\.tsx\\'" . typescript-ts-mode))
+;;   :after (company flycheck)
+;;   :hook ((typescript-ts-mode . tide-setup)
+;;          (tsx-ts-mode . tide-setup)
+;;          (typescript-ts-mode . tide-hl-identifier-mode)
+;;          (before-save . tide-format-before-save)))
 
-(defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  ;; company is an optional dependency. You have to
-  ;; install it separately via package-install
-  ;; `M-x package-install [ret] company`
-  (company-mode +1))
+;; (defun setup-tide-mode ()
+;;   (interactive)
+;;   (tide-setup)
+;;   (flycheck-mode +1)
+;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
+;;   (eldoc-mode +1)
+;;   (tide-hl-identifier-mode +1)
+;;   ;; company is an optional dependency. You have to
+;;   ;; install it separately via package-install
+;;   ;; `M-x package-install [ret] company`
+;;   (company-mode +1))
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 
 ;; formats the buffer before saving
-(add-hook 'before-save-hook 'tide-format-before-save)
+;; (add-hook 'before-save-hook 'tide-format-before-save)
 
 ;; if you use typescript-mode
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
+;; (add-hook 'typescript-mode-hook #'setup-tide-mode)
 ;; if you use treesitter based typescript-ts-mode (emacs 29+)
-(add-hook 'typescript-ts-mode-hook #'setup-tide-mode)
+;; (add-hook 'typescript-ts-mode-hook #'setup-tide-mode)
+
+(use-package eglot
+  :straight (:type built-in)
+  :hook ((typescript-mode typescript-ts-mode) . eglot-ensure)
+  :config
+  (setq eglot-autoshutdown t)
+  (add-to-list 'eglot-server-programs
+               '((typescript-mode typescript-ts-mode) .
+                 ("typescript-language-server" "--stdio"))))
 
 ;; Format-all: Load on demand
 (use-package format-all

@@ -30,10 +30,10 @@
    '(magit-diff-removed ((t (:background "#4f3d3d" :foreground "#e06c75"))))))
 
 ;; Conventional-commit: Load for git commit mode
-(use-package conventional-commit
-  :straight (:type git :host github :repo "akirak/conventional-commit.el" :branch "master")
-  :commands (conventional-commit-setup)
-  :hook (git-commit-mode . conventional-commit-setup))
+;; (use-package conventional-commit
+;;   :straight (:type git :host github :repo "akirak/conventional-commit.el" :branch "master")
+;;   :commands (conventional-commit-setup)
+;;   :hook (git-commit-mode . conventional-commit-setup))
 
 ;; Magit-todos: Load after magit
 (use-package magit-todos
@@ -91,21 +91,46 @@
 (use-package gptel-magit
   :load-path "~/.emacs.d/lisp/packages/"
   ;; :after (gptel magit)
-  ;; :commands (gptel-magit-generate-message gptel-magit-install)
-  :bind (:map git-commit-mode-map
-         ("M-g" . gptel-magit-generate-message))
-  :hook (magit-mode . gptel-magit-install)
-  :init
-  (setq gptel-api-key "7995a988739243c6969c5653218cb330"
-        gptel-max-tokens 8024
-        gptel-verbose t)
+	:init
+  (setq gptel-api-key (getenv "AIML_API"))
+  (setq gptel-max-tokens 8024)
+	(setq gptel-verbose t)
   :config
-  (setq gptel-magit-model 'mistral-nemo:12b
-        gptel-magit-backend
-        (gptel-make-ollama "Ollama"
-                           :host "localhost:11434"
-                           :models '(mistral-nemo:12b)
-                           :stream t)))
+  (setq gptel-magit-model 'gpt-4o)
+  (setq gptel-magit-backend
+        (gptel-make-openai "AIMLAPI"
+          :host "api.aimlapi.com"
+          :endpoint "/chat/completions"
+          :stream nil
+          :key (getenv "AIML_API")
+          :models '(gpt-4o)))
+	  (gptel-magit-install)
+
+  :bind (:map git-commit-mode-map
+              ("M-g" . gptel-magit-generate-message))
+  :hook
+  (magit-mode . gptel-magit-install))
+
+;; (use-package gptel-magit
+;;   :load-path "~/.emacs.d/lisp/packages/"
+;;   :hook (magit-mode . gptel-magit-install)
+;;   ;; :after (gptel magit)
+;;   ;; :commands (gptel-magit-generate-message gptel-magit-install)
+;;   :bind (:map git-commit-mode-map
+;;          ("M-g" . gptel-magit-generate-message))
+;;   :hook (magit-mode . gptel-magit-install)
+;;   :init
+;;   (setq gptel-api-key "7995a988739243c6969c5653218cb330"
+;;         gptel-max-tokens 8024
+;;         gptel-verbose t)
+;;   :config
+;;   ;; (setq gptel-magit-model 'mistral-nemo:12b
+;;   ;;       gptel-magit-backend
+;;   ;;       (gptel-make-ollama "Ollama"
+;;   ;;                          :host "localhost:11434"
+;;   ;;                          :models '(mistral-nemo:12b)
+;;   ;;                          :stream t))
+;;   )
 
 (use-package forge
    :straight t)
