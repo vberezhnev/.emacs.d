@@ -1,4 +1,4 @@
-					; Disable package loading at startup (already present, kept for clarity)
+; Disable package loading at startup (already present, kept for clarity)
 (setq package-enable-at-startup nil)
 
 ;; Optimize garbage collection and process output (unchanged)
@@ -87,8 +87,8 @@
 ;; Font settings (unchanged)
 (set-face-attribute
  'default nil
- :family "Iosevka" ;; Aporetic Sans Mono
- :height 150)
+ :family "Aporetic Sans Mono" ;; IosevkaTerm Nerd Font
+ :height 160)
 
 ;; System-packages: Load only when commands are invoked
 (use-package system-packages
@@ -97,8 +97,8 @@
   :defer t)
 
 ;; Elpa-mirror: Configure only when package.el is used
-(use-package elpa-mirror
-  :straight t)
+;; (use-package elpa-mirror
+;;   :straight t)
 
 ;; All-the-icons: Load only in graphical mode
 (use-package all-the-icons
@@ -180,33 +180,33 @@
         leetcode-directory "~/leetcode"))
 
 ;; Whisper: Load when whisper commands are used
-(use-package whisper
-  :straight (:host github :repo "natrys/whisper.el" :branch "master")
-  :commands (whisper-run whisper-transcribe)
-  :defer t
-  :config
-  (setq whisper-install-directory "/tmp/"
-        whisper-model "large-v3-turbo"
-        whisper-quantize "q5_0"
-        whisper-language "ru"
-        whisper-translate nil
-        whisper-use-threads (/ (num-processors) 2)))
+;; (use-package whisper
+;;   :straight (:host github :repo "natrys/whisper.el" :branch "master")
+;;   :commands (whisper-run whisper-transcribe)
+;;   :defer t
+;;   :config
+;;   (setq whisper-install-directory "/tmp/"
+;;         whisper-model "large-v3-turbo"
+;;         whisper-quantize "q5_0"
+;;         whisper-language "ru"
+;;         whisper-translate nil
+;;         whisper-use-threads (/ (num-processors) 2)))
 
-;; Whisper hook (unchanged)
-(defun whisper--break-sentences (n)
-  "Put a paragraph break every N sentences."
-  (catch 'return
-    (while t
-      (dotimes (_ n)
-        (forward-sentence 1)
-        (when (eobp) (throw 'return nil)))
-      (insert "\n\n")
-      (when (= (char-after) ?\ )
-        (delete-horizontal-space)))))
+;; ;; Whisper hook (unchanged)
+;; (defun whisper--break-sentences (n)
+;;   "Put a paragraph break every N sentences."
+;;   (catch 'return
+;;     (while t
+;;       (dotimes (_ n)
+;;         (forward-sentence 1)
+;;         (when (eobp) (throw 'return nil)))
+;;       (insert "\n\n")
+;;       (when (= (char-after) ?\ )
+;;         (delete-horizontal-space)))))
 
-(add-hook 'whisper-post-process-hook
-          (lambda ()
-            (whisper--break-sentences 8)))
+;; (add-hook 'whisper-post-process-hook
+;;           (lambda ()
+;;             (whisper--break-sentences 8)))
 
 ;; TRAMP and mode-line settings (unchanged)
 (setq tramp-ssh-controlmaster-options "")
@@ -254,84 +254,84 @@
 (use-package beacon
   :straight t)
 
-(use-package chess
-  :straight t)
+;; (use-package chess
+;;   :straight t)
 
-(use-package alert
-  :straight t) ;; dep for telega-alert
+;; (use-package alert
+;;   :straight t) ;; dep for telega-alert
 
-(use-package telega
-  :straight (:host github :repo "zevlg/telega.el" :branch "master")
-  :config
+;; (use-package telega
+;;   :straight (:host github :repo "zevlg/telega.el" :branch "master")
+;;   :config
 
-  (add-hook 'after-init-hook 'telega-notifications-mode)
+;;   (add-hook 'after-init-hook 'telega-notifications-mode)
 
-  (setq telega-use-docker t)
-  (add-hook 'telega-root-mode-hook
-            (lambda ()
-              (hl-line-mode 1)  ;; Включить hl-line-mode
-              (evil-local-mode -1)  ;; Отключить evil-mode
-              (telega-view-two-lines)))  ;; Двухстрочный вид
-  (add-hook 'telega-chat-mode-hook
-            (lambda ()
-	      ;; (company-mode 1)
-	      ;; (telega-company-emoji 1)
-	      ;; (telega-company-username t)
-              (hl-line-mode 1)  ;; Включить hl-line-mode
-              (evil-local-mode -1)))  ;; Отключить evil-mode
-  ;; Стилизация под Telegram Desktop (тёмная тема)
-  (set-face-attribute 'telega-box-button nil
-                      :background "#17212B"
-                      :foreground "#E1E1E1"
-                      :height 1.4
-                      :box nil)
-  (set-face-attribute 'telega-box-button-active nil
-                      :background "#2B3744"
-                      :foreground "#FFFFFF"
-                      :height 1.4
-                      :box nil)
-  (set-face-attribute 'telega-root-heading nil
-                      :background "#17212B"
-                      :foreground "#4B8EFF"
-                      :height 1.4
-                      ;; :weight bold
-		      )
-  ;; (set-face-attribute 'default nil
-  ;;                     :background "#17212B"
-  ;;                     :foreground "#E1E1E1")
-  ;; (set-face-attribute 'hl-line nil
-  ;;                     :background "#2B3744"
-  ;;                     :foreground nil
-  ;;                     :inherit nil)
-  (set-fontset-font t 'emoji "Noto Color Emoji" nil 'prepend)
-  ;; Кастомное лицо для иконок
-  (defface telega-icon
-    '((t :family "Noto Color Emoji" :height 1.6 :foreground "#E1E1E1"))
-    "Face for icons in telega root buffer.")
-  (defun telega-custom-icon-inserter (icon)
-    "Insert ICON with telega-icon face."
-    (propertize icon 'face 'telega-icon))
-  (setq telega-folder-icons-alist
-        `(("Channels" . ,(telega-custom-icon-inserter "🔊"))
-          ("Groups" . ,(telega-custom-icon-inserter "👪"))
-          ("Private" . ,(telega-custom-icon-inserter "🙋"))
-          ("Main" . ,(telega-custom-icon-inserter "📢"))))
-  (setq telega-root-fill-column 110)
-  (setq telega-root-auto-fill-mode nil)
-  (setq face-font-rescale-alist nil)
-  (setq telega-auto-download-mode t)
-  (setq telega-emoji-use-images nil)
-  ;; (add-hook 'telega-load-hook 'global-telega-url-shorted-)
+;;   (setq telega-use-docker t)
+;;   (add-hook 'telega-root-mode-hook
+;;             (lambda ()
+;;               (hl-line-mode 1)  ;; Включить hl-line-mode
+;;               (evil-local-mode -1)  ;; Отключить evil-mode
+;;               (telega-view-two-lines)))  ;; Двухстрочный вид
+;;   (add-hook 'telega-chat-mode-hook
+;;             (lambda ()
+;; 	      ;; (company-mode 1)
+;; 	      ;; (telega-company-emoji 1)
+;; 	      ;; (telega-company-username t)
+;;               (hl-line-mode 1)  ;; Включить hl-line-mode
+;;               (evil-local-mode -1)))  ;; Отключить evil-mode
+;;   ;; Стилизация под Telegram Desktop (тёмная тема)
+;;   (set-face-attribute 'telega-box-button nil
+;;                       :background "#17212B"
+;;                       :foreground "#E1E1E1"
+;;                       :height 1.4
+;;                       :box nil)
+;;   (set-face-attribute 'telega-box-button-active nil
+;;                       :background "#2B3744"
+;;                       :foreground "#FFFFFF"
+;;                       :height 1.4
+;;                       :box nil)
+;;   (set-face-attribute 'telega-root-heading nil
+;;                       :background "#17212B"
+;;                       :foreground "#4B8EFF"
+;;                       :height 1.4
+;;                       ;; :weight bold
+;; 		      )
+;;   ;; (set-face-attribute 'default nil
+;;   ;;                     :background "#17212B"
+;;   ;;                     :foreground "#E1E1E1")
+;;   ;; (set-face-attribute 'hl-line nil
+;;   ;;                     :background "#2B3744"
+;;   ;;                     :foreground nil
+;;   ;;                     :inherit nil)
+;;   (set-fontset-font t 'emoji "Noto Color Emoji" nil 'prepend)
+;;   ;; Кастомное лицо для иконок
+;;   (defface telega-icon
+;;     '((t :family "Noto Color Emoji" :height 1.6 :foreground "#E1E1E1"))
+;;     "Face for icons in telega root buffer.")
+;;   (defun telega-custom-icon-inserter (icon)
+;;     "Insert ICON with telega-icon face."
+;;     (propertize icon 'face 'telega-icon))
+;;   (setq telega-folder-icons-alist
+;;         `(("Channels" . ,(telega-custom-icon-inserter "🔊"))
+;;           ("Groups" . ,(telega-custom-icon-inserter "👪"))
+;;           ("Private" . ,(telega-custom-icon-inserter "🙋"))
+;;           ("Main" . ,(telega-custom-icon-inserter "📢"))))
+;;   (setq telega-root-fill-column 110)
+;;   (setq telega-root-auto-fill-mode nil)
+;;   (setq face-font-rescale-alist nil)
+;;   (setq telega-auto-download-mode t)
+;;   (setq telega-emoji-use-images nil)
+;;   ;; (add-hook 'telega-load-hook 'global-telega-url-shorted-)
 
-  (with-eval-after-load 'telega
-    (load-file "~/.emacs.d/lisp/packages/telega/telega-alert.el")
-    (load-file "~/.emacs.d/lisp/packages/telega/telega-emacs-stories.el")
-    (load-file "~/.emacs.d/lisp/packages/telega/telega-url-shorten.el"))
-  (require 'telega-emacs-stories)
-  (require 'telega-alert)
-  (telega-emacs-stories-mode 1)
-  (define-key telega-root-mode-map (kbd "v e") 'telega-view-emacs-stories)
-  (telega-alert-mode 1))
+;;   (with-eval-after-load 'telega
+;;     (load-file "~/.emacs.d/lisp/packages/telega/telega-alert.el")
+;;     (load-file "~/.emacs.d/lisp/packages/telega/telega-emacs-stories.el")
+;;     (load-file "~/.emacs.d/lisp/packages/telega/telega-url-shorten.el"))
+;;   (require 'telega-emacs-stories)
+;;   (require 'telega-alert)
+;;   (telega-emacs-stories-mode 1)
+;;   (define-key telega-root-mode-map (kbd "v e") 'telega-view-emacs-stories)
+;;   (telega-alert-mode 1))
 
 (use-package ace-link
   :config
@@ -392,8 +392,8 @@
 ;;   (setq display-wttr-locations '("Vladivostok")
 ;;         display-wttr-format "%c:+%t"))
 
-(defun set-org-timer-to-2340 ()
-  "Calculate time until 23:40:00 and set org-timer in HH:MM:SS format."
+(defun set-org-timer-to-2200 ()
+  "Calculate time until 22:00:00 and set org-timer in HH:MM:SS format."
   (interactive)
   (require 'org-timer)
   (let* ((current-time (decode-time (current-time)))
@@ -401,30 +401,29 @@
          (current-minute (nth 1 current-time))
          (current-second (nth 0 current-time))
          (current-total-seconds (+ (* current-hour 3600) (* current-minute 60) current-second))
-         (target-hour 23)
-         (target-minute 40)
+         (target-hour 22)
+         (target-minute 0)
          (target-second 0)
          (target-total-seconds (+ (* target-hour 3600) (* target-minute 60) target-second))
          (seconds-to-target (- target-total-seconds current-total-seconds)))
-    ;; If current time is past 23:40, add 24 hours
+    ;; Если текущее время уже позже 22:00 — добавить 24 часа
     (when (< seconds-to-target 0)
       (setq seconds-to-target (+ seconds-to-target (* 24 3600))))
-    ;; Debug output to check calculation
-    (message "Current time: %02d:%02d:%02d, Seconds to 23:40:00: %d (%02d:%02d:%02d)"
+    ;; Отладочный вывод
+    (message "Current time: %02d:%02d:%02d, Seconds to 22:00:00: %d (%02d:%02d:%02d)"
              current-hour current-minute current-second
              seconds-to-target
              (/ seconds-to-target 3600)
              (/ (% seconds-to-target 3600) 60)
              (% seconds-to-target 60))
-    ;; Format time as HH:MM:SS
+    ;; Форматирование таймера в HH:MM:SS
     (let ((timer-string (format "%02d:%02d:%02d"
                                 (/ seconds-to-target 3600)
                                 (/ (% seconds-to-target 3600) 60)
                                 (% seconds-to-target 60))))
       (org-timer-set-timer timer-string))))
 
-;; Add to Emacs startup
-(add-hook 'emacs-startup-hook 'set-org-timer-to-2340)
+(add-hook 'emacs-startup-hook 'set-org-timer-to-2200)
 
 ;; (use-package minimal-dashboard
 ;;   :straight (:host github :repo "dheerajshenoy/minimal-dashboard.el" :branch "main")
@@ -469,17 +468,18 @@
 (use-package writeroom-mode
   :straight t)
 
-(use-package notmuch
-  :straight t)
+;; (use-package notmuch
+;;   :straight t)
 
-(use-package emms
-  :straight t)
+;; (use-package emms
+;;   :straight t)
 
 (use-package zoom
   :straight t
   :config
   (zoom-mode 1)
-  (setq zoom-size '(0.618 . 0.618)))
+  (setq zoom-size '(0.618 . 0.618))
+  (setq zoom-ignored-major-modes '(calendar-mode calculator-mode)))
 (global-set-key (kbd "C-x +") 'zoom)
 
 (use-package hl-todo
@@ -499,6 +499,20 @@
 
   (setq global-hl-todo-mode 1))
 
+(use-package envrc
+  :straight t
+  :hook (after-init . envrc-global-mode)
+  :config
+  (envrc-global-mode))
+
+(use-package nix-mode
+  :straight t)
+
+(use-package gcmh
+  :ensure t
+  :init
+  (gcmh-mode 1))
+
 ;; Load external files (unchanged, but ensure they respect lazy-loading)
 (load-file "~/.emacs.d/lisp/evil.el")
 (load-file "~/.emacs.d/lisp/appereance.el")
@@ -516,6 +530,7 @@
 (load-file "~/.emacs.d/lisp/lsp.el")
 
 (load-file "~/.emacs.d/lisp/enlight.el")
+;; (load-file "~/.emacs.d/lisp/grammar.el")
 
 (provide 'init)
 ;; init.el ends here
