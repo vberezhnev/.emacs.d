@@ -38,16 +38,32 @@
 	org-duration-format 'h:mm
 	org-log-redeadline t
 	org-log-reschedule t
-	org-tag-alist '(("interviewing" . ?i)
-			("@programming" . ?p)
-			;; ("c" . c)
-			("c++" . ?C)
-			("rust" . ?t)
-			("nestjs" . ?n)
-			("solana" . ?s)
-			("@idea" . ?I)
-			("@philosophy" . ?P)
-			("@math" . ?m)))
+	org-tag-alist
+	'((:startgroup)
+          ("@coding"     . ?c)
+          ("@reading"    . ?r)
+          ("@video"      . ?v)
+          ("@writing"    . ?w)
+          ("@thinking"   . ?t)
+          ("@planning"   . ?p)
+          ("@research"   . ?s)
+          (:endgroup)
+
+          ("@interviewing" . ?i)
+          ("@zettelkasten" . ?z)
+
+          ;; Темы
+          ("rust"        . ?R)
+          ("c++"         . ?C)
+          ("nestjs"      . ?N)
+          ("solana"      . ?S)
+          ("db"          . ?D)
+          ("philosophy"  . ?P)
+          ("math"        . ?M)
+          ("psychology"  . ?Y)
+          ("productivity". ?U)
+          ("chinese"     . ?H))
+	)
   :config
   (with-eval-after-load 'org
     (setq org-confirm-babel-evaluate nil)
@@ -257,8 +273,10 @@
   :after org
   :commands (org-pomodoro my/org-pomodoro)
   :bind (("C-c k" . my/org-pomodoro))
+  :config
+  (setq org-pomodoro-audio-player "aplay")
   :init
-  (setq org-pomodoro-audio-player (or (executable-find "mpv") (executable-find "aplay"))
+  (setq ;; org-pomodoro-audio-player "mpv" ;;(or (executable-find "mpv") (executable-find "aplay"))
         org-pomodoro-play-sounds t
         org-pomodoro-keep-killed-pomodoro-time t
         org-pomodoro-format "👨‍💻 %s"
@@ -274,7 +292,7 @@
         org-pomodoro-length 40
         org-pomodoro-short-break-length 5
         org-pomodoro-long-break-length 15
-        org-pomodoro-long-break-frequency 3))
+        org-pomodoro-long-break-frequency 2))
 
 ;; Custom pomodoro function (unchanged)
 (defun my/org-pomodoro ()
@@ -297,7 +315,15 @@
   (org-timed-alert-warning-string (concat "%todo %headline\n at %alert-time")))
 
 (use-package org-alert
-  :straight t)
+  :straight t
+  :config
+  (setq alert-default-style 'libnotify
+	org-alert-notification-title "ORG REMINDER"
+	org-alert-headline "Task Reminder"
+	org-alert-time '(deadline scheduled)
+	org-alert-active-margin 0 ;; Напоминать о всех задачах, которые на сегодня
+	org-alert-interval 300) ;; каждые 5 минут проверка (можно 60–120)
+  (org-alert-enable))
 
 ;; Emacsql: Load for org dependencies
 (use-package emacsql
@@ -330,6 +356,7 @@
 ;; Org-gtd: Load for GTD workflows
 (use-package org-gtd
   :straight (:type git :host github :repo "Trevoke/org-gtd.el")
+  :demand t
   ;; :after org
   ;; :commands (org-gtd-capture org-gtd-engage org-gtd-engage-grouped-by-context org-gtd-process-inbox org-gtd-organize)
   :bind (("C-c d c" . org-gtd-capture)
@@ -347,6 +374,7 @@
   (org-gtd-clarify-show-horizons t)
   (org-gtd-horizons-file "horizons.org")
   :config
+  (org-gtd-oops)
   (org-edna-mode))
 
 ;; Org-clock-budget: Load for budgeting
@@ -427,14 +455,19 @@
   :straight t
   :bind
   (:map global-map
- 	("C-c s" . org-timeblock)))
+ 	("C-c s" . org-timeblock))
+  :config
+  (setq org-timeblock-files '("~/Org/agenda/timeblock.org"
+			      "~/Org/agenda/GTD/org-gtd-tasks.org")
+	org-timeblock-inbox-file "~/Org/agenda/timeblock.org"
+	org-timeblock-span 4
+	org-timeblock-scale-options '(6 . 25)
+	org-timeblock-show-future-repeats t))
 
-(setq org-timeblock-files '("~/Org/agenda/timeblock.org"
-			    "~/Org/agenda/GTD/org-gtd-tasks.org"))
-(setq org-timeblock-inbox-file "~/Org/agenda/timeblock.org")
-(setq org-timeblock-span 7)
-(setq org-timeblock-scale-options '(7 . 25))
-(setq org-timeblock-show-future-repeats t)
+;; (use-package timeblock
+;;   :straight (:host github
+;; 		   :repo "ichernyshovvv/timeblock.el"
+;; 		   :branch "master"))
 
 (use-package org-contacts
   :straight t
@@ -462,7 +495,7 @@
 
 (use-package dash
   :straight t)
- 
+
 (use-package org-now
   :straight (:host github :repo "alphapapa/org-now" :branch "master" :files ("*.el" "out"))
   :after org  ;; Убедитесь, что org-mode загружен перед org-now
@@ -478,6 +511,35 @@
             "rl" #'org-now-link
             "rn" #'org-now-refile-to-now
             "rp" #'org-now-refile-to-previous-location))
- 
+
+;;;;;;;;
+
+(defun my-gtd-stale-next-to-someday (&optional days)
+  "Move stale NEXT tasks to SOMEDAY/Incubated if older than DAYS.
+Default is 14 days."
+  (interactive "P")
+  (let ((days (or (and days (prefix-numeric-value days)) 14))
+        (cutoff (float-time (time-subtract (current-time)
+                                           (days-to-time days))))
+        ;; путь к SOMEDAY/Incubated
+        (incubated-file (expand-file-name "incubated.org" org-gtd-directory)))
+    (org-map-entries
+     (lambda ()
+       (let* ((ts (org-entry-get (point) "ORG_GTD_TIMESTAMP"))
+              (time (when ts (float-time (org-time-string-to-time ts)))))
+         (when (and time
+                    (< time cutoff)) ; протухло
+           (message "Incubating stale NEXT: %s" (org-get-heading t t))
+           ;; ставим TODO → TODO (обычный)
+           (org-todo org-gtd-todo)
+           ;; рефайлим в Incubated
+           (org-refile nil nil
+                       (list (org-get-heading t t)
+                             incubated-file
+                             nil
+                             nil)))))
+     (format "TODO=\"%s\"" org-gtd-next)
+     `(org-gtd-agenda-files))))
+
 (provide 'org-mode)
 ;;; org-mode.el ends here

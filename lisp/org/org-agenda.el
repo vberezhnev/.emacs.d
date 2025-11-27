@@ -1,7 +1,43 @@
 ;;; org-agenda.el --- Org-agenda configuration -*- lexical-binding: t; -*-
 
 (use-package org-ql
-  :straight t)
+  :straight t
+  :demand t)
+
+(defun my/agenda-count (query)
+  "Return count of org-ql results for QUERY."
+  (length
+   (org-ql-select (org-agenda-files)
+     query
+     :action 'element)))
+
+(defun my/update-agenda-stats ()
+  (setq my/agenda-overdue
+        (my/agenda-count '(deadline :to -1))) ;; overdue
+
+  (setq my/agenda-today
+        (my/agenda-count '(ts :on today)))    ;; today
+
+  (setq my/agenda-soon
+        (my/agenda-count '(and (scheduled :to 2)
+                               (not (todo "DONE")))))) ;; next 2 days
+
+(my/update-agenda-stats)
+
+(run-with-timer 0 60 #'my/update-agenda-stats)
+
+;; (doom-modeline-def-segment my-org-agenda
+;;   "Show org agenda alerts in mode-line"
+;;   (concat
+;;    (when (> my/agenda-overdue 0)
+;;      (propertize (format " 🔥%d" my/agenda-overdue)
+;;                  'face '(:foreground "#ff6c6b")))
+;;    (when (> my/agenda-today 0)
+;;      (propertize (format " ⏳%d" my/agenda-today)
+;;                  'face '(:foreground "#ECBE7B")))
+;;    (when (> my/agenda-soon 0)
+;;      (propertize (format " 📌%d" my/agenda-soon)
+;;                  'face '(:foreground "#51afef")))))
 
 ;; Org-super-agenda: Load for agenda enhancements
 (use-package org-super-agenda
@@ -248,7 +284,13 @@
           ;;         ((org-agenda-overriding-header "\n✅📋 === COMPLETED TASKS ===\n")
           ;;          (org-agenda-remove-tags t)))))
 
-          ("E" "📤 View for exporting"
+          ("f" "🪓 TimeBlocking"
+           ((agenda "" ((org-agenda-span 'week)
+			(org-agenda-prefix-format "  ∘ %t %s")
+			(org-agenda-files '("~/Org/agenda/timeblock.org"))
+			))))
+
+          ("e" "📤 View for exporting"
            ((agenda "" ((org-agenda-span 'week)
 			(org-agenda-prefix-format
 			 '((agenda . "| % t")
