@@ -90,10 +90,10 @@
 ;; Gptel-magit: Load for git commit integration
 (use-package gptel-magit
   :load-path "~/.emacs.d/lisp/packages/"
-  ;; :after (gptel magit)
-	:init
+  :after magit
+  :init
   (setq gptel-api-key (getenv "AIML_API"))
-  (setq gptel-max-tokens 8024)
+  (setq gptel-max-tokens 10024)
 	(setq gptel-verbose t)
   :config
   (setq gptel-magit-model 'gpt-4o)
