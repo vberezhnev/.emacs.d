@@ -277,22 +277,22 @@
   (setq org-pomodoro-audio-player "aplay")
   :init
   (setq ;; org-pomodoro-audio-player "mpv" ;;(or (executable-find "mpv") (executable-find "aplay"))
-        org-pomodoro-play-sounds t
-        org-pomodoro-keep-killed-pomodoro-time t
-        org-pomodoro-format "👨‍💻 %s"
-        org-pomodoro-short-break-format "🍵 Short Break %s"
-        org-pomodoro-long-break-format "✋ Long Break %s"
-        org-pomodoro-start-sound-p t
-        org-pomodoro-start-sound "/home/berezhnev/.emacs.d/sounds/bell.wav"
-        org-pomodoro-finished-sound-p t
-        org-pomodoro-finished-sound "/home/berezhnev/.emacs.d/sounds/bell.wav"
-        org-pomodoro-manual-break t
-        org-pomodoro-overtime-sound-p t
-        org-pomodoro-overtime-sound "/home/berezhnev/.emacs.d/sounds/bell.wav"
-        org-pomodoro-length 40
-        org-pomodoro-short-break-length 5
-        org-pomodoro-long-break-length 15
-        org-pomodoro-long-break-frequency 2))
+   org-pomodoro-play-sounds t
+   org-pomodoro-keep-killed-pomodoro-time t
+   org-pomodoro-format "👨‍💻 %s"
+   org-pomodoro-short-break-format "🍵 Short Break %s"
+   org-pomodoro-long-break-format "✋ Long Break %s"
+   org-pomodoro-start-sound-p t
+   org-pomodoro-start-sound "/home/berezhnev/.emacs.d/sounds/bell.wav"
+   org-pomodoro-finished-sound-p t
+   org-pomodoro-finished-sound "/home/berezhnev/.emacs.d/sounds/bell.wav"
+   org-pomodoro-manual-break t
+   org-pomodoro-overtime-sound-p t
+   org-pomodoro-overtime-sound "/home/berezhnev/.emacs.d/sounds/bell.wav"
+   org-pomodoro-length 40
+   org-pomodoro-short-break-length 5
+   org-pomodoro-long-break-length 15
+   org-pomodoro-long-break-frequency 2))
 
 ;; Custom pomodoro function (unchanged)
 (defun my/org-pomodoro ()
@@ -540,6 +540,33 @@ Default is 14 days."
                              nil)))))
      (format "TODO=\"%s\"" org-gtd-next)
      `(org-gtd-agenda-files))))
+
+
+(use-package request
+  :straight t)
+
+(use-package org-social
+  :straight (:host github :repo "tanrax/org-social.el" :branch "main")
+  :demand t
+  :config
+  (org-social-add-account "vberezhnev"
+                          :file (getenv "ORG_SOCIAL_FILE_VBEREZHNEV")
+                          :relay "https://relay.org-social.org/"
+                          :public-url "http://host.org-social.org/vberezhnev/social.org")
+
+  (org-social-add-account "obersturmbannburger"
+                          :file (getenv "ORG_SOCIAL_FILE_OBERSTURMBANNBURGER")
+                          :relay "https://relay.org-social.org/"
+                          :public-url "http://host.org-social.org/obersturmbannburger/social.org")
+
+  (setq org-social-relay "https://relay.org-social.org/")
+  (setq org-social-my-public-url "http://host.org-social.org/obersturmbannburger/social.org")
+
+  (load-file "~/.emacs.d/lisp/packages/org-social.el/org-social-ui.el")
+  (load-file "~/.emacs.d/lisp/packages/org-social.el/ui/org-social-ui-core.el")
+  (load-file "~/.emacs.d/lisp/packages/org-social.el/ui/org-social-ui-utils.el")
+  (load-file "~/.emacs.d/lisp/packages/org-social.el/ui/org-social-ui-components.el")
+  )
 
 (provide 'org-mode)
 ;;; org-mode.el ends here
