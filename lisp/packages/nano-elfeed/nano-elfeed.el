@@ -34,18 +34,7 @@
 ;; (add-hook 'elfeed-search-mode-hook (lambda () (setq-local line-spacing 0)))
 
 (defconst nano-elfeed--rss-icon-data
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"RSSicon\" viewBox=\"0 0 8 8\" width=\"256\" height=\"256\">
-  <title>RSS feed icon</title>
-  <style type=\"text/css\">
-    .button {stroke: none; fill: %s;}
-    .symbol {stroke: none; fill: white;}
-  </style>
-  <rect class=\"button\" width=\"8\" height=\"8\" rx=\"1.5\"/>
-  <circle class=\"symbol\" cx=\"2\" cy=\"6\" r=\"1\"/>
-  <path class=\"symbol\" d=\"m 1,4 a 3,3 0 0 1 3,3 h 1 a 4,4 0 0 0 -4,-4 z\"/>
-  <path class=\"symbol\" d=\"m 1,2 a 5,5 0 0 1 5,5 h 1 a 6,6 0 0 0 -6,-6 z\"/>
-</svg>")
+"<svg fill=\"#000000\" height=\"256px\" width=\"256px\" version=\"1.1\" id=\"Layer_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"-271 273 256 256\" xml:space=\"preserve\"><g id=\"SVGRepo_bgCarrier\" stroke-width=\"0\"></g><g id=\"SVGRepo_tracerCarrier\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></g><g id=\"SVGRepo_iconCarrier\"> <g> <path d=\"M-271,360v48.9c31.9,0,62.1,12.6,84.7,35.2c22.6,22.6,35.1,52.8,35.1,84.8v0.1h49.1c0-46.6-19-88.7-49.6-119.4 C-182.2,379-224.4,360.1-271,360z\"></path> <path d=\"M-237,460.9c-9.4,0-17.8,3.8-24,10s-10,14.6-10,24c0,9.3,3.8,17.7,10,23.9c6.2,6.1,14.6,9.9,24,9.9s17.8-3.7,24-9.9 s10-14.6,10-23.9c0-9.4-3.8-17.8-10-24C-219.2,464.7-227.6,460.9-237,460.9z\"></path> <path d=\"M-90.1,348.1c-46.3-46.4-110.2-75.1-180.8-75.1v48.9C-156.8,322-64.1,414.9-64,529h49C-15,458.4-43.7,394.5-90.1,348.1z\"></path> </g> </g></svg>")
 
 (defun nano-elfeed--make-icon (image)
   (let* ((img-width (car (image-size image t)))
@@ -149,7 +138,7 @@
     ("Rust - Хабр" . ,(or (nano-elfeed-make-icon "habr") (cons "Habr" "Habr")))
     ("Научно-популярное - Хабр" . ,(or (nano-elfeed-make-icon "habr") (cons "Habr" "Habr")))
     ("Астрономия - Хабр" . ,(or (nano-elfeed-make-icon "habr") (cons "Habr" "Habr")))
-    ("Space.com" . ,(or (nano-elfeed-make-icon "rss") (cons "RSS" "RSS")))
+    ;; ("Space.com" . ,(or (nano-elfeed-make-icon "rss") (cons "RSS" "RSS")))
     ("Rust Blog" . ,(or (nano-elfeed-make-icon "rss") (cons "RSS" "RSS")))
     ("Terminally Incoherent" . ,(or (nano-elfeed-make-icon "rss") (cons "RSS" "RSS")))
     ("null program" . ,(or (nano-elfeed-make-icon "rss") (cons "RSS" "RSS")))
