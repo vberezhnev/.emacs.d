@@ -90,10 +90,10 @@
 ;; Gptel-magit: Load for git commit integration
 (use-package gptel-magit
   :load-path "~/.emacs.d/lisp/packages/"
-  :after magit
-  :init
+  ;; :after (gptel magit)
+	:init
   (setq gptel-api-key (getenv "AIML_API"))
-  (setq gptel-max-tokens 10024)
+  (setq gptel-max-tokens 8024)
 	(setq gptel-verbose t)
   :config
   (setq gptel-magit-model 'gpt-4o)
@@ -110,27 +110,6 @@
               ("M-g" . gptel-magit-generate-message))
   :hook
   (magit-mode . gptel-magit-install))
-
-;; (use-package gptel-magit
-;;   :load-path "~/.emacs.d/lisp/packages/"
-;;   :hook (magit-mode . gptel-magit-install)
-;;   ;; :after (gptel magit)
-;;   ;; :commands (gptel-magit-generate-message gptel-magit-install)
-;;   :bind (:map git-commit-mode-map
-;;          ("M-g" . gptel-magit-generate-message))
-;;   :hook (magit-mode . gptel-magit-install)
-;;   :init
-;;   (setq gptel-api-key "7995a988739243c6969c5653218cb330"
-;;         gptel-max-tokens 8024
-;;         gptel-verbose t)
-;;   :config
-;;   ;; (setq gptel-magit-model 'mistral-nemo:12b
-;;   ;;       gptel-magit-backend
-;;   ;;       (gptel-make-ollama "Ollama"
-;;   ;;                          :host "localhost:11434"
-;;   ;;                          :models '(mistral-nemo:12b)
-;;   ;;                          :stream t))
-;;   )
 
 (use-package forge
    :straight t)
