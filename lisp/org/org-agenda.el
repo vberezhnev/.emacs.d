@@ -441,15 +441,47 @@
 			       ((>= total-progress 50) "#FF9800")
 			       (t "#FF5722")))))))))
 
-(use-package org-hyperscheduler
-  :straight
-  ( :repo "dmitrym0/org-hyperscheduler"
-    :host github
-    :type git
-    :files ("*"))
+;; (use-package org-hyperscheduler
+;;   :straight
+;;   ( :repo "dmitrym0/org-hyperscheduler"
+;;     :host github
+;;     :type git
+;;     :files ("*"))
+;;   :config
+;;   (setq org-hyperscheduler-inbox-file "~/Org/agenda/timeblock.org")
+;;   (setq org-hyperscheduler-readonly-mode nil))
+
+(use-package calfw
+  :straight  (:repo "kiwanami/emacs-calfw"
+		    :host github
+		    :type git
+		    :files ("*"))
+  :demand t)
+
+(use-package calfw-blocks
+  :load-path "~/.emacs.d/lisp/packages/calfw-blocks/"
+  :demand t
   :config
-  (setq org-hyperscheduler-inbox-file "~/Org/agenda/timeblock.org")
-  (setq org-hyperscheduler-readonly-mode nil))
+  (setq calfw-fchar-junction ?╋
+      calfw-fchar-vertical-line ?┃
+      calfw-fchar-horizontal-line ?━
+      calfw-fchar-left-junction ?┣
+      calfw-fchar-right-junction ?┫
+      calfw-fchar-top-junction ?┯
+      calfw-fchar-top-left-corner ?┏
+      calfw-fchar-top-right-corner ?┓))
+
+(require 'calfw-cal)
+
+(defun my-open-calendar-files ()
+  (interactive)
+  (calfw-open-calendar-buffer
+   :contents-sources
+   (list
+    ;; (calfw-org-create-file-source )
+    (calfw-org-create-file-source "Todos" "~/Org/agenda/GTD/org-gtd-tasks.org" "green")
+    (calfw-org-create-file-source "Events" "~/Org/agenda/timeblock.org" "blue"))
+   :view 'two-weeks))
 
 (provide 'org-agenda)
 ;;; org-agenda.el ends here
