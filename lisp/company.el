@@ -27,9 +27,9 @@
          ;; ("C-c s s" . company-yasnippet)
          :map company-active-map
          ("C-n" . company-select-next)
-     ("C-p" . company-select-previous)
-     ("C-d" . company-show-doc-buffer)
-     ("M-." . company-show-location))
+	 ("C-p" . company-select-previous)
+	 ("C-d" . company-show-doc-buffer)
+	 ("M-." . company-show-location))
   ;; :hook (prog-mode . global-company-mode)
   :config
   ;; (eval-after-load 'rustic-mode
@@ -41,7 +41,7 @@
   ;; (setq company-idle-delay 0)
   ;; (setq company-echo-delay 0)
   ;; ;; (setq company-ispell-dictionary (f-join tychoish-config-path "aspell-pws"))
-  
+
   ;; (setq company-backends '(company-capf
   ;;              company-keywords
   ;;              company-semantic
@@ -176,7 +176,7 @@
 ;;   ;;     (frame-local-setq company-box-doc-frame nil frame)))
 ;;   ;; (advice-add 'company-box-doc :before #'+company-box-detect-deleted-doc-frame-advice))
 ;; )
-  
+
 ;; Company-dict: Per-project dictionaries
 ;; (use-package company-dict
 ;;   :straight t
@@ -194,14 +194,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;; COMPANY-ORG-BLOCK ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package company-org-block
-:straight t
-:defer t
-:custom
-(company-org-block-edit-style 'auto)
-:hook ((org-mode . (lambda ()
-                     (setq-local company-backends '(company-org-block))
-                     (company-mode +1)))))
+  :straight t
+  :defer t
+  :custom
+  (company-org-block-edit-style 'auto)
+  :hook ((org-mode . (lambda ()
+                       (setq-local company-backends '(company-org-block))
+                       (company-mode +1)))))
 
+
+;; (use-package company-ispell
+;;   :straight t
+;;   :after company
+;;   :config (add-to-list 'company-backends 'company-ispell))
 
 (provide 'company)
 ;;; company.el ends here

@@ -225,7 +225,7 @@
 
   (evil-set-initial-state 'org-super-agenda-mode 'emacs)
   (evil-set-initial-state 'calculator-mode 'emacs)
-  (evil-set-initial-state 'calendar-mode 'normal)
+  (evil-set-initial-state 'calendar-mode 'emacs)
   (evil-set-initial-state 'enlight-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal)
 

@@ -11,7 +11,7 @@
   (when (string-equal (buffer-name) "*enlight*")
     (my/toggle-modeline)))
 
-(add-hook 'enlight-mode-hook 'my/enlight-disable-modeline-hook)
+;; (add-hook 'enlight-mode-hook 'my/enlight-disable-modeline-hook)
 
 (defvar enlight-lipsum
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
