@@ -94,16 +94,27 @@
    "ac" 'chess
    "ag" 'tetris
 
+   "r" '(:ignore t :which-key "rust/cargo")
+   ;; основные cargo команды
+   "rr" 'rustic-cargo-run
+   "rt" 'rustic-cargo-test
+   "rb" 'rustic-cargo-build
+   "rc" 'rustic-cargo-check
+   "rl" 'rustic-cargo-clippy
+   "rC" 'rustic-cargo-clean
+   "rf" 'rustic-format-buffer
+   "ra" 'rustic-cargo-add
+   ;; расширенные команды
+   "ru" 'rustic-cargo-update
+   "rx" 'rustic-cargo-uninstall
+   "rd" 'rustic-cargo-doc
+   "rB" 'rustic-cargo-bench
+   "rF" 'rustic-cargo-fix
    
    "l" '(:ignore t :which-key "LSP")
    "lf" 'consult-flymake
    "lr" 'replace-string
-   
-   "r" '(:ignore t :which-key "bookmarks")
-   "rb" 'consult-bookmark
-   "rm" 'bookmark-set
-   "rl" 'bookmark-bmenu-list
-   
+  
    "p" '(:ignore t :which-key "projectile")
    "pf" 'projectile-find-file
    "pd" 'projectile-find-dir
@@ -120,9 +131,14 @@
    "gg" 'magit
    "gc" 'magit-clone
 
-   "e" '(:ignore t :which-key "eval")
+   "e" '(:ignore t :which-key "eval+bookmarks")
    "ee" 'eval-buffer
    "er" 'eval-region
+   ;; "e" '(:ignore t :which-key "bookmarks")
+   "eb" 'consult-bookmark
+   "em" 'bookmark-set
+   "el" 'bookmark-bmenu-list
+
 
    "o" '(:ignore t :which-key "org")
    "oc" 'org-capture
