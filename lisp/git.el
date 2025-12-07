@@ -12,15 +12,16 @@
   (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1
         magit-diff-refine-hunk 'all
         magit-section-initial-visibility-alist '((untracked . show)
-                                                (unstaged . show)
-                                                (staged . show))
+                                                 (unstaged . show)
+                                                 (staged . show))
         magit-status-margin '(t age magit-log-margin-width nil 18)
         magit-log-margin '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18)
         magit-commit-show-diff t
         magit-revision-show-gravatars nil
         magit-refresh-status-buffer t
         magit-diff-paint-whitespace t
-        magit-auto-revert-mode t)
+        magit-auto-revert-mode t
+	global-auto-revert-mode 1)
   :config
   (custom-set-faces
    '(magit-section-heading ((t (:foreground "#61afef" :weight bold))))
@@ -68,51 +69,8 @@
   :commands (transient-define-prefix transient-dispatch)
   :defer t)
 
-;; Gptel: Load for AI commands
-(use-package gptel
-  :straight (:host github :repo "karthink/gptel" :branch "master")
-  :commands (gptel gptel-context-add gptel-add-file gptel-menu gptel--regenerate gptel-rewrite)
-  :bind (("M-s M-d" . gptel-context-add)
-         ("M-s M-f" . gptel-add-file)
-         ("M-s M-a" . gptel-menu)
-         ("M-s M-r" . gptel--regenerate)
-         ("M-s M-e" . gptel-rewrite)
-         ("M-s M-s" . gptel))
-  :init
-  (setq gptel-verbose t
-        gptel-model 'deepseek-r1-concise)
-  :config
-  (setq gptel-backend (gptel-make-ollama "Ollama"
-                        :host "localhost:11434"
-                        :models '(mistral-nemo:12b)
-                        :stream t)))
-
-;; Gptel-magit: Load for git commit integration
-(use-package gptel-magit
-  :load-path "~/.emacs.d/lisp/packages/"
-  ;; :after (gptel magit)
-	:init
-  (setq gptel-api-key (getenv "AIML_API"))
-  (setq gptel-max-tokens 8024)
-	(setq gptel-verbose t)
-  :config
-  (setq gptel-magit-model 'gpt-4o)
-  (setq gptel-magit-backend
-        (gptel-make-openai "AIMLAPI"
-          :host "api.aimlapi.com"
-          :endpoint "/chat/completions"
-          :stream nil
-          :key (getenv "AIML_API")
-          :models '(gpt-4o)))
-	  (gptel-magit-install)
-
-  :bind (:map git-commit-mode-map
-              ("M-g" . gptel-magit-generate-message))
-  :hook
-  (magit-mode . gptel-magit-install))
-
 (use-package forge
-   :straight t)
+  :straight t)
 
 (provide 'git)
 ;;; git.el ends here
