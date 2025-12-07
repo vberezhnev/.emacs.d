@@ -159,6 +159,7 @@
    "sa" 'gptel-menu
    "sr" 'gptel--regenerate
    "se" 'gptel-rewrite
+   "sq" 'gptel-quick
 
    "m" '(:ignore t :which-key "misc")
    "ms" 'scratch-buffer
