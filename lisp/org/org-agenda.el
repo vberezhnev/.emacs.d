@@ -99,7 +99,15 @@
           (tags . "%t %-10c | %s")
           (search . "%c %t %s"))
         org-agenda-clockreport-parameter-plist
-        (quote (:maxlevel 5 :compact t :wstart 0 :link t :formula % :tags nil :properties ("CATEGORY" "EFFORT" "File") :narrow 80 :fileskip0 t))
+        (quote (:maxlevel 5
+			  :compact t
+			  :wstart 0
+			  :link t
+			  :formula %
+			  :tags nil
+			  :properties ("CATEGORY" "EFFORT" "File")
+			  :narrow 80
+			  :fileskip0 t))
         org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:")
         org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:")
         org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
@@ -111,8 +119,9 @@
         org-agenda-skip-scheduled-if-deadline-is-shown t
         org-agenda-skip-timestamp-if-deadline-is-shown t
         org-default-notes-file "~/Org/agenda/Notes.org"
-        org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org")
-	)
+        org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
+			   "~/Org/agenda/GTD/org-gtd-incubated.org"
+			   "~/Org/agenda/GTD/org-gtd-habits.org"))
   :config
 
   ;; Add hook to move cursor to top of agenda buffer
@@ -178,7 +187,7 @@
 		     (org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:"))
 		     (org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:"))
 
-                     (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
+                     ;; (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
                      (org-super-agenda-groups
                       `((:name "🔥🚨 Q1: Urgent & Important"
                                :order 1
@@ -228,7 +237,7 @@
 			(org-habit-show-habits t)
 			(org-agenda-remove-tags t)
 			(org-agenda-prefix-format "  ∘ %t %s")
-			(org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
+			;; (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
 			(org-super-agenda-groups
 			 '((:name "🌍 Everytime"
                                   :tag ("everytime"))
@@ -451,37 +460,37 @@
 ;;   (setq org-hyperscheduler-inbox-file "~/Org/agenda/timeblock.org")
 ;;   (setq org-hyperscheduler-readonly-mode nil))
 
-(use-package calfw
-  :straight  (:repo "kiwanami/emacs-calfw"
-		    :host github
-		    :type git
-		    :files ("*"))
-  :demand t)
+;; (use-package calfw
+;;   :straight  (:repo "kiwanami/emacs-calfw"
+;; 		    :host github
+;; 		    :type git
+;; 		    :files ("*"))
+;;   :demand t)
 
-(use-package calfw-blocks
-  :load-path "~/.emacs.d/lisp/packages/calfw-blocks/"
-  :demand t
-  :config
-  (setq calfw-fchar-junction ?╋
-      calfw-fchar-vertical-line ?┃
-      calfw-fchar-horizontal-line ?━
-      calfw-fchar-left-junction ?┣
-      calfw-fchar-right-junction ?┫
-      calfw-fchar-top-junction ?┯
-      calfw-fchar-top-left-corner ?┏
-      calfw-fchar-top-right-corner ?┓))
+;; (use-package calfw-blocks
+;;   :load-path "~/.emacs.d/lisp/packages/calfw-blocks/"
+;;   :demand t
+;;   :config
+;;   (setq calfw-fchar-junction ?╋
+;;       calfw-fchar-vertical-line ?┃
+;;       calfw-fchar-horizontal-line ?━
+;;       calfw-fchar-left-junction ?┣
+;;       calfw-fchar-right-junction ?┫
+;;       calfw-fchar-top-junction ?┯
+;;       calfw-fchar-top-left-corner ?┏
+;;       calfw-fchar-top-right-corner ?┓))
 
-(require 'calfw-cal)
+;; (require 'calfw-cal)
 
-(defun my-open-calendar-files ()
-  (interactive)
-  (calfw-open-calendar-buffer
-   :contents-sources
-   (list
-    ;; (calfw-org-create-file-source )
-    (calfw-org-create-file-source "Todos" "~/Org/agenda/GTD/org-gtd-tasks.org" "green")
-    (calfw-org-create-file-source "Events" "~/Org/agenda/timeblock.org" "blue"))
-   :view 'two-weeks))
+;; (defun my-open-calendar-files ()
+;;   (interactive)
+;;   (calfw-open-calendar-buffer
+;;    :contents-sources
+;;    (list
+;;     ;; (calfw-org-create-file-source )
+;;     (calfw-org-create-file-source "Todos" "~/Org/agenda/GTD/org-gtd-tasks.org" "green")
+;;     (calfw-org-create-file-source "Events" "~/Org/agenda/timeblock.org" "blue"))
+;;    :view 'two-weeks))
 
 (provide 'org-agenda)
 ;;; org-agenda.el ends here
