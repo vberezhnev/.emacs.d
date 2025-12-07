@@ -19,6 +19,21 @@
   ;;   "S-SPC")
   )
 
+(defalias 'hide-dot-files
+    (kmacro "% m ^ \\ . <return> k")
+    "Hide dot files (files that start with a dot (.))
+
+  For example, a list like this:
+
+    .bashrc
+    bookmarks.html
+
+  is converted to this simpler list:
+
+    bookmarks.html")
+
+(keymap-global-set "C-c 1" #'hide-dot-files)
+
 ;; All-the-icons-dired: Load for dired with icons
 (use-package all-the-icons-dired
   :straight t
