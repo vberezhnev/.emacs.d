@@ -115,7 +115,9 @@
 ;;   ;; (setq eldoc-box-)
 ;;   (add-hook 'eldoc-box-buffer-setup-hook #'eldoc-box-prettify-ts-errors 0 t))
 
-;; Flycheck: Load for programming modes
+;; (use-package flycheck-hl-todo
+;;   :straight t)
+
 (use-package flycheck
   :straight t
   ;; :commands (flycheck-mode flycheck-next-error flycheck-previous-error)
@@ -197,28 +199,6 @@
   :after (company flycheck)
   :config
   (define-derived-mode typescriptreact-mode typescript-mode "TypeScript TSX"))
-
-;; (use-package tide
-;;   :ensure t
-;;   :mode (("\\.ts\\'" . typescript-ts-mode)
-;;          ("\\.tsx\\'" . typescript-ts-mode))
-;;   :after (company flycheck)
-;;   :hook ((typescript-ts-mode . tide-setup)
-;;          (tsx-ts-mode . tide-setup)
-;;          (typescript-ts-mode . tide-hl-identifier-mode)
-;;          (before-save . tide-format-before-save)))
-
-;; (defun setup-tide-mode ()
-;;   (interactive)
-;;   (tide-setup)
-;;   (flycheck-mode +1)
-;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-;;   (eldoc-mode +1)
-;;   (tide-hl-identifier-mode +1)
-;;   ;; company is an optional dependency. You have to
-;;   ;; install it separately via package-install
-;;   ;; `M-x package-install [ret] company`
-;;   (company-mode +1))
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
