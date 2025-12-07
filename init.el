@@ -74,6 +74,9 @@
       tab-width 2
       mouse-autoselect-window t)
 
+(setq auth-sources '("~/.authinfo"))
+(setq auth-source-debug nil)
+
 (setq-default shell-file-name "/bin/fish")
 
 (defun my-delete-backward-word (arg)
@@ -362,6 +365,7 @@
   :hook (prog-mode . annotate-mode))
 
 (setq tab-width 2)
+(setq standard-indent 2)
 (setq indent-tabs-mode t)
 
 (use-package htmlize
@@ -484,12 +488,33 @@
 
 (use-package hl-todo
   :straight t
+  :init
+  (global-hl-todo-mode 1)
   :config
   (setq hl-todo-keyword-faces
-	'(("TODO"   . "#FF0000")
-          ("FIXME"  . "#FF0000")
-          ("DEBUG"  . "#A020F0")
-          ("STUB"   . "#1E90FF")))
+        '(("TODO"  . "#ff5555")
+          ("FIXME" . "#ff4444")
+          ("BUG"   . "#ff2222")
+          ("HACK"  . "#ff9900")
+          ("WARN"  . "#ffaa00")
+          ("NOTE"  . "#00ccff")
+          ("IDEA"  . "#00ddaa")
+          ("DEBUG" . "#a020f0")
+          ("STUB"  . "#1e90ff")))
+
+  (keymap-set hl-todo-mode-map "C-c t p" #'hl-todo-previous)
+  (keymap-set hl-todo-mode-map "C-c t n" #'hl-todo-next)
+  (keymap-set hl-todo-mode-map "C-c t o" #'hl-todo-occur)
+  (keymap-set hl-todo-mode-map "C-c t i" #'hl-todo-insert)
+
+  ;; (with-eval-after-load 'consult
+  ;;   (keymap-set hl-todo-mode-map "C-c t s" #'consult-todo))
+
+  ;; (with-eval-after-load 'flymake
+  ;;   (hl-todo-flymake 'enable))
+
+  ;; (with-eval-after-load 'flycheck
+  ;;   (require 'flycheck-hl-todo))
 
   (with-eval-after-load 'magit
     (add-hook 'magit-log-wash-summary-hook
@@ -497,7 +522,8 @@
     (add-hook 'magit-revision-wash-message-hook
               #'hl-todo-search-and-highlight t))
 
-  (setq global-hl-todo-mode 1))
+  (setq hl-todo-insert-keywords
+        '("TODO" "FIXME" "BUG" "HACK" "NOTE" "IDEA")))
 
 (use-package envrc
   :straight t
@@ -513,10 +539,30 @@
   :init
   (gcmh-mode 1))
 
+(use-package bufler
+  :straight t
+  :bind
+  ("C-x C-b" . bufler-list)
+  ("C-x b" . bufler-switch-buffer)
+  :config
+  ;; Убираем лишний шум из авто-группировки
+  (setq bufler-filter-buffer-name-regexps '("^\\*Matches\\*"))
+  
+  ;; Настройка колонок для bufler-list (режим "админки")
+  (setq bufler-columns
+        '("Name"
+          (size :name "Size" :width 10)
+          (mode :name "Mode" :width 20)
+          (path :name "Path" :max-width 100)))
+
+  ;; Включаем режим workspace, чтобы bufler запоминал контексты окон
+  (bufler-mode 1))
+
 ;; Load external files (unchanged, but ensure they respect lazy-loading)
 (load-file "~/.emacs.d/lisp/evil.el")
 (load-file "~/.emacs.d/lisp/appereance.el")
 
+(load-file "~/.emacs.d/lisp/ai.el")
 (load-file "~/.emacs.d/lisp/git.el")
 (load-file "~/.emacs.d/lisp/dired.el")
 (load-file "~/.emacs.d/lisp/org/org.el")
