@@ -110,6 +110,9 @@
   :config
   (ultra-scroll-mode 1))
 
+(use-package gruvbox-theme
+  :straight (:host github :repo "greduan/emacs-theme-gruvbox" :branch "master"))
+
 ;; Hide-mode-line: Load on demand
 (use-package hide-mode-line
   :straight t
