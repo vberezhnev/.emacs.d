@@ -374,7 +374,7 @@
   (org-gtd-clarify-show-horizons t)
   (org-gtd-horizons-file "horizons.org")
   :config
-  (org-gtd-oops)
+  ;; (org-gtd-oops)
   (org-edna-mode))
 
 ;; Org-clock-budget: Load for budgeting
