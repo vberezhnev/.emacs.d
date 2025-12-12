@@ -16,29 +16,35 @@
 ;;   :config
 ;;   (gptel-watch-global-mode 1))
 
+(use-package llm-tool-collection
+  :straight (:host github :repo "skissue/llm-tool-collection" :branch "main")
+  :demand t)
+
 (use-package gptel
   :straight (:host github :repo "karthink/gptel" :branch "master")
   :demand t
   :init
+  (mapcar (apply-partially #'apply #'gptel-make-tool)
+          (llm-tool-collection-get-all))
+
   (setq gptel-verbose t
 	gptel-max-tokens 8024
-	gptel-temperature 0.7)
-  (setq gptel-api-key (getenv "AIML_API"))
-
-  (setq gptel-model 'openai/gpt-5-1-chat-latest)
+	gptel-temperature 0.7
+	gptel-api-key (getenv "AIML_API")
+	gptel-include-reasoning nil
+	gptel-track-media t
+	gptel-confirm-tool-calls t
+	gptel-model 'openai/gpt-5-2)
   :config
-  (defun read-file-contents (file-path)
-    "Read the contents of FILE-PATH and return it as a string."
-    (with-temp-buffer
-      (insert-file-contents file-path)
-      (buffer-string)))
+  (mapcar (apply-partially #'apply #'gptel-make-tool)
+          (llm-tool-collection-get-all))
 
   (gptel-make-openai "ChatGPT"
     :host "api.aimlapi.com"
     :endpoint "/chat/completions"
     :stream t
     :key gptel-api-key
-    :models '(gpt-4o openai/gpt-5-1-chat-latest openai/gpt-5-chat-latest))
+    :models '(openai/gpt-5-2 gpt-4o openai/gpt-5-1-chat-latest openai/gpt-5-chat-latest openai/gpt-5-1-codex-mini))
 
   (gptel-make-openai "xAI"
     :host "api.aimlapi.com"
@@ -66,7 +72,7 @@
     :endpoint "/chat/completions"
     :stream t
     :key gptel-api-key
-    :models '(anthropic/claude-opus-4-5))
+    :models '(anthropic/claude-opus-4-5 anthropic/claude-haiku-4.5))
 
   (gptel-make-openai "Search Models"
     :host "api.aimlapi.com"
@@ -80,27 +86,27 @@
     :stream t
     :models '(qwen2.5:7b deepseek-coder:6.7b gpt-oss:20b))
 
-  (setq gptel-backend (gptel-get-backend "ChatGPT"))
-
   (gptel-make-tool
-   :function (lambda (path filename content)
-               (let ((full-path (expand-file-name filename path)))
-		 (with-temp-buffer
-                   (insert content)
-                   (write-file full-path))
-		 (format "Created file %s in %s" filename path)))
-   :name "create_file"
-   :description "Create a new file with the specified content"
-   :args (list '(:name "path"
-		       :type "string"
-		       :description "The directory where to create the file")
-               '(:name "filename"
-		       :type "string"
-		       :description "The name of the file to create")
-               '(:name "content"
-		       :type "string"
-		       :description "The content to write to the file"))
-   :category "filesystem")
+   :name "read_buffer"                    ; javascript-style snake_case name
+   :function (lambda (buffer)                  ; the function that will run
+               (unless (buffer-live-p (get-buffer buffer))
+		 (error "error: buffer %s is not live." buffer))
+               (with-current-buffer  buffer
+		 (buffer-substring-no-properties (point-min) (point-max))))
+   :description "return the contents of an emacs buffer"
+   :args (list '(:name "buffer"
+		       :type string            ; :type value must be a symbol
+		       :description "the name of the buffer whose contents are to be retrieved"))
+   :category "emacs")                     ; An arbitrary label for grouping
+
+  (gptel-make-preset 'gpt4coding
+    :description "A preset optimized for coding tasks"
+    :backend "Claude"
+    :model 'openai/gpt-5-1-codex-mini
+    :system "You are an expert coding assistant. Your role is to provide high-quality code solutions, refactorings, and explanations."
+    :tools '("read_buffer")) ;gptel tools or tool names
+
+  (setq gptel-backend (gptel-get-backend "ChatGPT"))
 
   (setq gptel--system-message "
 ###INSTRUCTIONS###
@@ -159,29 +165,26 @@ Follow in the strict order:
 ;; Gptel-magit: Load for git commit integration
 (use-package gptel-magit
   :load-path "~/.emacs.d/lisp/packages/"
-  ;; :after (gptel magit)
+  :after (gptel magit)
   :init
-  (setq gptel-api-key (getenv "AIML_API"))
-  (setq gptel-magit-model 'gpt-4o)
+  (setq gptel-api-key (getenv "AIML_API")
+        gptel-magit-model 'gpt-4o)
   :config
-  ;; (setq gptel-magit-model 'gpt-4o)
-  ;; (setq gptel-magit-backend
-  ;;       (gptel-make-openai "AIMLAPI"
-  ;;         :host "api.aimlapi.com"
-  ;;         :endpoint "/chat/completions"
-  ;;         :stream nil
-  ;;         :key (getenv "AIML_API")
-  ;;         :models '(gpt-4o)))
   (gptel-magit-install)
-
   :bind (:map git-commit-mode-map
-	      ("M-g" . gptel-magit-generate-message))
+              ("M-g" . gptel-magit-generate-message))
   :hook
   (magit-mode . gptel-magit-install))
 
 (use-package gptel-quick
   :straight (:host github :repo "karthink/gptel-quick" :branch "master")
-  :bind (("C-c TAB" . gptel-quick)))
+  :bind (("C-c TAB" . gptel-quick))
+  :custom
+  (gptel-quick-word-count 20)
+  (gptel-quick-use-context t)
+  (gptel-quick-model 'gpt-4o)
+  :config
+  (setq gptel-quick-backend (gptel-get-backend "ChatGPT")))
 
 (use-package gptel-autocomplete
   :straight (:host github :repo "JDNdeveloper/gptel-autocomplete" :branch "main")
