@@ -178,24 +178,20 @@
   ;; (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook)
   )
 
+(use-package rust-playground
+  :straight t)
+
 ;; (defun rk/rustic-mode-hook ()
 ;;   "Custom hook for rustic-mode."
 ;;   (when buffer-file-name
 ;;     (setq-local buffer-save-without-query t))
 ;;   (add-hook 'before-save-hook 'lsp-bridge-format-file nil t))
 
-;; (use-package js-mode
-;;   :straight t
-;;   :hook ((js-mode . subword-mode)
-;;          (js-mode . electric-pair-mode)
-;;          (js-mode . eglot-ensure)
-;;          (js-mode . completion-preview-mode)))
-
 ;; Typescript-mode: Load for TypeScript/TSX files
 (use-package typescript-mode
   :straight t
   :mode (("\\.ts\\'" . typescript-mode)
-         ("\\.tsx\\'" . typescript-mode))
+         ("\\.tsx\\'" . tsx-ts-mode))
   :after (company flycheck)
   :config
   (define-derived-mode typescriptreact-mode typescript-mode "TypeScript TSX"))
