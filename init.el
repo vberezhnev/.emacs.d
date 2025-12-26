@@ -1,4 +1,4 @@
-; Disable package loading at startup (already present, kept for clarity)
+					; Disable package loading at startup (already present, kept for clarity)
 (setq package-enable-at-startup nil)
 
 ;; Optimize garbage collection and process output (unchanged)
@@ -42,6 +42,8 @@
 (setq use-package-always-ensure t) ;; Don’t auto-install unless :straight t
 (setq use-package-always-defer nil)   ;; Default to deferring all packages
 
+(set-frame-parameter (selected-frame) 'alpha '(85 . 50))
+(add-to-list 'default-frame-alist '(alpha . (85 . 50)))
 
 ;; Other settings (unchanged, but included for context)
 (server-start)
@@ -547,16 +549,148 @@
   :config
   ;; Убираем лишний шум из авто-группировки
   (setq bufler-filter-buffer-name-regexps '("^\\*Matches\\*"))
-  
-  ;; Настройка колонок для bufler-list (режим "админки")
-  (setq bufler-columns
-        '("Name"
-          (size :name "Size" :width 10)
-          (mode :name "Mode" :width 20)
-          (path :name "Path" :max-width 100)))
+
+  ;; ;; Настройка колонок для bufler-list (режим "админки")
+  ;; (setq bufler-columns
+  ;;       '("Name"
+  ;;         (size :name "Size" :width 10)
+  ;;         (mode :name "Mode" :width 20)
+  ;;         (path :name "Path" :max-width 100)))
 
   ;; Включаем режим workspace, чтобы bufler запоминал контексты окон
   (bufler-mode 1))
+
+;; (use-package consult-omni
+;;   :straight (consult-omni :type git :host github :repo "armindarvish/consult-omni" :branch "main" :files (:defaults "sources/*.el"))
+;;   :after consult
+;;   :custom
+;;   ;; General settings that apply to all sources
+;;   (consult-omni-show-preview t) ;;; show previews
+;;   (consult-omni-preview-key "C-o") ;;; set the preview key to C-o
+;;   :config
+;;   ;; Load Sources Core code
+;;   (require 'consult-omni-sources)
+;;   ;; Load Embark Actions
+;;   (require 'consult-omni-embark)
+
+;;   ;; Either load all source modules or a selected list
+
+;;   ;;; Select a list of modules you want to aload, otherwise all sources all laoded
+;; 					; (setq consult-omni-sources-modules-to-load (list 'consult-omni-wkipedia 'consult-omni-notes))
+;;   (consult-omni-sources-load-modules)
+;;   ;;; set multiple sources for consult-omni-multi command. Change these lists as needed for different interactive commands. Keep in mind that each source has to be a key in `consult-omni-sources-alist'.
+;;   (setq consult-omni-multi-sources '("calc"
+;;                                      ;; "File"
+;;                                      ;; "Buffer"
+;;                                      ;; "Bookmark"
+;;                                      "Apps"
+;;                                      "gptel"
+;;                                      "Brave"
+;;                                      "Dictionary"
+;;                                      ;; "Google"
+;;                                      "Wikipedia"
+;;                                      "elfeed"
+;;                                      ;; "mu4e"
+;;                                      ;; "buffers text search"
+;;                                      "Notes Search"
+;;                                      "Org Agenda"
+;;                                      "GitHub"
+;;                                      ;; "YouTube"
+;;                                      "Invidious"))
+
+;;   ;; Per source customization
+
+;;   (setq gptel-api-key (getenv "AIML_API"))
+
+;;   ;;; Set API KEYs. It is recommended to use a function that returns the string for better security.
+;;   (setq consult-omni-google-customsearch-key "YOUR-GOOGLE-API-KEY-OR-FUNCTION")
+;;   (setq consult-omni-google-customsearch-cx "YOUR-GOOGLE-CX-NUMBER-OR-FUNCTION")
+;;   (setq consult-omni-brave-api-key "YOUR-BRAVE-API-KEY-OR-FUNCTION")
+;;   (setq consult-omni-stackexchange-api-key "YOUR-STACKEXCHANGE-API-KEY-OR-FUNCTION")
+;;   ;; (setq consult-omni-pubmed-api-key "YOUR-PUBMED-API-KEY-OR-FUNCTION")
+;;   (setq consult-omni-openai-api-key gptel-api-key)
+
+;; ;;; Pick you favorite autosuggest command.
+;;   (setq consult-omni-default-autosuggest-command #'consult-omni-dynamic-brave-autosuggest) ;;or any other autosuggest source you define
+
+;;  ;;; Set your shorthand favorite interactive command
+;;   (setq consult-omni-default-interactive-command #'consult-omni-multi))
+
+(use-package google-translate
+  :straight (google-translate :type git :host github :repo "atykhonov/google-translate" :branch "master")
+  :after popup
+  :config
+  (setq google-translate-default-source-language "auto"
+	google-translate-default-target-language "en"
+	google-translate-output-destination nil))
+
+;; shit for chinese
+(use-package rime
+  :straight (rime :type git
+                  :host github
+                  :repo "DogLooksGood/emacs-rime"
+                  :files ("*.el" "Makefile" "lib.c"))
+  :custom
+  (default-input-method "rime")
+
+  ;; UI Configuration
+  (rime-show-candidate 'posframe)       ;; Show candidates in a floating box
+  (rime-posframe-style 'vertical)       ;; Vertical list is usually more readable
+  (rime-posframe-properties
+   (list :internal-border-width 1))
+
+  ;; Directory Setup
+  (rime-user-data-dir "~/.emacs.d/rime")
+
+  ;; LOGIC: When to automatically switch to ASCII (English)
+  (rime-disable-predicates
+   '(;; 1. Navigation/Control
+     rime-predicate-evil-mode-p              ;; If using Evil, ASCII in Normal mode
+     rime-predicate-hydra-p                  ;; If using Hydra
+     rime-predicate-ace-window-p             ;; If using Ace-window
+
+     ;; 2. General Text Editing
+     rime-predicate-after-alphabet-char-p    ;; "word" -> keep English for "word"
+     rime-predicate-space-after-ascii-p      ;; "word " -> keep English for next char
+     rime-predicate-punctuation-after-ascii-p;; "word." -> keep English punctuation
+
+     ;; 3. Programming (General)
+     rime-predicate-prog-in-code-p           ;; In comments -> Rime; In code -> ASCII
+
+     ;; 4. ORG-MODE SPECIFIC MAGIC
+     rime-predicate-org-in-src-block-p       ;; Inside #+BEGIN_SRC ... #+END_SRC -> ASCII
+     rime-predicate-org-latex-mode-p         ;; Inside $...$ or LaTeX env -> ASCII
+     rime-predicate-tex-math-or-command-p    ;; Inside \command -> ASCII
+     ))
+
+  ;; Inline ASCII triggers (optional, for manual toggle)
+  (rime-inline-ascii-trigger 'shift-l)      ;; Left Shift to toggle ASCII inside Rime
+
+  :bind
+  (:map rime-mode-map
+        ("C-`" . rime-send-keybinding)      ;; Allow accessing Rime menu
+        ("M-j" . rime-force-enable))        ;; Force enable if predicates block you incorrectly
+
+  :config
+  ;; Fix for posframe occasionally hiding the last candidate
+  (defun +rime--posframe-display-content-a (args)
+    "Append a full-width whitespace to the input string."
+    (cl-destructuring-bind (content) args
+      (let ((newresult (if (string-blank-p content)
+                           content
+                         (concat content "　"))))
+        (list newresult))))
+
+  (advice-add 'rime--posframe-display-content
+              :filter-args
+              #'+rime--posframe-display-content-a))
+
+(use-package activity-watch-mode
+  :straight (activity-watch-mode :type git
+				 :host github
+				 :repo "pauldub/activity-watch-mode")
+  :init
+  (global-activity-watch-mode))
 
 ;; Load external files (unchanged, but ensure they respect lazy-loading)
 (load-file "~/.emacs.d/lisp/evil.el")
@@ -576,7 +710,11 @@
 (load-file "~/.emacs.d/lisp/lsp.el")
 
 (load-file "~/.emacs.d/lisp/enlight.el")
-;; (load-file "~/.emacs.d/lisp/grammar.el")
+(load-file "~/.emacs.d/lisp/grammar.el")
+
+(add-hook 'after-init-hook '(lambda () (enlight)))
+(add-hook 'after-init-hook '(lambda () (org-agenda-list 1)))
 
 (provide 'init)
 ;; init.el ends here
+(put 'narrow-to-region 'disabled nil)
