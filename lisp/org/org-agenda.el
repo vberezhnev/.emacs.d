@@ -1,30 +1,30 @@
 ;;; org-agenda.el --- Org-agenda configuration -*- lexical-binding: t; -*-
 
-(use-package org-ql
-  :straight t
-  :demand t)
+;; (use-package org-ql
+;;   :straight t
+;;   :demand t)
 
-(defun my/agenda-count (query)
-  "Return count of org-ql results for QUERY."
-  (length
-   (org-ql-select (org-agenda-files)
-     query
-     :action 'element)))
+;; (defun my/agenda-count (query)
+;;   "Return count of org-ql results for QUERY."
+;;   (length
+;;    (org-ql-select (org-agenda-files)
+;;      query
+;;      :action 'element)))
 
-(defun my/update-agenda-stats ()
-  (setq my/agenda-overdue
-        (my/agenda-count '(deadline :to -1))) ;; overdue
+;; (defun my/update-agenda-stats ()
+;;   (setq my/agenda-overdue
+;;         (my/agenda-count '(deadline :to -1))) ;; overdue
 
-  (setq my/agenda-today
-        (my/agenda-count '(ts :on today)))    ;; today
+;;   (setq my/agenda-today
+;;         (my/agenda-count '(ts :on today)))    ;; today
 
-  (setq my/agenda-soon
-        (my/agenda-count '(and (scheduled :to 2)
-                               (not (todo "DONE")))))) ;; next 2 days
+;;   (setq my/agenda-soon
+;;         (my/agenda-count '(and (scheduled :to 2)
+;;                                (not (todo "DONE")))))) ;; next 2 days
 
-(my/update-agenda-stats)
+;; (my/update-agenda-stats)
 
-(run-with-timer 0 60 #'my/update-agenda-stats)
+;; (run-with-timer 0 60 #'my/update-agenda-stats)
 
 ;; (doom-modeline-def-segment my-org-agenda
 ;;   "Show org agenda alerts in mode-line"
@@ -64,12 +64,13 @@
 ;; Org-agenda: Load for agenda commands
 (use-package org-agenda
   :straight (:type built-in)
+  :demand t
   ;; :commands (org-agenda)
   :bind (:map global-map
               ("C-c a" . org-agenda))
   :init
   (setq org-agenda-start-on-weekday 1
-        org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-scheduled-if-done nil
         org-agenda-skip-deadline-if-done t
         org-agenda-include-deadlines t
         org-agenda-block-separator #x2501
@@ -113,9 +114,9 @@
         org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
                                                       "\n"
                                                       (org-agenda-format-date-aligned date)))
-        org-agenda-skip-timestamp-if-done t
+        org-agenda-skip-timestamp-if-done nil
         org-agenda-skip-deadline-if-done t
-        org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-scheduled-if-done nil
         org-agenda-skip-scheduled-if-deadline-is-shown t
         org-agenda-skip-timestamp-if-deadline-is-shown t
         org-default-notes-file "~/Org/agenda/Notes.org"
@@ -232,28 +233,28 @@
 				:and (:category ("ASCENT" "PERSONAL") :not (:deadline t) :not (:scheduled t)))
 			 (:discard (:todo ("DONE" "CANCELLED")))))))))
 
-          ("x" "🧘 Habits view"
-           ((agenda "" ((org-agenda-span 'day)
-			(org-habit-show-habits t)
-			(org-agenda-remove-tags t)
-			(org-agenda-prefix-format "  ∘ %t %s")
-			;; (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
-			(org-super-agenda-groups
-			 '((:name "🌍 Everytime"
-                                  :tag ("everytime"))
-                           ;; :face (:background "#A8BFC7" :foreground "white" :weight bold))  ; Pale blue-gray
-                           (:name "🌅 Morning"
-                                  :tag ("morning"))
-                           ;; :face (:background "#C7E8D5" :foreground "black"))  ; Very pale green
-                           (:name "☀️ Day"
-                                  :tag ("day"))
-                           ;; :face (:background "#F0E9C9" :foreground "black"))  ; Pale ivory
-                           (:name "🌙 Evening"
-                                  :tag ("evening"))
-                           ;; :face (:background "#D1E4F5" :foreground "black"))  ; Very pale blue
-                           (:discard (:anything))
-                           (:discard (:not (:tag "habit"))))))
-		    (hq-add-quest-info-to-agenda ""))))
+          ;; ("x" "🧘 Habits view"
+          ;;  ((agenda "" ((org-agenda-span 'day)
+	  ;; 		(org-habit-show-habits t)
+	  ;; 		(org-agenda-remove-tags t)
+	  ;; 		(org-agenda-prefix-format "  ∘ %t %s")
+	  ;; 		;; (org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"))
+	  ;; 		(org-super-agenda-groups
+	  ;; 		 '((:name "🌍 Everytime"
+          ;;                         :tag ("everytime"))
+          ;;                  ;; :face (:background "#A8BFC7" :foreground "white" :weight bold))  ; Pale blue-gray
+          ;;                  (:name "🌅 Morning"
+          ;;                         :tag ("morning"))
+          ;;                  ;; :face (:background "#C7E8D5" :foreground "black"))  ; Very pale green
+          ;;                  (:name "☀️ Day"
+          ;;                         :tag ("day"))
+          ;;                  ;; :face (:background "#F0E9C9" :foreground "black"))  ; Pale ivory
+          ;;                  (:name "🌙 Evening"
+          ;;                         :tag ("evening"))
+          ;;                  ;; :face (:background "#D1E4F5" :foreground "black"))  ; Very pale blue
+          ;;                  (:discard (:anything))
+          ;;                  (:discard (:not (:tag "habit"))))))
+	  ;; 	    (hq-add-quest-info-to-agenda ""))))
 
           ;; ("d" "📊 Day results"
           ;;  ((agenda ""
@@ -293,46 +294,57 @@
           ;;         ((org-agenda-overriding-header "\n✅📋 === COMPLETED TASKS ===\n")
           ;;          (org-agenda-remove-tags t)))))
 
-          ("f" "🪓 TimeBlocking"
-           ((agenda "" ((org-agenda-span 'week)
-			(org-agenda-prefix-format "  ∘ %t %s")
-			(org-agenda-files '("~/Org/agenda/timeblock.org"))
-			))))
+          ;; ("f" "🪓 TimeBlocking"
+          ;;  ((agenda "" ((org-agenda-span 'week)
+	  ;; 		(org-agenda-prefix-format "  ∘ %t %s")
+	  ;; 		(org-agenda-files '("~/Org/agenda/timeblock.org"))
+	  ;; 		(org-agenda-skip-scheduled-if-done nil
+	  ;; 						   org-agenda-skip-deadline-if-done nil
+	  ;; 						   org-agenda-skip-timestamp-if-done nil
+	  ;; 						   org-agenda-skip-deadline-if-done nil
+	  ;; 						   org-agenda-skip-scheduled-if-done nil
+	  ;; 						   org-agenda-skip-scheduled-if-deadline-is-shown nil
+	  ;; 						   org-agenda-skip-timestamp-if-deadline-is-shown nil)
 
-          ("e" "📤 View for exporting"
-           ((agenda "" ((org-agenda-span 'week)
-			(org-agenda-prefix-format
-			 '((agenda . "| % t")
-                           (todo . "%s")
-                           (tags . "%t %-10c | %s")
-                           (search . "%c %t %s")))
-			(org-agenda-clockreport-parameter-plist
-			 '(:maxlevel 5 :compact t :wstart 0 :link t :formula % :tags nil
-                                     :properties ("CATEGORY" "EFFORT" "File")
-                                     :narrow 80 :fileskip0 t))
-			(org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:"))
-			(org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:"))
-			(org-agenda-clockreport-mode nil)
-			(org-agenda-remove-tags t)
-			(org-agenda-filter '(category "+CORE"))
-			(org-super-agenda-groups
-			 '((:name "📅📌 CORE Tasks"
-                                  :category "CORE"
-                                  :face (:background "#F5E0A9" :foreground "black" :weight bold))
-			   (:name "📅📌 ASCENT Tasks"
-                                  :category "ASCENT"
-                                  :face (:background "#F5E0A9" :foreground "black" :weight bold))
-			   ))))))
+
+
+	  ;; 		))))
+
+          ;; ("e" "📤 View for exporting"
+          ;;  ((agenda "" ((org-agenda-span 'week)
+	  ;; 		(org-agenda-prefix-format
+	  ;; 		 '((agenda . "| % t")
+          ;;                  (todo . "%s")
+          ;;                  (tags . "%t %-10c | %s")
+          ;;                  (search . "%c %t %s")))
+	  ;; 		(org-agenda-clockreport-parameter-plist
+	  ;; 		 '(:maxlevel 5 :compact t :wstart 0 :link t :formula % :tags nil
+          ;;                            :properties ("CATEGORY" "EFFORT" "File")
+          ;;                            :narrow 80 :fileskip0 t))
+	  ;; 		(org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:"))
+	  ;; 		(org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:"))
+	  ;; 		(org-agenda-clockreport-mode nil)
+	  ;; 		(org-agenda-remove-tags t)
+	  ;; 		(org-agenda-filter '(category "+CORE"))
+	  ;; 		(org-super-agenda-groups
+	  ;; 		 '((:name "📅📌 CORE Tasks"
+          ;;                         :category "CORE"
+          ;;                         :face (:background "#F5E0A9" :foreground "black" :weight bold))
+	  ;; 		   (:name "📅📌 ASCENT Tasks"
+          ;;                         :category "ASCENT"
+          ;;                         :face (:background "#F5E0A9" :foreground "black" :weight bold))
+	  ;; 		   ))))))
 
 	  ("w" "✅ Weekly Completed Tasks"
 	   ((tags "TODO=\"DONE\"&CLOSED>=\"<-1w>\"")))
 
-	  ("m" "📅 Monthly Completed Tasks"
-	   ((tags "TODO=\"DONE\"&CLOSED>=\"<-1m>\""
-		  ((org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
-				       "~/Org/agenda/GTD/gtd_archive_2025"
-				       "~/Org/agenda/GTD/gtd_archive_2024"
-				       "~/Org/agenda/GTD/org-gtd-tasks.org_archive"))))))))
+	  ;; ("m" "📅 Monthly Completed Tasks"
+	  ;;  ((tags "TODO=\"DONE\"&CLOSED>=\"<-1m>\""
+	  ;; 	  ((org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
+	  ;; 			       "~/Org/agenda/GTD/gtd_archive_2025"
+	  ;; 			       "~/Org/agenda/GTD/gtd_archive_2024"
+	  ;; 			       "~/Org/agenda/GTD/Old_files/gtd_archive_2025_archive"))))))
+	  ))
 
   (defun my/style-org-agenda()
     (set-face-attribute 'org-agenda-date nil :height 1.5)
