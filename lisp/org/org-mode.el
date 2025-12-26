@@ -224,7 +224,6 @@
                                 ("src" "ϰ" "ϰ")
                                 ("quote" "❝" "❞"))
         org-modern-progress t
-        org-modern-statistics nil
         org-modern-todo t
         org-modern-todo-faces (quote (("TODO" :background "indian red" :foreground "white" :weight bold)
                                       ("NEXT" :background "sky blue" :foreground "black" :weight bold)
@@ -236,21 +235,29 @@
                                           (?B :background "dark orange" :foreground "black")
                                           (?C :background "tan" :foreground "black")))
         org-modern-tag t
-        org-modern-timestamp nil
+        org-modern-timestamp t
         org-modern-statistics t
         org-modern-table t
-        org-modern-tag-faces (quote (("@zettelkasten" :background "#DC1FFF" :foreground "#000000")
-                                     ("@coding" :background "#00bfff" :foreground "#000000")
-                                     ("@business" :background "#00bfff" :foreground "#000000")
-                                     ("@crypto" :background "#FFD700" :foreground "#000000")
-                                     ("@health" :background "#0b8043" :foreground "#ffffff")
-                                     ("@interview" :background "#CE412B" :foreground "#ffffff")
+        org-modern-tag-faces (quote (("@coding"      :background "#00BFFF" :foreground "#000000")
+				     ("@reading"     :background "#8FBC8F" :foreground "#000000")
+				     ("@video"       :background "#FF8C00" :foreground "#000000")
+				     ("@writing"     :background "#FFD700" :foreground "#000000")
+				     ("@thinking"    :background "#AFEEEE" :foreground "#000000")
+				     ("@planning"    :background "#BA55D3" :foreground "#FFFFFF")
+				     ("@research"    :background "#DC143C" :foreground "#FFFFFF")
+				     ("@interviewing":background "#CE412B" :foreground "#FFFFFF")
+				     ("@zettelkasten":background "#DC1FFF" :foreground "#000000")
 
-                                     ("rust" :background "#CE412B" :foreground "#ffffff")
-                                     ("go" :background "#CE412B" :foreground "#ffffff")
-                                     ("devops" :background "#CE412B" :foreground "#ffffff")
-
-				     ))
+				     ("rust"         :background "#CE412B" :foreground "#FFFFFF")
+				     ("c++"          :background "#4B0082" :foreground "#FFFFFF")
+				     ("nestjs"       :background "#E0234E" :foreground "#FFFFFF")
+				     ("solana"       :background "#14F195" :foreground "#000000")
+				     ("db"           :background "#2E8B57" :foreground "#FFFFFF")
+				     ("philosophy"   :background "#9370DB" :foreground "#FFFFFF")
+				     ("math"         :background "#4682B4" :foreground "#FFFFFF")
+				     ("psychology"   :background "#FF69B4" :foreground "#000000")
+				     ("productivity" :background "#32CD32" :foreground "#000000")
+				     ("chinese"      :background "#FF3030" :foreground "#FFFFFF")))
         org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
         org-modern-hide-stars " "
         org-modern-keyword "‣"))
@@ -451,18 +458,18 @@
 		   :branch "master")
   :after org)
 
-(use-package org-timeblock
-  :straight t
-  :bind
-  (:map global-map
- 	("C-c s" . org-timeblock))
-  :config
-  (setq org-timeblock-files '("~/Org/agenda/timeblock.org"
-			      "~/Org/agenda/GTD/org-gtd-tasks.org")
-	org-timeblock-inbox-file "~/Org/agenda/timeblock.org"
-	org-timeblock-span 4
-	org-timeblock-scale-options '(6 . 25)
-	org-timeblock-show-future-repeats t))
+;; (use-package org-timeblock
+;;   :straight t
+;;   :bind
+;;   (:map global-map
+;;  	("C-c s" . org-timeblock))
+;;   :config
+;;   (setq org-timeblock-files '("~/Org/agenda/timeblock.org"
+;; 			      "~/Org/agenda/GTD/org-gtd-tasks.org")
+;; 	org-timeblock-inbox-file "~/Org/agenda/timeblock.org"
+;; 	org-timeblock-span 4
+;; 	org-timeblock-scale-options '(6 . 25)
+;; 	org-timeblock-show-future-repeats t))
 
 ;; (use-package timeblock
 ;;   :straight (:host github
