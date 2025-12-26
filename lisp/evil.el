@@ -127,7 +127,8 @@
    "fs" 'save-buffer
    "ff" 'ace-link
 
-   "g" '(:ignore t :which-key "git")
+   "g" '(:ignore t :which-key "git+google-translate")
+   "gt" 'google-translate-at-point
    "gg" 'magit
    "gc" 'magit-clone
 
@@ -228,6 +229,7 @@
   (setq evil-want-integration t)
   (evil-collection-init '(ibuffer bookmark vterm magit xwidget-webkit sunrise))
   ;; (evil-set-initial-state 'elfeed-show-mode 'emacs)
+  (evil-set-initial-state 'bufler-mode 'emacs)
   (evil-set-initial-state 'ibuffer-mode 'normal)
   (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
   (evil-set-initial-state 'vterm-mode 'normal)
