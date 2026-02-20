@@ -81,63 +81,71 @@ The commit message MUST follow this structure:
     data))
 
 (defun gptel-magit--request (diff &rest args)
-  "Отправляет запрос к Ollama с исправленными функциями буфера."
+  "Отправляет запрос к Ollama через внешний процесс curl для максимальной скорости."
   (if (string-empty-p (string-trim diff))
       (message "Ошибка: Пустой diff")
     (let* ((url "http://localhost:11434/v1/chat/completions")
-           (url-request-method "POST")
-           (url-request-extra-headers '(("Content-Type" . "application/json")))
-           ;; Формируем структуру данных
+           (callback (plist-get args :callback))
            (request-data `((model . ,gptel-magit-model)
                            (messages . [((role . "system") (content . ,gptel-magit-commit-prompt))
                                         ((role . "user") (content . ,diff))])
-                           (stream . :json-false)))
-           (url-request-data (encode-coding-string (json-encode request-data) 'utf-8))
-           (callback (plist-get args :callback)))
+                           (stream . :json-false)
+                           (temperature . 0.2))) ; Низкая температура для скорости и четкости
+           (json-payload (encode-coding-string (json-encode request-data) 'utf-8))
+           (output-buffer (generate-new-buffer " *gptel-ollama-output*")))
+      
+      (message "Ollama: Generating with %s..." gptel-magit-model)
+      
+      (make-process
+       :name "gptel-magit-curl"
+       :buffer output-buffer
+       :command `("curl" "-s" "-X" "POST" ,url
+                  "-H" "Content-Type: application/json"
+                  "-d" ,json-payload)
+       :sentinel
+       (lambda (process event)
+         (when (eq (process-status process) 'exit)
+           (let ((parsed-content nil)
+                 (http-status (process-exit-status process)))
+             (unwind-protect
+                 (with-current-buffer (buffer-name output-buffer)
+                   (goto-char (point-min))
+                   (condition-case err
+                       (let* ((data (json-read))
+                              (choices (alist-get 'choices data)))
+                         (if (and (vectorp choices) (> (length choices) 0))
+                             (setq parsed-content 
+                                   (alist-get 'content (alist-get 'message (aref choices 0))))
+                           (message "Ollama Error: %s" (buffer-string))))
+                     (error (message "Parse Error: %s" err))))
+               (funcall callback parsed-content `(:http-status ,http-status))
+               (kill-buffer output-buffer)))))))))
 
-      (url-retrieve url
-                    (lambda (status)
-                      (let ((http-status (or (plist-get status :code) 0))
-                            (parsed-content nil))
-                        (unwind-protect
-                            (with-current-buffer (current-buffer)
-                              (goto-char (point-min))
-                              (if (re-search-forward "\n\n" nil t)
-                                  (let* ((json-body (buffer-substring (point) (point-max)))
-                                         (data (condition-case nil 
-                                                   (json-read-from-string json-body) 
-                                                 (error nil)))
-                                         (choices (and data (alist-get 'choices data))))
-                                    (if (and (vectorp choices) (> (length choices) 0))
-                                        (setq parsed-content 
-                                              (alist-get 'content 
-                                                         (alist-get 'message (aref choices 0))))
-                                      (message "Ollama RAW response: %s" json-body)))
-                                (message "HTTP Error: No body found")))
-                          ;; Передаем результат в колбэк
-                          (funcall callback parsed-content 
-                                   `(:http-status ,http-status 
-                                     :error ,(if parsed-content nil "Check *Messages*"))))
-                        (kill-buffer (current-buffer))))
-                    nil t t))))
+(defun gptel-magit--get-optimized-diff ()
+  "Получает сжатый diff: только измененные строки без лишнего контекста."
+  ;; Используем -U0 чтобы убрать строки контекста вокруг изменений
+  (let ((diff (magit-git-output "diff" "--cached" "-U0" "--diff-algorithm=histogram")))
+    (if (> (length diff) 8000)
+        (concat (substring diff 0 8000) "\n... [diff truncated for speed] ...")
+      diff)))
 
 (defun gptel-magit-generate-message ()
-  "Создаёт сообщение для коммита с помощью AIMLAPI."
+  "Создаёт сообщение для коммита, используя оптимизированный diff."
   (interactive)
-  (let ((diff (magit-git-output "diff" "--cached")))
-    (message "Diffing changes to be committed")
-    (gptel-magit--request
-     diff
-     :system gptel-magit-commit-prompt
-     :callback
-     (lambda (response info)
-       (if response
-           (with-current-buffer (current-buffer)
-             (goto-char (point-min))
-             (insert response)
-             ;; (message "Commit message inserted: %s" response)
-	     )
-         (message "Failed to generate commit message: %s" (plist-get info :error)))))))
+  (let ((diff (gptel-magit--get-optimized-diff)))
+    (if (string-empty-p diff)
+        (message "No staged changes to commit.")
+      (message "Ollama: Processing optimized diff...")
+      (gptel-magit--request
+       diff
+       :system gptel-magit-commit-prompt
+       :callback
+       (lambda (response info)
+         (if response
+             (save-excursion
+               (goto-char (point-min))
+               (insert response))
+           (message "Error: %s" (plist-get info :error))))))))
 
 (defun gptel-magit--generate (callback)
   "Generate a commit message and pass it to CALLBACK."
