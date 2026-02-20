@@ -692,6 +692,33 @@
   :init
   (global-activity-watch-mode))
 
+(defun my/toggle-highlight-line-or-region ()
+  "Toggle подсветку текущей строки или активного региона.
+Если подсветка уже есть — убрать её."
+  (interactive)
+  (let* ((beg (if (use-region-p)
+                  (region-beginning)
+                (line-beginning-position)))
+         (end (if (use-region-p)
+                  (region-end)
+                (line-end-position)))
+         (existing
+          (seq-filter
+           (lambda (ov)
+             (and (overlay-get ov 'my-highlight)
+                  (<= beg (overlay-start ov))
+                  (>= end (overlay-end ov))))
+           (overlays-in beg end))))
+    (if existing
+        ;; если уже есть — удалить
+        (mapc #'delete-overlay existing)
+      ;; иначе — создать
+      (let ((ov (make-overlay beg end)))
+        (overlay-put ov 'face 'hl-line)
+        (overlay-put ov 'my-highlight t)))))
+
+(global-set-key (kbd "C-c l") #'my/toggle-highlight-line-or-region)
+
 ;; Load external files (unchanged, but ensure they respect lazy-loading)
 (load-file "~/.emacs.d/lisp/evil.el")
 (load-file "~/.emacs.d/lisp/appereance.el")
