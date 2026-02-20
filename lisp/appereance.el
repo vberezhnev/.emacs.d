@@ -20,6 +20,47 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode 0))
 
+
+(defun system-theme-mode ()
+  "Считывает текущую системную тему из файла theme-mode."
+  (let ((file (concat (getenv "XDG_RUNTIME_DIR") "/theme-mode")))
+    (when (file-exists-p file)
+      (string-trim
+       (with-temp-buffer
+         (insert-file-contents file)
+         (buffer-string))))))
+
+(use-package auto-dark
+  :ensure t
+  :custom
+  (auto-dark-detection-method 'custom)
+  :config
+  (setq auto-dark-custom-theme-detection
+        (lambda ()
+          (pcase (system-theme-mode)
+            ("dark" 'dark)
+            ("light" 'light)
+            (_ nil))))
+  (setq auto-dark-themes '((modus-vivendi) (leuven)))
+  (auto-dark-mode))
+
+(defun update-theme-from-system-file (_event)
+  "Вызывается при изменении файла theme-mode."
+  (pcase (system-theme-mode)
+    ("dark" (auto-dark--set-theme 'dark))
+    ("light" (auto-dark--set-theme 'light))))
+
+(when (fboundp 'file-notify-add-watch)
+  (file-notify-add-watch
+   (concat (getenv "XDG_RUNTIME_DIR") "/theme-mode")
+   '(change)
+   #'update-theme-from-system-file))
+
+(update-theme-from-system-file nil)
+
+(use-package beacon
+  :straight t)
+
 ;; Doom-modeline: Load on demand
 (use-package doom-modeline
   :straight t
