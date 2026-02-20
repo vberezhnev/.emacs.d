@@ -216,6 +216,8 @@
 ;; TRAMP and mode-line settings (unchanged)
 (setq tramp-ssh-controlmaster-options "")
 (setq tramp-verbose 10)
+(setq tramp-auto-save-directory "~/tmp/tramp/")
+(setq tramp-chunksize 2000)
 
 ;; Olivetti: Load for specific modes
 (use-package olivetti
