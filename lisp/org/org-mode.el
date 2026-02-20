@@ -38,6 +38,14 @@
 	org-duration-format 'h:mm
 	org-log-redeadline t
 	org-log-reschedule t
+	;; org-todo-keywords
+	;; '((sequence "NEXT(n)"
+	;; 	    "TODO(t)"
+	;; 	    "WAIT(w@)"
+	;; 	    "|"
+	;; 	    "DONE(d)"
+	;; 	    "CNCL(c@)"
+	;; 	    "MOVED(m)"))
 	org-tag-alist
 	'((:startgroup)
           ("@coding"     . ?c)
@@ -74,10 +82,37 @@
 						(org-redisplay-inline-images))))
     (add-to-list 'org-modules 'org-tempo t))
 
-  (defun my-org-font-setup ()
-    (face-remap-add-relative 'variable-pitch :family "Liberation Serif"
-                             :height 1.5))
-  (add-hook 'org-mode-hook 'my-org-font-setup)
+  (with-eval-after-load 'org
+    (setq org-todo-keyword-faces
+          '(("TODO" . (:background "indian red" :foreground "white" :weight bold))
+            ("NEXT" . (:background "sky blue" :foreground "black" :weight bold))
+            ("WAIT" . (:background "olive drab" :foreground "black" :weight bold))
+            ("DONE" . (:background "pale green" :foreground "black" :weight bold))
+            ("CNCL" . (:background "dark red" :foreground "white" :weight bold))
+            ("MOVED" . (:background "gray50" :foreground "white" :weight bold)))))
+
+  (with-eval-after-load 'org-agenda
+    (defface my/org-agenda-next-face
+      '((t (:background "sky blue" :foreground "black" :weight bold)))
+      "Face for NEXT keyword in org-agenda.")
+
+    (defun my/org-agenda-highlight-next ()
+      "Force highlight NEXT keyword in org-agenda."
+      (font-lock-add-keywords
+       nil
+       '(("\\_<NEXT\\_>"
+          (0 'my/org-agenda-next-face t)) )
+       'append)
+      (when (bound-and-true-p font-lock-mode)
+	(font-lock-flush)))
+
+    (add-hook 'org-agenda-mode-hook #'my/org-agenda-highlight-next))
+
+
+  ;; (defun my-org-font-setup ()
+  ;;   (face-remap-add-relative 'variable-pitch :family "Liberation Serif"
+  ;;                            :height 1.5))
+  ;; (add-hook 'org-mode-hook 'my-org-font-setup)
 
   ;; (set-face-attribute 'org-block nil            :foreground nil :inherit
   ;; 		      'fixed-pitch :height 0.85)
@@ -364,12 +399,13 @@
 (use-package org-gtd
   :straight (:type git :host github :repo "Trevoke/org-gtd.el")
   :demand t
-  ;; :after org
+  :after org
   ;; :commands (org-gtd-capture org-gtd-engage org-gtd-engage-grouped-by-context org-gtd-process-inbox org-gtd-organize)
-  :bind (("C-c d c" . org-gtd-capture)
-         ("C-c d e" . org-gtd-engage)
-         ("C-c d r" . org-gtd-engage-grouped-by-context)
-         ("C-c d p" . org-gtd-process-inbox)
+  :bind (
+	 ;; ("C-c d c" . org-gtd-capture)
+         ;; ("C-c d e" . org-gtd-engage)
+         ;; ("C-c d r" . org-gtd-engage-grouped-by-context)
+         ;; ("C-c d p" . org-gtd-process-inbox)
          :map org-gtd-clarify-map
          ("C-c c" . org-gtd-organize))
   :custom
