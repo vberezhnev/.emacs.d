@@ -20,13 +20,39 @@
 (require 'json)
 
 (defcustom gptel-magit-commit-prompt
-  "You are an expert at writing short, clear Git commit messages. Your job is to summarize changes from the diff or context using simple words and minimal details, with Gitmoji codes for clarity.\n\nThe commit message MUST follow this structure:\n\n    <gitmoji> <type>(<optional scope>): <description>\n\n    [optional body]\n\nRules:\n- Use a type and Gitmoji code from this list:\n  - add: :heavy_plus_sign: Add new files or functionality\n  - build: :package: Update build system or dependencies\n  - chore: :wrench: Update tools or minor tasks\n  - ci: :construction_worker: Update CI system\n  - config: :gear: Update config files\n  - docs: :books: Update docs\n  - feat: :sparkles: Add new feature\n  - fix: :bug: Fix bug\n  - i18n: :globe_with_meridians: Update translations\n  - perf: :zap: Improve performance\n  - refactor: :recycle: Rework code, no new features or fixes\n  - remove: :heavy_minus_sign: Remove files or functionality\n  - security: :lock: Fix security issues\n  - style: :art: Update formatting\n  - test: :rotating_light: Add or update tests\n\n- Place Gitmoji code (e.g., :sparkles:) before type, with a space.\n- Add optional scope to show the affected part of code (e.g., fix(parser)).\n\n- **Hexagonal architecture scopes (optional):**\n  - If the diff clearly belongs to a known layer, use: \n\n        (<layer>/<module>)\n\n    Example: feat(adapters/db): Add repository\n\n  - If the layer is **not explicitly visible**, **do NOT guess**. Use only the module:\n\n        feat(gptel-magit): Update prompts\n\n  Allowed layers:\n  - app\n  - domain\n  - application\n  - adapters\n  - infra\n\n- Keep the description short and simple. Use basic words (e.g., \"Add login page\").\n- Capitalize description, no punctuation at the end.\n- Keep the subject line (Gitmoji + type + scope + description) ideally under 50 characters, max 72.\n- Write in English and avoid complex grammar.\n- Analyze the diff to choose type, Gitmoji, and scope.\n- If changes span multiple types, choose the most significant.\n\n- **Use the commit body only when absolutely necessary**, such as:\n  - very large diffs needing brief bullets\n  - BREAKING CHANGE notes\n  - ticket references\n\n  If the summary fits cleanly in the subject line, **do not add a body**.\n\n- For breaking changes, use :boom: with \"feat\" or \"fix\" and add \"BREAKING CHANGE:\" in the body.\n- If diff is unclear or empty, create a generic \"chore\" commit with a note to review manually.\n\nExamples of valid commit messages:\n- :sparkles: feat(auth): Add login page\n- :bug: fix(parser): Fix space parsing\n- :books: docs(readme): Update install guide\n- :recycle: refactor(api): Simplify error code\n- :heavy_plus_sign: add(ui): Add button component\n- :sparkles: feat(adapters/db): Add repository\n- :sparkles: feat(gptel-magit): Integrate gptel for commit messages\n\nExample with body (only when needed):\n- :boom: feat(api): Change response format\n\n  - Update response structure\n  - BREAKING CHANGE: Response now uses {data: {}}\n\nInvalid examples (avoid):\n- Update stuff\n- :bug: fix: fixed bug.\n- :rocket: FEAT: Add thing\n~~~"
+  "You are an expert at writing Git commit messages. Summarize changes from the diff using Gitmoji.
+
+The commit message MUST follow this structure:
+<gitmoji> <type>(<scope>): <description>
+
+### SCOPE RULES (STRICT):
+1. Look at the file paths in the diff (e.g., `modified  path/to/file.ts`).
+2. **Path Cleaning**: Ignore project root prefixes (like `grip-class-backend/` or `grip-class-frontend/`). Focus on what comes after `src/`.
+3. **Hexagonal Check**: 
+   - If the path contains `frameworks/primary`, `frameworks/adapters`, `infrastructure`, or `domain`, you MUST use the format: (<layer>/<module>).
+   - Example: `src/frameworks/primary/guards/jwt.ts` -> (primary/guards)
+   - Example: `src/infrastructure/db/repo.ts` -> (infra/db)
+4. **Standard Check**: 
+   - If it is not hexagonal (e.g. frontend components), use: (<folder>/<module>).
+   - Example: `src/components/api/auth.tsx` -> (components/auth)
+   - Example: `app/pages/login.tsx` -> (pages/login)
+5. **Conflict**: If multiple files are changed, use the scope of the most 'logic-heavy' file (usually the backend one or the main component). NEVER use a single word if a layer is visible.
+
+### GENERAL RULES:
+- Use Gitmoji: feat :sparkles:, fix :bug:, refactor :recycle:, chore :wrench:, docs :books:, style :art:, test :rotating_light:.
+- Description: Simple English, Capitalized, no period at the end.
+- Max 72 characters for the first line.
+
+### EXAMPLES:
+- :bug: fix(primary/guards): Skip dev key if auth header present
+- :sparkles: feat(components/auth): Clear dev key on logout
+- :wrench: chore(infra/config): Update env variables"
   "Prompt for short, simple commit messages with Gitmoji codes for AIMLAPI."
   :type 'string
   :group 'gptel-magit)
 
-(defcustom gptel-magit-model "gpt-4o"
-  "The model to use for AIMLAPI."
+(defcustom gptel-magit-model "qwen3-coder:30b" ; Указываем твою модель
+  "The model to use for Ollama."
   :type 'string
   :group 'gptel-magit)
 
@@ -55,62 +81,44 @@
     data))
 
 (defun gptel-magit--request (diff &rest args)
-  "Отправляет запрос с экранированным diff."
+  "Отправляет запрос к Ollama с исправленными функциями буфера."
   (if (string-empty-p (string-trim diff))
-      (progn
-        (message "Ошибка: Пустой diff, нет изменений для коммита")
-        (funcall (plist-get args :callback) nil `(:error "Empty diff")))
-    (let* ((encoded-diff (encode-coding-string diff 'utf-8 t))
-           (escaped-diff (json-encode-string encoded-diff))
-           (url "https://api.aimlapi.com/chat/completions")
+      (message "Ошибка: Пустой diff")
+    (let* ((url "http://localhost:11434/v1/chat/completions")
            (url-request-method "POST")
-           (url-request-extra-headers
-            `(("Content-Type" . "application/json")
-              ("Authorization" . ,(concat "Bearer " (getenv "AIML_API")))))
-           (request-data (gptel-magit--url-request-data escaped-diff args))
-           (url-request-data
-            (encode-coding-string
-             (json-encode request-data)
-             'utf-8 t))
+           (url-request-extra-headers '(("Content-Type" . "application/json")))
+           ;; Формируем структуру данных
+           (request-data `((model . ,gptel-magit-model)
+                           (messages . [((role . "system") (content . ,gptel-magit-commit-prompt))
+                                        ((role . "user") (content . ,diff))])
+                           (stream . :json-false)))
+           (url-request-data (encode-coding-string (json-encode request-data) 'utf-8))
            (callback (plist-get args :callback)))
-      ;; (message "Экранированный diff: %s" escaped-diff)
-      ;; (message "Отправляемый JSON: %s" (json-encode request-data)) ; Debug log
+
       (url-retrieve url
                     (lambda (status)
-                      (let* ((raw-response (buffer-string))
-                             (http-status (or (plist-get status :code) 0))
-                             (response (condition-case err
-                                           (with-temp-buffer
-                                             (insert raw-response)
-                                             (goto-char (point-min))
-                                             (when (re-search-forward "\n\n" nil t)
-                                               (json-read)))
-                                         (error (message "Ошибка парсинга JSON: %s" err) nil)))
-                             (parsed-response
-                              (cond
-                               ((null response)
-                                (message "Ошибка: Пустой или невалидный JSON")
-                                nil)
-                               ((alist-get 'error response)
-                                (message "API error: %s" (alist-get 'error response))
-                                nil)
-                               (t
-                                (let ((choices (alist-get 'choices response)))
-                                  (if (and choices (vectorp choices) (> (length choices) 0))
-                                      (or (alist-get 'content
-                                                     (alist-get 'message (aref choices 0)))
-                                          (message "Ошибка: Нет content в message")
-                                          nil)
-                                    (message "Ошибка: Неверный формат choices: %s" choices)
-                                    nil)))))
-                             (info `(:http-status ,http-status
-                                     :raw-response ,raw-response
-                                     :error ,(if (plist-get status :error)
-                                                 (format "%s" (plist-get status :error))
-                                               (unless parsed-response "Failed to parse response")))))
-                        ;; (message "Сырой ответ API: %s" raw-response)
-                        ;; (message "Информация API: %s" info)
-                        (funcall callback parsed-response info)))
+                      (let ((http-status (or (plist-get status :code) 0))
+                            (parsed-content nil))
+                        (unwind-protect
+                            (with-current-buffer (current-buffer)
+                              (goto-char (point-min))
+                              (if (re-search-forward "\n\n" nil t)
+                                  (let* ((json-body (buffer-substring (point) (point-max)))
+                                         (data (condition-case nil 
+                                                   (json-read-from-string json-body) 
+                                                 (error nil)))
+                                         (choices (and data (alist-get 'choices data))))
+                                    (if (and (vectorp choices) (> (length choices) 0))
+                                        (setq parsed-content 
+                                              (alist-get 'content 
+                                                         (alist-get 'message (aref choices 0))))
+                                      (message "Ollama RAW response: %s" json-body)))
+                                (message "HTTP Error: No body found")))
+                          ;; Передаем результат в колбэк
+                          (funcall callback parsed-content 
+                                   `(:http-status ,http-status 
+                                     :error ,(if parsed-content nil "Check *Messages*"))))
+                        (kill-buffer (current-buffer))))
                     nil t t))))
 
 (defun gptel-magit-generate-message ()
@@ -128,7 +136,7 @@
              (goto-char (point-min))
              (insert response)
              ;; (message "Commit message inserted: %s" response)
-						 )
+	     )
          (message "Failed to generate commit message: %s" (plist-get info :error)))))))
 
 (defun gptel-magit--generate (callback)
@@ -169,11 +177,11 @@
 (defun gptel-magit--do-diff-request (diff)
   "Send request for an explanation of DIFF."
   (gptel-magit--request diff
-    :system "You are an expert at understanding and explaining code changes by reading diff output. Your job is to write a short clear summary explanation of the changes in Markdown format."
-    :callback (lambda (response info)
-                (if (null response)
-                    (message "Ошибка: API вернул пустой ответ или ошибку: %s" info)
-                  (gptel-magit--show-diff-explain response))))
+			:system "You are an expert at understanding and explaining code changes by reading diff output. Your job is to write a short clear summary explanation of the changes in Markdown format."
+			:callback (lambda (response info)
+				    (if (null response)
+					(message "Ошибка: API вернул пустой ответ или ошибку: %s" info)
+				      (gptel-magit--show-diff-explain response))))
   (message "magit-gptel: Explaining diff..."))
 
 (defun gptel-magit-diff-explain ()
