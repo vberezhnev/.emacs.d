@@ -246,20 +246,18 @@
   (add-hook 'telega-root-mode-hook (lambda () (setq olivetti-body-width 110))))
 
 ;; Theme-changer: Load for theme switching
-(use-package theme-changer
-  :straight (:host github :repo "hadronzoo/theme-changer" :branch "master")
-  ;; :commands (change-theme)
-  :demand t
-  :init
-  (setq calendar-location-name "Tianjin, CN"
-	calendar-latitude 39.13
-	calendar-longitude 117.20)
-  :config
-  ;; (load-file "~/.emacs.d/lisp/themes/twitch-dark-theme.el") ;; Load theme lazily
-  (change-theme 'leuven 'modus-vivendi)) ;; dichromacy | cobrakai
-
-(use-package beacon
-  :straight t)
+;; (use-package theme-changer
+;;   :straight (:host github :repo "hadronzoo/theme-changer" :branch "master")
+;;   ;; :commands (change-theme)
+;;   :demand t
+;;   :init
+;;   (setq calendar-location-name "Tianjin, CN"
+;; 	calendar-latitude 39.13
+;; 	calendar-longitude 117.20)
+;;   :config
+;;   ;; (load-file "~/.emacs.d/lisp/themes/twitch-dark-theme.el") ;; Load theme lazily
+;;   (change-theme 'leuven 'modus-vivendi))
+;; dichromacy | cobrakai
 
 ;; (use-package chess
 ;;   :straight t)
