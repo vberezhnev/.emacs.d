@@ -196,6 +196,15 @@
   :config
   (define-derived-mode typescriptreact-mode typescript-mode "TypeScript TSX"))
 
+(defun my/create-typescript-sandbox ()
+  "Create a temporary Typescript file and set a local variable for
+the compile-command."
+  (interactive)
+  (let ((folder (make-temp-file "typescript-sandbox-" t)))
+    (find-file (concat folder "/index.ts"))
+    (typescript-mode)
+    (set (make-local-variable 'compile-command) (format "deno run %s" (buffer-file-name)))))
+
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 
