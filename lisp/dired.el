@@ -47,7 +47,7 @@
         ("jpg" . "eog")
         ("png" . "eog")
         ("mkv" . "vlc --one-instance")
-        ("mp4" . "vlc --one-instance")
+        ("mp4" . "vlc")
         ("ogv" . "vlc --one-instance")
         ("ogg" . "vlc --one-instance")
         ("avi" . "vlc --one-instance")
