@@ -167,4 +167,4 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
   (enlight-open)
   (my/toggle-cursor))
 
-(setopt initial-buffer-choice #'enlight)
+;; (setopt initial-buffer-choice #'enlight)
