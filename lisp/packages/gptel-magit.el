@@ -1,88 +1,216 @@
-;;; gptel-magit.el --- Robust Git Commit Generator with Ollama -*- lexical-binding: t; -*-
+;;; gptel-magit.el --- Generate commit messages for magit using AIMLAPI -*- lexical-binding: t; -*-
 
-(require 'gptel)
+;; Copyright (C) 2025 Authors
+;; SPDX-License-Identifier: Apache-2.0
+
+;; Author: Ragnar Dahlén <r.dahlen@gmail.com>
+;; Version: 1.0
+;; Package-Requires: ((emacs "28.1") (magit "4.0"))
+;; Keywords: vc, convenience
+;; URL: https://github.com/ragnard/gptel-magit
+
+;;; Commentary:
+
+;; This package integrates with api.aimlapi.com to generate commit messages for magit.
+
+;;; Code:
+
 (require 'magit)
+(require 'url)
+(require 'json)
 
-(defgroup gptel-magit nil
-  "Генерация сообщений коммита через gptel и Ollama."
-  :group 'magit)
+(defcustom gptel-magit-commit-prompt
+  "You are an expert at writing Git commit messages. Summarize changes from the diff using Gitmoji.
 
-(defcustom gptel-magit-model 'qwen2.5-coder:7b
-  "Модель для генерации (например, qwen2.5-coder:7b или qwen3:4b)."
-  :type 'symbol
-  :group 'gptel-magit)
-
-(defcustom gptel-magit-backend-name "Ollama"
-  "Имя бэкенда Ollama, как оно указано в вашем gptel-make-ollama."
-  :type 'string
-  :group 'gptel-magit)
-
-(defvar gptel-magit-commit-prompt
-  "You are an expert at writing Git commit messages. 
-Summarize changes from the diff using Gitmoji.
 The commit message MUST follow this structure:
 <gitmoji> <type>(<scope>): <description>
 
-Output ONLY the raw text of the commit message. No markdown, no commentary."
-  "Системный промпт для модели.")
+### SCOPE RULES (STRICT):
+1. Look at the file paths in the diff (e.g., `modified  path/to/file.ts`).
+2. **Path Cleaning**: Ignore project root prefixes (like `grip-class-backend/` or `grip-class-frontend/`). Focus on what comes after `src/`.
+3. **Hexagonal Check**:
+   - If the path contains `frameworks/primary`, `frameworks/adapters`, `infrastructure`, or `domain`, you MUST use the format: (<layer>/<module>).
+   - Example: `src/frameworks/primary/guards/jwt.ts` -> (primary/guards)
+   - Example: `src/infrastructure/db/repo.ts` -> (infra/db)
+4. **Standard Check**:
+   - If it is not hexagonal (e.g. frontend components), use: (<folder>/<module>).
+   - Example: `src/components/api/auth.tsx` -> (components/auth)
+   - Example: `app/pages/login.tsx` -> (pages/login)
+5. **Conflict**: If multiple files are changed, use the scope of the most 'logic-heavy' file (usually the backend one or the main component). NEVER use a single word if a layer is visible.
 
-;;;###autoload
-(defun gptel-magit-generate-message (&optional rationale)
-  "Генерирует сообщение коммита. Очищает буфер перед вставкой, чтобы не было каши."
+### GENERAL RULES:
+- Use Gitmoji: feat :sparkles:, fix :bug:, refactor :recycle:, chore :wrench:, docs :books:, style :art:, test :rotating_light:.
+- Description: Simple English, Capitalized, no period at the end.
+- Max 72 characters for the first line.
+
+### EXAMPLES:
+- :bug: fix(primary/guards): Skip dev key if auth header present
+- :sparkles: feat(components/auth): Clear dev key on logout
+- :wrench: chore(infra/config): Update env variables"
+  "Prompt for short, simple commit messages with Gitmoji codes for AIMLAPI."
+  :type 'string
+  :group 'gptel-magit)
+
+(defcustom gptel-magit-model "hoangquan456/qwen3-nothink:1.7b" ; Указываем твою модель
+  "The model to use for Ollama."
+  :type 'string
+  :group 'gptel-magit)
+
+(defun gptel-magit--format-commit-message (message)
+  "Форматирует сообщение коммита MESSAGE, обрабатывая nil."
+  (if (null message)
+      (progn
+        (message "Ошибка: API вернул пустое сообщение")
+        "")
+    (with-temp-buffer
+      (insert message)
+      (text-mode)
+      (setq fill-column git-commit-summary-max-length)
+      (fill-region (point-min) (point-max))
+      (buffer-string))))
+
+(defun gptel-magit--url-request-data (prompt &optional parameters)
+  "Создаёт JSON для запроса к AIMLAPI."
+  (let* ((params (or parameters (list :system gptel-magit-commit-prompt)))
+         (data `((model . ,gptel-magit-model)
+                 (messages . [((role . "system") (content . ,(plist-get params :system)))
+                              ((role . "user") (content . ,prompt))])
+                 (max_tokens . 500)
+                 (stream . :json-false)))) ; Force boolean
+    ;; (message "Запрос JSON: %s" (json-encode data))
+    data))
+
+(defun gptel-magit--request (diff &rest args)
+  "Отправляет запрос к Ollama через внешний процесс curl для максимальной скорости."
+  (if (string-empty-p (string-trim diff))
+      (message "Ошибка: Пустой diff")
+    (let* ((url "http://localhost:11434/v1/chat/completions")
+           (callback (plist-get args :callback))
+	   (request-data `((model . ,gptel-magit-model)
+			   (messages . [((role . "system") (content . ,gptel-magit-commit-prompt))
+					((role . "user") (content . ,diff))])
+			   (stream . :json-false)
+			   (options . ((num_predict . 100) ; ограничение длины ответа ускоряет генерацию
+				       (temperature . 0.2)))
+			   (keep_alive . "1h"))) ; модель будет висеть в памяти час
+           (json-payload (encode-coding-string (json-encode request-data) 'utf-8))
+           (output-buffer (generate-new-buffer " *gptel-ollama-output*")))
+
+      (message "Ollama: Generating with %s..." gptel-magit-model)
+
+      (make-process
+       :name "gptel-magit-curl"
+       :buffer output-buffer
+       :command `("curl" "-s" "-X" "POST" ,url
+                  "-H" "Content-Type: application/json"
+                  "-d" ,json-payload)
+       :sentinel
+       (lambda (process event)
+         (when (eq (process-status process) 'exit)
+           (let ((parsed-content nil)
+                 (http-status (process-exit-status process)))
+             (unwind-protect
+                 (with-current-buffer (buffer-name output-buffer)
+                   (goto-char (point-min))
+                   (condition-case err
+                       (let* ((data (json-read))
+                              (choices (alist-get 'choices data)))
+                         (if (and (vectorp choices) (> (length choices) 0))
+                             (setq parsed-content
+                                   (alist-get 'content (alist-get 'message (aref choices 0))))
+                           (message "Ollama Error: %s" (buffer-string))))
+                     (error (message "Parse Error: %s" err))))
+               (funcall callback parsed-content `(:http-status ,http-status))
+               (kill-buffer output-buffer)))))))))
+
+(defun gptel-magit--get-optimized-diff ()
+  "Получает сжатый diff: только измененные строки без лишнего контекста."
+  ;; Используем -U0 чтобы убрать строки контекста вокруг изменений
+  (let ((diff (magit-git-output "diff" "--cached" "-U0" "--diff-algorithm=histogram")))
+    (if (> (length diff) 8000)
+        (concat (substring diff 0 8000) "\n... [diff truncated for speed] ...")
+      diff)))
+
+(defun gptel-magit-generate-message ()
+  "Создаёт сообщение для коммита, используя оптимизированный diff."
   (interactive)
-  (let* ((target-backend (gptel-get-backend gptel-magit-backend-name))
-         (diff (shell-command-to-string "git diff --cached --unified=0 --no-prefix"))
-         (commit-buf (or (get-buffer "COMMIT_EDITMSG")
-                         (when (derived-mode-p 'git-commit-mode) (current-buffer))))
-         (full-prompt (if (and rationale (not (string-empty-p rationale)))
-                          (format "User Rationale: %s\n\nDiff:\n%s" rationale diff)
-                        diff)))
+  (let ((diff (gptel-magit--get-optimized-diff)))
+    (if (string-empty-p diff)
+        (message "No staged changes to commit.")
+      (message "Ollama: Processing optimized diff...")
+      (gptel-magit--request
+       diff
+       :system gptel-magit-commit-prompt
+       :callback
+       (lambda (response info)
+         (if response
+             (save-excursion
+               (goto-char (point-min))
+               (insert response))
+           (message "Error: %s" (plist-get info :error))))))))
 
-    (unless target-backend (user-error "Бэкенд '%s' не найден!" gptel-magit-backend-name))
-    (unless commit-buf (user-error "Буфер коммита не найден"))
+(defun gptel-magit--generate (callback)
+  "Generate a commit message and pass it to CALLBACK."
+  (let ((diff (magit-git-output "diff" "--cached")))
+    (message "Diffing changes to be committed")
+    (gptel-magit--request
+     diff
+     :system gptel-magit-commit-prompt
+     :callback
+     (lambda (response info)
+       (if response
+           (funcall callback (gptel-magit--format-commit-message response))
+         (message "Failed to generate commit message: %s" (plist-get info :error)))))))
 
-    (if (string-empty-p (string-trim diff))
-        (user-error "Diff пуст!")
-      
-      (message "[gptel-magit] Ollama генерирует чистый текст...")
-      
-      ;; Очищаем буфер перед началом, чтобы не было наслоения текста
-      (with-current-buffer commit-buf
-        (let ((inhibit-read-only t))
-          (delete-region (point-min) (point-max))))
+(defun gptel-magit-commit-generate (&optional args)
+  "Create a new commit with a generated commit message."
+  (interactive (list (magit-commit-arguments)))
+  (gptel-magit--generate
+   (lambda (message)
+     (magit-commit-create (append args `("--message" ,message "--edit")))))
+  (message "magit-gptel: Generating commit..."))
 
-      (let ((gptel-backend target-backend)
-            (gptel-model gptel-magit-model)
-            (gptel-max-tokens 200))
-        
-        (gptel-request
-         full-prompt
-         :system gptel-magit-commit-prompt
-         :stream t
-         :callback
-         (lambda (response info)
-           (let ((msg-buffer commit-buf))
-             (when (and (stringp response) (buffer-live-p msg-buffer))
-               (with-current-buffer msg-buffer
-                 (let ((inhibit-read-only t))
-                   ;; Вставляем в конец текущего текста (стриминг)
-                   (save-excursion
-                     (goto-char (point-max))
-                     (insert response))))))))))))
+(defun gptel-magit--show-diff-explain (text)
+  "Popup a buffer with diff explanation TEXT."
+  (let ((buffer-name "*gptel-magit diff-explain*"))
+    (when-let ((existing-buffer (get-buffer buffer-name)))
+      (kill-buffer existing-buffer))
+    (let ((buffer (get-buffer-create buffer-name)))
+      (with-current-buffer buffer
+        (insert text)
+        (setq fill-column 72)
+        (fill-region (point-min) (point-max))
+        (markdown-view-mode)
+        (goto-char (point-min)))
+      (pop-to-buffer buffer))))
 
-;;;###autoload
-(defun gptel-magit-commit-with-rationale ()
-  "Сначала спрашивает 'Зачем?', затем генерирует коммит."
+(defun gptel-magit--do-diff-request (diff)
+  "Send request for an explanation of DIFF."
+  (gptel-magit--request diff
+			:system "You are an expert at understanding and explaining code changes by reading diff output. Your job is to write a short clear summary explanation of the changes in Markdown format."
+			:callback (lambda (response info)
+				    (if (null response)
+					(message "Ошибка: API вернул пустой ответ или ошибку: %s" info)
+				      (gptel-magit--show-diff-explain response))))
+  (message "magit-gptel: Explaining diff..."))
+
+(defun gptel-magit-diff-explain ()
+  "Ask for an explanation of diff at current section."
   (interactive)
-  (let ((rationale (read-string "Rationale (optional): ")))
-    (gptel-magit-generate-message rationale)))
+  (when-let* ((section (magit-current-section))
+              (start (oref section content))
+              (end (oref section end))
+              (content (buffer-substring start end)))
+    (gptel-magit--do-diff-request content)))
 
 ;;;###autoload
 (defun gptel-magit-install ()
-  "Заглушка для совместимости с вашим конфигом."
-  (interactive)
-  (message "gptel-magit helper ready."))
+  "Install gptel-magit functionality."
+  (define-key git-commit-mode-map (kbd "M-g") 'gptel-magit-generate-message)
+  (transient-append-suffix 'magit-commit "c"
+    '("g" "Generate commit" gptel-magit-commit-generate))
+  (transient-append-suffix 'magit-diff "s"
+    '("x" "Explain" gptel-magit-diff-explain)))
 
 (provide 'gptel-magit)
-
 ;;; gptel-magit.el ends here
