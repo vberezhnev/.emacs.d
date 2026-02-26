@@ -55,7 +55,7 @@ General rules:
   :type 'string
   :group 'gptel-magit)
 
-(defcustom gptel-magit-model "hoangquan456/qwen3-nothink:1.7b" ; Указываем твою модель
+(defcustom gptel-magit-model "hoangquan456/qwen3-nothink:4b" ; Указываем твою модель
   "The model to use for Ollama."
   :type 'string
   :group 'gptel-magit)
