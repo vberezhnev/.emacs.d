@@ -43,7 +43,23 @@
 (use-package org-super-agenda
   :straight t
   ;; :commans (org-super-agenda-mode)
-  :hook (org-agenda-mode . org-super-agenda-mode))
+  :hook (org-agenda-mode . org-super-agenda-mode)
+  :config
+  (setq org-super-agenda-groups
+      '(;; 1. Твой доминирующий блок
+        (:name "" ;;"🚀 CURRENT SPRINT"
+               :category "SPRINT"
+               :order -100
+               )
+        
+        ;; 2. Группа-заглушка для всего остального, чтобы не было "Other items"
+        (:habit t :order 100) ; Хабиты в конец
+        
+        ;; 3. Самый важный хак:
+        ;; Если ты не хочешь видеть "Other items", 
+        ;; нужно разрешить остальным задачам просто быть собой
+        (:anything t :order 99) 
+        )))
 
 ;; (use-package better-org-habit
 ;;   :straight (:type built-in)
@@ -51,11 +67,11 @@
 ;;   ;; :straight (better-org-habit :type git :host github :repo "vberezhnev/better-org-habit.el")
 ;;   :load-path "~/Templates2/Lisp/better-org-habit/better-org-habit.el")
 
-(with-eval-after-load 'org-agenda
-  (load-file "~/Templates2/Lisp/better-org-habbit/better-org-habit-custom.el")
-  (load-file "~/Templates2/Lisp/better-org-habbit/better-org-habit-stats.el")
-  (load-file "~/Templates2/Lisp/better-org-habbit/better-org-habit.el")
-  (hq-setup))
+;; (with-eval-after-load 'org-agenda
+;;   (load-file "~/Templates2/Lisp/better-org-habbit/better-org-habit-custom.el")
+;;   (load-file "~/Templates2/Lisp/better-org-habbit/better-org-habit-stats.el")
+;;   (load-file "~/Templates2/Lisp/better-org-habbit/better-org-habit.el")
+;;   (hq-setup))
 
 (defun my/org-super-agenda-date-in-n-days (days)
   "Return a date string for DAYS days from today in YYYY-MM-DD format."
@@ -73,7 +89,8 @@
         org-agenda-skip-scheduled-if-done nil
         org-agenda-skip-deadline-if-done t
         org-agenda-include-deadlines t
-        org-agenda-block-separator #x2501
+        ;; org-agenda-block-separator #x2501
+	org-agenda-block-separator nil
         org-agenda-compact-blocks t
         org-agenda-start-with-log-mode nil
         org-agenda-deadline-faces
@@ -109,8 +126,13 @@
 			  :properties ("CATEGORY" "EFFORT" "File")
 			  :narrow 80
 			  :fileskip0 t))
-        org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:")
-        org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:")
+        ;; org-agenda-scheduled-leaders '("[S]:" "[S] x%3dd.:")
+        ;; org-agenda-deadline-leaders '("[D]:" "[D] +%3dd.:" "[D] -%3dd.:")
+
+	;; https://github.com/Martinsos/dotfiles/blob/89aa97d07343ff2da29ca22cea702ec7b02b569c/vanilla-emacs.d/Emacs.org#L1814
+	org-agenda-scheduled-leaders '("-> " "-%dd -> ")
+	org-agenda-deadline-leaders '("! " "+%dd ! " "-%dd ! ")
+
         org-agenda-format-date (lambda (date) (concat "\n" (make-string (window-width) 9472)
                                                       "\n"
                                                       (org-agenda-format-date-aligned date)))
@@ -121,7 +143,10 @@
         org-agenda-skip-timestamp-if-deadline-is-shown t
         org-default-notes-file "~/Org/agenda/Notes.org"
         org-agenda-files '("~/Org/agenda/GTD/org-gtd-tasks.org"
+			   "~/Org/agenda/GTD/org-gtd-actions.org"
+			   "~/Org/agenda/GTD/org-gtd-sprints.org"
 			   "~/Org/agenda/GTD/org-gtd-incubated.org"
+			   "~/Org/agenda/GTD/org-gtd-calendar.org"
 			   "~/Org/agenda/GTD/org-gtd-habits.org"))
   :config
 
