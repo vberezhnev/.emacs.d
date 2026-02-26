@@ -4,10 +4,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("19a2c0b92a6aa1580f1be2deb7b8a8e3a4857b6c6ccf522d00547878837267e7"
-     "fa49766f2acb82e0097e7512ae4a1d6f4af4d6f4655a48170d0a00bcb7183970"
-     default)))
+ '(org-agenda-files
+   '("/home/berezhnev/Org/agenda/GTD/org-gtd-tasks.org"
+     "/home/berezhnev/Org/agenda/GTD/gtd_archive_2025"
+     "/home/berezhnev/Org/agenda/GTD/gtd_archive_2024")))
 ;; (custom-set-faces
 ;;  ;; custom-set-faces was added by Custom.
 ;;  ;; If you edit it by hand, you could mess it up, so be careful.
