@@ -20,33 +20,37 @@
 (require 'json)
 
 (defcustom gptel-magit-commit-prompt
-  "You are an expert at writing Git commit messages. Summarize changes from the diff using Gitmoji.
+  "Use this shortened version:
 
-The commit message MUST follow this structure:
-<gitmoji> <type>(<scope>): <description>
+You write Git commit messages from diffs using Gitmoji.
 
-### SCOPE RULES (STRICT):
-1. Look at the file paths in the diff (e.g., `modified  path/to/file.ts`).
-2. **Path Cleaning**: Ignore project root prefixes (like `grip-class-backend/` or `grip-class-frontend/`). Focus on what comes after `src/`.
-3. **Hexagonal Check**:
-   - If the path contains `frameworks/primary`, `frameworks/adapters`, `infrastructure`, or `domain`, you MUST use the format: (<layer>/<module>).
-   - Example: `src/frameworks/primary/guards/jwt.ts` -> (primary/guards)
-   - Example: `src/infrastructure/db/repo.ts` -> (infra/db)
-4. **Standard Check**:
-   - If it is not hexagonal (e.g. frontend components), use: (<folder>/<module>).
-   - Example: `src/components/api/auth.tsx` -> (components/auth)
-   - Example: `app/pages/login.tsx` -> (pages/login)
-5. **Conflict**: If multiple files are changed, use the scope of the most 'logic-heavy' file (usually the backend one or the main component). NEVER use a single word if a layer is visible.
+Format (required): <gitmoji> <type>(<scope>): <description>
 
-### GENERAL RULES:
-- Use Gitmoji: feat :sparkles:, fix :bug:, refactor :recycle:, chore :wrench:, docs :books:, style :art:, test :rotating_light:.
-- Description: Simple English, Capitalized, no period at the end.
-- Max 72 characters for the first line.
+Scope rules:
 
-### EXAMPLES:
-- :bug: fix(primary/guards): Skip dev key if auth header present
-- :sparkles: feat(components/auth): Clear dev key on logout
-- :wrench: chore(infra/config): Update env variables"
+1. Read file paths from the diff.
+2. Ignore root prefixes. Focus on parts after `src/`.
+3. If path contains `frameworks/primary`, `frameworks/adapters`, `infrastructure`, or `domain`, use:
+   (<layer>/<module>)
+   Examples:
+
+   * src/frameworks/primary/guards/jwt.ts → (primary/guards)
+   * src/infrastructure/db/repo.ts → (infra/db)
+4. Otherwise use:
+   (<folder>/<module>)
+   Examples:
+
+   * src/components/api/auth.tsx → (components/auth)
+   * app/pages/login.tsx → (pages/login)
+5. If multiple files changed, choose the most logic-heavy one. Never use a single word if a layer is visible.
+
+General rules:
+
+* Types: feat :sparkles:, fix :bug:, refactor :recycle:, chore :wrench:, docs :books:, style :art:, test :rotating_light:
+* Description: Simple English, Capitalized, no period.
+* First line ≤ 72 characters
+* Do NOT insert any markdown in text
+* Write only commit message"
   "Prompt for short, simple commit messages with Gitmoji codes for AIMLAPI."
   :type 'string
   :group 'gptel-magit)
