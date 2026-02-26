@@ -10,35 +10,8 @@
   :hook
   (prog-mode . smerge-mode))
 
-(use-package gptel-watch
-  :straight (:host github :repo "ISouthRain/gptel-watch" :branch "master")
-  :after gptel
-  :config
-  (gptel-watch-global-mode 1))
-
-(use-package gptel-quick
-  :straight (:host github :repo "karthink/gptel-quick" :branch "master")
-  :bind (("C-c TAB" . gptel-quick))
-  :custom
-  (gptel-quick-word-count 20)
-  (gptel-quick-use-context t)
-  (gptel-quick-model 'gpt-4o)
-  :config
-  (setq gptel-quick-backend (gptel-get-backend "ChatGPT")))
-
-(use-package gptel-autocomplete
-  :straight (:host github :repo "JDNdeveloper/gptel-autocomplete" :branch "main")
-  ;; :demand t
-  :init
-  (setq gptel-autocomplete-before-context-lines 100
-        gptel-autocomplete-after-context-lines 20
-        gptel-autocomplete-temperature 0.1
-        gptel-autocomplete-use-context t)
-  :bind (("C-c TAB" . gptel-complete)))
-
-(use-package llm-tool-collection
-  :straight (:host github :repo "skissue/llm-tool-collection" :branch "main")
-  :demand t)
+;; (use-package llm
+;;   :straight t)
 
 (use-package gptel
   ;; :straight (:host github :repo "karthink/gptel" :branch "master")
@@ -47,23 +20,25 @@
   :init
   (setq gptel-verbose t
         gptel-max-tokens 8024
-        gptel-temperature 0.7
+        ;; gptel-temperature 0.7
         gptel-api-key (getenv "AIML_API")
         gptel-include-reasoning nil
         gptel-track-media t
         gptel-confirm-tool-calls t
         gptel-model 'openai/gpt-5-2)
+  ;; gptel-backend (gptel-get-backend "Local-Ollama")
+  ;; gptel-model 'qwen2.5-coder:7b)
   :config
-  (mapcar (apply-partially #'apply #'gptel-make-tool)
-          (llm-tool-collection-get-all))
+  ;; (mapcar (apply-partially #'apply #'gptel-make-tool)
+  ;;         (llm-tool-collection-get-all))
 
-  (gptel-make-openai "OpenSearch"
-    :host "openrouter.ai"
-    :endpoint "/api/v1/chat/completions"
-    :stream t
-    :key "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"
-    :models '(deepseek/deepseek-r1-0528:free
-              tngtech/deepseek-r1t2-chimera:free))
+  ;; (gptel-make-openai "OpenSearch"
+  ;;   :host "openrouter.ai"
+  ;;   :endpoint "/api/v1/chat/completions"
+  ;;   :stream t
+  ;;   :key "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"
+  ;;   :models '(deepseek/deepseek-r1-0528:free
+  ;;             tngtech/deepseek-r1t2-chimera:free))
 
   (gptel-make-openai "ChatGPT"
     :host "api.aimlapi.com"
@@ -86,19 +61,19 @@
     :key gptel-api-key
     :models '(google/gemini-3-pro-preview))
 
-  (gptel-make-openai "Nvidia"
-    :host "api.aimlapi.com"
-    :endpoint "/chat/completions"
-    :stream t
-    :key gptel-api-key
-    :models '(nvidia/nemotron-nano-9b-v2))
+  ;; (gptel-make-openai "Nvidia"
+  ;;   :host "api.aimlapi.com"
+  ;;   :endpoint "/chat/completions"
+  ;;   :stream t
+  ;;   :key gptel-api-key
+  ;;   :models '(nvidia/nemotron-nano-9b-v2))
 
-  (gptel-make-openai "Anthropic"
-    :host "api.aimlapi.com"
-    :endpoint "/chat/completions"
-    :stream t
-    :key gptel-api-key
-    :models '(anthropic/claude-opus-4-5 anthropic/claude-haiku-4.5))
+  ;; (gptel-make-openai "Anthropic"
+  ;;   :host "api.aimlapi.com"
+  ;;   :endpoint "/chat/completions"
+  ;;   :stream t
+  ;;   :key gptel-api-key
+  ;;   :models '(anthropic/claude-opus-4-5 anthropic/claude-haiku-4.5))
 
   (gptel-make-openai "Search Models"
     :host "api.aimlapi.com"
@@ -110,7 +85,7 @@
   (gptel-make-ollama "Ollama"
     :host "localhost:11434"
     :stream t
-    :models '(deepseek-coder:6.7b gpt-oss:20b qwen3-coder:30b))
+    :models '(deepseek-coder:6.7b gpt-oss:20b qwen2.5-coder:7b qwen3:4b qwen3:0.6b qwen3-coder:30b))
 
   (gptel-make-preset 'gpt4coding
     :description "A preset optimized for coding tasks"
@@ -157,9 +132,9 @@ Follow in the strict order:
    :name "read_buffer"
    :function (lambda (buffer)
                (unless (buffer-live-p (get-buffer buffer))
-                 (error "error: buffer %s is not live." buffer))
+		 (error "error: buffer %s is not live." buffer))
                (with-current-buffer buffer
-                 (buffer-substring-no-properties (point-min) (point-max))))
+		 (buffer-substring-no-properties (point-min) (point-max))))
    :description "return the contents of an emacs buffer"
    :args (list '(:name "buffer"
                        :type string
@@ -173,11 +148,41 @@ Follow in the strict order:
     :system "You generate commit messages based on the given diff")
 
   :bind (("M-s M-d" . gptel-context-add)
-         ("M-s M-f" . gptel-add-file)
-         ("M-s M-a" . gptel-menu)
-         ("M-s M-r" . gptel--regenerate)
-         ("M-s M-e" . gptel-rewrite)
-         ("M-s M-s" . gptel)))
+	 ("M-s M-f" . gptel-add-file)
+	 ("M-s M-a" . gptel-menu)
+	 ("M-s M-r" . gptel--regenerate)
+	 ("M-s M-e" . gptel-rewrite)
+	 ("M-s M-s" . gptel)))
+
+(use-package gptel-watch
+  :straight (:host github :repo "ISouthRain/gptel-watch" :branch "master")
+  :after gptel
+  :config
+  (gptel-watch-global-mode 1))
+
+(use-package gptel-quick
+  :straight (:host github :repo "karthink/gptel-quick" :branch "master")
+  :bind (("C-c TAB" . gptel-quick))
+  :custom
+  (gptel-quick-word-count 20)
+  (gptel-quick-use-context t)
+  (gptel-quick-model 'gpt-4o)
+  :config
+  (setq gptel-quick-backend (gptel-get-backend "ChatGPT")))
+
+(use-package gptel-autocomplete
+  :straight (:host github :repo "JDNdeveloper/gptel-autocomplete" :branch "main")
+  ;; :demand t
+  :init
+  (setq gptel-autocomplete-before-context-lines 100
+        gptel-autocomplete-after-context-lines 20
+        gptel-autocomplete-temperature 0.1
+        gptel-autocomplete-use-context t)
+  :bind (("C-c TAB" . gptel-complete)))
+
+(use-package llm-tool-collection
+  :straight (:host github :repo "skissue/llm-tool-collection" :branch "main")
+  :demand t)
 
 (use-package gptel-aibo
   :straight t
@@ -207,69 +212,45 @@ Follow in the strict order:
 
 (use-package gptel-magit
   :load-path "~/.emacs.d/lisp/packages/"
+  ;; :straight t
   :after (gptel magit)
-  :init
-  (setq gptel-magit-model 'qwen3-coder:30b)
+  ;; :init
+  ;; (setq gptel-magit-model 'qwen3:3b)
   :config
   (gptel-magit-install)
+  (setq gptel-magit-commit-prompt "Use this shortened version:
+
+You write Git commit messages from diffs using Gitmoji.
+
+Format (required): <gitmoji> <type>(<scope>): <description>
+
+Scope rules:
+
+1. Read file paths from the diff.
+2. Ignore root prefixes. Focus on parts after `src/`.
+3. If path contains `frameworks/primary`, `frameworks/adapters`, `infrastructure`, or `domain`, use:
+   (<layer>/<module>)
+   Examples:
+
+   * src/frameworks/primary/guards/jwt.ts → (primary/guards)
+   * src/infrastructure/db/repo.ts → (infra/db)
+4. Otherwise use:
+   (<folder>/<module>)
+   Examples:
+
+   * src/components/api/auth.tsx → (components/auth)
+   * app/pages/login.tsx → (pages/login)
+5. If multiple files changed, choose the most logic-heavy one. Never use a single word if a layer is visible.
+
+General rules:
+
+* Types: feat :sparkles:, fix :bug:, refactor :recycle:, chore :wrench:, docs :books:, style :art:, test :rotating_light:
+* Description: Simple English, Capitalized, no period.
+* First line ≤ 72 characters.")
   :bind (:map git-commit-mode-map
               ("M-g" . gptel-magit-generate-message))
   :hook
   (magit-mode . gptel-magit-install))
-
-(provide 'ai)
-
-;; (defun create-commit-message ()
-;;   (interactive)
-;;   (gptel-context-add)
-;;   (gptel--apply-preset 'commit-message)
-;;   (gptel-send))
-
-;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp/packages/gptel-manual-complete"))
-;; (autoload #'gptel-manual-complete "gptel-manual-complete" t)
-
-
-;; (defvar my-xref-map
-;;   (let ((map (make-sparse-keymap)))
-;;     (define-key map (kbd "c") #'gptel-manual-complete)
-;;     (define-key map (kbd ".") #'xref-find-definitions)
-;;     (define-key map (kbd ",") #'xref-go-back)
-;;     (define-key map (kbd "/") #'xref-find-references)
-;;     map)
-;;   "My key customizations for AI and xref.")
-
-;; (global-set-key (kbd "C-c .") my-xref-map)
-
-;; ;; ;; Gptel-magit: Load for git commit integration
-;; ;; (use-package gptel-magit
-;; ;;   :load-path "~/.emacs.d/lisp/packages/"
-;; ;;   :after (gptel magit)
-;; ;;   :init
-;; ;;   (setq gptel-api-key (getenv "AIML_API")
-;; ;;         gptel-magit-model 'gpt-oss:20b)
-;; ;;   (setq gptel-magit-backend 'ollama)
-;; ;;   (setq gptel-magit-model "qwen2.5-coder:7b")
-;; ;;   (setq gptel-magit-ollama-host "http://localhost:11434")
-
-;; ;;         ;; gptel-magit-model 'gpt-4o)
-;; ;;   :config
-;; ;;   (gptel-magit-install)
-;; ;;   :bind (:map git-commit-mode-map
-;; ;;               ("M-g" . gptel-magit-generate-message))
-;; ;;   :hook
-;; ;;   (magit-mode . gptel-magit-install))
-
-;; (use-package gptel-magit
-;;   :load-path "~/.emacs.d/lisp/packages/"
-;;   :after (gptel magit)
-;;   :init
-;;   (setq gptel-magit-model 'grok-4-1-fast-reasoning)
-;;   :config
-;;   (gptel-magit-install)
-;;   :bind (:map git-commit-mode-map
-;;               ("M-g" . gptel-magit-generate-message))
-;;   :hook
-;;   (magit-mode . gptel-magit-install))
 
 (provide 'ai)
 
