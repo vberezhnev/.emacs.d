@@ -166,6 +166,11 @@
   :commands (multi-vterm)
   :defer t)
 
+(use-package auth-source
+  :straight t
+  :no-require t
+  :config (setq auth-sources '("~/.authinfo")))
+
 ;; Bluetooth: Load on demand for bluetooth commands
 (use-package bluetooth
   :straight t
@@ -686,12 +691,12 @@
               :filter-args
               #'+rime--posframe-display-content-a))
 
-(use-package activity-watch-mode
-  :straight (activity-watch-mode :type git
-				 :host github
-				 :repo "pauldub/activity-watch-mode")
-  :init
-  (global-activity-watch-mode))
+;; (use-package activity-watch-mode
+;;   :straight (activity-watch-mode :type git
+;; 				 :host github
+;; 				 :repo "pauldub/activity-watch-mode")
+;;   :init
+;;   (global-activity-watch-mode))
 
 (defun my/toggle-highlight-line-or-region ()
   "Toggle подсветку текущей строки или активного региона.
@@ -724,7 +729,6 @@
 (load-file "~/.emacs.d/lisp/evil.el")
 (load-file "~/.emacs.d/lisp/appereance.el")
 
-(load-file "~/.emacs.d/lisp/ai.el")
 (load-file "~/.emacs.d/lisp/git.el")
 (load-file "~/.emacs.d/lisp/dired.el")
 (load-file "~/.emacs.d/lisp/org/org.el")
@@ -739,9 +743,50 @@
 
 (load-file "~/.emacs.d/lisp/enlight.el")
 (load-file "~/.emacs.d/lisp/grammar.el")
+(load-file "~/.emacs.d/lisp/ai.el")
 
 (add-hook 'after-init-hook '(lambda () (enlight)))
 (add-hook 'after-init-hook '(lambda () (org-agenda-list 1)))
+
+(use-package org-jira
+  :straight t
+  :init
+  (setq jiralib-url "https://unloqsharing.atlassian.net"
+        org-jira-working-dir "~/Org/agenda/GTD"
+        org-jira-worklog-sync-p nil)
+  :config
+  (setq org-jira-project-filename-alist '(("SCRUM" . "org-gtd-tasks")))
+  (setq org-jira-download-comments t) 
+
+  (defun org-jira-get-issue-file (&rest _)
+    (expand-file-name "org-gtd-tasks.org" org-jira-working-dir))
+  
+  (defun org-jira-get-org-file-name (&rest _)
+    "org-gtd-tasks")
+
+  (setq org-jira-custom-jqls
+        '((:jql "project = 'SCRUM' AND status != 'Done'"
+           :limit 50
+           :filename "org-gtd-tasks")))
+
+  (message "Punk-Patch: Total Lockdown Active"))
+
+(use-package origami
+  :straight t
+  :hook (prog-mode . origami-mode)
+  :config
+  (general-define-key
+   :states 'normal
+   :keymaps 'origami-mode-map
+   "za" 'origami-toggle-node
+   "zo" 'origami-open-node
+   "zc" 'origami-close-node
+   "zO" 'origami-open-all-nodes
+   "zM" 'origami-close-all-nodes))
+
+;; (use-package treesit-fold
+;;   :straight t
+;;   :hook (rust-mode . ts-fold-mode))
 
 (provide 'init)
 ;; init.el ends here
