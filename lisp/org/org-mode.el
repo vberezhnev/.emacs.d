@@ -55,6 +55,7 @@
           ("@thinking"   . ?t)
           ("@planning"   . ?p)
           ("@research"   . ?s)
+          ("@chinese"     . ?H)
           (:endgroup)
 
           ("@interviewing" . ?i)
@@ -69,8 +70,7 @@
           ("philosophy"  . ?P)
           ("math"        . ?M)
           ("psychology"  . ?Y)
-          ("productivity". ?U)
-          ("chinese"     . ?H))
+          ("productivity". ?U))
 	)
   :config
   (with-eval-after-load 'org
@@ -274,6 +274,7 @@
         org-modern-statistics t
         org-modern-table t
         org-modern-tag-faces (quote (("@coding"      :background "#00BFFF" :foreground "#000000")
+				     ("@chinese"      :background "#FF3030" :foreground "#FFFFFF")
 				     ("@reading"     :background "#8FBC8F" :foreground "#000000")
 				     ("@video"       :background "#FF8C00" :foreground "#000000")
 				     ("@writing"     :background "#FFD700" :foreground "#000000")
@@ -291,8 +292,7 @@
 				     ("philosophy"   :background "#9370DB" :foreground "#FFFFFF")
 				     ("math"         :background "#4682B4" :foreground "#FFFFFF")
 				     ("psychology"   :background "#FF69B4" :foreground "#000000")
-				     ("productivity" :background "#32CD32" :foreground "#000000")
-				     ("chinese"      :background "#FF3030" :foreground "#FFFFFF")))
+				     ("productivity" :background "#32CD32" :foreground "#000000")))
         org-modern-horizontal-rule "──────────────────────────────────────────────────────────────────────────────────────────"
         org-modern-hide-stars " "
         org-modern-keyword "‣"))
