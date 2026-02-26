@@ -58,6 +58,7 @@
 
 ;; Custom file and other settings (unchanged)
 (setq custom-file (concat user-emacs-directory "custom.el")
+      truncate-lines t
       mouse-yank-at-point t
       backup-by-copying t
       version-control t
