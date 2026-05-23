@@ -419,3 +419,98 @@
 :END:
 
 Адаптер -- конкретная реализация портов
+
+* 505852
+:PROPERTIES:
+:org-remark-file: habr.com/ru/companies/otus/articles/505852/
+:END:
+** GRASP'овские паттерны являются обобщением GoF'овских паттернов, а также непосредственным следствием принципов ООП. Они дополняют недостающую ступеньку в логической лестнице, которая позволяет получить GoF'овские паттерны из принципов ООП. 
+:PROPERTIES:
+:org-remark-id: c1e65c7f
+:org-remark-label: nil
+:org-remark-beg: 931
+:org-remark-end: 1170
+:org-remark-link: [[https://habr.com/ru/companies/otus/articles/505852/]]
+:org-remark-original-text: GRASP'овские паттерны являются обобщением GoF'овских паттернов, а также непосредственным следствием принципов ООП. Они дополняют недостающую ступеньку в логической лестнице, которая позволяет получить GoF'овские паттерны из принципов ООП.
+:END:
+
+** Полный список шаблонов GRASP состоит из 9 элементов:  * Information Expert * Creator * Controller * Low Coupling  * High Cohesion  * Polymorphism  * Pure Fabrication * Indirection * Protected Variations
+:PROPERTIES:
+:org-remark-id: 6ffbcb1e
+:org-remark-label: nil
+:org-remark-beg: 1538
+:org-remark-end: 1740
+:org-remark-link: [[https://habr.com/ru/companies/otus/articles/505852/]]
+:org-remark-original-text: Полный список шаблонов GRASP состоит из 9 элементов:  * Information Expert * Creator * Controller * Low Coupling  * High Cohesion  * Polymorphism  * Pure Fabrication * Indirection * Protected Variations
+:END:
+
+** Low Coupling  Формулировка  Необходимо распределить ответственности между классами так, чтобы обеспечить минимальную связанность.
+:PROPERTIES:
+:org-remark-id: ec16871b
+:org-remark-label: nil
+:org-remark-beg: 2144
+:org-remark-end: 2273
+:org-remark-link: [[https://habr.com/ru/companies/otus/articles/505852/]]
+:org-remark-original-text: Low Coupling  Формулировка  Необходимо распределить ответственности между классами так, чтобы обеспечить минимальную связанность.
+:END:
+
+** Чем меньше связей между классами — тем лучше, вот о чем говорит нам принцип Low Coupling.
+:PROPERTIES:
+:org-remark-id: 49c47273
+:org-remark-label: nil
+:org-remark-beg: 2988
+:org-remark-end: 3077
+:org-remark-link: [[https://habr.com/ru/companies/otus/articles/505852/]]
+:org-remark-original-text: Чем меньше связей между классами — тем лучше, вот о чем говорит нам принцип Low Coupling.
+:END:
+
+** Принцип High Cohesion говорит нам следующее: классы должны содержать связанную бизнес — логику.
+:PROPERTIES:
+:org-remark-id: a18ce884
+:org-remark-label: nil
+:org-remark-beg: 3625
+:org-remark-end: 3720
+:org-remark-link: [[https://habr.com/ru/companies/otus/articles/505852/]]
+:org-remark-original-text: Принцип High Cohesion говорит нам следующее: классы должны содержать связанную бизнес — логику.
+:END:
+
+Если исключить этот принцип, следуя только принципу Low Coupling, тогда можно придти к выводу, что всё нужно размещать в одном классе (ибо так связей между классами не будет вообще). Как итог:
+
++ делать меньше связей между классами, чтобы они могли использоваться по отдельности
++ выделять отдельные классы на основе бизнес-логики
+** Если проводить параллели с принципами SOLID, то класс нарушает SRP: через него проходят две оси изменения.
+:PROPERTIES:
+:org-remark-id: 91a62ce7
+:org-remark-label: nil
+:org-remark-beg: 4432
+:org-remark-end: 4538
+:org-remark-link: [[https://habr.com/ru/companies/otus/articles/505852/]]
+:org-remark-original-text: Если проводить параллели с принципами SOLID, то класс нарушает SRP: через него проходят две оси изменения.
+:END:
+
+High cohesion (высокая сплоченность) очень похож на Single Responsibility Princip тем, что требует дробить один класс на два других, если внутри него есть поля/методы, которые не связаны друг с другом напрямую в высокой степени.
+
+* dependency-injection-in-nestjs-a-comprehensive-guide-with-examples-ea0fe4be1256
+:PROPERTIES:
+:org-remark-file: freedium-mirror.cfd/https:/medium.com/@Abdelrahman_Rezk/dependency-injection-in-nestjs-a-comprehensive-guide-with-examples-ea0fe4be1256
+:END:
+
+** Dependency Injection involves the process of supplying a class with its dependencies from external sources rather than creating them internally.
+:PROPERTIES:
+:org-remark-id: c278f0e2
+:org-remark-label: nil
+:org-remark-beg: 1031
+:org-remark-end: 1175
+:org-remark-link: [[https://freedium-mirror.cfd/https:/medium.com/@Abdelrahman_Rezk/dependency-injection-in-nestjs-a-comprehensive-guide-with-examples-ea0fe4be1256]]
+:org-remark-original-text: Dependency Injection involves the process of supplying a class with its dependencies from external sources rather than creating them internally.
+:END:
+
+** 1. Singleton Services: By default, NestJS services are singletons. This means that a single instance of the service is created and shared across the application. This approach avoids the overhead of creating multiple instances of the same service, reducing memory consumption.
+:PROPERTIES:
+:org-remark-id: d1a67cb8
+:org-remark-label: nil
+:org-remark-beg: 5000
+:org-remark-end: 5276
+:org-remark-link: [[https://freedium-mirror.cfd/https:/medium.com/@Abdelrahman_Rezk/dependency-injection-in-nestjs-a-comprehensive-guide-with-examples-ea0fe4be1256]]
+:org-remark-original-text: 1. Singleton Services: By default, NestJS services are singletons. This means that a single instance of the service is created and shared across the application. This approach avoids the overhead of creating multiple instances of the same service, reducing memory consumption.
+:END:

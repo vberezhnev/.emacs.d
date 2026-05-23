@@ -86,6 +86,9 @@
               ("C-c a" . org-agenda))
   :init
   (setq org-agenda-start-on-weekday 1
+	calendar-latitude 39.13
+	calendar-longitude 117.20
+	calendar-location-name "Tianjin, China"
         org-agenda-skip-scheduled-if-done nil
         org-agenda-skip-deadline-if-done t
         org-agenda-include-deadlines t

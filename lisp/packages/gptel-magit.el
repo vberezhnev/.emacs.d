@@ -20,9 +20,7 @@
 (require 'json)
 
 (defcustom gptel-magit-commit-prompt
-  "Use this shortened version:
-
-You write Git commit messages from diffs using Gitmoji.
+  "You write Git commit messages from diffs using Gitmoji.
 
 Format (required): <gitmoji> <type>(<scope>): <description>
 
@@ -55,7 +53,7 @@ General rules:
   :type 'string
   :group 'gptel-magit)
 
-(defcustom gptel-magit-model "hoangquan456/qwen3-nothink:4b" ; Указываем твою модель
+(defcustom gptel-magit-model "hoangquan456/qwen3-nothink:8b" 
   "The model to use for Ollama."
   :type 'string
   :group 'gptel-magit)

@@ -6,11 +6,16 @@
 (setq gc-cons-threshold 200000000)
 
 (require 'package)
-(setq package-archives
-      '(("myelpa" . "~/.myelpa/")
-	("melpa" . "http://1.15.88.122/melpa/packages/")
-	("gnu"   . "http://1.15.88.122/gnu/")
-	("nongnu" . "http://1.15.88.122/gnu/nongnu/")))
+;; (setq package-archives
+;;       '(("myelpa" . "~/.myelpa/")
+;; 	("melpa" . "http://1.15.88.122/melpa/packages/")
+;; 	("gnu"   . "http://1.15.88.122/gnu/")
+;; 	("nongnu" . "http://1.15.88.122/gnu/nongnu/")))
+(setq package-archive-priorities '(("gnu" . 10)
+                                   ("melpa" . 5))
+      package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://stable.melpa.org/packages/")
+                         ("melpa-devel" . "https://melpa.org/packages/")))
 
 ;; Straight.el bootstrap (unchanged, as it’s required early)
 (defvar bootstrap-version)
@@ -42,8 +47,8 @@
 (setq use-package-always-ensure t) ;; Don’t auto-install unless :straight t
 (setq use-package-always-defer nil)   ;; Default to deferring all packages
 
-(set-frame-parameter (selected-frame) 'alpha '(85 . 50))
-(add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+(set-frame-parameter (selected-frame) 'alpha '(85 . 80))
+(add-to-list 'default-frame-alist '(alpha . (85 . 80)))
 
 ;; Other settings (unchanged, but included for context)
 (server-start)
@@ -235,12 +240,13 @@
   (add-hook 'telega-chat-mode-hook #'olivetti-mode)
   (add-hook 'eww-mode-hook #'olivetti-mode)
   (add-hook 'nov-mode-hook #'olivetti-mode)
+  ;; (add-hook 'eww-mode-hook #'eww-mode)
   ;; (add-hook 'elfeed-show-mode-hook #'olivetti-mode)
   ;; (add-hook 'elfeed-search-mode-hook #'olivetti-mode)
 
+  (add-hook 'eww-mode-hook (lambda () (setq olivetti-body-width 120)))
+  (add-hook 'eww-buffers-mode-hook (lambda () (setq olivetti-body-width 120)))
   (add-hook 'chess-game-hooks (lambda () (setq olivetti-body-width 90)))
-  (add-hook 'eww-mode-hook (lambda () (setq olivetti-body-width 80)))
-  (add-hook 'eww-buffers-mode-hook (lambda () (setq olivetti-body-width 80)))
   (add-hook 'nov-mode-hook (lambda () (setq olivetti-body-width 90)))
 
   (add-hook 'prog-mode-hook (lambda () (setq olivetti-body-width 130)))
@@ -271,78 +277,78 @@
 ;; (use-package alert
 ;;   :straight t) ;; dep for telega-alert
 
-;; (use-package telega
-;;   :straight (:host github :repo "zevlg/telega.el" :branch "master")
-;;   :config
+(use-package telega
+  :straight (:host github :repo "zevlg/telega.el" :branch "master")
+  :config
 
-;;   (add-hook 'after-init-hook 'telega-notifications-mode)
+  (add-hook 'after-init-hook 'telega-notifications-mode)
 
-;;   (setq telega-use-docker t)
-;;   (add-hook 'telega-root-mode-hook
-;;             (lambda ()
-;;               (hl-line-mode 1)  ;; Включить hl-line-mode
-;;               (evil-local-mode -1)  ;; Отключить evil-mode
-;;               (telega-view-two-lines)))  ;; Двухстрочный вид
-;;   (add-hook 'telega-chat-mode-hook
-;;             (lambda ()
-;; 	      ;; (company-mode 1)
-;; 	      ;; (telega-company-emoji 1)
-;; 	      ;; (telega-company-username t)
-;;               (hl-line-mode 1)  ;; Включить hl-line-mode
-;;               (evil-local-mode -1)))  ;; Отключить evil-mode
-;;   ;; Стилизация под Telegram Desktop (тёмная тема)
-;;   (set-face-attribute 'telega-box-button nil
-;;                       :background "#17212B"
-;;                       :foreground "#E1E1E1"
-;;                       :height 1.4
-;;                       :box nil)
-;;   (set-face-attribute 'telega-box-button-active nil
-;;                       :background "#2B3744"
-;;                       :foreground "#FFFFFF"
-;;                       :height 1.4
-;;                       :box nil)
-;;   (set-face-attribute 'telega-root-heading nil
-;;                       :background "#17212B"
-;;                       :foreground "#4B8EFF"
-;;                       :height 1.4
-;;                       ;; :weight bold
-;; 		      )
-;;   ;; (set-face-attribute 'default nil
-;;   ;;                     :background "#17212B"
-;;   ;;                     :foreground "#E1E1E1")
-;;   ;; (set-face-attribute 'hl-line nil
-;;   ;;                     :background "#2B3744"
-;;   ;;                     :foreground nil
-;;   ;;                     :inherit nil)
-;;   (set-fontset-font t 'emoji "Noto Color Emoji" nil 'prepend)
-;;   ;; Кастомное лицо для иконок
-;;   (defface telega-icon
-;;     '((t :family "Noto Color Emoji" :height 1.6 :foreground "#E1E1E1"))
-;;     "Face for icons in telega root buffer.")
-;;   (defun telega-custom-icon-inserter (icon)
-;;     "Insert ICON with telega-icon face."
-;;     (propertize icon 'face 'telega-icon))
-;;   (setq telega-folder-icons-alist
-;;         `(("Channels" . ,(telega-custom-icon-inserter "🔊"))
-;;           ("Groups" . ,(telega-custom-icon-inserter "👪"))
-;;           ("Private" . ,(telega-custom-icon-inserter "🙋"))
-;;           ("Main" . ,(telega-custom-icon-inserter "📢"))))
-;;   (setq telega-root-fill-column 110)
-;;   (setq telega-root-auto-fill-mode nil)
-;;   (setq face-font-rescale-alist nil)
-;;   (setq telega-auto-download-mode t)
-;;   (setq telega-emoji-use-images nil)
-;;   ;; (add-hook 'telega-load-hook 'global-telega-url-shorted-)
+  (setq telega-use-docker t)
+  (add-hook 'telega-root-mode-hook
+            (lambda ()
+              (hl-line-mode 1)  ;; Включить hl-line-mode
+              (evil-local-mode -1)  ;; Отключить evil-mode
+              (telega-view-two-lines)))  ;; Двухстрочный вид
+  (add-hook 'telega-chat-mode-hook
+            (lambda ()
+	      ;; (company-mode 1)
+	      ;; (telega-company-emoji 1)
+	      ;; (telega-company-username t)
+              (hl-line-mode 1)  ;; Включить hl-line-mode
+              (evil-local-mode -1)))  ;; Отключить evil-mode
+  ;; Стилизация под Telegram Desktop (тёмная тема)
+  (set-face-attribute 'telega-box-button nil
+                      :background "#17212B"
+                      :foreground "#E1E1E1"
+                      :height 1.4
+                      :box nil)
+  (set-face-attribute 'telega-box-button-active nil
+                      :background "#2B3744"
+                      :foreground "#FFFFFF"
+                      :height 1.4
+                      :box nil)
+  (set-face-attribute 'telega-root-heading nil
+                      :background "#17212B"
+                      :foreground "#4B8EFF"
+                      :height 1.4
+                      ;; :weight bold
+		      )
+  ;; (set-face-attribute 'default nil
+  ;;                     :background "#17212B"
+  ;;                     :foreground "#E1E1E1")
+  ;; (set-face-attribute 'hl-line nil
+  ;;                     :background "#2B3744"
+  ;;                     :foreground nil
+  ;;                     :inherit nil)
+  (set-fontset-font t 'emoji "Noto Color Emoji" nil 'prepend)
+  ;; Кастомное лицо для иконок
+  (defface telega-icon
+    '((t :family "Noto Color Emoji" :height 1.6 :foreground "#E1E1E1"))
+    "Face for icons in telega root buffer.")
+  (defun telega-custom-icon-inserter (icon)
+    "Insert ICON with telega-icon face."
+    (propertize icon 'face 'telega-icon))
+  (setq telega-folder-icons-alist
+        `(("Channels" . ,(telega-custom-icon-inserter "🔊"))
+          ("Groups" . ,(telega-custom-icon-inserter "👪"))
+          ("Private" . ,(telega-custom-icon-inserter "🙋"))
+          ("Main" . ,(telega-custom-icon-inserter "📢"))))
+  (setq telega-root-fill-column 110)
+  (setq telega-root-auto-fill-mode nil)
+  (setq face-font-rescale-alist nil)
+  (setq telega-auto-download-mode t)
+  (setq telega-emoji-use-images nil)
+  ;; (add-hook 'telega-load-hook 'global-telega-url-shorted-)
 
-;;   (with-eval-after-load 'telega
-;;     (load-file "~/.emacs.d/lisp/packages/telega/telega-alert.el")
-;;     (load-file "~/.emacs.d/lisp/packages/telega/telega-emacs-stories.el")
-;;     (load-file "~/.emacs.d/lisp/packages/telega/telega-url-shorten.el"))
-;;   (require 'telega-emacs-stories)
-;;   (require 'telega-alert)
-;;   (telega-emacs-stories-mode 1)
-;;   (define-key telega-root-mode-map (kbd "v e") 'telega-view-emacs-stories)
-;;   (telega-alert-mode 1))
+  (with-eval-after-load 'telega
+    (load-file "~/.emacs.d/lisp/packages/telega/telega-alert.el")
+    (load-file "~/.emacs.d/lisp/packages/telega/telega-emacs-stories.el")
+    (load-file "~/.emacs.d/lisp/packages/telega/telega-url-shorten.el"))
+  (require 'telega-emacs-stories)
+  (require 'telega-alert)
+  (telega-emacs-stories-mode 1)
+  (define-key telega-root-mode-map (kbd "v e") 'telega-view-emacs-stories)
+  (telega-alert-mode 1))
 
 (use-package ace-link
   :config
@@ -756,18 +762,18 @@
         org-jira-worklog-sync-p nil)
   :config
   (setq org-jira-project-filename-alist '(("SCRUM" . "org-gtd-tasks")))
-  (setq org-jira-download-comments t) 
+  (setq org-jira-download-comments t)
 
   (defun org-jira-get-issue-file (&rest _)
     (expand-file-name "org-gtd-tasks.org" org-jira-working-dir))
-  
+
   (defun org-jira-get-org-file-name (&rest _)
     "org-gtd-tasks")
 
   (setq org-jira-custom-jqls
         '((:jql "project = 'SCRUM' AND status != 'Done'"
-           :limit 50
-           :filename "org-gtd-tasks")))
+		:limit 50
+		:filename "org-gtd-tasks")))
 
   (message "Punk-Patch: Total Lockdown Active"))
 
@@ -783,6 +789,17 @@
    "zc" 'origami-close-node
    "zO" 'origami-open-all-nodes
    "zM" 'origami-close-all-nodes))
+
+(use-package neoscroll
+  :straight (:type git :host github :repo "0WD0/neoscroll.el")
+  :config
+  ;; (setq neoscroll-easing 'quadratic)
+  ;; (setq neoscroll-scroll-duration 0.25)
+  ;; (setq neoscroll-page-duration 0.25)
+  ;; (setq neoscroll-line-duration 0.025)
+  ;; (setq neoscroll-line-step 3)
+
+  (neoscroll-mode 1))
 
 ;; (use-package treesit-fold
 ;;   :straight t
